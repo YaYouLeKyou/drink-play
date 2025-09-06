@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Never Have I Ever - Hot Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="top-bar">
+        <button id="lang-menu-button" class="styled-button" data-i18n-key="languages">Languages</button>
+    </div>
+    <div class="container">
+        <div class="card">
+            <div class="spicy-title" data-i18n-key="super_spicy">Super Spicy 🌶️</div>
+            <p id="question-text">Never have I ever...</p>
+        </div>
+        <div id="choices" class="hidden">
+            <span class="drink-text" data-i18n-key="drink_or">Truth, drink or</span>
+            <button id="do-button" class="styled-button" data-i18n-key="do">Do</button>
+        </div>
+        <button id="next-question" class="styled-button" data-i18n-key="next_question">Next Question</button>
+    </div>
+
+    <div id="action-modal" class="modal hidden">
+        <div class="modal-content">
+            <p id="action-text"></p>
+            <button id="close-modal" class="styled-button" data-i18n-key="close">Close</button>
+        </div>
+    </div>
+
+    <div id="lang-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="lang-select styled-button" data-lang="en">English</button>
+            <button class="lang-select styled-button" data-lang="fr">Français</button>
+            <button class="lang-select styled-button" data-lang="es">Español</button>
+            <button class="lang-select styled-button" data-lang="ar">العربية</button>
+            <button class="lang-select styled-button" data-lang="zh">中文</button>
+            <button id="close-lang-modal" class="styled-button">Close</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

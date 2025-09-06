@@ -1,0 +1,62 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
+body {
+ 
+  margin: 0;
+  text-align: center;
+  font-family: "Press Start 2P", cursive;
+  user-select: none;
+  background-color: black;
+  background-image: url("media/gameboy1.jpg");
+ 
+  background-size: 80vh;
+  background-attachment:fixed;
+  background-repeat: no-repeat;
+  background-position: center;
+  justify-content: center;
+  background-position: top;
+  padding: 50px 0 0 0;
+}
+header {
+  margin: 0 auto;
+  width: 431px;
+}
+h1 {
+  background: url(./media/drunkinalien2.png) 34% -600px;
+  padding: 1.2rem 0;
+  margin: 0;
+}
+.score-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 6px;
+  background: #5ee270;
+}
+.gameboy {
+  background-size: cover;
+}
+canvas{
+
+  position: absolute;
+  top: -4%;
+  left: 50%;
+  transform: translate(-50%,+50%);
+}
+
+/* @media all and (max-width:1150px){
+  body{
+  background-size: cover;
+  }
+  header{
+    position: absolute;
+    top: -1%;
+    left: 50%;
+    transform: translate(-50%);
+  }
+  canvas{
+    top: -12%;
+  }
+} */
+
+
+
