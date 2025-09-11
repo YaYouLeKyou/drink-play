@@ -10,12 +10,12 @@ body {
   background-image: url("media/gameboy1.jpg");
  
   background-size: 80vh;
-  background-attachment:fixed;
   background-repeat: no-repeat;
   background-position: center;
   justify-content: center;
   background-position: top;
   padding: 50px 0 0 0;
+  overflow-x: hidden;
 }
 header {
   margin: 0 auto;
@@ -43,20 +43,27 @@ canvas{
   transform: translate(-50%,+50%);
 }
 
-/* @media all and (max-width:1150px){
+@media all and (max-width:1150px){
   body{
+  background-image: none;
   background-size: cover;
+  background-position: center;
+  background-attachment: scroll;
+  min-height: 100vh;
   }
   header{
     position: absolute;
-    top: -1%;
+    top: 0%;
     left: 50%;
     transform: translate(-50%);
   }
   canvas{
-    top: -12%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    height: auto;
   }
-} */
+}
 
 
 
