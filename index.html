@@ -1,156 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drink & play</title>
-    <link rel="icon" href="icon/Logo d&p.png" type="image/png">
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+  <title>Drunkin' Alien</title>
+
+  <link href="./style.css" rel="stylesheet">
 </head>
+<header>
+  <div>
+  <h1>Drunkin' Alien</h1>
+  <div class="="score-container">
+    <div id="bestScore"></div>
+    <div class="currentScore"></div>
+  </div>
+  
+</header>
 
-<body style="background-image: url(./img/d&p.jpg)">
-    <div class="wrapper">
-        <h1>Drink & Play<br>Party games</h1>
-        <div class="cols">
-            <div class="col" ontouchstart="this.classList.toggle('hover');">
-                <div class="container">
-                    <div class="front" style="background-image: url(./img/slot.png)">
-                        <div class="inner">
-                            <p>Drinking jackpot</p>
-                            <span>Fun and unpredictable party game where every spin brings a surprise, laught, crazy
-                                task or a shot</span>
-                        </div>
-                    </div>
-                    <div class="back">
-                        <div class="inner">
-                            <input type="button" onClick="javascript:window.open('./jackpot/index.html', '_blank');"
-                                value="Play">
-                        </div>
-                    </div>
-                </div>
-            </div>
+<canvas id="canvas" width="431" height="400"></canvas>
 
-            <div class="col" ontouchstart="this.classList.toggle('hover');">
-                <div class="container">
-                    <div class="front" style="background-image: url(./img/gaginator.png)">
-                        <div class="inner">
-                            <p>Gaginator</p>
-                            <span>You have been bewitched by the sorcerer, you are now his puppet. <br>Do it or
-                                drink.</span>
-                        </div>
-                    </div>
-                    <div class="back">
-                        <div class="inner">
-                            <input type="button" onClick="javascript:window.open('./gaginator/index.html', '_blank');"
-                                value="Play">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col" ontouchstart="this.classList.toggle('hover');">
-                <div class="container">
-                    <div class="front" style="background-image: url(./img/juicy.webp)">
-                        <div class="inner">
-                            <p>Never ever</p>
-                            <span>Party game where players reveal funny, embarrassing, or surprising things about
-                                themselves.</span>
-                        </div>
-                    </div>
-                    <div class="back">
-                        <div class="inner">
-                            <input type="button" onClick="javascript:window.open('./never-ever/index.html', '_blank');"
-                                value="Play">
-                        </div>
-                    </div>
-                </div>
-            </div>
+<body>
 
-            <div class="col" ontouchstart="this.classList.toggle('hover');">
-                <div class="container">
-                    <div class="front" style="background-image: url(./img/drunkin-alien2.png)">
-                        <div class="inner">
-                            <p>Drunkin Alien</p>
-                            <span>Flappy Bird has turned into a drunk alien. Get the highest score to prove you’re the
-                                least drunk.</span>
-                        </div>
-                    </div>
-                    <div class="back">
-                        <div class="inner">
-                            <input type="button"
-                                onClick="javascript:window.open('./drunkin-alien-main/index.html', '_blank');"
-                                value="Play">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- <div class="col" ontouchstart="this.classList.toggle('hover');">
-                <div class="container">
-                    <div class="front" style="background-image: url(https://unsplash.it/504/504/);">
-                        <div class="inner">
-                            <p>Rendann</p>
-                            <span>Lorem ipsum</span>
-                        </div>
-                    </div>
-                    <div class="back">
-                        <div class="inner">
-                            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Alias cum repellat velit quae
-                                suscipit c.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col" ontouchstart="this.classList.toggle('hover');">
-                <div class="container">
-                    <div class="front" style="background-image: url(https://unsplash.it/505/505/)">
-                        <div class="inner">
-                            <p>Reflupper</p>
-                            <span>Lorem ipsum</span>
-                        </div>
-                    </div>
-                    <div class="back">
-                        <div class="inner">
-                            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Alias cum repellat velit quae
-                                suscipit c.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col" ontouchstart="this.classList.toggle('hover');">
-                <div class="container">
-                    <div class="front" style="background-image: url(https://unsplash.it/506/506/)">
-                        <div class="inner">
-                            <p>Acirassi</p>
-                            <span>Lorem ipsum</span>
-                        </div>
-                    </div>
-                    <div class="back">
-                        <div class="inner">
-                            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Alias cum repellat velit quae
-                                suscipit c.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col" ontouchstart="this.classList.toggle('hover');">
-                <div class="container">
-                    <div class="front" style="background-image: url(https://unsplash.it/508/508/)">
-                        <div class="inner">
-                            <p>Sohanidd</p>
-                            <span>Lorem ipsum</span>
-                        </div>
-                    </div>
-                    <div class="back">
-                        <div class="inner">
-                            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Alias cum repellat velit quae
-                                suscipit c.</p>
-                        </div>
-                    </div>
-                </div> -->
-        </div>
-    </div>
-    </div>
+
+</div>
+  <script src="./script.js" type="text/javascript" ></script>
 </body>
+
+
 
 </html>
