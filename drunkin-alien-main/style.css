@@ -41,6 +41,8 @@ canvas{
   top: -4%;
   left: 50%;
   transform: translate(-50%,+50%);
+  width: 431px;
+  height: 400px;
 }
 
 @media all and (max-width:1150px){
@@ -49,7 +51,6 @@ canvas{
   background-size: cover;
   background-position: center;
   background-attachment: scroll;
-  min-height: 100vh;
   }
   header{
     position: absolute;
@@ -64,6 +65,3 @@ canvas{
     height: auto;
   }
 }
-
-
-
