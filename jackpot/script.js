@@ -23,6 +23,10 @@ const state = {
     jackpotRules: {},
     tooHot: false,
     maxRounds: 10,
+    neverEverActive: false,
+    neverEverMode: false,
+    neverEverQuestionsUsed: 0,
+    neverEverActionsUsed: 0,
 };
 
 const slot1 = document.getElementById('slot1');
@@ -31,32 +35,163 @@ const slot3 = document.getElementById('slot3');
 const spinButton = document.getElementById('spinButton');
 const resultDisplay = document.getElementById('result');
 const languageSelector = document.getElementById('language');
+const langDropdown = document.getElementById('langDropdown');
+const langBtn = document.getElementById('langBtn');
 const emojiRainContainer = document.getElementById('emoji-rain-container');
 const emojiExplosionContainer = document.getElementById('emoji-explosion-container');
 
+// Setup panel elements
 const setupPanel = document.getElementById('setupPanel');
 const gamePanel = document.getElementById('gamePanel');
-const playerNameInput = document.getElementById('playerNameInput');
 const addPlayerBtn = document.getElementById('addPlayerBtn');
+const playerNameInput = document.getElementById('playerNameInput');
 const playerList = document.getElementById('playerList');
 const modeBtns = document.querySelectorAll('.mode-btn');
-const roundDisplay = document.getElementById('roundDisplay');
 const prevRoundBtn = document.getElementById('prevRoundBtn');
 const nextRoundBtn = document.getElementById('nextRoundBtn');
+const roundDisplay = document.getElementById('roundDisplay');
 const startTimerBtn = document.getElementById('startTimerBtn');
 const stopTimerBtn = document.getElementById('stopTimerBtn');
 const timerDisplay = document.getElementById('timerDisplay');
 const startGameBtn = document.getElementById('startGameBtn');
+const backHomeBtn = document.getElementById('backHomeBtn');
+const backToHubBtn = document.getElementById('backToHubBtn');
+const tooHotBtn = document.getElementById('tooHotBtn');
+
+// Game info display elements
 const gameModeDisplay = document.getElementById('gameModeDisplay');
 const gameRoundDisplay = document.getElementById('gameRoundDisplay');
 const gameTimerDisplay = document.getElementById('gameTimerDisplay');
-const tooHotBtn = document.getElementById('tooHotBtn');
-const backHomeBtn = document.getElementById('backHomeBtn');
-const langBtn = document.getElementById('langBtn');
-const langDropdown = document.getElementById('langDropdown');
-const rulesToggle = document.getElementById('rulesToggle');
-const rulesSidebar = document.getElementById('rulesSidebar');
-const langLabel = document.getElementById('langLabel');
+
+// Rules modal elements
+const rulesBtn = document.getElementById('rulesBtn');
+const rulesModal = document.getElementById('rulesModal');
+const closeRulesModal = document.getElementById('closeRulesModal');
+
+function updateNeverEverUI() {
+    const neverEverPanel = document.getElementById('neverEverPanel');
+    if (neverEverPanel) {
+        if (state.neverEverMode) {
+            neverEverPanel.classList.add('active');
+        } else {
+            neverEverPanel.classList.remove('active');
+        }
+    }
+}
+
+function getNeverEverQuestion() {
+    if (!neverEverGameContent || !neverEverGameContent['en']) return "No questions available. Load the Never Ever game first.";
+
+    const questions = neverEverGameContent['en'].questions;
+    if (!questions || questions.length === 0) return "No questions available.";
+
+    let questionIndex;
+    do {
+        questionIndex = Math.floor(Math.random() * questions.length);
+    } while (questionIndex === lastNeverEverQuestionIndex && questions.length > 1);
+    lastNeverEverQuestionIndex = questionIndex;
+    state.neverEverQuestionsUsed++;
+
+    return questions[questionIndex];
+}
+
+function getNeverEverAction() {
+    if (!neverEverGameContent || !neverEverGameContent['en']) return "Take action!";
+
+    const actions = neverEverGameContent['en'].actions;
+    if (!actions || actions.length === 0) return "Take action!";
+
+    let actionIndex;
+    do {
+        actionIndex = Math.floor(Math.random() * actions.length);
+    } while (actionIndex === lastNeverEverActionIndex && actions.length > 1);
+    lastNeverEverActionIndex = actionIndex;
+    state.neverEverActionsUsed++;
+
+    return actions[actionIndex];
+}
+
+function getNeverEverSuperSpicyQuestion() {
+    if (!neverEverGameContent || !neverEverGameContent['en']) return "Super Spicy question not available.";
+
+    const superSpicyQuestions = neverEverGameContent['en'].superSpicyQuestions;
+    if (!superSpicyQuestions || superSpicyQuestions.length === 0) return "Super Spicy question not available.";
+
+    let questionIndex;
+    do {
+        questionIndex = Math.floor(Math.random() * superSpicyQuestions.length);
+    } while (questionIndex === lastNeverEverQuestionIndex && superSpicyQuestions.length > 1);
+    lastNeverEverQuestionIndex = questionIndex;
+    state.neverEverQuestionsUsed++;
+
+    return superSpicyQuestions[questionIndex];
+}
+
+function getNeverEverSuperSpicyAction() {
+    if (!neverEverGameContent || !neverEverGameContent['en']) return "Super Spicy action not available.";
+
+    const superSpicyActions = neverEverGameContent['en'].superSpicyActions;
+    if (!superSpicyActions || superSpicyActions.length === 0) return "Super Spicy action not available.";
+
+    let actionIndex;
+    do {
+        actionIndex = Math.floor(Math.random() * superSpicyActions.length);
+    } while (actionIndex === lastNeverEverActionIndex && superSpicyActions.length > 1);
+    lastNeverEverActionIndex = actionIndex;
+    state.neverEverActionsUsed++;
+
+    return superSpicyActions[actionIndex];
+}
+
+function getNeverEverChallenge() {
+    if (!neverEverGameContent || !neverEverGameContent['en']) {
+        return null;
+    }
+
+    const hasSuperSpicy = Math.random() < 0.2;
+
+    if (hasSuperSpicy) {
+        return {
+            challenge: getNeverEverSuperSpicyQuestion(),
+            source: 'neverEverSuperSpicy'
+        };
+    } else {
+        const isSpicy = Math.random() < 0.3;
+
+        if (isSpicy) {
+            return {
+                challenge: getNeverEverSuperSpicyQuestion(),
+                source: 'neverEverSpicy'
+            };
+        } else {
+            return {
+                challenge: getNeverEverQuestion(),
+                source: 'neverEver'
+            };
+        }
+    }
+}
+
+function getNeverEverResults() {
+    return {
+        questionsUsed: state.neverEverQuestionsUsed,
+        actionsUsed: state.neverEverActionsUsed,
+        neverEverActive: state.neverEverActive
+    };
+}
+
+function getNeverEverResults() {
+    return {
+        questionsUsed: state.neverEverQuestionsUsed,
+        actionsUsed: state.neverEverActionsUsed,
+        neverEverActive: state.neverEverActive
+    };
+}
+
+function showNeverEverResults() {
+    const results = getNeverEverResults();
+    console.log('Never Ever Results:', results);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     fetch('rules.json')
@@ -89,8 +224,25 @@ function setupEventListeners() {
         langDropdown.classList.toggle('open');
     });
 
-    rulesToggle.addEventListener('click', () => {
-        rulesSidebar.classList.toggle('open');
+    // Back to Hub
+    if (backToHubBtn) {
+        backToHubBtn.addEventListener('click', goToHub);
+    }
+
+    // Rules Modal
+    rulesBtn.addEventListener('click', () => {
+        rulesModal.classList.add('open');
+    });
+
+    closeRulesModal.addEventListener('click', () => {
+        rulesModal.classList.remove('open');
+    });
+
+    // Close modal when clicking outside
+    rulesModal.addEventListener('click', (event) => {
+        if (event.target === rulesModal) {
+            rulesModal.classList.remove('open');
+        }
     });
 
     addPlayerBtn.addEventListener('click', () => {
@@ -137,6 +289,7 @@ function setupEventListeners() {
     startTimerBtn.addEventListener('click', startTimer);
     stopTimerBtn.addEventListener('click', stopTimer);
     startGameBtn.addEventListener('click', startGame);
+    document.getElementById('backToHubSetupBtn').addEventListener('click', goToHub);
     backHomeBtn.addEventListener('click', goHome);
     spinButton.addEventListener('click', spin);
     tooHotBtn.addEventListener('click', () => {
@@ -235,6 +388,11 @@ function goHome() {
     updateUI();
     gamePanel.classList.add('hidden');
     setupPanel.classList.remove('hidden');
+}
+
+function goToHub() {
+    stopTimer();
+    window.location.href = '../index.html';
 }
 
 function startGame() {

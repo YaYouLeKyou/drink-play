@@ -23,7 +23,7 @@ body {
     background-attachment: fixed;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Press+Start 2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 /* ---------- Language button (top corner) ---------- */
 .lang-btn {
@@ -89,78 +89,137 @@ body {
     outline: none;
 }
 
-/* ---------- Retractable rules sidebar ---------- */
-.rules-sidebar {
+/* ---------- Rules button (top corner) ---------- */
+.rules-btn {
     position: fixed;
-    top: 0;
-    right: 0;
-    width: 280px;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.88);
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
-    transform: translateX(240px);
-    transition: transform 0.3s ease;
-    z-index: 150;
-    overflow-y: auto;
-}
-
-.rules-sidebar.open {
-    transform: translateX(0);
-}
-
-.rules-toggle {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px;
-    height: 64px;
-    border: none;
-    border-radius: 8px 0 0 8px;
-    background: #00ffff;
-    color: #000;
-    font-size: 1.4em;
+    top: 15px;
+    right: 65px;
+    z-index: 199;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 255, 255, 0.2);
+    color: #00ffff;
+    font-size: 1.2em;
     font-weight: bold;
     cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
 
-.rules-content {
-    padding: 20px 20px 20px 56px;
-    text-align: left;
+.rules-btn:hover {
+    background: rgba(0, 255, 255, 0.4);
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
 }
 
-.rules-content h2 {
+.rules-btn:active {
+    transform: scale(0.95);
+}
+
+.rules-tooltip {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.7em;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.rules-btn:hover .rules-tooltip {
+    opacity: 1;
+}
+
+/* ---------- Rules Modal ---------- */
+.rules-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9998;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(3px);
+}
+
+.rules-modal.open {
+    display: flex;
+}
+
+.rules-modal-content {
+    background: rgba(0, 0, 0, 0.95);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.rules-modal-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 255, 255, 0.1);
+}
+
+.rules-modal-header h2 {
     color: #00ffff;
-    font-size: 1em;
-    margin-bottom: 10px;
+    margin: 0;
+    font-size: 1.3em;
     font-family: 'Press Start 2P', cursive;
 }
 
-.rules-content p,
-.rules-content li {
+.rules-modal-body {
+    padding: 20px;
+}
+
+.rules-modal-body h3 {
+    color: #00ffff;
+    margin-bottom: 15px;
+    font-size: 1em;
+}
+
+.rules-modal-body p {
     font-size: 0.85em;
     color: #ddd;
-    line-height: 1.5;
-    margin-bottom: 6px;
+    line-height: 1.6;
+    margin-bottom: 12px;
 }
 
-.rules-content ul {
+.rules-modal-body ul {
     list-style: none;
     padding-left: 0;
-    margin: 10px 0;
+    margin: 12px 0;
 }
 
-.rules-content li {
-    padding: 4px 0;
+.rules-modal-body li {
+    padding: 6px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.85em;
 }
 
-.rules-content li:last-child {
-    border-bottom: none;
-}
-
-.rules-content strong {
+.rules-modal-body strong {
     color: #00ffff;
+    font-size: 1.1em;
 }
 
 /* ---------- Main container ---------- */
@@ -176,6 +235,7 @@ body {
     overflow-y: auto;
 }
 
+/* Slot machine and game styles (existing) */
 h1 {
     color: #00ffff;
     margin-bottom: 25px;
@@ -190,22 +250,52 @@ h1:hover {
     color: #ff00ff;
 }
 
-/* ---------- Setup panel ---------- */
+h2 {
+    color: #00ffff;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+    font-family: 'Press Start 2P', cursive;
+}
+
+h3 {
+    color: #00ffff;
+    margin-bottom: 15px;
+    font-size: 1em;
+}
+
+a {
+    color: #00ffff;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #ff00ff;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 10px 0;
+}
+
+li {
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+strong {
+    color: #00ffff;
+}
+
+/* Setup and Game Panels */
 .setup-panel,
 .game-panel {
     width: 100%;
 }
 
-.setup-section {
+setup-section {
     margin-bottom: 18px;
     text-align: left;
-}
-
-.setup-section h2 {
-    color: #00ffff;
-    font-size: 1.1em;
-    margin-bottom: 8px;
-    font-family: 'Press Start 2P', cursive;
 }
 
 .player-input-row {
@@ -326,6 +416,11 @@ h1:hover {
     background-color: #00dd77;
 }
 
+.back-to-hub-btn {
+    width: 100%;
+    margin-top: 10px;
+}
+
 .secondary-btn {
     padding: 8px 16px;
     background: #444;
@@ -355,13 +450,6 @@ h1:hover {
 
 .danger-btn:hover {
     background: #cc3333;
-}
-
-/* ---------- Game panel layout ---------- */
-.game-panel {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 .game-info-bar {
@@ -452,26 +540,6 @@ h1:hover {
     }
 }
 
-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.5em;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-}
-
-button:hover {
-    background-color: #45a049;
-    transform: translateY(-2px);
-}
-
-button:active {
-    transform: translateY(0);
-}
-
 .result {
     margin-top: 10px;
     font-size: 1.5em;
@@ -494,7 +562,7 @@ button:active {
     display: none !important;
 }
 
-/* ---------- Emoji effects ---------- */
+/* Emoji effects */
 .emoji-rain-container {
     position: fixed;
     top: 0;
@@ -568,6 +636,7 @@ button:active {
     }
 }
 
+/* Responsive */
 @media (max-width: 768px) {
     .slot {
         font-size: 3em;

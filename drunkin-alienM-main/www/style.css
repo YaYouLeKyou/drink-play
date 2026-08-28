@@ -55,6 +55,27 @@ header {
   font-family: "Press Start 2P", cursive;
 }
 
+/* ---------- Back to Hub button ---------- */
+.back-to-hub-btn {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 8px 16px;
+  background-color: rgba(76, 175, 80, 0.25);
+  color: #7ee787;
+  border: 1px solid #4CAF50;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 10px;
+  font-family: "Press Start 2P", cursive;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.15s ease;
+}
+
+.back-to-hub-btn:hover {
+  background-color: rgba(76, 175, 80, 0.5);
+  transform: translateY(-1px);
+}
+
 #pauseButton:hover {
   background-color: #45a049;
 }

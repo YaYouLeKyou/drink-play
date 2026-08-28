@@ -18,22 +18,32 @@
         </select>
     </div>
 
-    <!-- Retractable rules sidebar on the screen edge -->
-    <div id="rulesSidebar" class="rules-sidebar">
-        <button id="rulesToggle" class="rules-toggle" title="Rules">?</button>
-        <div class="rules-content">
-            <h2>How to Play</h2>
-            <p>Add players, choose a mode, and hit Start Game. Each round, spin the slots — if all 3 match, you hit the Jackpot and get a challenge!</p>
-            <ul>
-                <li><strong>🍺🍺🍺</strong> : Drink up</li>
-                <li><strong>🍷🍷🍷</strong> : Truth or drink</li>
-                <li><strong>😂😂😂</strong> : Tell your funniest embarrassing story</li>
-                <li><strong>🍑🍑🍑</strong> : Sexy question</li>
-                <li><strong>🍆🍆🍆</strong> : Sexy &amp; spicy question</li>
-                <li><strong>👽👽👽</strong> : Crazy dare</li>
-                <li><strong>❤️❤️❤️</strong> : Romantic challenge</li>
-            </ul>
-            <p>Use <strong>Too Hot</strong> if a challenge is too intense — it will fall back to a local rule instead.</p>
+    <!-- Rules button below language -->
+    <button id="rulesBtn" class="rules-btn" title="Rules">?
+        <span class="rules-tooltip">Click to view game rules</span>
+    </button>
+    
+    <!-- Rules Modal (kept for when users want expanded view) -->
+    <div id="rulesModal" class="rules-modal">
+        <div class="rules-modal-content">
+            <div class="rules-modal-header">
+                <h2>Game Rules</h2>
+                <button id="closeRulesModal" class="close-btn">×</button>
+            </div>
+            <div class="rules-modal-body">
+                <h3>How to Play</h3>
+                <p>Add players, choose a mode, and hit Start Game. Each round, spin the slots — if all 3 match, you hit the Jackpot and get a challenge!</p>
+                <ul>
+                    <li><strong>🍺🍺🍺</strong> : Drink up</li>
+                    <li><strong>🍷🍷🍷</strong> : Truth or drink</li>
+                    <li><strong>😂😂😂</strong> : Tell your funniest embarrassing story</li>
+                    <li><strong>🍑🍑🍑</strong> : Sexy question</li>
+                    <li><strong>🍆🍆🍆</strong> : Sexy &amp; spicy question</li>
+                    <li><strong>👽👽👽</strong> : Crazy dare</li>
+                    <li><strong>❤️❤️❤️</strong> : Romantic challenge</li>
+                </ul>
+                <p>Use <strong>Too Hot</strong> if a challenge is too intense — it will fall back to a local rule instead.</p>
+            </div>
         </div>
     </div>
 
@@ -80,6 +90,7 @@
             </div>
 
             <button id="startGameBtn" class="primary-btn">Start Game</button>
+            <button id="backToHubSetupBtn" class="secondary-btn back-to-hub-btn">← Back to Hub</button>
         </div>
 
         <!-- GAME SCREEN -->
@@ -89,6 +100,7 @@
                 <span id="gameRoundDisplay">Round: 1</span>
                 <span id="gameTimerDisplay">00:00</span>
                 <button id="backHomeBtn" class="secondary-btn">← Home</button>
+                <button id="backToHubBtn" class="secondary-btn">← Back to Hub</button>
                 <button id="tooHotBtn" class="danger-btn">Too Hot</button>
             </div>
 
