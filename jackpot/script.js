@@ -1,17 +1,29 @@
 const emojis = ['🍑', '🍆', '🍺', '🍷', '😂', '👽', '❤️'];
 
 const emojiColors = {
-    '🍑': '#FFC0CB', // Pink
-    '🍆': '#800080', // Purple
-    '🍺': '#FFD700', // Gold
-    '🍷': '#8B0000', // Dark Red
-    '😂': '#FFFF00', // Yellow
-    '👽': '#00FF00', // Green
-    '❤️': '#FF0000'  // Red
+    '🍑': '#FFC0CB',
+    '🍆': '#800080',
+    '🍺': '#FFD700',
+    '🍷': '#8B0000',
+    '😂': '#FFFF00',
+    '👽': '#00FF00',
+    '❤️': '#FF0000'
 };
 
-let jackpotRules = {}; // Will be loaded from JSON
-let currentLanguage = 'en'; // Default language
+const state = {
+    players: [],
+    mode: 'classic',
+    round: 1,
+    spinning: false,
+    history: [],
+    timerSeconds: 0,
+    timerInterval: null,
+    timerRunning: false,
+    language: 'en',
+    jackpotRules: {},
+    tooHot: false,
+    maxRounds: 10,
+};
 
 const slot1 = document.getElementById('slot1');
 const slot2 = document.getElementById('slot2');
@@ -19,90 +31,250 @@ const slot3 = document.getElementById('slot3');
 const spinButton = document.getElementById('spinButton');
 const resultDisplay = document.getElementById('result');
 const languageSelector = document.getElementById('language');
-const emojiRainContainer = document.getElementById('emoji-rain-container'); // Get the new container
-const emojiExplosionContainer = document.getElementById('emoji-explosion-container'); // Get the new explosion container
+const emojiRainContainer = document.getElementById('emoji-rain-container');
+const emojiExplosionContainer = document.getElementById('emoji-explosion-container');
 
-let spinning = false;
-const jackpotChance = 0.7; // 70% chance of a jackpot
+const setupPanel = document.getElementById('setupPanel');
+const gamePanel = document.getElementById('gamePanel');
+const playerNameInput = document.getElementById('playerNameInput');
+const addPlayerBtn = document.getElementById('addPlayerBtn');
+const playerList = document.getElementById('playerList');
+const modeBtns = document.querySelectorAll('.mode-btn');
+const roundDisplay = document.getElementById('roundDisplay');
+const prevRoundBtn = document.getElementById('prevRoundBtn');
+const nextRoundBtn = document.getElementById('nextRoundBtn');
+const startTimerBtn = document.getElementById('startTimerBtn');
+const stopTimerBtn = document.getElementById('stopTimerBtn');
+const timerDisplay = document.getElementById('timerDisplay');
+const startGameBtn = document.getElementById('startGameBtn');
+const gameModeDisplay = document.getElementById('gameModeDisplay');
+const gameRoundDisplay = document.getElementById('gameRoundDisplay');
+const gameTimerDisplay = document.getElementById('gameTimerDisplay');
+const tooHotBtn = document.getElementById('tooHotBtn');
+const backHomeBtn = document.getElementById('backHomeBtn');
+const langBtn = document.getElementById('langBtn');
+const langDropdown = document.getElementById('langDropdown');
+const rulesToggle = document.getElementById('rulesToggle');
+const rulesSidebar = document.getElementById('rulesSidebar');
+const langLabel = document.getElementById('langLabel');
 
-// Initialize slots with beer emojis on page load and attach event listener
 document.addEventListener('DOMContentLoaded', () => {
-    // Fetch rules from JSON
     fetch('rules.json')
         .then(response => response.json())
         .then(data => {
-            jackpotRules = data; // Store the full rules object
-            setLanguage(currentLanguage); // Set initial language
-            spinButton.addEventListener('click', spin);
-            languageSelector.addEventListener('change', (event) => {
-                setLanguage(event.target.value);
-            });
+            state.jackpotRules = data;
+            updateLanguage(languageSelector.value);
         })
         .catch(error => {
             console.error('Error loading jackpot rules:', error);
             resultDisplay.textContent = 'Error loading game. Please try again.';
         });
-});
 
-function setLanguage(lang) {
-    currentLanguage = lang;
-    // Update UI elements that are not part of jackpotRules
-    document.querySelector('h1').textContent = {
-        'en': 'Jackpot Drinking Game',
-        'fr': 'Jeu à Boire Jackpot',
-        'es': 'Juego de Beber Jackpot',
-        'it': 'Gioco a Bere Jackpot'
-    }[currentLanguage];
-    spinButton.textContent = {
-        'en': 'Spin',
-        'fr': 'Lancer',
-        'es': 'Girar',
-        'it': 'Gira'
-    }[currentLanguage];
-    resultDisplay.textContent = {
-        'en': 'Spin the wheel to start!',
-        'fr': 'Lance la roue pour commencer !',
-        'es': '¡Gira la rueda para empezar!',
-        'it': 'Gira la ruota per iniziare!'
-    }[currentLanguage];
+    setupEventListeners();
+    updateUI();
 
-    // Re-initialize slots with beer emojis in the current language
     slot1.textContent = '🍺';
     slot2.textContent = '🍺';
     slot3.textContent = '🍺';
+});
+
+function setupEventListeners() {
+    languageSelector.addEventListener('change', (event) => {
+        state.language = event.target.value;
+        updateLanguage(state.language);
+        langDropdown.classList.remove('open');
+    });
+
+    langBtn.addEventListener('click', () => {
+        langDropdown.classList.toggle('open');
+    });
+
+    rulesToggle.addEventListener('click', () => {
+        rulesSidebar.classList.toggle('open');
+    });
+
+    addPlayerBtn.addEventListener('click', () => {
+        const name = playerNameInput.value.trim();
+        if (name && !state.players.includes(name)) {
+            state.players.push(name);
+            playerNameInput.value = '';
+            renderPlayers();
+            updateUI();
+        }
+    });
+
+    playerNameInput.addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            addPlayerBtn.click();
+        }
+    });
+
+    modeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            modeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.mode = btn.dataset.mode;
+            updateUI();
+        });
+    });
+
+    prevRoundBtn.addEventListener('click', () => {
+        if (state.round > 1) {
+            state.round--;
+            roundDisplay.textContent = state.round;
+            updateUI();
+        }
+    });
+
+    nextRoundBtn.addEventListener('click', () => {
+        if (state.round < state.maxRounds) {
+            state.round++;
+            roundDisplay.textContent = state.round;
+            updateUI();
+        }
+    });
+
+    startTimerBtn.addEventListener('click', startTimer);
+    stopTimerBtn.addEventListener('click', stopTimer);
+    startGameBtn.addEventListener('click', startGame);
+    backHomeBtn.addEventListener('click', goHome);
+    spinButton.addEventListener('click', spin);
+    tooHotBtn.addEventListener('click', () => {
+        state.tooHot = true;
+        tooHotBtn.textContent = 'Too Hot!';
+        setTimeout(() => {
+            state.tooHot = false;
+            tooHotBtn.textContent = 'Too Hot';
+        }, 2000);
+    });
+}
+
+function renderPlayers() {
+    playerList.innerHTML = '';
+    state.players.forEach((player, index) => {
+        const li = document.createElement('li');
+        li.className = 'player-item';
+        li.innerHTML = `${player} <button class="remove-player-btn" data-index="${index}">&times;</button>`;
+        playerList.appendChild(li);
+    });
+
+    document.querySelectorAll('.remove-player-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const index = parseInt(btn.dataset.index);
+            state.players.splice(index, 1);
+            renderPlayers();
+            updateUI();
+        });
+    });
+}
+
+function updateLanguage(lang) {
+    state.language = lang;
+    const titles = {
+        en: 'Jackpot Drinking Game',
+        fr: 'Jeu à Boire Jackpot',
+        es: 'Juego de Beber Jackpot',
+        it: 'Gioco a Bere Jackpot'
+    };
+    const labels = {
+        en: 'EN',
+        fr: 'FR',
+        es: 'ES',
+        it: 'IT'
+    };
+    document.querySelector('h1').textContent = titles[lang] || titles.en;
+    if (langLabel) langLabel.textContent = labels[lang] || lang.toUpperCase();
+    spinButton.textContent = {
+        en: 'Spin',
+        fr: 'Lancer',
+        es: 'Girar',
+        it: 'Gira'
+    }[lang] || 'Spin';
+
+    slot1.textContent = '🍺';
+    slot2.textContent = '🍺';
+    slot3.textContent = '🍺';
+}
+
+function updateUI() {
+    gameModeDisplay.textContent = `Mode: ${state.mode.charAt(0).toUpperCase() + state.mode.slice(1)}`;
+    gameRoundDisplay.textContent = `Round: ${state.round}`;
+    gameTimerDisplay.textContent = formatTime(state.timerSeconds);
+}
+
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const secs = (seconds % 60).toString().padStart(2, '0');
+    return `${mins}:${secs}`;
+}
+
+function startTimer() {
+    if (state.timerRunning) return;
+    state.timerRunning = true;
+    state.timerInterval = setInterval(() => {
+        state.timerSeconds++;
+        timerDisplay.textContent = formatTime(state.timerSeconds);
+        gameTimerDisplay.textContent = formatTime(state.timerSeconds);
+    }, 1000);
+}
+
+function stopTimer() {
+    state.timerRunning = false;
+    if (state.timerInterval) {
+        clearInterval(state.timerInterval);
+        state.timerInterval = null;
+    }
+}
+
+function goHome() {
+    stopTimer();
+    state.round = 1;
+    roundDisplay.textContent = state.round;
+    state.timerSeconds = 0;
+    timerDisplay.textContent = '00:00';
+    updateUI();
+    gamePanel.classList.add('hidden');
+    setupPanel.classList.remove('hidden');
+}
+
+function startGame() {
+    setupPanel.classList.add('hidden');
+    gamePanel.classList.remove('hidden');
+    state.round = 1;
+    roundDisplay.textContent = state.round;
+    updateUI();
+    startTimer();
 }
 
 function getRandomEmoji() {
     return emojis[Math.floor(Math.random() * emojis.length)];
 }
 
-function spin() {
-    console.log('Spin function called!'); // Added for debugging
-    if (spinning) return;
-    spinning = true;
-    spinButton.textContent = 'Spinning...';
+async function spin() {
+    if (state.spinning) return;
+    state.spinning = true;
+    state.tooHot = false;
+    spinButton.textContent = state.language === 'fr' ? 'Tourne...' : 'Spinning...';
     resultDisplay.textContent = '';
-    resultDisplay.style.backgroundColor = '#f9f9f9'; // Reset background color
-    resultDisplay.style.color = '#555'; // Reset text color
+    resultDisplay.style.backgroundColor = '#f9f9f9';
+    resultDisplay.style.color = '#555';
 
     slot1.classList.add('spinning');
     slot2.classList.add('spinning');
     slot3.classList.add('spinning');
 
     let spins = 0;
-    const maxSpins = 20; // Number of times to change emoji before stopping
-    const intervalTime = 100; // Milliseconds between changes
+    const maxSpins = 20;
+    const intervalTime = 100;
 
     let finalEmoji1, finalEmoji2, finalEmoji3;
 
-    if (Math.random() < jackpotChance) {
-        // Force a jackpot
+    if (Math.random() < 0.7) {
         const forcedEmoji = getRandomEmoji();
         finalEmoji1 = forcedEmoji;
         finalEmoji2 = forcedEmoji;
         finalEmoji3 = forcedEmoji;
     } else {
-        // Normal random spin
         finalEmoji1 = getRandomEmoji();
         finalEmoji2 = getRandomEmoji();
         finalEmoji3 = getRandomEmoji();
@@ -116,128 +288,130 @@ function spin() {
 
         if (spins > maxSpins) {
             clearInterval(spinInterval);
-            spinning = false;
-            spinButton.textContent = 'Spin';
+            state.spinning = false;
+            spinButton.textContent = state.language === 'fr' ? 'Lancer' : 'Spin';
             slot1.classList.remove('spinning');
             slot2.classList.remove('spinning');
             slot3.classList.remove('spinning');
 
-            // Set the final emojis after spinning stops
             slot1.textContent = finalEmoji1;
             slot2.textContent = finalEmoji2;
             slot3.textContent = finalEmoji3;
 
-            checkResult();
+            checkResult(finalEmoji1, finalEmoji2, finalEmoji3);
         }
     }, intervalTime);
 }
 
-// Function for emoji rain effect
+async function checkResult(emoji1, emoji2, emoji3) {
+    if (emoji1 === emoji2 && emoji2 === emoji3) {
+        const jackpotKey = emoji1 + emoji2 + emoji3;
+        let challenge = null;
+        let source = 'local';
+
+        if (!state.tooHot) {
+            try {
+                const response = await fetch('/api/jackpot/challenge', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: state.mode,
+                        round: state.round,
+                        players: state.players,
+                        history: state.history,
+                        language: state.language,
+                        emojiCombo: jackpotKey,
+                    }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.source === 'ai' && data.challenge) {
+                        challenge = data.challenge;
+                        source = 'ai';
+                    }
+                }
+            } catch (error) {
+                console.error('AI challenge fetch failed:', error);
+            }
+        }
+
+        if (!challenge) {
+            const rule = state.jackpotRules[jackpotKey]?.[state.language];
+            if (rule && rule.questions && rule.questions.length > 0) {
+                const randomIndex = Math.floor(Math.random() * rule.questions.length);
+                challenge = rule.questions[randomIndex];
+                source = 'local';
+            } else {
+                challenge = state.language === 'fr' ? `Jackpot ! ${jackpotKey} - Bois !` : `Jackpot! ${jackpotKey} - Drink!`;
+                source = 'local';
+            }
+        }
+
+        state.history.push(challenge);
+        if (state.history.length > 50) state.history.shift();
+
+        const winningEmoji = emoji1;
+        const emojiColor = emojiColors[winningEmoji] || '#f9f9f9';
+        resultDisplay.style.backgroundColor = emojiColor;
+        resultDisplay.style.color = 'white';
+
+        const sourceLabel = source === 'ai' ? '[AI] ' : '';
+        resultDisplay.innerHTML = `${jackpotKey}<br>${sourceLabel}${challenge}`;
+
+        startEmojiRain(winningEmoji, 50);
+        triggerEmojiExplosion(winningEmoji);
+
+        state.round++;
+        if (state.round > state.maxRounds) {
+            state.round = 1;
+        }
+        roundDisplay.textContent = state.round;
+        updateUI();
+    } else {
+        resultDisplay.style.backgroundColor = '#f9f9f9';
+        resultDisplay.style.color = '#555';
+        const messages = {
+            fr: 'Pas de jackpot. Relance !',
+            es: 'No hay jackpot. ¡Gira de nuevo!',
+            it: 'Nessun jackpot. Gira di nuovo!',
+            en: 'No jackpot. Spin again!'
+        };
+        resultDisplay.textContent = messages[state.language] || messages.en;
+    }
+}
+
 function startEmojiRain(emoji, count) {
-    if (!emojiRainContainer) return; // Ensure the container exists
-
-    // Clear any existing emojis
+    if (!emojiRainContainer) return;
     emojiRainContainer.innerHTML = '';
-
     for (let i = 0; i < count; i++) {
         const emojiElement = document.createElement('div');
         emojiElement.classList.add('falling-emoji');
         emojiElement.textContent = emoji;
-        // Adjust horizontal position based on screen size
-        if (window.innerWidth <= 768) { // Mobile breakpoint
-            // Distribute emojis within the center 80% of the screen on mobile
-            const minLeft = 5; // Start at 5% from left
-            const maxLeft = 85; // End at 85% from left
+        if (window.innerWidth <= 768) {
+            const minLeft = 5;
+            const maxLeft = 85;
             emojiElement.style.left = `${Math.random() * (maxLeft - minLeft) + minLeft}vw`;
         } else {
-            // Distribute emojis within a more centered range for larger screens
-            const minLeft = 28; // Start at 28% from left
-            const maxLeft = 68; // End at 68% from left (40vw range)
+            const minLeft = 28;
+            const maxLeft = 68;
             emojiElement.style.left = `${Math.random() * (maxLeft - minLeft) + minLeft}vw`;
         }
-        emojiElement.style.animationDuration = `${Math.random() * 2 + 3}s`; // Random duration between 3 and 5 seconds
-        emojiElement.style.animationDelay = `${Math.random() * 0.5}s`; // Staggered start
-
+        emojiElement.style.animationDuration = `${Math.random() * 2 + 3}s`;
+        emojiElement.style.animationDelay = `${Math.random() * 0.5}s`;
         emojiRainContainer.appendChild(emojiElement);
-
-        // Remove the element after its animation finishes to prevent DOM clutter
-        emojiElement.addEventListener('animationend', () => {
-            emojiElement.remove();
-        });
+        emojiElement.addEventListener('animationend', () => emojiElement.remove());
     }
 }
 
-// New function for emoji explosion effect
 function triggerEmojiExplosion(emoji) {
     if (!emojiExplosionContainer) return;
-
-    // Clear any existing explosion emojis
     emojiExplosionContainer.innerHTML = '';
-
-    // Create a single large emoji for the explosion
     const explosionEmoji = document.createElement('div');
     explosionEmoji.classList.add('emoji-explosion');
     explosionEmoji.textContent = emoji;
-
-    // Position it in the center of the screen
     explosionEmoji.style.left = '50%';
     explosionEmoji.style.top = '50%';
-
     emojiExplosionContainer.appendChild(explosionEmoji);
-
-    // Remove the element after its animation finishes
-    explosionEmoji.addEventListener('animationend', () => {
-        explosionEmoji.remove();
-    });
-}
-
-
-function checkResult() {
-    const val1 = slot1.textContent;
-    const val2 = slot2.textContent;
-    const val3 = slot3.textContent;
-
-    if (val1 === val2 && val2 === val3) {
-        const jackpotKey = val1 + val2 + val3;
-        const rule = jackpotRules[jackpotKey][currentLanguage]; // Access language-specific rule
-        if (rule) {
-            const winningEmoji = val1; // Get the winning emoji
-            const emojiColor = emojiColors[winningEmoji]; // Get the color from mapping
-            resultDisplay.style.backgroundColor = emojiColor || '#f9f9f9'; // Apply color, default if not found
-            resultDisplay.style.color = 'white'; // Set text color for contrast
-            const randomQuestion = rule.questions[Math.floor(Math.random() * rule.questions.length)];
-            
-            // Extract message text without the emoji and arrow
-            const messageParts = rule.message.split(' → ');
-            const messageText = messageParts.length > 1 ? messageParts[1] : messageParts[0];
-
-            resultDisplay.innerHTML = `${val1}${val2}${val3}<br>${messageText}<br><br>${randomQuestion}`;
-
-            // Start the emoji rain!
-            startEmojiRain(winningEmoji, 50); // Rain 50 of the winning emoji
-
-            // Trigger the emoji explosion!
-            triggerEmojiExplosion(winningEmoji);
-        } else {
-            resultDisplay.style.backgroundColor = '#f9f9f9'; // Reset to default
-            resultDisplay.style.color = '#555'; // Reset to default
-            resultDisplay.textContent = currentLanguage === 'en' ? `Jackpot! ${val1}${val2}${val3} - No specific rule defined for this combination. Drink!` : `Jackpot! ${val1}${val2}${val3} - Aucune règle spécifique définie pour cette combinaison. Bois !`;
-        }
-    } else {
-        resultDisplay.style.backgroundColor = '#f9f9f9'; // Reset to default
-        resultDisplay.style.color = '#555'; // Reset to default
-        switch (currentLanguage) {
-            case 'fr':
-                resultDisplay.textContent = 'Pas de jackpot. Relance !';
-                break;
-            case 'es':
-                resultDisplay.textContent = 'No hay jackpot. ¡Gira de nuevo!';
-                break;
-            case 'it':
-                resultDisplay.textContent = 'Nessun jackpot. Gira di nuovo!';
-                break;
-            default:
-                resultDisplay.textContent = 'No jackpot. Spin again!';
-        }
-    }
+    explosionEmoji.addEventListener('animationend', () => explosionEmoji.remove());
 }

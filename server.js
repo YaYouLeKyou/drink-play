@@ -91,6 +91,45 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+app.post('/api/jackpot/challenge', async (req, res) => {
+    try {
+        const { mode = 'classic', round = 1, players = [], history = [], language = 'en', emojiCombo = '' } = req.body || {};
+
+        const JackpotAI = require('./lib/jackpot-ai');
+        const jackpotAI = new JackpotAI(aiClient);
+
+        const result = await jackpotAI.generateChallenge({
+            mode,
+            round,
+            players: Array.isArray(players) ? players : [],
+            history: Array.isArray(history) ? history : [],
+            language,
+            emojiCombo,
+        });
+
+        if (result.source === 'ai' && result.challenge) {
+            return res.json({
+                source: 'ai',
+                model: result.model,
+                challenge: result.challenge,
+            });
+        }
+
+        res.status(500).json({
+            source: 'fallback',
+            error: result.error || 'AI challenge generation failed',
+            message: 'AI unavailable. Use local rules for this round.',
+        });
+    } catch (error) {
+        console.error('[API] Jackpot challenge error:', error.message);
+        res.status(500).json({
+            source: 'error',
+            error: 'Failed to generate challenge',
+            details: error.message,
+        });
+    }
+});
+
 app.use(express.static(rootDir, {
     dotfiles: 'deny',
 }));

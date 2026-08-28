@@ -7,25 +7,103 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="language-selector">
-            <label for="language">Language:</label>
-            <select id="language">
-                <option value="en">English</option>
-                <option value="fr">Français</option>
-                <option value="es">Español</option>
-                <option value="it">Italiano</option>
-            </select>
-        </div>
-        <h1>Jackpot Drinking Game</h1>
-        <div class="slots">
-            <div class="slot" id="slot1"></div>
-            <div class="slot" id="slot2"></div>
-            <div class="slot" id="slot3"></div>
-        </div>
-        <button id="spinButton">Spin</button>
-        <div class="result" id="result">Spin the wheel to start!</div>
+    <!-- Language button in top corner -->
+    <button id="langBtn" class="lang-btn" title="Language"><span class="lang-flag">🌐</span> <span id="langLabel">EN</span></button>
+    <div id="langDropdown" class="lang-dropdown">
+        <select id="language">
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="es">Español</option>
+            <option value="it">Italiano</option>
+        </select>
     </div>
+
+    <!-- Retractable rules sidebar on the screen edge -->
+    <div id="rulesSidebar" class="rules-sidebar">
+        <button id="rulesToggle" class="rules-toggle" title="Rules">?</button>
+        <div class="rules-content">
+            <h2>How to Play</h2>
+            <p>Add players, choose a mode, and hit Start Game. Each round, spin the slots — if all 3 match, you hit the Jackpot and get a challenge!</p>
+            <ul>
+                <li><strong>🍺🍺🍺</strong> : Drink up</li>
+                <li><strong>🍷🍷🍷</strong> : Truth or drink</li>
+                <li><strong>😂😂😂</strong> : Tell your funniest embarrassing story</li>
+                <li><strong>🍑🍑🍑</strong> : Sexy question</li>
+                <li><strong>🍆🍆🍆</strong> : Sexy &amp; spicy question</li>
+                <li><strong>👽👽👽</strong> : Crazy dare</li>
+                <li><strong>❤️❤️❤️</strong> : Romantic challenge</li>
+            </ul>
+            <p>Use <strong>Too Hot</strong> if a challenge is too intense — it will fall back to a local rule instead.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Jackpot Drinking Game</h1>
+
+        <!-- SETUP SCREEN -->
+        <div class="setup-panel" id="setupPanel">
+            <div class="setup-section">
+                <h2>Players</h2>
+                <div class="player-input-row">
+                    <input type="text" id="playerNameInput" placeholder="Enter player name" maxlength="20">
+                    <button id="addPlayerBtn" class="secondary-btn">Add</button>
+                </div>
+                <ul id="playerList" class="player-list"></ul>
+            </div>
+
+            <div class="setup-section">
+                <h2>Game Mode</h2>
+                <div class="mode-selector">
+                    <button class="mode-btn active" data-mode="classic">Classic</button>
+                    <button class="mode-btn" data-mode="spicy">Spicy</button>
+                    <button class="mode-btn" data-mode="funny">Funny</button>
+                    <button class="mode-btn" data-mode="mixed">Mixed</button>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <h2>Round</h2>
+                <div class="round-controls">
+                    <button id="prevRoundBtn" class="secondary-btn">-</button>
+                    <span id="roundDisplay">1</span>
+                    <button id="nextRoundBtn" class="secondary-btn">+</button>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <h2>Timer</h2>
+                <div class="timer-controls">
+                    <button id="startTimerBtn" class="secondary-btn">Start</button>
+                    <button id="stopTimerBtn" class="secondary-btn">Stop</button>
+                    <span id="timerDisplay">00:00</span>
+                </div>
+            </div>
+
+            <button id="startGameBtn" class="primary-btn">Start Game</button>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div class="game-panel hidden" id="gamePanel">
+            <div class="game-info-bar">
+                <span id="gameModeDisplay">Mode: Classic</span>
+                <span id="gameRoundDisplay">Round: 1</span>
+                <span id="gameTimerDisplay">00:00</span>
+                <button id="backHomeBtn" class="secondary-btn">← Home</button>
+                <button id="tooHotBtn" class="danger-btn">Too Hot</button>
+            </div>
+
+            <div class="slots">
+                <div class="slot" id="slot1"></div>
+                <div class="slot" id="slot2"></div>
+                <div class="slot" id="slot3"></div>
+            </div>
+
+            <button id="spinButton" class="spin-btn">Spin</button>
+
+            <div class="result" id="result">Spin the wheel to start!</div>
+        </div>
+    </div>
+
     <div id="emoji-rain-container"></div>
     <div id="emoji-explosion-container"></div>
     <script src="script.js"></script>

@@ -1,15 +1,10 @@
 html,
 body {
     overflow: hidden;
-    /* Ensures no scrollbars */
     width: 100vw;
-    /* Full viewport width */
     height: 100vh;
-    /* Full viewport height */
     margin: 0;
-    /* Remove default margins */
     padding: 0;
-    /* Remove default paddings */
 }
 
 body {
@@ -20,9 +15,7 @@ body {
     min-height: 100vh;
     margin: 0;
     background-color: #222;
-    /* Fallback background color */
     color: #eee;
-    /* Light text color for contrast */
     background-image: url('./img/casino3.png');
     background-size: cover;
     background-position: center;
@@ -30,52 +23,372 @@ body {
     background-attachment: fixed;
 }
 
-/* Media query for mobile devices to handle background-attachment */
-@media (max-width: 768px) {
-    body {
-        background-attachment: scroll;
-        /* Change to scroll on mobile */
-    }
+@import url('https://fonts.googleapis.com/css2?family=Press+Start 2P&display=swap');
+
+/* ---------- Language button (top corner) ---------- */
+.lang-btn {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.55);
+    color: #eee;
+    font-size: 0.85em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
+.lang-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
+}
+
+.lang-btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.lang-flag {
+    font-size: 1.1em;
+    line-height: 1;
+}
+
+.lang-dropdown {
+    position: fixed;
+    top: 68px;
+    right: 15px;
+    z-index: 200;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    display: none;
+}
+
+.lang-dropdown.open {
+    display: block;
+}
+
+.lang-dropdown select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #555;
+    background: #333;
+    color: #eee;
+    font-size: 0.9em;
+    cursor: pointer;
+    outline: none;
+}
+
+/* ---------- Retractable rules sidebar ---------- */
+.rules-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.88);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    transform: translateX(240px);
+    transition: transform 0.3s ease;
+    z-index: 150;
+    overflow-y: auto;
+}
+
+.rules-sidebar.open {
+    transform: translateX(0);
+}
+
+.rules-toggle {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 64px;
+    border: none;
+    border-radius: 8px 0 0 8px;
+    background: #00ffff;
+    color: #000;
+    font-size: 1.4em;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.rules-content {
+    padding: 20px 20px 20px 56px;
+    text-align: left;
+}
+
+.rules-content h2 {
+    color: #00ffff;
+    font-size: 1em;
+    margin-bottom: 10px;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.rules-content p,
+.rules-content li {
+    font-size: 0.85em;
+    color: #ddd;
+    line-height: 1.5;
+    margin-bottom: 6px;
+}
+
+.rules-content ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 10px 0;
+}
+
+.rules-content li {
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rules-content li:last-child {
+    border-bottom: none;
+}
+
+.rules-content strong {
+    color: #00ffff;
+}
+
+/* ---------- Main container ---------- */
 .container {
     background-color: rgba(0, 0, 0, 0.7);
-    /* Black transparent background */
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     text-align: center;
     width: 90%;
     max-width: 500px;
+    max-height: 100vh;
+    overflow-y: auto;
 }
 
 h1 {
     color: #00ffff;
-    /* Cyan for 80s feel */
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     font-family: 'Press Start 2P', cursive;
-    /* 80s arcade font */
     text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff, 0 0 15px #00ffff,
         -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
-    /* Neon glow + More pronounced black border effect */
-    font-size: 2.5em;
-    /* Adjust size */
+    font-size: 2.2em;
     transition: color 0.5s ease-in-out;
-    /* Smooth color transition */
 }
 
 h1:hover {
     color: #ff00ff;
-    /* Magenta on hover */
 }
 
-/* Import Google Font for retro style */
-@import url('https://fonts.googleapis.com/css2?family=Press+Start 2P&display=swap');
+/* ---------- Setup panel ---------- */
+.setup-panel,
+.game-panel {
+    width: 100%;
+}
+
+.setup-section {
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+.setup-section h2 {
+    color: #00ffff;
+    font-size: 1.1em;
+    margin-bottom: 8px;
+    font-family: 'Press Start 2P', cursive;
+}
+
+.player-input-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.player-input-row input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 2px solid #555;
+    background: #333;
+    color: #eee;
+    font-size: 1em;
+}
+
+.player-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+.player-item {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.remove-player-btn {
+    background: #ff4444;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 1em;
+    line-height: 1;
+}
+
+.mode-selector {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.mode-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 10px;
+    border: 2px solid #555;
+    background: #333;
+    color: #eee;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.2s;
+}
+
+.mode-btn.active {
+    border-color: #00ffff;
+    background: rgba(0, 255, 255, 0.2);
+    color: #00ffff;
+}
+
+.round-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.round-controls span {
+    font-size: 1.5em;
+    color: #00ffff;
+    font-family: 'Press Start 2P', cursive;
+    min-width: 40px;
+    text-align: center;
+}
+
+.timer-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.timer-controls span {
+    font-size: 1.3em;
+    color: #00ffff;
+    font-family: 'Press Start 2P', cursive;
+    min-width: 60px;
+}
+
+.primary-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: #00ff88;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: transform 0.1s;
+}
+
+.primary-btn:hover {
+    transform: translateY(-2px);
+    background-color: #00dd77;
+}
+
+.secondary-btn {
+    padding: 8px 16px;
+    background: #444;
+    color: #eee;
+    border: 2px solid #666;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.2s;
+}
+
+.secondary-btn:hover {
+    background: #555;
+    border-color: #888;
+}
+
+.danger-btn {
+    padding: 8px 16px;
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.2s;
+}
+
+.danger-btn:hover {
+    background: #cc3333;
+}
+
+/* ---------- Game panel layout ---------- */
+.game-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.game-info-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    flex-wrap: wrap;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.game-info-bar span {
+    color: #00ffff;
+    font-size: 0.9em;
+}
 
 .slots {
     display: flex;
-    justify-content: space-around;
-    margin-bottom: 40px;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 30px;
 }
 
 .slot {
@@ -91,26 +404,37 @@ h1:hover {
     background-color: #e9e9e9;
     box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    /* Ensure only one emoji is visible */
     line-height: 1;
-    /* Ensure single line for emoji */
-}
-
-/* Media query for mobile devices */
-@media (max-width: 768px) {
-    .slot {
-        font-size: 3em;
-        /* Smaller font for mobile */
-        width: 70px;
-        /* Smaller width */
-        height: 70px;
-        /* Smaller height */
-        padding: 10px;
-    }
 }
 
 .slot.spinning {
     animation: spin-animation 0.1s infinite linear;
+}
+
+.spin-btn {
+    margin: 22px auto;
+    padding: 14px 50px;
+    background: linear-gradient(135deg, #00ff88 0%, #00dd77 100%);
+    color: #000;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.3em;
+    font-weight: bold;
+    font-family: 'Press Start 2P', cursive;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.spin-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 22px rgba(0, 255, 136, 0.6);
+}
+
+.spin-btn:active {
+    transform: translateY(0) scale(0.98);
 }
 
 @keyframes spin-animation {
@@ -118,12 +442,10 @@ h1:hover {
         transform: translateY(0);
         opacity: 1;
     }
-
     50% {
         transform: translateY(-10px);
         opacity: 0.5;
     }
-
     100% {
         transform: translateY(0);
         opacity: 1;
@@ -151,39 +473,28 @@ button:active {
 }
 
 .result {
-    margin-top: 30px;
+    margin-top: 10px;
     font-size: 1.5em;
-    /* Bigger font size */
     color: #555;
-    height: 200px;
-    /* Fixed height to prevent container change */
+    min-height: 160px;
+    width: 100%;
+    box-sizing: border-box;
     overflow: hidden;
-    /* Hide overflowing text */
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: #f9f9f9;
     border-radius: 10px;
-    padding: 10px;
+    padding: 15px;
     border: 1px solid #eee;
     text-shadow: 1px 1px 2px black;
-    /* Tiny black border effect */
 }
 
-/* Media query for mobile devices */
-@media (max-width: 768px) {
-    .result {
-        height: 300px;
-        height: 220px;
-        /* Even bigger height for mobile */
-        font-size: 2em;
-        font-size: 1.5em;
-        /* Further reduced font size for mobile */
-    }
+.hidden {
+    display: none !important;
 }
 
-
-
+/* ---------- Emoji effects ---------- */
 .emoji-rain-container {
     position: fixed;
     top: 0;
@@ -191,39 +502,30 @@ button:active {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    /* Allows clicks to pass through */
     overflow: hidden;
     z-index: 9999;
-    /* Ensure it's on top of other content */
 }
 
 .falling-emoji {
     position: absolute;
     font-size: 2em;
-    /* Adjust size as needed */
     opacity: 0;
     animation: fall 3s linear forwards;
-    /* Animation duration and timing */
 }
 
 @keyframes fall {
     0% {
         transform: translateY(-10vh);
-        /* Start above the viewport */
         opacity: 0;
     }
-
     10% {
         opacity: 1;
     }
-
     90% {
         opacity: 1;
     }
-
     100% {
         transform: translateY(100vh);
-        /* End below the viewport */
         opacity: 0;
     }
 }
@@ -235,23 +537,17 @@ button:active {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    /* Allows clicks to pass through */
     overflow: hidden;
     z-index: 10000;
-    /* Ensure it's on top of everything */
 }
 
 .emoji-explosion {
     position: absolute;
     font-size: 0em;
-    /* Start small */
     opacity: 1;
     transform: translate(-50%, -50%);
-    /* Center the emoji */
     animation: explode 0.7s ease-out forwards;
-    /* Animation duration and timing */
     z-index: 10000;
-    /* Ensure it's on top of everything */
 }
 
 @keyframes explode {
@@ -260,18 +556,29 @@ button:active {
         opacity: 1;
         transform: translate(-50%, -50%) scale(0.1);
     }
-
     50% {
         font-size: 8em;
-        /* Zoom out */
         opacity: 0.8;
         transform: translate(-50%, -50%) scale(1.5);
     }
-
     100% {
         font-size: 10em;
-        /* Further zoom out */
         opacity: 0;
         transform: translate(-50%, -50%) scale(2);
+    }
+}
+
+@media (max-width: 768px) {
+    .slot {
+        font-size: 3em;
+        width: 70px;
+        height: 70px;
+        padding: 10px;
+    }
+    .container {
+        padding: 20px;
+    }
+    h1 {
+        font-size: 1.6em;
     }
 }
