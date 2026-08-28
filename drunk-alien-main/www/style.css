@@ -54,6 +54,8 @@ header {
   font-family: "Press Start 2P", cursive;
   text-decoration: none;
   transition: background-color 0.3s ease, transform 0.15s ease;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .back-to-hub-btn:hover {
