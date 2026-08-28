@@ -38,42 +38,27 @@ header {
   max-width: 100%;
   /* Ensure header doesn't overflow */
   padding-top: 20px;
-  position: relative;
 }
 
 /* ---------- Back to Hub button ---------- */
 .back-to-hub-btn {
-  position: absolute;
-  top: 12px;
-  left: -140px;
-  z-index: 100;
-  background: linear-gradient(145deg, #00ffff, #00b3b3);
-  border: none;
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-family: "Press Start 2P", cursive;
-  font-size: 8px;
-  color: #001a1a;
-  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 8px 16px;
+  background-color: rgba(76, 175, 80, 0.25);
+  color: #7ee787;
+  border: 1px solid #4CAF50;
+  border-radius: 5px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  font-size: 10px;
+  font-family: "Press Start 2P", cursive;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.15s ease;
 }
 
 .back-to-hub-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
-}
-
-@media (max-width: 760px) {
-  .back-to-hub-btn {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    font-size: 7px;
-    padding: 8px 10px;
-  }
-}
-  /* Add some top padding to the header */
+  background-color: rgba(76, 175, 80, 0.5);
+  transform: translateY(-1px);
 }
 
 #pauseButton {
