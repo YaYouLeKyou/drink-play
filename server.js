@@ -130,6 +130,54 @@ app.post('/api/jackpot/challenge', async (req, res) => {
     }
 });
 
+app.post('/api/never-ever/generate', async (req, res) => {
+    try {
+        const {
+            type = 'question',
+            language = 'en',
+            isSpicy = false,
+            history = [],
+            round = 1,
+            lastAction = '',
+            players = [],
+        } = req.body || {};
+
+        const NeverEverAI = require('./lib/never-ever-ai');
+        const neverEverAI = new NeverEverAI(aiClient);
+
+        const result = await neverEverAI.generateContent({
+            type,
+            language,
+            isSpicy,
+            history: Array.isArray(history) ? history : [],
+            round,
+            lastAction,
+            players: Array.isArray(players) ? players : [],
+        });
+
+        if (result.source === 'ai' && result.content) {
+            return res.json({
+                source: 'ai',
+                model: result.model,
+                content: result.content,
+            });
+        }
+
+        res.status(500).json({
+            source: 'fallback',
+            error: result.error || 'AI generation failed',
+            message: 'AI unavailable. Use local content for this request.',
+        });
+    } catch (error) {
+        console.error('[API] Never Ever generate error:', error.message);
+        res.status(500).json({
+            source: 'error',
+            error: 'Failed to generate content',
+            details: error.message,
+        });
+    }
+});
+
 app.use(express.static(rootDir, {
     dotfiles: 'deny',
 }));

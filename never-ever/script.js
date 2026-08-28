@@ -20,7 +20,22 @@ let lastSpicyActionIndex = -1;
 
 let isSpicy = false;
 let questionCounter = 0;
-let nextSpicy = Math.floor(Math.random() * 3) + 3; // 3 to 5
+let nextSpicy = Math.floor(Math.random() * 3) + 3;
+
+let questionHistory = [];
+let actionHistory = [];
+let questionUsedSet = new Set();
+let actionUsedSet = new Set();
+let roundCounter = 1;
+let totalClicks = 0;
+let doClicks = 0;
+let nextClicks = 0;
+let aiChance = 0.25;
+let currentNarrative = null;
+let currentMostLikely = null;
+let temporaryCardMessage = null;
+
+const AI_TIMEOUT = 5000;
 
 function t(key) {
     return gameContent[currentLanguage][key];
@@ -33,6 +48,18 @@ function updateUIText() {
     });
 }
 
+function isPoolExhausted(type) {
+    if (type === 'questions') {
+        const pool = isSpicy ? t('superSpicyQuestions') : t('questions');
+        return questionUsedSet.size >= pool.length;
+    }
+    if (type === 'actions') {
+        const pool = isSpicy ? t('superSpicyActions') : t('actions');
+        return actionUsedSet.size >= pool.length;
+    }
+    return false;
+}
+
 function getNewQuestion() {
     questionCounter++;
     if (questionCounter >= nextSpicy) {
@@ -42,7 +69,7 @@ function getNewQuestion() {
         let newSpicyQuestionIndex;
         do {
             newSpicyQuestionIndex = Math.floor(Math.random() * t('superSpicyQuestions').length);
-        } while (newSpicyQuestionIndex === lastSpicyQuestionIndex);
+        } while (newSpicyQuestionIndex === lastSpicyQuestionIndex && t('superSpicyQuestions').length > 1);
         lastSpicyQuestionIndex = newSpicyQuestionIndex;
         return t('superSpicyQuestions')[newSpicyQuestionIndex];
     } else {
@@ -50,7 +77,7 @@ function getNewQuestion() {
         let newQuestionIndex;
         do {
             newQuestionIndex = Math.floor(Math.random() * t('questions').length);
-        } while (newQuestionIndex === lastQuestionIndex);
+        } while (newQuestionIndex === lastQuestionIndex && t('questions').length > 1);
         lastQuestionIndex = newQuestionIndex;
         return t('questions')[newQuestionIndex];
     }
@@ -61,34 +88,149 @@ function getNewAction() {
         let newSpicyActionIndex;
         do {
             newSpicyActionIndex = Math.floor(Math.random() * t('superSpicyActions').length);
-        } while (newSpicyActionIndex === lastSpicyActionIndex);
+        } while (newSpicyActionIndex === lastSpicyActionIndex && t('superSpicyActions').length > 1);
         lastSpicyActionIndex = newSpicyActionIndex;
         return t('superSpicyActions')[newSpicyActionIndex];
     } else {
         let newActionIndex;
         do {
             newActionIndex = Math.floor(Math.random() * t('actions').length);
-        } while (newActionIndex === lastActionIndex);
+        } while (newActionIndex === lastActionIndex && t('actions').length > 1);
         lastActionIndex = newActionIndex;
         return t('actions')[newActionIndex];
     }
 }
 
-function displayNewQuestion() {
+function shouldUseAI() {
+    return Math.random() < aiChance;
+}
+
+async function fetchAIContent(type, context = {}) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), AI_TIMEOUT);
+
+    try {
+        const response = await fetch('/api/never-ever/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type,
+                language: currentLanguage,
+                isSpicy,
+                history: type === 'question' ? questionHistory : type === 'action' ? actionHistory : [],
+                round: roundCounter,
+                lastAction: context.lastAction || '',
+                players: context.players || [],
+            }),
+            signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.source === 'ai' && data.content) {
+            return data.content;
+        }
+        return null;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        console.warn(`[AI] ${type} fetch failed:`, error.message);
+        return null;
+    }
+}
+
+function showTemporaryCardMessage(message) {
+    temporaryCardMessage = message;
+    const originalText = questionText.innerText;
+    questionText.setAttribute('data-original-text', originalText);
+    questionText.innerText = message;
+    questionText.classList.add('fade');
+    setTimeout(() => questionText.classList.remove('fade'), 50);
+}
+
+function clearTemporaryCardMessage() {
+    if (temporaryCardMessage) {
+        const originalText = questionText.getAttribute('data-original-text');
+        if (originalText) {
+            questionText.innerText = originalText;
+            questionText.removeAttribute('data-original-text');
+        }
+        temporaryCardMessage = null;
+    }
+}
+
+function updateAdaptiveSpice() {
+    if (totalClicks < 3) return;
+
+    const ratio = doClicks / totalClicks;
+    if (ratio > 0.6) {
+        aiChance = 0.4;
+        nextSpicy = Math.floor(Math.random() * 2) + 2;
+    } else if (ratio > 0.4) {
+        aiChance = 0.3;
+        nextSpicy = Math.floor(Math.random() * 3) + 2;
+    } else {
+        aiChance = 0.15;
+        nextSpicy = Math.floor(Math.random() * 3) + 4;
+    }
+}
+
+async function displayNewQuestion() {
+    clearTemporaryCardMessage();
+    currentNarrative = null;
+    currentMostLikely = null;
+
     questionText.classList.add('fade');
     choicesContainer.classList.add('hidden');
     actionModal.classList.add('hidden');
     card.classList.remove('super-spicy', 'glitch');
 
-    setTimeout(() => {
-        questionText.innerText = getNewQuestion();
+    setTimeout(async () => {
+        let content = null;
+        const useAI = shouldUseAI() || isPoolExhausted('questions');
+
+        if (useAI) {
+            content = await fetchAIContent('question');
+        }
+
+        if (!content) {
+            content = getNewQuestion();
+            questionHistory.push(content);
+            questionUsedSet.add(lastQuestionIndex !== -1 ? lastQuestionIndex : content);
+        } else {
+            questionHistory.push(content);
+        }
+
+        let displayText = content;
+
+        if (shouldUseAI() && !isPoolExhausted('questions')) {
+            const narrative = await fetchAIContent('narrative');
+            if (narrative) {
+                currentNarrative = narrative;
+                displayText = `${narrative}\n\n${content}`;
+            }
+        }
+
+        if (shouldUseAI()) {
+            const mostLikely = await fetchAIContent('most_likely');
+            if (mostLikely) {
+                currentMostLikely = mostLikely;
+                displayText = `${displayText}\n\n${mostLikely}`;
+            }
+        }
+
+        questionText.innerText = displayText;
         if (isSpicy) {
             card.classList.add('super-spicy');
             card.classList.add('glitch');
         }
         questionText.classList.remove('fade');
         choicesContainer.classList.remove('hidden');
-    }, 500); // Match the CSS transition time
+    }, 500);
 }
 
 function setLanguage(lang) {
@@ -117,16 +259,61 @@ document.querySelectorAll('.lang-select').forEach(button => {
     });
 });
 
-doButton.addEventListener('click', () => {
-    actionText.innerText = getNewAction();
+doButton.addEventListener('click', async () => {
+    doClicks++;
+    totalClicks++;
+    updateAdaptiveSpice();
+
+    let action = null;
+    const useAI = shouldUseAI() || isPoolExhausted('actions');
+
+    if (useAI) {
+        action = await fetchAIContent('action');
+    }
+
+    if (!action) {
+        action = getNewAction();
+        actionHistory.push(action);
+        actionUsedSet.add(lastActionIndex !== -1 ? lastActionIndex : action);
+    } else {
+        actionHistory.push(action);
+    }
+
+    let displayAction = action;
+
+    if (shouldUseAI()) {
+        const comment = await fetchAIContent('sarcastic_comment');
+        if (comment) {
+            displayAction = `${action}\n\n— ${comment}`;
+        }
+    }
+
+    actionText.innerText = displayAction;
     actionModal.classList.remove('hidden');
 });
 
-closeModalButton.addEventListener('click', () => {
+closeModalButton.addEventListener('click', async () => {
     actionModal.classList.add('hidden');
+    nextClicks++;
+    totalClicks++;
+    updateAdaptiveSpice();
+
+    if (shouldUseAI() && actionHistory.length > 0) {
+        const lastAction = actionHistory[actionHistory.length - 1];
+        const consequence = await fetchAIContent('consequence', { lastAction });
+        if (consequence) {
+            showTemporaryCardMessage(consequence);
+        }
+    }
 });
 
-nextQuestionButton.addEventListener('click', displayNewQuestion);
+nextQuestionButton.addEventListener('click', () => {
+    nextClicks++;
+    totalClicks++;
+    roundCounter++;
+    updateAdaptiveSpice();
+    displayNewQuestion();
+});
 
 async function initGame() {
     try {
@@ -136,9 +323,7 @@ async function initGame() {
         displayNewQuestion();
     } catch (error) {
         console.error('Error loading game content:', error);
-        // Fallback or error message to user
     }
 }
 
 initGame();
-
