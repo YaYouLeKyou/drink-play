@@ -1,0 +1,37 @@
+# Node.js
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Capacitor / Android build artifacts
+drunkin-alienM-main/android/
+drunkin-alienM-main/node_modules/
+drunkin-alienM-main/.gradle/
+drunkin-alienM-main/build/
+drunkin-alienM-main/.idea/
+
+# Build output
+dist/
+build/
+
+# Lock files for sub-projects (we use root package.json)
+drunkin-alienM-main/.package-lock.json

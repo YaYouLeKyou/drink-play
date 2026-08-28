@@ -1,0 +1,277 @@
+html,
+body {
+    overflow: hidden;
+    /* Ensures no scrollbars */
+    width: 100vw;
+    /* Full viewport width */
+    height: 100vh;
+    /* Full viewport height */
+    margin: 0;
+    /* Remove default margins */
+    padding: 0;
+    /* Remove default paddings */
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #222;
+    /* Fallback background color */
+    color: #eee;
+    /* Light text color for contrast */
+    background-image: url('./img/casino3.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* Media query for mobile devices to handle background-attachment */
+@media (max-width: 768px) {
+    body {
+        background-attachment: scroll;
+        /* Change to scroll on mobile */
+    }
+}
+
+.container {
+    background-color: rgba(0, 0, 0, 0.7);
+    /* Black transparent background */
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 90%;
+    max-width: 500px;
+}
+
+h1 {
+    color: #00ffff;
+    /* Cyan for 80s feel */
+    margin-bottom: 30px;
+    font-family: 'Press Start 2P', cursive;
+    /* 80s arcade font */
+    text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff, 0 0 15px #00ffff,
+        -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+    /* Neon glow + More pronounced black border effect */
+    font-size: 2.5em;
+    /* Adjust size */
+    transition: color 0.5s ease-in-out;
+    /* Smooth color transition */
+}
+
+h1:hover {
+    color: #ff00ff;
+    /* Magenta on hover */
+}
+
+/* Import Google Font for retro style */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start 2P&display=swap');
+
+.slots {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 40px;
+}
+
+.slot {
+    font-size: 4em;
+    padding: 20px;
+    border: 3px solid #ddd;
+    border-radius: 10px;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #e9e9e9;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    /* Ensure only one emoji is visible */
+    line-height: 1;
+    /* Ensure single line for emoji */
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+    .slot {
+        font-size: 3em;
+        /* Smaller font for mobile */
+        width: 70px;
+        /* Smaller width */
+        height: 70px;
+        /* Smaller height */
+        padding: 10px;
+    }
+}
+
+.slot.spinning {
+    animation: spin-animation 0.1s infinite linear;
+}
+
+@keyframes spin-animation {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    50% {
+        transform: translateY(-10px);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.result {
+    margin-top: 30px;
+    font-size: 1.5em;
+    /* Bigger font size */
+    color: #555;
+    height: 200px;
+    /* Fixed height to prevent container change */
+    overflow: hidden;
+    /* Hide overflowing text */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid #eee;
+    text-shadow: 1px 1px 2px black;
+    /* Tiny black border effect */
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+    .result {
+        height: 300px;
+        height: 220px;
+        /* Even bigger height for mobile */
+        font-size: 2em;
+        font-size: 1.5em;
+        /* Further reduced font size for mobile */
+    }
+}
+
+
+
+.emoji-rain-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* Allows clicks to pass through */
+    overflow: hidden;
+    z-index: 9999;
+    /* Ensure it's on top of other content */
+}
+
+.falling-emoji {
+    position: absolute;
+    font-size: 2em;
+    /* Adjust size as needed */
+    opacity: 0;
+    animation: fall 3s linear forwards;
+    /* Animation duration and timing */
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-10vh);
+        /* Start above the viewport */
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(100vh);
+        /* End below the viewport */
+        opacity: 0;
+    }
+}
+
+.emoji-explosion-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    /* Allows clicks to pass through */
+    overflow: hidden;
+    z-index: 10000;
+    /* Ensure it's on top of everything */
+}
+
+.emoji-explosion {
+    position: absolute;
+    font-size: 0em;
+    /* Start small */
+    opacity: 1;
+    transform: translate(-50%, -50%);
+    /* Center the emoji */
+    animation: explode 0.7s ease-out forwards;
+    /* Animation duration and timing */
+    z-index: 10000;
+    /* Ensure it's on top of everything */
+}
+
+@keyframes explode {
+    0% {
+        font-size: 0em;
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.1);
+    }
+
+    50% {
+        font-size: 8em;
+        /* Zoom out */
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1.5);
+    }
+
+    100% {
+        font-size: 10em;
+        /* Further zoom out */
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(2);
+    }
+}
