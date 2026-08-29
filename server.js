@@ -140,6 +140,7 @@ app.post('/api/never-ever/generate', async (req, res) => {
             round = 1,
             lastAction = '',
             players = [],
+            mood = 'balanced',
         } = req.body || {};
 
         const NeverEverAI = require('./lib/never-ever-ai');
@@ -153,6 +154,7 @@ app.post('/api/never-ever/generate', async (req, res) => {
             round,
             lastAction,
             players: Array.isArray(players) ? players : [],
+            mood,
         });
 
         if (result.source === 'ai' && result.content) {

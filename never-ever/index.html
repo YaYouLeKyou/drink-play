@@ -12,8 +12,39 @@
 <body>
     <a id="back-to-hub" class="back-to-hub-btn" href="../index.html">&#8592; Back to Hub</a>
     <div class="top-bar">
-        <button id="lang-menu-button" class="styled-button" data-i18n-key="languages">Languages</button>
+        <div class="top-bar-center">
+            <select id="host-voice-select" class="styled-button top-bar-btn" style="padding: 6px 10px; font-size: 12px;">
+                <option value="">Loading voices...</option>
+            </select>
+        </div>
     </div>
+    <div id="players-display" class="players-display">
+        <div class="players-controls">
+            <button id="host-mute-button" class="styled-button players-ctrl-btn">🔊</button>
+            <button id="host-timer-button" class="styled-button players-ctrl-btn">⏱️</button>
+            <button id="host-reset-button" class="styled-button players-ctrl-btn">🔄</button>
+            <button id="lang-menu-button" class="styled-button players-ctrl-btn" data-i18n-key="languages">Languages</button>
+        </div>
+        <div id="players-list" class="players-list"></div>
+        <div class="players-input-group">
+            <input type="text" id="player-name-input" class="player-input" placeholder="Your name..." maxlength="20">
+            <button id="add-player-btn" class="styled-button player-add-btn">Add</button>
+        </div>
+    </div>
+
+    <div id="welcome-overlay" class="welcome-overlay">
+        <div class="welcome-card">
+            <h1 class="welcome-title">Never Ever</h1>
+            <p class="welcome-subtitle" data-i18n-key="welcome_subtitle">Drop the act. Spill the secrets.</p>
+            <div class="welcome-input-group">
+                <input type="text" id="welcome-player-input" class="welcome-input" placeholder="Your name..." maxlength="20">
+                <button id="welcome-add-btn" class="styled-button welcome-btn">Add</button>
+            </div>
+            <div id="welcome-players-list" class="welcome-players-list"></div>
+            <button id="start-game-btn" class="styled-button start-btn" disabled>Start Game</button>
+        </div>
+    </div>
+
     <div class="container">
         <div class="card">
             <div class="spicy-title" data-i18n-key="super_spicy">Super Spicy 🌶️</div>
