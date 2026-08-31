@@ -170,6 +170,11 @@ body.rtl .back-to-hub-btn {
     align-items: center;
     z-index: 200;
     backdrop-filter: blur(10px);
+    pointer-events: none;
+}
+
+.welcome-card {
+    pointer-events: auto;
 }
 
 .welcome-card {
@@ -426,8 +431,10 @@ body.rtl .back-to-hub-btn {
 .players-display {
     position: fixed;
     bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: fit-content;
     text-align: center;
     padding: 12px;
     font-size: 13px;
@@ -447,10 +454,13 @@ body.rtl .back-to-hub-btn {
 }
 
 .players-controls {
+    position: fixed;
+    top: 14px;
+    right: 20px;
+    z-index: 120;
     display: flex;
     gap: 8px;
-    justify-content: center;
-    flex-wrap: wrap;
+    justify-content: flex-end;
     pointer-events: auto;
 }
 

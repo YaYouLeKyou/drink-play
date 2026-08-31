@@ -465,6 +465,7 @@ function setup() {
     gameState.boss3Defeated = false;
     gameState.boss3AppearedOnce = false;
     gameState.boss3AppearedTwice = false;
+    if (window.DA_Audio) window.DA_Audio.playLevel('home');
     effectiveEnemyMinInterval = isMobile ? enemyMinInterval * 2 : enemyMinInterval;
     gameState.lastAlternatingEnemyType = "enemy1";
     gameState.onFire = false;
@@ -658,6 +659,7 @@ function update() {
                 if (gameState.activeBoss.hp <= 0) {
                     createExplosion(gameState.activeBoss.x + gameState.activeBoss.width / 2, gameState.activeBoss.y + gameState.activeBoss.height / 2, 50);
                     createFireworks(gameState.activeBoss.x + gameState.activeBoss.width / 2, gameState.activeBoss.y + gameState.activeBoss.height / 2, 100);
+                    if (window.DA_Audio) window.DA_Audio.sfx.bossDeath();
                     const currentLevel = gameState.activeBoss.level;
                     if (currentLevel === 1) {
                         gameState.boss1Defeated = true;
@@ -676,6 +678,7 @@ function update() {
                     gameState.enemies = []; // Clear all enemies
                     gameState.pipesEntered = 0;
                     showMessageWithDuration("Congratulation!", "", "gold", 120);
+                    if (currentLevel === 3 && window.DA_Audio) window.DA_Audio.playLevel('ending');
                     setTimeout(() => {
                         let nextMessage = currentLevel < 3 ? `Level ${currentLevel + 1}` : "You are";
                         let nextMessage2 = currentLevel < 3 ? "Start!" : "the boss!";
@@ -693,6 +696,7 @@ function update() {
                 const enemy = gameState.enemies[j];
                 if (shot.x < enemy.x + enemy.width && shot.x + shot.width > enemy.x && shot.y < enemy.y + enemy.height && shot.y + shot.height > enemy.y) {
                     createExplosion(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2);
+                    if (window.DA_Audio) window.DA_Audio.sfx.explosion();
                     gameState.shots.splice(i, 1);
                     const enemyCenterX = enemy.x + enemy.width / 2;
                     const enemyCenterY = enemy.y + enemy.height / 2;
@@ -771,18 +775,22 @@ function update() {
         }
 
         if (gameState.currentScore === 60 && !gameState.bossMode && !gameState.postBossDelayActive && !gameState.boss1Defeated) {
-            spawnBoss(1)
+            spawnBoss(1);
+            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playLevel('level2'); }
         }
         if (gameState.currentScore === 120 && !gameState.bossMode && !gameState.postBossDelayActive && !gameState.boss2Defeated) {
-            spawnBoss(2)
+            spawnBoss(2);
+            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playLevel('level3'); }
         }
         if (gameState.currentScore === 180 && !gameState.bossMode && !gameState.postBossDelayActive && !gameState.boss3AppearedOnce) {
             spawnBoss(3);
-            gameState.boss3AppearedOnce = true
+            gameState.boss3AppearedOnce = true;
+            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playLevel('level4'); }
         }
         if (gameState.currentScore === 500 && !gameState.bossMode && !gameState.postBossDelayActive && gameState.boss3Defeated && !gameState.boss3AppearedTwice) {
             spawnBoss(3);
-            gameState.boss3AppearedTwice = true
+            gameState.boss3AppearedTwice = true;
+            if (window.DA_Audio) window.DA_Audio.sfx.bossEntry();
         }
         if (gameState.bossMode && !gameState.activeBoss && gameState.bossEntryDelay > 0) {
             gameState.bossEntryDelay--;
@@ -874,7 +882,8 @@ function update() {
                 createCollectionParticles(gameState.cTenth + playerState.size[0] / 2, playerState.flyHeight + playerState.size[1] / 2, item.color, item.type === "beer" ? (isMobile ? 5 : 15) : 15);
                 if (item.type === "shield") {
                     playerState.hasShield = true;
-                    spawnShieldParticles()
+                    spawnShieldParticles();
+                    if (window.DA_Audio) window.DA_Audio.sfx.shield();
                 } else if (item.type === "weapon") {
                     if (playerState.weaponLevel < 3) {
                         playerState.weaponLevel++;
@@ -883,12 +892,14 @@ function update() {
                         if (playerState.weaponLevel === 1) message = "Double Shot!";
                         else if (playerState.weaponLevel === 2) message = "Triple Shot!";
                         else if (playerState.weaponLevel === 3) message = "Max Weapon!";
-                        showMessageWithDuration(message, "", "gold", 90)
+                        showMessageWithDuration(message, "", "gold", 90);
+                        if (window.DA_Audio) window.DA_Audio.sfx.item();
                     } else {
                         showMessageWithDuration("Max Weapon", "Level!", "gold", 90)
                     }
                 } else if (item.type === "bomb") {
                     clearScreen();
+                    if (window.DA_Audio) window.DA_Audio.sfx.bomb();
                 } else if (item.type === "vomit") {
                     if (playerState.weaponLevel > 0) {
                         playerState.weaponLevel = 0;
@@ -896,7 +907,8 @@ function update() {
                     }
                 } else if (item.type === "beer") {
                     gameState.beerScore++;
-                    gameState.bestBeerScore = Math.max(gameState.bestBeerScore, gameState.beerScore)
+                    gameState.bestBeerScore = Math.max(gameState.bestBeerScore, gameState.beerScore);
+                    if (window.DA_Audio) window.DA_Audio.sfx.beer();
                 }
                 gameState.items.splice(i, 1)
             }
@@ -956,7 +968,8 @@ function update() {
                 if (gameState.currentScore % 20 === 0 && gameState.currentScore !== 60 && gameState.currentScore !== 120 && gameState.currentScore !== 180) {
                     gameState.speed += gameSettings.speedIncreaseAmount;
                     gameState.showSpeedUpAd = true;
-                    gameState.speedUpAdTimer = gameSettings.speedUpAdDuration
+                    gameState.speedUpAdTimer = gameSettings.speedUpAdDuration;
+                    if (window.DA_Audio) window.DA_Audio.sfx.speedBoost();
                 }
                 if (gameState.boss3Defeated && gameState.currentScore > 180 && (gameState.currentScore - 180) % 60 === 0) {
                     gameState.enemySpeed += gameSettings.enemySpeedIncreaseAmount
@@ -964,11 +977,12 @@ function update() {
                 if (gameState.currentScore > 300 && (gameState.currentScore - 300) % 60 === 0) {
                     effectiveEnemyMinInterval = Math.max(10, effectiveEnemyMinInterval - 5)
                 }
-                if (gameState.beerScore > 0 && gameState.beerScore % 10 === 0 && gameState.beerScore !== gameState.lastOnFireBeerScore) {
+if (gameState.beerScore > 0 && gameState.beerScore % 10 === 0 && gameState.beerScore !== gameState.lastOnFireBeerScore) {
                     gameState.onFire = true;
                     gameState.onFireTimer = gameSettings.ON_FIRE_DURATION;
                     showMessageWithDuration("ON FIRE!", "", "red", 120);
-                    gameState.lastOnFireBeerScore = gameState.beerScore
+                    gameState.lastOnFireBeerScore = gameState.beerScore;
+                    if (window.DA_Audio) window.DA_Audio.sfx.onFire();
                 }
             }
             const playerHitbox = {
@@ -1348,6 +1362,7 @@ function fireShot() {
             fireSingleShot(weaponColors[3], shotSpeedValue, 0, false, 10)
         }
     }
+    if (window.DA_Audio) window.DA_Audio.sfx.shoot();
 }
 
 function clearScreen() {
@@ -1375,6 +1390,8 @@ function handleInteractionStart() {
         gameState.gamePlaying = true;
         playerState.isThrusting = true;
         gameState.firstClickDone = true;
+        if (window.DA_Audio) window.DA_Audio.playLevel('level1');
+        if (window.DA_Audio) window.DA_Audio.sfx.jump();
         showMessageWithDuration("Level 1", "Start!", "white", 120)
     } else if (gameState.gamePlaying && !gameState.isPaused) {
         playerState.isThrusting = true;
