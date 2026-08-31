@@ -22,7 +22,10 @@
     <button id="rulesBtn" class="rules-btn" title="Rules">?
         <span class="rules-tooltip">Click to view game rules</span>
     </button>
-    
+
+    <!-- Cowboy host mute button -->
+    <button id="cowboyMuteBtn" class="cowboy-mute-btn" title="Toggle voice">🤠</button>
+
     <!-- Rules Modal (kept for when users want expanded view) -->
     <div id="rulesModal" class="rules-modal">
         <div class="rules-modal-content">
@@ -38,7 +41,7 @@
                     <li><strong>🍷🍷🍷</strong> : Truth or drink</li>
                     <li><strong>😂😂😂</strong> : Tell your funniest embarrassing story</li>
                     <li><strong>🍑🍑🍑</strong> : Sexy question</li>
-                    <li><strong>🍆🍆🍆</strong> : Sexy &amp; spicy question</li>
+                    <li><strong>🍆🍆🍆</strong> : Sexy & spicy question</li>
                     <li><strong>👽👽👽</strong> : Crazy dare</li>
                     <li><strong>❤️❤️❤️</strong> : Romantic challenge</li>
                 </ul>
@@ -103,6 +106,12 @@
                 <button id="backToHubBtn" class="secondary-btn">← Back to Hub</button>
                 <button id="tooHotBtn" class="danger-btn">Too Hot</button>
             </div>
+            <div class="cowboy-announcer">
+                <div class="cowboy-speech-bubble">
+                    <span id="cowboyText">Howdy, partner! Press Spin to start!</span>
+                </div>
+                <div class="cowboy-idle-warning" id="idleWarning"></div>
+            </div>
 
             <div class="slots">
                 <div class="slot" id="slot1"></div>
@@ -111,6 +120,7 @@
             </div>
 
             <button id="spinButton" class="spin-btn">Spin</button>
+            <button id="restartBtn" class="restart-btn">Restart Game</button>
 
             <div class="result" id="result">Spin the wheel to start!</div>
         </div>
@@ -119,5 +129,6 @@
     <div id="emoji-rain-container"></div>
     <div id="emoji-explosion-container"></div>
     <script src="script.js"></script>
+    <script src="../music-player.js" data-start="512 BB.mp3" defer></script>
 </body>
 </html>

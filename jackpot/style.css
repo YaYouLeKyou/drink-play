@@ -142,84 +142,88 @@ body {
     opacity: 1;
 }
 
-/* ---------- Rules Modal ---------- */
-.rules-modal {
+/* ---------- Cowboy Announcer ---------- */
+.cowboy-announcer {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.cowboy-speech-bubble {
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.8);
+    color: #00ff88;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.7em;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 2px solid rgba(0, 255, 136, 0.3);
+    max-width: 80%;
+    min-width: 200px;
+    position: relative;
+    word-wrap: break-word;
+}
+
+.cowboy-speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 10px 10px 0 10px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+}
+
+@keyframes speechBubblePop {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.cowboy-idle-warning {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.6em;
+    color: #ff4444;
+    margin-top: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    text-shadow: 0 0 5px rgba(255, 68, 68, 0.5);
+}
+
+.cowboy-idle-warning.show {
+    opacity: 1;
+    animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* ---------- Cowboy mute button ---------- */
+.cowboy-mute-btn {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 9998;
-    display: none;
+    top: 15px;
+    right: 105px;
+    z-index: 201;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    background: rgba(0, 0, 0, 0.55);
+    font-size: 1.2em;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+    display: flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(3px);
 }
 
-.rules-modal.open {
-    display: flex;
-}
-
-.rules-modal-content {
-    background: rgba(0, 0, 0, 0.95);
-    border-radius: 12px;
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    max-width: 500px;
-    width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-}
-
-.rules-modal-header {
-    padding: 15px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(0, 255, 255, 0.1);
-}
-
-.rules-modal-header h2 {
-    color: #00ffff;
-    margin: 0;
-    font-size: 1.3em;
-    font-family: 'Press Start 2P', cursive;
-}
-
-.rules-modal-body {
-    padding: 20px;
-}
-
-.rules-modal-body h3 {
-    color: #00ffff;
-    margin-bottom: 15px;
-    font-size: 1em;
-}
-
-.rules-modal-body p {
-    font-size: 0.85em;
-    color: #ddd;
-    line-height: 1.6;
-    margin-bottom: 12px;
-}
-
-.rules-modal-body ul {
-    list-style: none;
-    padding-left: 0;
-    margin: 12px 0;
-}
-
-.rules-modal-body li {
-    padding: 6px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    font-size: 0.85em;
-}
-
-.rules-modal-body strong {
-    color: #00ffff;
-    font-size: 1.1em;
+.cowboy-mute-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
 }
 
 /* ---------- Main container ---------- */
@@ -235,7 +239,7 @@ body {
     overflow-y: auto;
 }
 
-/* Slot machine and game styles (existing) */
+/* Slot machine and game styles */
 h1 {
     color: #00ffff;
     margin-bottom: 25px;

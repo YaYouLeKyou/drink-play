@@ -22,12 +22,101 @@ const state = {
     language: 'en',
     jackpotRules: {},
     tooHot: false,
-    maxRounds: 10,
     neverEverActive: false,
     neverEverMode: false,
     neverEverQuestionsUsed: 0,
     neverEverActionsUsed: 0,
 };
+
+// Cowboy announcer
+let cowboyVoiceEnabled = true;
+let lastActivity = Date.now();
+let idleCheckInterval = null;
+
+const cowboyMessages = {
+    ready: ['Howdy, partner! Let those wheels spin!', 'Yee-haw! The Jackpot wheel is loaded!', 'Grab your hat! The spin is on!', 'Whoa! Get ready to ride the jackpot!'],
+    spinning: ['Spinning...', 'Hold on tight!', 'This could be your lucky day!', 'You aint seen nothin yet!', 'Round and round she goes!'],
+    win: ['Jackpot! You hit the motherload!', 'Thats a hit!', 'Look at that luck!', 'Whatta ride!', 'Yeehaw! Thats how its done!', 'You knocked it out of the park!'],
+    lose: ['Next time, partner!', 'Keep tryin!', 'Better luck next spin!', 'Not today!', 'Dust yourself off!'],
+    idle: ['Say "Spin"!', 'Press the Spin button!', 'Aint nobody here but us chickens!', 'Yoo-hoo! Anybody home?'],
+    spinCommand: ['Spin!', 'GO!', 'Yeah!', 'Lets do this!', 'Spin that wheel!']
+};
+
+function announceCowboy(messageType, customMessage = null) {
+    const cowboyText = document.getElementById('cowboyText');
+    if (!cowboyVoiceEnabled || !cowboyText) return;
+    const messages = cowboyMessages[messageType] || [customMessage];
+    const message = customMessage || messages[Math.floor(Math.random() * messages.length)];
+    cowboyText.textContent = message;
+    cowboyText.style.animation = 'none';
+    cowboyText.offsetHeight;
+    cowboyText.style.animation = 'speechBubblePop 0.5s ease-out';
+}
+
+function resetIdleWarning() {
+    lastActivity = Date.now();
+    const idleWarning = document.getElementById('idleWarning');
+    if (idleWarning) idleWarning.classList.remove('show');
+}
+
+function checkIdle() {
+    const idleTime = Date.now() - lastActivity;
+    const idleWarning = document.getElementById('idleWarning');
+    if (idleTime > 20000 && !state.spinning) {
+        if (idleWarning) {
+            idleWarning.textContent = cowboyMessages.idle[0];
+            idleWarning.classList.add('show');
+        }
+        announceCowboy('spinCommand', 'Spin!');
+    } else if (idleTime <= 20000 && idleWarning && idleWarning.classList.contains('show')) {
+        idleWarning.classList.remove('show');
+    }
+}
+
+function playSound(soundType) {
+    if (!window.AudioContext && !window.webkitAudioContext) return;
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (soundType === 'spin') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(1500, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.5);
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.5);
+        } else if (soundType === 'win') {
+            const notes = [523, 659, 784, 1047];
+            notes.forEach((freq, i) => {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.connect(g);
+                g.connect(ctx.destination);
+                o.type = 'sine';
+                o.frequency.value = freq;
+                g.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.15);
+                g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.15 + 0.5);
+                o.start(ctx.currentTime + i * 0.15);
+                o.stop(ctx.currentTime + i * 0.15 + 0.5);
+            });
+        } else if (soundType === 'lose') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(300, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.3);
+        }
+    } catch (e) {
+        console.log('Audio error:', e);
+    }
+}
 
 const slot1 = document.getElementById('slot1');
 const slot2 = document.getElementById('slot2');
@@ -37,8 +126,11 @@ const resultDisplay = document.getElementById('result');
 const languageSelector = document.getElementById('language');
 const langDropdown = document.getElementById('langDropdown');
 const langBtn = document.getElementById('langBtn');
+const langLabel = document.getElementById('langLabel');
 const emojiRainContainer = document.getElementById('emoji-rain-container');
 const emojiExplosionContainer = document.getElementById('emoji-explosion-container');
+const cowboyMuteBtn = document.getElementById('cowboyMuteBtn');
+const restartBtn = document.getElementById('restartBtn');
 
 // Setup panel elements
 const setupPanel = document.getElementById('setupPanel');
@@ -79,120 +171,6 @@ function updateNeverEverUI() {
     }
 }
 
-function getNeverEverQuestion() {
-    if (!neverEverGameContent || !neverEverGameContent['en']) return "No questions available. Load the Never Ever game first.";
-
-    const questions = neverEverGameContent['en'].questions;
-    if (!questions || questions.length === 0) return "No questions available.";
-
-    let questionIndex;
-    do {
-        questionIndex = Math.floor(Math.random() * questions.length);
-    } while (questionIndex === lastNeverEverQuestionIndex && questions.length > 1);
-    lastNeverEverQuestionIndex = questionIndex;
-    state.neverEverQuestionsUsed++;
-
-    return questions[questionIndex];
-}
-
-function getNeverEverAction() {
-    if (!neverEverGameContent || !neverEverGameContent['en']) return "Take action!";
-
-    const actions = neverEverGameContent['en'].actions;
-    if (!actions || actions.length === 0) return "Take action!";
-
-    let actionIndex;
-    do {
-        actionIndex = Math.floor(Math.random() * actions.length);
-    } while (actionIndex === lastNeverEverActionIndex && actions.length > 1);
-    lastNeverEverActionIndex = actionIndex;
-    state.neverEverActionsUsed++;
-
-    return actions[actionIndex];
-}
-
-function getNeverEverSuperSpicyQuestion() {
-    if (!neverEverGameContent || !neverEverGameContent['en']) return "Super Spicy question not available.";
-
-    const superSpicyQuestions = neverEverGameContent['en'].superSpicyQuestions;
-    if (!superSpicyQuestions || superSpicyQuestions.length === 0) return "Super Spicy question not available.";
-
-    let questionIndex;
-    do {
-        questionIndex = Math.floor(Math.random() * superSpicyQuestions.length);
-    } while (questionIndex === lastNeverEverQuestionIndex && superSpicyQuestions.length > 1);
-    lastNeverEverQuestionIndex = questionIndex;
-    state.neverEverQuestionsUsed++;
-
-    return superSpicyQuestions[questionIndex];
-}
-
-function getNeverEverSuperSpicyAction() {
-    if (!neverEverGameContent || !neverEverGameContent['en']) return "Super Spicy action not available.";
-
-    const superSpicyActions = neverEverGameContent['en'].superSpicyActions;
-    if (!superSpicyActions || superSpicyActions.length === 0) return "Super Spicy action not available.";
-
-    let actionIndex;
-    do {
-        actionIndex = Math.floor(Math.random() * superSpicyActions.length);
-    } while (actionIndex === lastNeverEverActionIndex && superSpicyActions.length > 1);
-    lastNeverEverActionIndex = actionIndex;
-    state.neverEverActionsUsed++;
-
-    return superSpicyActions[actionIndex];
-}
-
-function getNeverEverChallenge() {
-    if (!neverEverGameContent || !neverEverGameContent['en']) {
-        return null;
-    }
-
-    const hasSuperSpicy = Math.random() < 0.2;
-
-    if (hasSuperSpicy) {
-        return {
-            challenge: getNeverEverSuperSpicyQuestion(),
-            source: 'neverEverSuperSpicy'
-        };
-    } else {
-        const isSpicy = Math.random() < 0.3;
-
-        if (isSpicy) {
-            return {
-                challenge: getNeverEverSuperSpicyQuestion(),
-                source: 'neverEverSpicy'
-            };
-        } else {
-            return {
-                challenge: getNeverEverQuestion(),
-                source: 'neverEver'
-            };
-        }
-    }
-}
-
-function getNeverEverResults() {
-    return {
-        questionsUsed: state.neverEverQuestionsUsed,
-        actionsUsed: state.neverEverActionsUsed,
-        neverEverActive: state.neverEverActive
-    };
-}
-
-function getNeverEverResults() {
-    return {
-        questionsUsed: state.neverEverQuestionsUsed,
-        actionsUsed: state.neverEverActionsUsed,
-        neverEverActive: state.neverEverActive
-    };
-}
-
-function showNeverEverResults() {
-    const results = getNeverEverResults();
-    console.log('Never Ever Results:', results);
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     fetch('rules.json')
         .then(response => response.json())
@@ -211,25 +189,31 @@ document.addEventListener('DOMContentLoaded', () => {
     slot1.textContent = '🍺';
     slot2.textContent = '🍺';
     slot3.textContent = '🍺';
+
+    idleCheckInterval = setInterval(checkIdle, 1000);
+    announceCowboy('ready');
 });
+
+document.addEventListener('click', resetIdleWarning);
+document.addEventListener('touchstart', resetIdleWarning);
+document.addEventListener('keydown', resetIdleWarning);
 
 function setupEventListeners() {
     languageSelector.addEventListener('change', (event) => {
         state.language = event.target.value;
         updateLanguage(state.language);
         langDropdown.classList.remove('open');
+        resetIdleWarning();
     });
 
     langBtn.addEventListener('click', () => {
         langDropdown.classList.toggle('open');
     });
 
-    // Back to Hub
     if (backToHubBtn) {
         backToHubBtn.addEventListener('click', goToHub);
     }
 
-    // Rules Modal
     rulesBtn.addEventListener('click', () => {
         rulesModal.classList.add('open');
     });
@@ -238,7 +222,6 @@ function setupEventListeners() {
         rulesModal.classList.remove('open');
     });
 
-    // Close modal when clicking outside
     rulesModal.addEventListener('click', (event) => {
         if (event.target === rulesModal) {
             rulesModal.classList.remove('open');
@@ -279,11 +262,9 @@ function setupEventListeners() {
     });
 
     nextRoundBtn.addEventListener('click', () => {
-        if (state.round < state.maxRounds) {
-            state.round++;
-            roundDisplay.textContent = state.round;
-            updateUI();
-        }
+        state.round++;
+        roundDisplay.textContent = state.round;
+        updateUI();
     });
 
     startTimerBtn.addEventListener('click', startTimer);
@@ -300,6 +281,17 @@ function setupEventListeners() {
             tooHotBtn.textContent = 'Too Hot';
         }, 2000);
     });
+
+    if (restartBtn) {
+        restartBtn.addEventListener('click', restartGame);
+    }
+
+    if (cowboyMuteBtn) {
+        cowboyMuteBtn.addEventListener('click', () => {
+            cowboyVoiceEnabled = !cowboyVoiceEnabled;
+            cowboyMuteBtn.textContent = cowboyVoiceEnabled ? '🤠' : '🔇';
+        });
+    }
 }
 
 function renderPlayers() {
@@ -395,6 +387,44 @@ function goToHub() {
     window.location.href = '../index.html';
 }
 
+function restartGame() {
+    stopTimer();
+    if (idleCheckInterval) clearInterval(idleCheckInterval);
+    state.players = [];
+    state.round = 1;
+    state.history = [];
+    state.tooHot = false;
+    state.spinning = false;
+    state.mode = 'classic';
+    state.timerSeconds = 0;
+
+    roundDisplay.textContent = state.round;
+    timerDisplay.textContent = '00:00';
+    gameTimerDisplay.textContent = '00:00';
+
+    modeBtns.forEach(b => b.classList.remove('active'));
+    const classicBtn = document.querySelector('.mode-btn[data-mode="classic"]');
+    if (classicBtn) classicBtn.classList.add('active');
+
+    renderPlayers();
+    updateUI();
+
+    gamePanel.classList.add('hidden');
+    setupPanel.classList.remove('hidden');
+
+    resultDisplay.textContent = 'Spin the wheel to start!';
+    resultDisplay.style.backgroundColor = '#f9f9f9';
+    resultDisplay.style.color = '#555';
+
+    slot1.textContent = '🍺';
+    slot2.textContent = '🍺';
+    slot3.textContent = '🍺';
+
+    announceCowboy('ready');
+    idleCheckInterval = setInterval(checkIdle, 1000);
+    resetIdleWarning();
+}
+
 function startGame() {
     setupPanel.classList.add('hidden');
     gamePanel.classList.remove('hidden');
@@ -402,6 +432,7 @@ function startGame() {
     roundDisplay.textContent = state.round;
     updateUI();
     startTimer();
+    announceCowboy('ready');
 }
 
 function getRandomEmoji() {
@@ -412,6 +443,9 @@ async function spin() {
     if (state.spinning) return;
     state.spinning = true;
     state.tooHot = false;
+    resetIdleWarning();
+    playSound('spin');
+    announceCowboy('spinning');
     spinButton.textContent = state.language === 'fr' ? 'Tourne...' : 'Spinning...';
     resultDisplay.textContent = '';
     resultDisplay.style.backgroundColor = '#f9f9f9';
@@ -519,16 +553,17 @@ async function checkResult(emoji1, emoji2, emoji3) {
 
         startEmojiRain(winningEmoji, 50);
         triggerEmojiExplosion(winningEmoji);
+        playSound('win');
+        announceCowboy('win');
 
         state.round++;
-        if (state.round > state.maxRounds) {
-            state.round = 1;
-        }
         roundDisplay.textContent = state.round;
         updateUI();
     } else {
         resultDisplay.style.backgroundColor = '#f9f9f9';
         resultDisplay.style.color = '#555';
+        playSound('lose');
+        announceCowboy('lose');
         const messages = {
             fr: 'Pas de jackpot. Relance !',
             es: 'No hay jackpot. ¡Gira de nuevo!',
