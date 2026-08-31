@@ -16,6 +16,7 @@
         { name: 'Level 2',     file: 'Level 2.mp3',            track: 'level2' },
         { name: 'Level 3',     file: 'level 3.mp3',            track: 'level3' },
         { name: 'Level 4',     file: 'level 4.mp3',            track: 'level4' },
+        { name: 'Boss 1',      file: 'Boss 1.mp3',             track: 'boss1'  },
         { name: 'Generique',   file: 'generique de fin.mp3',   track: 'ending' }
     ];
 
@@ -53,6 +54,7 @@
     musicAudio.loop = true;
 
     var currentTrackKey = null;
+    var levelTrackBeforeBoss = null;
     var userMuted = false;
 
     function trackUrl(file) {
@@ -87,6 +89,18 @@
         }
         updateTitle();
         updatePlayButton();
+    }
+
+    function playBossMusic() {
+        if (currentTrackKey === 'boss1') return;
+        levelTrackBeforeBoss = currentTrackKey;
+        playTrack('boss1');
+    }
+
+    function resumeLevelMusic() {
+        if (levelTrackBeforeBoss) {
+            playTrack(levelTrackBeforeBoss);
+        }
     }
 
     function stopMusic() {
@@ -385,9 +399,36 @@
         playSweep(400, 800, 0.12, 'square', 0.12);
     }
 
-    function sfxShoot() {
-        playTone(1200, 0.05, 'square', 0.08);
-        playTone(600, 0.05, 'square', 0.06);
+    function sfxShoot(type) {
+        // Default to basic shot
+        if (type === 'fire') {
+            // Rapid fire for on-fire mode
+            playTone(1000, 0.03, 'square', 0.1);
+            playTone(1200, 0.03, 'square', 0.08);
+            playTone(800, 0.03, 'square', 0.06);
+        } else if (type === 'basic') {
+            // Basic single shot
+            playTone(800, 0.05, 'square', 0.08);
+            playTone(600, 0.05, 'square', 0.06);
+        } else if (type === 'double') {
+            // Double shot - slightly higher pitch
+            playTone(1000, 0.05, 'square', 0.09);
+            playTone(800, 0.05, 'square', 0.07);
+        } else if (type === 'triple') {
+            // Triple shot - even higher
+            playTone(1200, 0.05, 'square', 0.1);
+            playTone(1000, 0.05, 'square', 0.08);
+            playTone(800, 0.05, 'square', 0.06);
+        } else if (type === 'max') {
+            // Max weapon - powerful sound
+            playTone(1500, 0.06, 'square', 0.12);
+            playTone(1000, 0.06, 'square', 0.1);
+            playTone(500, 0.06, 'square', 0.08);
+        } else {
+            // Default/fallback
+            playTone(1200, 0.05, 'square', 0.08);
+            playTone(600, 0.05, 'square', 0.06);
+        }
     }
 
     function sfxBeer() {
@@ -476,6 +517,52 @@
         ], 100, 'square', 0.1);
     }
 
+    function sfxWeaponUpgrade() {
+        // rising power-up sound
+        playSequence([
+            { freq: 523, dur: 0.1 },
+            { freq: 659, dur: 0.1 },
+            { freq: 784, dur: 0.1 },
+            { freq: 1047, dur: 0.2 }
+        ], 80, 'square', 0.15);
+    }
+
+    function sfxWeaponDowngrade() {
+        // sad descending sound
+        playSequence([
+            { freq: 784, dur: 0.1 },
+            { freq: 659, dur: 0.1 },
+            { freq: 523, dur: 0.15 },
+            { freq: 392, dur: 0.2 }
+        ], 100, 'triangle', 0.12);
+    }
+
+    function sfxWeaponReset() {
+        // neutral "reset" beep
+        playSequence([
+            { freq: 440, dur: 0.1 },
+            { freq: 440, dur: 0.1 }
+        ], 80, 'square', 0.1);
+    }
+
+    function sfxStart() {
+        // energetic start jingle
+        playSequence([
+            { freq: 523, dur: 0.1 },
+            { freq: 659, dur: 0.1 },
+            { freq: 784, dur: 0.1 },
+            { freq: 1047, dur: 0.3 }
+        ], 80, 'square', 0.18);
+    }
+
+    function sfxItemBoost() {
+        // power-up collect sound
+        playSequence([
+            { freq: 880, dur: 0.08 },
+            { freq: 1320, dur: 0.12 }
+        ], 60, 'triangle', 0.15);
+    }
+
     /* ============================================================
        Public API
        ============================================================ */
@@ -485,6 +572,8 @@
         playLevel: playTrack,
         playHome: function () { playTrack('home'); },
         playEnding: function () { playTrack('ending'); },
+        playBoss: playBossMusic,
+        resumeLevel: resumeLevelMusic,
         stopMusic: stopMusic,
         mute: function () {
             userMuted = true;
@@ -511,7 +600,12 @@
             shield: sfxShield,
             bomb: sfxBomb,
             onFire: sfxOnFire,
-            speedBoost: sfxSpeedBoost
+            speedBoost: sfxSpeedBoost,
+            weaponUpgrade: sfxWeaponUpgrade,
+            weaponDowngrade: sfxWeaponDowngrade,
+            weaponReset: sfxWeaponReset,
+            start: sfxStart,
+            itemBoost: sfxItemBoost
         }
     };
 

@@ -215,13 +215,13 @@ input:hover {
 
 /* ===== AI Chat ===== */
 
-#ai-chat-container {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    z-index: 1000;
-    font-family: 'Montserrat', sans-serif;
-}
+    #ai-chat-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 1000;
+        font-family: 'Montserrat', sans-serif;
+    }
 
 .ai-chat-toggle {
     background: linear-gradient(45deg, #6c63ff 0%, #a29bfe 100%);

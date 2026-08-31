@@ -668,7 +668,7 @@ function update() {
                         gameState.boss2Defeated = true;
                         gameState.enemySpeed += 1
                     } else if (currentLevel === 3) {
-                        gameState.boss3Defeated = true
+                        gameState.boss3Defeated = true;
                     }
                     gameState.activeBoss = null;
                     gameState.bossMode = false;
@@ -678,7 +678,14 @@ function update() {
                     gameState.enemies = []; // Clear all enemies
                     gameState.pipesEntered = 0;
                     showMessageWithDuration("Congratulation!", "", "gold", 120);
-                    if (currentLevel === 3 && window.DA_Audio) window.DA_Audio.playLevel('ending');
+                    if (currentLevel === 3 && window.DA_Audio) {
+                        window.DA_Audio.playLevel('ending');
+                    } else if (window.DA_Audio) {
+                        // Resume level music after boss fight
+                        if (currentLevel === 1) window.DA_Audio.playLevel('level2');
+                        else if (currentLevel === 2) window.DA_Audio.playLevel('level3');
+                        else if (currentLevel === 3) window.DA_Audio.playLevel('level4');
+                    }
                     setTimeout(() => {
                         let nextMessage = currentLevel < 3 ? `Level ${currentLevel + 1}` : "You are";
                         let nextMessage2 = currentLevel < 3 ? "Start!" : "the boss!";
@@ -776,16 +783,16 @@ function update() {
 
         if (gameState.currentScore === 60 && !gameState.bossMode && !gameState.postBossDelayActive && !gameState.boss1Defeated) {
             spawnBoss(1);
-            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playLevel('level2'); }
+            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playBoss(); }
         }
         if (gameState.currentScore === 120 && !gameState.bossMode && !gameState.postBossDelayActive && !gameState.boss2Defeated) {
             spawnBoss(2);
-            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playLevel('level3'); }
+            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playBoss(); }
         }
         if (gameState.currentScore === 180 && !gameState.bossMode && !gameState.postBossDelayActive && !gameState.boss3AppearedOnce) {
             spawnBoss(3);
             gameState.boss3AppearedOnce = true;
-            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playLevel('level4'); }
+            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playBoss(); }
         }
         if (gameState.currentScore === 500 && !gameState.bossMode && !gameState.postBossDelayActive && gameState.boss3Defeated && !gameState.boss3AppearedTwice) {
             spawnBoss(3);
@@ -893,7 +900,7 @@ function update() {
                         else if (playerState.weaponLevel === 2) message = "Triple Shot!";
                         else if (playerState.weaponLevel === 3) message = "Max Weapon!";
                         showMessageWithDuration(message, "", "gold", 90);
-                        if (window.DA_Audio) window.DA_Audio.sfx.item();
+                        if (window.DA_Audio) window.DA_Audio.sfx.weaponUpgrade();
                     } else {
                         showMessageWithDuration("Max Weapon", "Level!", "gold", 90)
                     }
@@ -903,7 +910,10 @@ function update() {
                 } else if (item.type === "vomit") {
                     if (playerState.weaponLevel > 0) {
                         playerState.weaponLevel = 0;
-                        showMessageWithDuration("Basic Shot!", "", "orange", 90)
+                        showMessageWithDuration("Basic Shot!", "", "orange", 90);
+                        if (window.DA_Audio) window.DA_Audio.sfx.weaponDowngrade();
+                    } else {
+                        if (window.DA_Audio) window.DA_Audio.sfx.weaponReset();
                     }
                 } else if (item.type === "beer") {
                     gameState.beerScore++;
@@ -1362,7 +1372,13 @@ function fireShot() {
             fireSingleShot(weaponColors[3], shotSpeedValue, 0, false, 10)
         }
     }
-    if (window.DA_Audio) window.DA_Audio.sfx.shoot();
+    if (window.DA_Audio) {
+        if (gameState.onFire) window.DA_Audio.sfx.shoot('fire');
+        else if (playerState.weaponLevel === 0) window.DA_Audio.sfx.shoot('basic');
+        else if (playerState.weaponLevel === 1) window.DA_Audio.sfx.shoot('double');
+        else if (playerState.weaponLevel === 2) window.DA_Audio.sfx.shoot('triple');
+        else if (playerState.weaponLevel >= 3) window.DA_Audio.sfx.shoot('max');
+    }
 }
 
 function clearScreen() {
@@ -1391,6 +1407,7 @@ function handleInteractionStart() {
         playerState.isThrusting = true;
         gameState.firstClickDone = true;
         if (window.DA_Audio) window.DA_Audio.playLevel('level1');
+        if (window.DA_Audio) window.DA_Audio.sfx.start();
         if (window.DA_Audio) window.DA_Audio.sfx.jump();
         showMessageWithDuration("Level 1", "Start!", "white", 120)
     } else if (gameState.gamePlaying && !gameState.isPaused) {
