@@ -24,6 +24,11 @@
             marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
             residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
             alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
+            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
+            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
+            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
+            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
+            music: 'sherlock.mp3',
         },
         'sherlock-holmes': {
             universe: ASSETS_BASE + 'univers/sherlock holmes.png',
@@ -35,6 +40,11 @@
             marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
             residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
             alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
+            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
+            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
+            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
+            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
+            music: 'sherlock.mp3',
         },
         'cyberpunk': {
             universe: ASSETS_BASE + 'univers/cyberpunk.png',
@@ -46,6 +56,11 @@
             marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
             residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
             alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
+            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
+            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
+            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
+            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
+            music: 'cyberpunk.mp3',
         },
         'heroic-fantasy': {
             universe: ASSETS_BASE + 'univers/heroic fantasy.png',
@@ -57,6 +72,11 @@
             marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
             residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
             alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
+            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
+            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
+            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
+            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
+            music: 'heroic fantasy.mp3',
         },
         'sci-fi': {
             universe: ASSETS_BASE + 'univers/sci fi.png',
@@ -68,6 +88,11 @@
             marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
             residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
             alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
+            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
+            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
+            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
+            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
+            music: 'SF.mp3',
         },
         'lovecraftian': {
             universe: ASSETS_BASE + 'univers/lovecraft.png',
@@ -79,6 +104,11 @@
             marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
             residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
             alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
+            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
+            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
+            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
+            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
+            music: 'peur.mp3',
         },
         'antiquite': {
             universe: ASSETS_BASE + 'univers/Antiquité.png',
@@ -90,6 +120,11 @@
             marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
             residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
             alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
+            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
+            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
+            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
+            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
+            music: 'gaginator.mp3',
         },
     };
 
@@ -232,6 +267,8 @@
         langEnBtn: document.getElementById('lang-en'),
         langFrBtn: document.getElementById('lang-fr'),
         restartBtn: document.getElementById('restart-btn'),
+        gameBackToHubBtn: document.getElementById('game-back-to-hub-btn'),
+        themeBackToHubBtn: document.getElementById('theme-back-to-hub-btn'),
         musicInfo: document.getElementById('music-info'),
         narrationTimer: document.getElementById('narration-timer'),
         objectiveDisplay: document.getElementById('objective-display'),
@@ -355,6 +392,9 @@
         if ($.homeScreen) {
             $.homeScreen.classList.add('active');
             hideLoading();
+            if (TDAudioService && typeof window !== 'undefined' && window.DPMusicPlayer) {
+                window.DPMusicPlayer.playTrack('generique.mp3');
+            }
         }
 
         animateDots();
@@ -392,19 +432,30 @@
 
     function setupEventListeners() {
         if ($.startBtn) {
-            $.startBtn.addEventListener('click', function () {
-                if ($.homeScreen) {
-                    $.homeScreen.classList.remove('active');
-                    $.homeScreen.classList.add('hidden');
-                }
-                if ($.themeScreen) {
-                    $.themeScreen.classList.remove('hidden');
-                    $.themeScreen.classList.add('active');
-                }
-                if (window.DPMusicPlayer) {
-                    window.DPMusicPlayer.playTrack('night ride.mp3');
-                }
-                hideLoading();
+$.startBtn.addEventListener('click', function () {
+    if ($.homeScreen) {
+        $.homeScreen.classList.remove('active');
+        $.homeScreen.classList.add('hidden');
+    }
+    if ($.themeScreen) {
+        $.themeScreen.classList.remove('hidden');
+        $.themeScreen.classList.add('active');
+    }
+    if (window.DPMusicPlayer) {
+        window.DPMusicPlayer.playTrack('night ride.mp3');
+    }
+    hideLoading();
+}
+
+$.langEnHomeBtn.addEventListener('click', function () {
+    setLanguage('en');
+    updateLanguageUI();
+});
+
+$.langFrHomeBtn.addEventListener('click', function () {
+    setLanguage('fr');
+    updateLanguageUI();
+});
             });
         }
 
@@ -463,6 +514,12 @@
                 if (TDNarrativeEngine) {
                     TDNarrativeEngine.resetGame();
                 }
+                if (TDImageService) {
+                    TDImageService.clearCache();
+                }
+                if (TDAudioService) {
+                    TDAudioService.stopSpeaking();
+                }
                 window.location.href = '../index.html';
             });
         }
@@ -479,8 +536,54 @@
                     TDAudioService.stopSpeaking();
                 }
                 $.themeScreen.classList.remove('hidden');
+                $.themeScreen.classList.add('active');
+                $.gameScreen.classList.add('hidden');
+                $.gameScreen.classList.remove('active');
+                $.endScreen.classList.add('hidden');
+                $.endScreen.classList.remove('active');
+                hidePageNav();
+                checkSavedGame();
+            });
+        }
+
+        if ($.gameBackToHubBtn) {
+            $.gameBackToHubBtn.addEventListener('click', function () {
+                if (TDNarrativeEngine) {
+                    TDNarrativeEngine.resetGame();
+                }
+                if (TDImageService) {
+                    TDImageService.clearCache();
+                }
+                if (TDAudioService) {
+                    TDAudioService.stopSpeaking();
+                }
+                $.themeScreen.classList.add('hidden');
+                $.gameScreen.classList.add('hidden');
+                $.gameScreen.classList.remove('active');
+                $.endScreen.classList.add('hidden');
+                $.homeScreen.classList.remove('hidden');
+                $.homeScreen.classList.add('active');
+                hidePageNav();
+                checkSavedGame();
+            });
+        }
+
+        if ($.themeBackToHubBtn) {
+            $.themeBackToHubBtn.addEventListener('click', function () {
+                if (TDNarrativeEngine) {
+                    TDNarrativeEngine.resetGame();
+                }
+                if (TDImageService) {
+                    TDImageService.clearCache();
+                }
+                if (TDAudioService) {
+                    TDAudioService.stopSpeaking();
+                }
+                $.themeScreen.classList.add('hidden');
                 $.gameScreen.classList.add('hidden');
                 $.endScreen.classList.add('hidden');
+                $.homeScreen.classList.remove('hidden');
+                $.homeScreen.classList.add('active');
                 hidePageNav();
                 checkSavedGame();
             });
@@ -740,6 +843,7 @@
         $.themeScreen.classList.add('hidden');
         $.endScreen.classList.add('hidden');
         $.gameScreen.classList.remove('hidden');
+        $.gameScreen.classList.add('active');
         updateIndicators();
 
         var firstScene = null;
@@ -793,10 +897,13 @@
             if (TDAudioService && TDAudioService.playThemeMusic) {
                 TDAudioService.playThemeMusic(themeId);
             }
-            updateMusicInfo('investigation', themeId);
+            var themeObj = THEMES.find(function (t) { return t.id === themeId; }) || {};
+            if ($.musicInfo) {
+                $.musicInfo.textContent = '🎵 ' + (themeObj.name || 'Intro');
+            }
             showNarrationSequence(introPages, function () {
                 displayScene(sceneData, false);
-            });
+            }, 'intro');
         });
     }
 
@@ -850,6 +957,7 @@
                 displayScene(lastScene, true);
                 $.themeScreen.classList.add('hidden');
                 $.gameScreen.classList.remove('hidden');
+                $.gameScreen.classList.add('active');
                 $.endScreen.classList.add('hidden');
             } else if (state.script && state.script.acts && state.script.acts[0]) {
                 hideLoading();
@@ -880,6 +988,7 @@
                 displayScene(sceneData, false);
                 $.themeScreen.classList.add('hidden');
                 $.gameScreen.classList.remove('hidden');
+                $.gameScreen.classList.add('active');
                 $.endScreen.classList.add('hidden');
             }
         } else {
@@ -894,6 +1003,7 @@
         $.themeScreen.classList.add('hidden');
         $.endScreen.classList.add('hidden');
         $.gameScreen.classList.remove('hidden');
+        $.gameScreen.classList.add('active');
         updateIndicators();
 
         var firstScene = null;
@@ -933,7 +1043,13 @@
             showClueToast(sceneData.clue);
         }
 
-        updateMusicInfo(sceneType, themeId);
+        if (TDAudioService && TDAudioService.playThemeMusic) {
+            TDAudioService.playThemeMusic(themeId);
+        }
+        var themeObj = THEMES.find(function (t) { return t.id === themeId; }) || {};
+        if ($.musicInfo) {
+            $.musicInfo.textContent = '🎵 ' + (themeObj.name || 'Intro');
+        }
         updateObjective(sceneData.objective);
 
         var script = TDNarrativeEngine ? TDNarrativeEngine.getGameState().script : null;
@@ -941,7 +1057,7 @@
             var introPages = buildIntroPages(script);
             showNarrationSequence(introPages, function () {
                 displayScene(sceneData, false);
-            });
+            }, 'intro');
         } else {
             displayScene(sceneData, false);
         }
@@ -1361,7 +1477,7 @@
         }
     }
 
-    function showNarrationSequence(pages, onCompleted) {
+    function showNarrationSequence(pages, onCompleted, musicPhase) {
         ui.currentPage = 0;
         ui.totalPages = pages.length;
         ui.currentSceneData = { type: 'narration', pages: pages };
@@ -1381,7 +1497,17 @@
 
         updatePageDots();
         showPageNav();
-        updateMusicInfo('investigation', getThemeId());
+        
+        if (musicPhase && musicPhase !== 'intro') {
+            updateMusicInfo(musicPhase, getThemeId());
+        } else if (musicPhase === 'intro') {
+            var themeObj = THEMES.find(function (t) { return t.id === getThemeId(); }) || {};
+            if ($.musicInfo) {
+                $.musicInfo.textContent = '🎵 ' + (themeObj.name || 'Intro');
+            }
+        } else {
+            updateMusicInfo('investigation', getThemeId());
+        }
 
         goToPage(1);
 
@@ -1645,6 +1771,11 @@
         ui.isTyping = true;
         ui.skipPending = false;
 
+        if (!$.dialogueText || !$.typeCursor) {
+            if (onComplete) { onComplete(); }
+            return;
+        }
+
         var i = 0;
         var len = text.length;
         $.dialogueText.textContent = '';
@@ -1873,7 +2004,7 @@
         var transitionPages = buildTransitionPages(sceneData);
         showNarrationSequence(transitionPages, function () {
             displayScene(sceneData, false);
-        });
+        }, sceneData.musicPhase);
     }
 
     function sendPlayerText() {
@@ -1943,6 +2074,16 @@
         }
     }
 
+    function encodeURI(url) {
+        if (!url) return url;
+        return url
+            .split('/')
+            .map(function (segment) {
+                return encodeURIComponent(segment);
+            })
+            .join('/');
+    }
+
     function loadNPCImage(url) {
         if (!$.npcImage) return;
         $.npcImage.src = '';
@@ -1950,13 +2091,13 @@
 
         var img = new Image();
         img.onload = function () {
-            $.npcImage.src = url;
+            $.npcImage.src = encodeURI(url);
             $.npcImage.classList.add('visible');
         };
         img.onerror = function () {
             $.npcImage.classList.add('visible');
         };
-        img.src = url;
+        img.src = encodeURI(url);
     }
 
     function showNPC(npc) {
@@ -1983,12 +2124,12 @@
         var img = new Image();
         img.onload = function() {
             $.bgLayer.style.opacity = '0';
-            $.bgLayer.style.backgroundImage = 'url(' + url + ')';
+            $.bgLayer.style.backgroundImage = 'url("' + encodeURI(url) + '")';
             setTimeout(function() {
                 $.bgLayer.style.opacity = '1';
             }, 50);
         };
-        img.src = url;
+        img.src = encodeURI(url);
     }
 
     function updateIndicators() {
@@ -2116,6 +2257,7 @@
     function showEndScreen(solution) {
         if (!$.endScreen) return;
         $.gameScreen.classList.add('hidden');
+        $.gameScreen.classList.remove('active');
         hidePageNav();
 
         updateMusicInfo('credits', ui.theme);

@@ -11,39 +11,234 @@
     var isSpeaking = false;
 
     var THEME_MUSIC = {
-        'agatha-christie': '1930s vintage orchestral, gentle piano melody, old mystery mansion atmosphere, tense strings, classic detective mood, instrumental',
-        'sherlock-holmes': 'Dark Victorian orchestral, tense violin solo, foggy London atmosphere, melancholic harpsichord, cinematic suspense, slow crescendo, instrumental',
-        'cyberpunk': 'Cyberpunk synthwave, dark synth, industrial beat, neon noir, heavy distorted bass, futuristic suspense, tempo 90bpm, blade runner style, instrumental',
-        'heroic-fantasy': 'Dark fantasy orchestral, ambient harp, deep choir chants, mysterious flute, dungeon tension, cinematic epic suspense, low horns, instrumental',
-        'sci-fi': 'Sci-fi dark ambient, cosmic synth drone, pulse bass, eerie space atmosphere, alien mystery, subtle electronic bleeps, cinematic suspense, instrumental',
-        'lovecraftian': 'Dark ambient horror, eerie dissonance, haunting soundscapes, low brass drone, psychological thriller, disturbing textures, slow building dread, instrumental',
-        'antiquite': 'Ancient Roman cinematic ambient, mysterious lyre melody, deep war drums, dark desert wind, suspenseful tribal strings, instrumental',
+        'agatha-christie': 'sherlock.mp3',
+        'sherlock-holmes': 'sherlock.mp3',
+        'cyberpunk': 'cyberpunk.mp3',
+        'heroic-fantasy': 'heroic fantasy.mp3',
+        'sci-fi': 'SF.mp3',
+        'lovecraftian': 'peur.mp3',
+        'antiquite': 'gaginator.mp3',
     };
 
+    /*
+    ============================================================
+    VOICE PROFILES — 8 Archetypes × 2 Languages
+    ============================================================
+
+    ENGLISH PERSONALITIES:
+    ───────────────────────
+    1. Detective (The Ally)       – Analytical, methodical, calm
+       Voice: Neutral, clear, poised. Slow rate, impeccable diction.
+    2. Wealthy Suspect (The Rich) – Arrogant, condescending, impatient
+       Voice: Deep, theatrical, emphatic. Slow, contemptuous tone.
+    3. Femme Fatale (The Seducteur) – Charismatic, mysterious, calculating
+       Voice: Smooth, velvet, captivating (Monroe style). Slow, breathy, warm.
+    4. Informant (The Witness)    – Anxious, paranoid, opportunistic
+       Voice: Fast, staccato, low. Frequent whispers, hesitations.
+    5. Scientist (The Expert)     – Eccentric, passionate, detached
+       Voice: Staccato, fast, slightly nasal. Sudden rhythm shifts.
+    6. Bodyguard (The Force)      – Stoic, loyal, menacing
+       Voice: Very deep, monotone, droning. Throat clearings, short sentences.
+    7. Criminal (The Shadow)       – Calculating, cold, manipulative
+       Voice: Dark, calm, cutting. Threatening but polite, master of silence.
+    8. Outsider (The Unhinged)    – Unstable, incoherent, obsessed
+       Voice: Shifting, high, raspy. Sudden switches whisper↔outbursts.
+
+    FRENCH PERSONALITIES:
+    ───────────────────────
+    1. Détective (L'Allié)         – Analytique, méthodique, posé
+       Voice: Neutre, claire, posée. Débit calme, diction impeccable.
+    2. Héritier Suspect (Le Riche) – Arrogant, condescendant, impatient
+       Voice: Grave, théâtrale, appuyée. Lente, ton méprisant.
+    3. Femme Fatale (La Séductrice) – Charismatique, mystérieuse, calculatrice
+       Voice: Suave, feutrée, envoûtante (style Bardot). Lente, souffle marqué.
+    4. Informateur (Le Témoin)    – Anxieux, paranoïaque, opportuniste
+       Voice: Rapide, saccadée, basse. Chuchotements, hésitations.
+    5. Scientifique (L'Expert)    – Excentrique, passionné, détaché
+       Voice: Saccadée, rapide, légèrement nasillarde. Variations brutales.
+    6. Protecteur (La Force)      – Stoïque, loyal, menaçant
+       Voice: Très grave, monotone, monocorde. Raclements, phrases courtes.
+    7. Criminel (L'Ombre)         – Calculateur, froid, manipulateur
+       Voice: Sombre, posé, tranchant. Méprisant mais poli, maître du silence.
+    8. Marginal (L'Intrus)        – Instable, incohérent, obsédé
+       Voice: Cambiante, aiguë, rocailleuse. Whispers↔éclats brusques.
+
+    NARRATOR:
+    ─────────
+    EN: Morgan Freeman-style (deep, resonant, calm)
+    FR: Hercule Poirot-style (measured, precise, slight Belgian/French accent feel)
+
+    ============================================================
+    */
     var VOICE_PROFILES = {
-        'detective': { name: 'Detective', lang: 'en-US', pitch: 0.9, rate: 0.95, gender: 'male', hint: 'david|alex|daniel|mark|james|en-US|male' },
-        'sherlock': { name: 'Sherlock', lang: 'en-GB', pitch: 0.85, rate: 0.9, gender: 'male', hint: 'daniel|oliver|en-GB|male' },
-        'suspect_rich': { name: 'Wealthy Suspect', lang: 'en-US', pitch: 0.8, rate: 0.9, gender: 'male', hint: 'mark|james|en-US|male' },
-        'femme_fatale': { name: 'Femme Fatale', lang: 'en-US', pitch: 0.65, rate: 0.8, gender: 'female', hint: 'karen|samantha|victoria|en-US|female' },
-        'informant': { name: 'Nervous Informant', lang: 'en-US', pitch: 1.3, rate: 1.15, gender: 'female', hint: 'karen|samantha|victoria|en-US|female' },
-        'scientist': { name: 'Scientist', lang: 'en-GB', pitch: 1.0, rate: 1.0, gender: 'male', hint: 'daniel|oliver|en-GB|male' },
-        'bodyguard': { name: 'Bodyguard', lang: 'en-US', pitch: 0.7, rate: 0.85, gender: 'male', hint: 'david|alex|en-US|male' },
-        'criminal': { name: 'Criminal Mind', lang: 'en-US', pitch: 0.6, rate: 0.85, gender: 'male', hint: 'james|mark|en-US|male' },
-        'outsider': { name: 'Unhinged Outsider', lang: 'en-US', pitch: 1.2, rate: 1.1, gender: 'male', hint: 'alex|david|en-US|male' },
-        'narrator': { name: 'Morgan Freeman-style', lang: 'en-US', pitch: 0.62, rate: 0.82, gender: 'male', hint: 'david|alex|en-US|male' },
-        'narrator_fr': { name: 'Narrateur (FR)', lang: 'fr-FR', pitch: 0.65, rate: 0.8, gender: 'male', hint: 'françois|pascal|cyprien|en-FR|male' },
-        'femme_fatale_fr': { name: 'Femme Fatale (FR)', lang: 'fr-FR', pitch: 0.68, rate: 0.82, gender: 'female', hint: 'samantha|victoria|françoise|en-FR|female|audrey' },
-        'suspect_rich_fr': { name: 'Suspect Aisé (FR)', lang: 'fr-FR', pitch: 0.78, rate: 0.85, gender: 'male', hint: 'françois|pascal|en-FR|male' },
-        'informant_fr': { name: 'Informateur Nerv.e (FR)', lang: 'fr-FR', pitch: 1.25, rate: 1.1, gender: 'female', hint: 'audrey|victoria|samantha|françoise|en-FR|female' },
-        'scientist_fr': { name: 'Scientifique (FR)', lang: 'fr-FR', pitch: 0.95, rate: 0.95, gender: 'male', hint: 'françois|pascal|cyprien|en-FR|male' },
-        'bodyguard_fr': { name: 'Protecteur (FR)', lang: 'fr-FR', pitch: 0.72, rate: 0.85, gender: 'male', hint: 'pascal|françois|en-FR|male' },
-        'criminal_fr': { name: 'Criminel (FR)', lang: 'fr-FR', pitch: 0.62, rate: 0.85, gender: 'male', hint: 'cyprien|pascal|en-FR|male' },
-        'outsider_fr': { name: 'Marginal (FR)', lang: 'fr-FR', pitch: 1.15, rate: 1.05, gender: 'male', hint: 'cyprien|pascal|en-FR|male' },
-        'detective_fr': { name: 'Détective (FR)', lang: 'fr-FR', pitch: 0.88, rate: 0.92, gender: 'male', hint: 'françois|pascal|en-FR|male' },
+        // ── ENGLISH VOICES ──
+        'detective': {
+            name: 'Detective',
+            lang: 'en-US',
+            pitch: 0.90,
+            rate: 0.92,
+            volumeBoost: 1.0,
+            gender: 'male',
+            hint: 'david|daniel|mark|james|en-US'
+        },
+        'suspect_rich': {
+            name: 'Wealthy Suspect',
+            lang: 'en-US',
+            pitch: 0.78,
+            rate: 0.82,
+            volumeBoost: 1.0,
+            gender: 'male',
+            hint: 'mark|james|en-US'
+        },
+        'femme_fatale': {
+            name: 'Femme Fatale',
+            lang: 'en-US',
+            pitch: 0.60,
+            rate: 0.78,
+            volumeBoost: 1.1,
+            gender: 'female',
+            hint: 'victoria|samantha|karen|en-US'
+        },
+        'informant': {
+            name: 'Nervous Informant',
+            lang: 'en-US',
+            pitch: 1.25,
+            rate: 1.18,
+            volumeBoost: 0.9,
+            gender: 'female',
+            hint: 'samantha|karen|en-US'
+        },
+        'scientist': {
+            name: 'Scientist',
+            lang: 'en-GB',
+            pitch: 1.05,
+            rate: 1.08,
+            volumeBoost: 1.0,
+            gender: 'male',
+            hint: 'daniel|oliver|en-GB'
+        },
+        'bodyguard': {
+            name: 'Bodyguard',
+            lang: 'en-US',
+            pitch: 0.65,
+            rate: 0.82,
+            volumeBoost: 1.2,
+            gender: 'male',
+            hint: 'david|alex|en-US'
+        },
+        'criminal': {
+            name: 'Criminal Mind',
+            lang: 'en-US',
+            pitch: 0.72,
+            rate: 0.85,
+            volumeBoost: 1.0,
+            gender: 'male',
+            hint: 'james|daniel|en-US'
+        },
+        'outsider': {
+            name: 'Unhinged Outsider',
+            lang: 'en-US',
+            pitch: 1.18,
+            rate: 1.05,
+            volumeBoost: 1.0,
+            gender: 'male',
+            hint: 'alex|david|en-US'
+        },
+        'narrator': {
+            name: 'Narrator',
+            lang: 'en-US',
+            pitch: 0.60,
+            rate: 0.82,
+            volumeBoost: 1.0,
+            gender: 'male',
+            hint: 'david|alex|en-US'
+        },
+
+        // ── FRENCH VOICES ──
+        'detective_fr': {
+            name: 'Détective (FR)',
+            lang: 'fr-FR',
+            pitch: 0.92,
+            rate: 0.90,
+            volumeBoost: 1.0,
+            gender: 'male',
+            hint: 'francois|pascal|cyprien|poirot|fr-FR'
+        },
+        'suspect_rich_fr': {
+            name: 'Héritier Suspect (FR)',
+            lang: 'fr-FR',
+            pitch: 0.78,
+            rate: 0.80,
+            volumeBoost: 1.0,
+            gender: 'male',
+            hint: 'francois|pascal|fr-FR'
+        },
+        'femme_fatale_fr': {
+            name: 'Femme Fatale (FR)',
+            lang: 'fr-FR',
+            pitch: 0.62,
+            rate: 0.76,
+            volumeBoost: 1.1,
+            gender: 'female',
+            hint: 'audrey|victoria|sabrine|françoise|fr-FR'
+        },
+        'informant_fr': {
+            name: 'Informateur (FR)',
+            lang: 'fr-FR',
+            pitch: 1.22,
+            rate: 1.15,
+            volumeBoost: 0.9,
+            gender: 'female',
+            hint: 'audrey|victoria|sabrine|fr-FR'
+        },
+        'scientist_fr': {
+            name: 'Scientifique (FR)',
+            lang: 'fr-FR',
+            pitch: 1.02,
+            rate: 1.05,
+            volumeBoost: 1.0,
+            gender: 'male',
+            hint: 'francois|pascal|cyprien|fr-FR'
+        },
+        'bodyguard_fr': {
+            name: 'Protecteur (FR)',
+            lang: 'fr-FR',
+            pitch: 0.68,
+            rate: 0.82,
+            volumeBoost: 1.2,
+            gender: 'male',
+            hint: 'pascal|francois|fr-FR'
+        },
+        'criminal_fr': {
+            name: 'Criminel (FR)',
+            lang: 'fr-FR',
+            pitch: 0.72,
+            rate: 0.82,
+            volumeBoost: 1.0,
+            gender: 'male',
+            hint: 'cyprien|pascal|fr-FR'
+        },
+        'outsider_fr': {
+            name: 'Marginal (FR)',
+            lang: 'fr-FR',
+            pitch: 1.15,
+            rate: 1.08,
+            volumeBoost: 1.0,
+            gender: 'male',
+            hint: 'cyprien|pascal|fr-FR'
+        },
+        // Hercule Poirot style: measured, precise, slightly formal, calm authority
+        'narrator_fr': {
+            name: 'Narrateur — Hercule Poirot (FR)',
+            lang: 'fr-FR',
+            pitch: 0.78,
+            rate: 0.88,
+            volumeBoost: 1.0,
+            gender: 'male',
+            hint: 'francois|pascal|poirot|fr-FR'
+        },
     };
 
-    var NARRATOR_VOICES_EN = ['david', 'alex', 'zarvox', 'fred'];
-    var NARRATOR_VOICES_FR = ['françois', 'pascal', 'cyprien'];
     var currentLanguage = 'en';
 
     var MUSIC_PHASES = {
@@ -53,6 +248,7 @@
         tension: { label: 'Tension', intensity: 'high', tempo: 120 },
         revelation: { label: 'Revelation', intensity: 'high', tempo: 120 },
         credits: { label: 'Credits', intensity: 'low', tempo: 60 },
+        intro: { label: 'Intro', intensity: 'low', tempo: 60 },
     };
 
     var MUSIC_PHASE_PROMPTS = {
@@ -62,6 +258,7 @@
         tension: 'Fast cinematic thriller, intense rhythmic percussion, rising tension, dramatic hybrid orchestral, dark synth pulses, high stakes climax, 120bpm, instrumental',
         revelation: 'Fast cinematic thriller, intense rhythmic percussion, rising tension, dramatic hybrid orchestral, dark synth pulses, high stakes climax, 120bpm, instrumental',
         credits: 'Slow cinematic outro, melancholic piano, gentle strings, resolution and closure, reflective mood',
+        intro: 'Cinematic intro music, majestic orchestra, forward momentum, establishing the mystery theme, soft drums, building anticipation',
     };
 
     var MUSIC_PHASE_TRACKS = {
@@ -71,6 +268,7 @@
         tension: 'stress.mp3',
         revelation: 'Act III Revelations.mp3',
         credits: 'generique.mp3',
+        intro: 'generique.mp3',
     };
 
     var THEME_MUSIC_TRACKS = {
@@ -158,7 +356,7 @@
                 utterance.voice = getMatchedVoice(profileId) || selectedVoice || null;
                 utterance.rate = profile.rate;
                 utterance.pitch = profile.pitch;
-                utterance.volume = volume;
+                utterance.volume = volume * (profile.volumeBoost || 1.0);
 
                 utterance.onend = function () {
                     isSpeaking = false;
@@ -266,7 +464,7 @@
     }
 
     function playThemeMusic(themeId) {
-        var track = THEME_MUSIC_TRACKS[themeId] || MUSIC_PHASE_TRACKS.investigation;
+        var track = THEME_MUSIC[themeId] || MUSIC_PHASE_TRACKS.investigation;
         if (typeof window !== 'undefined' && window.DPMusicPlayer) {
             window.DPMusicPlayer.playTrack(track);
         }
@@ -285,34 +483,40 @@
 
     function getVoiceProfileKey(npc, character) {
         var langSuffix = currentLanguage === 'fr' ? '_fr' : '';
-        if (npc && npc.voiceHint) {
-            var hint = npc.voiceHint.toLowerCase();
-            var matchedKey = Object.keys(VOICE_PROFILES).find(function (key) {
-                if (key.indexOf('_fr') !== -1 && langSuffix !== '_fr') { return false; }
-                return hint.indexOf(key.replace('_fr', '')) !== -1;
-            });
-            if (matchedKey) { return matchedKey; }
+
+        // Map NPC archetype to profile key
+        var archetype = (npc && npc.archetype) ? npc.archetype.toLowerCase() : '';
+
+        // Fall back to role
+        var role = (npc && npc.role) ? npc.role.toLowerCase() : '';
+
+        // Map from archetype/role → profile key
+        if (archetype === 'detective' || role === 'detective' || role === 'partner' || role === 'investigator' || role === 'detective-partner') {
+            return 'detective' + langSuffix;
         }
-        var baseKey = 'narrator';
-        if (npc && npc.role) {
-            var role = npc.role.toLowerCase();
-            if (role.indexOf('detective') !== -1 || role.indexOf('partner') !== -1 || role.indexOf('investigator') !== -1) {
-                baseKey = 'detective';
-            } else if (role.indexOf('scientist') !== -1 || role.indexOf('legist') !== -1 || role.indexOf('expert') !== -1) {
-                baseKey = 'scientist';
-            } else if (role.indexOf('guard') !== -1 || role.indexOf('bodyguard') !== -1 || role.indexOf('enforcer') !== -1) {
-                baseKey = 'bodyguard';
-            } else if (role.indexOf('criminal') !== -1 || role.indexOf('mastermind') !== -1) {
-                baseKey = 'criminal';
-            } else if (role.indexOf('informant') !== -1 || role.indexOf('witness') !== -1 || role.indexOf('témoin') !== -1) {
-                baseKey = 'informant';
-            } else if (role.indexOf('outsider') !== -1 || role.indexOf('marginal') !== -1) {
-                baseKey = 'outsider';
-            } else if (role.indexOf('femme') !== -1 || role.indexOf('seduct') !== -1 || role.indexOf('rich') !== -1 || role.indexOf('noble') !== -1) {
-                baseKey = 'femme_fatale';
-            }
+        if (archetype === 'suspect_rich' || role === 'suspect_rich' || role === 'suspect' || role === 'riche' || role === 'héritier' || role === 'rich' || role === 'noble' || role === 'heritier') {
+            return 'suspect_rich' + langSuffix;
         }
-        return baseKey + langSuffix;
+        if (archetype === 'femme_fatale' || role === 'femme_fatale' || role === 'seducteur' || role === 'seductive' || role === 'manipulatrice' || role === 'manipulator' || role === 'femme-fatale') {
+            return 'femme_fatale' + langSuffix;
+        }
+        if (archetype === 'informant' || role === 'informant' || role === 'witness' || role === 'témoin' || role === 'furtif' || role === 'informateur' || role === 'scientist' || role === 'légiste' || role === 'expert' || role === 'legist') {
+            return 'informant' + langSuffix;
+        }
+        if (archetype === 'scientist' || role === 'scientist' || role === 'légiste' || role === 'expert' || role === 'legist') {
+            return 'scientist' + langSuffix;
+        }
+        if (archetype === 'bodyguard' || role === 'bodyguard' || role === 'protecteur' || role === 'force' || role === 'enforcer' || role === 'videur') {
+            return 'bodyguard' + langSuffix;
+        }
+        if (archetype === 'criminal' || role === 'criminal' || role === 'ombre' || role === 'mastermind' || role === 'shadow') {
+            return 'criminal' + langSuffix;
+        }
+        if (archetype === 'outsider' || role === 'outsider' || role === 'marginal' || role === 'intrus' || role === 'unhinged') {
+            return 'outsider' + langSuffix;
+        }
+
+        return 'narrator' + langSuffix;
     }
 
     function getVoiceProfile(npc, character) {

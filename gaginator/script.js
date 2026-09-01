@@ -2,7 +2,7 @@ let actions_en = [];
 let actions_fr = [];
 let actions_es = [];
 
-let currentLanguage = 'en';
+let currentLanguage = localStorage.getItem('gaginator_language') || 'en';
 var LANGUAGES = ['en', 'fr', 'es'];
 var LANG_LABELS = { en: 'EN', fr: 'FR', es: 'ES' };
 
@@ -94,6 +94,7 @@ generateBtn.addEventListener('click', updateSuggestion);
 langOptionButtons.forEach(button => {
     button.addEventListener('click', () => {
         currentLanguage = button.dataset.lang;
+        localStorage.setItem('gaginator_language', currentLanguage);
         cycleVoiceSmooth();
     });
 });
@@ -150,6 +151,7 @@ function updateLangButton() {
 function cycleLanguage() {
     var idx = LANGUAGES.indexOf(currentLanguage);
     currentLanguage = LANGUAGES[(idx + 1) % LANGUAGES.length];
+    localStorage.setItem('gaginator_language', currentLanguage);
     langDropdown.classList.remove('show');
     cycleVoiceSmooth();
 }
@@ -166,7 +168,16 @@ function initSorcererVoice() {
     if (!voices.length) { setTimeout(initSorcererVoice, 300); return; }
     var pool = voices.filter(function(v) { return v.lang && v.lang.startsWith(currentLanguage); });
     if (!pool.length) pool = voices;
-    sorcererVoice = pool.find(function(v) { return /male|david|alex|daniel|oliver|francois|pascal|cyprien|carlos|antonio|riccardo|thierry|sebastien|guillaume/i.test(v.name); }) || pool[0];
+
+    if (currentLanguage === 'fr') {
+        // Vieux druide gaulois : voix rocailleuse, profonde, masculine
+        var deepFrench = pool.filter(function(v) {
+            return /male|homme|françois|paul|henri|louis|jacques|pierre|andre|rené|marc|philippe|thierry|sebastien|guillaume|olivier|bernard|dominique|jean/i.test(v.name);
+        });
+        sorcererVoice = deepFrench.length ? deepFrench[deepFrench.length - 1] : pool[pool.length - 1] || pool[0];
+    } else {
+        sorcererVoice = pool.find(function(v) { return /male|david|alex|daniel|oliver|francois|pascal|cyprien|carlos|antonio|riccardo|thierry|sebastien|guillaume/i.test(v.name); }) || pool[0];
+    }
 }
 
 function speakSorcerer(text, lang) {
