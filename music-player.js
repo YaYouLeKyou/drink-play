@@ -25,6 +25,10 @@
                 data-tracks="true-detective/music true detective/phases/generique.mp3,true-detective/music true detective/phases/recherche.mp3"
                 defer></script>
 
+    The "data-loop-track" attribute, when present, causes the player to
+    loop the current track instead of advancing to the next (useful for
+    games that want a single track to repeat).
+
     playTrack() matching: an exact name match wins first, then a filename
     (last path segment) match, so playTrack('generique.mp3') finds any
     track whose path ends with generique.mp3.
@@ -80,6 +84,7 @@
     var currentIndex = startIndex;
     var userPaused = false;       // false => autoplay behaviour (resume / advance)
     var pendingAutoplay = false;  // autoplay was blocked, waiting for user interaction
+    var loopCurrentTrack = !!scriptEl.getAttribute('data-loop-track');
 
     /* ---------- Audio element ---------- */
 
@@ -148,7 +153,12 @@
 
     audio.addEventListener('ended', function () {
         if (userPaused) {
-            return; // shouldn't happen, but stay safe
+            return;
+        }
+        if (loopCurrentTrack) {
+            audio.currentTime = 0;
+            play();
+            return;
         }
         loadTrack(currentIndex + 1);
         play();
