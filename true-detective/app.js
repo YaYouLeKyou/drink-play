@@ -9,6 +9,7 @@
         { id: 'sci-fi', name: 'Sci-Fi', emoji: '👽', desc: 'Space Opera', category: 'scifi' },
         { id: 'lovecraftian', name: 'Horreur Lovecraftienne', emoji: '🐙', desc: 'Paranormal', category: 'horror' },
         { id: 'antiquite', name: 'Antiquité', emoji: '🏛️', desc: 'Péplum', category: 'horror' },
+        { id: 'film-noir', name: 'Film Noir', emoji: '🎩', desc: 'Noir des années 40', category: 'classic' },
     ];
 
     var ASSETS_BASE = 'assets/image true detective/';
@@ -125,6 +126,22 @@
             laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
             headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
             music: 'gaginator.mp3',
+        },
+        'film-noir': {
+            universe: ASSETS_BASE + 'univers/film noire.png',
+            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
+            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
+            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
+            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
+            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
+            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
+            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
+            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
+            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
+            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
+            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
+            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
+            music: 'noire.mp3',
         },
     };
 
@@ -264,9 +281,11 @@
         voiceBtn: document.getElementById('voice-btn'),
         muteBtn: document.getElementById('mute-btn'),
         volumeBtn: document.getElementById('volume-btn'),
-        langEnBtn: document.getElementById('lang-en'),
-        langFrBtn: document.getElementById('lang-fr'),
-        restartBtn: document.getElementById('restart-btn'),
+langEnBtn: document.getElementById('lang-en'),
+    langFrBtn: document.getElementById('lang-fr'),
+    langEnHomeBtn: document.getElementById('lang-en-home'),
+    langFrHomeBtn: document.getElementById('lang-fr-home'),
+    restartBtn: document.getElementById('restart-btn'),
         gameBackToHubBtn: document.getElementById('game-back-to-hub-btn'),
         themeBackToHubBtn: document.getElementById('theme-back-to-hub-btn'),
         musicInfo: document.getElementById('music-info'),
@@ -432,30 +451,33 @@
 
     function setupEventListeners() {
         if ($.startBtn) {
-$.startBtn.addEventListener('click', function () {
-    if ($.homeScreen) {
-        $.homeScreen.classList.remove('active');
-        $.homeScreen.classList.add('hidden');
-    }
-    if ($.themeScreen) {
-        $.themeScreen.classList.remove('hidden');
-        $.themeScreen.classList.add('active');
-    }
-    if (window.DPMusicPlayer) {
-        window.DPMusicPlayer.playTrack('night ride.mp3');
-    }
-    hideLoading();
-}
+            $.startBtn.addEventListener('click', function () {
+                if ($.homeScreen) {
+                    $.homeScreen.classList.remove('active');
+                    $.homeScreen.classList.add('hidden');
+                }
+                if ($.themeScreen) {
+                    $.themeScreen.classList.remove('hidden');
+                    $.themeScreen.classList.add('active');
+                }
+                if (window.DPMusicPlayer) {
+                    window.DPMusicPlayer.playTrack('night ride.mp3');
+                }
+                hideLoading();
+            });
+        }
 
-$.langEnHomeBtn.addEventListener('click', function () {
-    setLanguage('en');
-    updateLanguageUI();
-});
+        if ($.langEnHomeBtn) {
+            $.langEnHomeBtn.addEventListener('click', function () {
+                setLanguage('en');
+                updateLanguageUI();
+            });
+        }
 
-$.langFrHomeBtn.addEventListener('click', function () {
-    setLanguage('fr');
-    updateLanguageUI();
-});
+        if ($.langFrHomeBtn) {
+            $.langFrHomeBtn.addEventListener('click', function () {
+                setLanguage('fr');
+                updateLanguageUI();
             });
         }
 
@@ -715,6 +737,14 @@ $.langFrHomeBtn.addEventListener('click', function () {
         }
 
         ui.theme = { id: ui.theme.id, name: ui.theme.name, emoji: ui.theme.emoji, desc: ui.theme.desc, category: ui.theme.category };
+
+        // MODE SCÉNARIO V2 : si les phases + scénario sont chargés, on utilise le
+        // fil conducteur complet (au lieu de la génération IA libre).
+        if (window.TDPhases && window.TDScenario) {
+            hideLoading();
+            startScenarioGame();
+            return;
+        }
 
         if (TDAudioService) {
             TDAudioService.playThemeMusic(ui.theme.id);
@@ -1232,8 +1262,9 @@ $.langFrHomeBtn.addEventListener('click', function () {
                 text: texts[2],
                 location: 'Crime scene',
                 showNPC: true,
-                npcId: introNPC ? introNPC.id : 'detective-partner',
-                npcName: introNPC ? introNPC.name : 'Partner',
+                npcId: 'detective-partner',
+                npcName: 'Partner',
+                npcImageUrl: assets.detective,
                 npcImageFull: true,
                 isDialogue: false,
             },
@@ -2370,6 +2401,382 @@ $.langFrHomeBtn.addEventListener('click', function () {
             .replace(/'/g, '&#039;');
     }
 
+/* ================================================================
+       MODE SCÉNARIO V2 — runner (consomme TDScenario + TDPhases)
+    ================================================================ */
+    var scr = {
+        phaseIdx: 0,
+        pageIdx: 0,
+        active: false,
+        awaitingChoice: false,
+    };
+
+    var SCENARIO_NPC_ASSETS = {
+        'detective-partner': 'detective',
+        'protecteur': null,
+        'femme-fatale': 'femmeFatale',
+        'seducteur': 'seducteur',
+        'suspect': 'suspect',
+        'marginal': 'marginal',
+        'scientifique': null,
+        'criminel': null,
+    };
+
+    var SCENARIO_NPC_NAMES = {
+        'detective-partner': { fr: 'Détective partenaire', en: 'Partner detective' },
+        'protecteur': { fr: 'Le Protecteur', en: 'The Protector' },
+        'femme-fatale': { fr: 'La Femme Fatale', en: 'The Femme Fatale' },
+        'seducteur': { fr: 'Le Séducteur', en: 'The Seductor' },
+        'suspect': { fr: 'Le Suspect', en: 'The Suspect' },
+        'marginal': { fr: 'Le Marginal', en: 'The Marginal' },
+        'scientifique': { fr: 'Le Scientifique', en: 'The Scientist' },
+        'criminel': { fr: 'Le Criminel', en: 'The Criminal' },
+    };
+
+    // personnages non présents dans THEME_ASSETS générique -> fichiers dédiés
+    var EXTRA_NPC_IMAGES = {
+        'protecteur': ASSETS_BASE + 'characteres/Le_Protecteur-removebg-preview.png',
+        'scientifique': ASSETS_BASE + 'characteres/Le_Scientifique-removebg-preview.png',
+        'criminel': ASSETS_BASE + 'characteres/Le_criminel-removebg-preview.png',
+    };
+
+    function scrGetState() { return TDScenario.getState(); }
+
+    function scrResetState() {
+        TDScenario.reset();
+        var s = scrGetState();
+        s.lang = ui.language;
+        s.theme = getThemeId();
+        scr.phaseIdx = 0;
+        scr.pageIdx = 0;
+        scr.active = true;
+        scr.awaitingChoice = false;
+    }
+
+    function scrDecorImage(decorKey) {
+        var assets = THEME_ASSETS[getThemeId()] || THEME_ASSETS['agatha-christie'];
+        var map = {
+            universe: assets.universe,
+            crimeScene: assets.crimeScene,
+            alley: assets.alley,
+            residence: assets.residence,
+            bar: assets.publicPlace,
+            clandestine: assets.secretPlace,
+            labo: assets.laboratory,
+            laboratoire: assets.laboratory,
+            qg: assets.headquarters,
+        };
+        return map[decorKey] || null;
+    }
+
+    function scrNpcImage(npcId) {
+        if (EXTRA_NPC_IMAGES[npcId]) return EXTRA_NPC_IMAGES[npcId];
+        var assets = THEME_ASSETS[getThemeId()] || THEME_ASSETS['agatha-christie'];
+        var key = SCENARIO_NPC_ASSETS[npcId];
+        return key ? (assets[key] || null) : null;
+    }
+
+    function scrNpcName(npcId) {
+        var n = SCENARIO_NPC_NAMES[npcId];
+        if (!n) return '';
+        return n[ui.language] || n.fr;
+    }
+
+    function scrChoiceLabel(choiceId) {
+        var map = {
+            'femme-fatale': ui.language === 'fr' ? 'La Femme Fatale' : 'The Femme Fatale',
+            'seducteur': ui.language === 'fr' ? 'Le Séducteur' : 'The Seductor',
+            'suspect': ui.language === 'fr' ? 'Le Suspect' : 'The Suspect',
+            'protecteur': ui.language === 'fr' ? 'Le Protecteur' : 'The Protector',
+            'marginal': ui.language === 'fr' ? 'Le Marginal' : 'The Marginal',
+            'criminel': ui.language === 'fr' ? 'Le Criminel' : 'The Criminal',
+        };
+        return map[choiceId] || choiceId;
+    }
+
+    function scrInterrogationConfig(orderIdx) {
+        var s = scrGetState();
+        var order = s.suspectOrdre;
+        var id = (order && order[orderIdx]) || s.prochainSuspect || 'suspect';
+        var decorKey = (id === 'seducteur') ? 'bar'
+            : (id === 'suspect' ? 'clandestine' : 'residence');
+        return { npcId: id, decor: decorKey };
+    }
+
+    function scrMusicPlaying(phaseMusic) {
+        var track;
+        if (phaseMusic === 'theme') {
+            track = (TDAudioService && TDAudioService.getThemeMusic)
+                ? TDAudioService.getThemeMusic(getThemeId())
+                : 'sherlock.mp3';
+        } else if (phaseMusic === 'credits') {
+            track = 'night ride.mp3';
+        } else {
+            var map = {
+                recherche: 'recherche.mp3',
+                reflexion: 'reflexion.mp3',
+                enigme: 'enigme.mp3',
+                rising: 'Rising Tension.mp3',
+                revelation: 'Act III Revelations.mp3',
+            };
+            track = map[phaseMusic] || 'recherche.mp3';
+        }
+        if (track && window.DPMusicPlayer) {
+            try { window.DPMusicPlayer.playTrack(track); } catch (e) { /* ignore */ }
+        }
+    }
+function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
+
+    function startScenarioGame() {
+        scrResetState();
+        $.themeScreen.classList.add('hidden');
+        $.gameScreen.classList.remove('hidden');
+        $.gameScreen.classList.add('active');
+        $.endScreen.classList.add('hidden');
+        renderScenarioPage();
+    }
+
+    function renderScenarioPage() {
+        if (!scr.active) return;
+        var phase = scrCurrentPhase();
+        if (!phase) { finishScenario(); return; }
+        var page = phase.pages[scr.pageIdx] || null;
+        if (!page) { nextScenarioPhase(); return; }
+
+        scr.awaitingChoice = false;
+        $.choicesContainer.innerHTML = '';
+        $.conversationInput.classList.add('hidden');
+        $.continueBtn.classList.add('hidden');
+        $.continueBtn.onclick = null;
+        $.npcName.textContent = '';
+        hideNPC();
+
+        scrMusicPlaying(phase.music);
+        if ($.currentAct) $.currentAct.textContent = phase.act || '';
+        if ($.currentScene) $.currentScene.textContent = (scr.pageIdx + 1) + '/3';
+
+        var decorKey = page.decor;
+        if (decorKey === 'dynamic') decorKey = scrInterrogationConfig(scr.pageIdx).decor;
+        var bg = scrDecorImage(decorKey);
+        if (bg) setBackground(bg);
+
+        var npcId = page.npc;
+        if (npcId === 'dynamic') npcId = scrInterrogationConfig(scr.pageIdx).npcId;
+        var txt = TDScenario.t(page.text, ui.language);
+
+        if (npcId) {
+            $.npcName.textContent = scrNpcName(npcId);
+            var npcImg = scrNpcImage(npcId);
+            if (npcImg) loadNPCImage(npcImg);
+        }
+
+        if ($.pageNav) {
+            var dots = $.pageNav.querySelectorAll('.page-dot');
+            for (var i = 0; i < dots.length; i++) dots[i].classList.toggle('active', i === scr.pageIdx);
+        }
+
+        hideLoading();
+        typeWriter(txt, function () { if (scr.active) renderScenarioPageAfter(); });
+    }
+
+    function renderScenarioPageAfter() {
+        var phase = scrCurrentPhase();
+        if (!phase) return;
+        var page = phase.pages[scr.pageIdx];
+
+        if (page.minigame && window.TDMiniGames) {
+            $.continueBtn.classList.add('hidden');
+            TDMiniGames.play(page.minigame, ui.language, function (res) {
+                if (res && res.won) {
+                    var s = scrGetState();
+                    s.miniGamesWon++;
+                    s.score += 10;
+                    if (!s.clues) s.clues = [];
+                    var clue = scrClueFromMinigame(page.minigame);
+                    s.clues.push(clue);
+                    showClueToast(clue);
+                }
+                scrNext();
+            });
+            return;
+        }
+        scrShowAdvance(page);
+    }
+
+    function scrClueFromMinigame(mg) {
+        if (!mg) return 'Indice bonus';
+        var labels = mg.hotspots
+            ? mg.hotspots.map(function (h) { return TDScenario.t(h, ui.language); }).join(', ')
+            : (mg.title ? TDScenario.t(mg.title, ui.language) : 'Indice bonus');
+        return ui.language === 'fr' ? ('Indice relevé : ' + labels) : ('Clue found : ' + labels);
+    }
+
+    function scrShowAdvance(page) {
+        if (page.choiceKey) {
+            var choices = page.choices || [];
+            scr.awaitingChoice = true;
+            $.choicesContainer.innerHTML = '';
+            choices.forEach(function (choiceId) {
+                var btn = document.createElement('button');
+                btn.className = 'btn btn-choice';
+                btn.textContent = scrChoiceLabel(choiceId);
+                btn.addEventListener('click', function () {
+                    if (!scr.awaitingChoice) return;
+                    scr.awaitingChoice = false;
+                    scrApplyChoice(page.choiceKey, choiceId);
+                });
+                $.choicesContainer.appendChild(btn);
+            });
+        } else {
+            $.continueBtn.classList.remove('hidden');
+            $.continueBtn.textContent = getText('continue') || 'Continuer';
+            $.continueBtn.onclick = function () { scrNext(); };
+        }
+    }
+
+    function scrNext() {
+        var phase = scrCurrentPhase();
+        if (!phase) return;
+        if (scr.pageIdx < (phase.pages.length - 1)) {
+            scr.pageIdx++;
+            renderScenarioPage();
+        } else {
+            nextScenarioPhase();
+        }
+    }
+
+    function nextScenarioPhase() {
+        scr.phaseIdx++;
+        scr.pageIdx = 0;
+        if (!scrCurrentPhase()) { finishScenario(); return; }
+        renderScenarioPage();
+    }
+
+    function finishScenario() {
+        scr.active = false;
+        var s = scrGetState();
+        var ending = buildEnding(s);
+        s.ending = ending;
+        showScenarioEnding(ending);
+    }
+function scrApplyChoice(choiceKey, choiceId) {
+        var s = scrGetState();
+        if (choiceKey === 'choisirSuspect') {
+            s.prochainSuspect = choiceId;
+            var all = ['femme-fatale', 'seducteur', 'suspect'];
+            var others = all.filter(function (x) { return x !== choiceId; });
+            s.suspectOrdre = [choiceId].concat(others);
+            scrNext();
+        } else if (choiceKey === 'accuser') {
+            s.accused = choiceId;
+            scr.phaseIdx++;
+            scr.pageIdx = 0;
+            buildOutroPages(s);
+            var outro = scrCurrentPhase();
+            if (outro) {
+                outro.music = 'theme';
+                outro.pages = outro.pages || [];
+            }
+            renderScenarioPage();
+        } else {
+            scrNext();
+        }
+    }
+
+    function buildOutroPages(s) {
+        var truth = TDScenario.getTruth();
+        var good = (s.accused === s.culprit);
+        var titleTxt = truth.title ? TDScenario.t(truth.title, ui.language) : (truth.coupable || '');
+        var morale = truth.morale ? TDScenario.t(truth.morale, ui.language) : '';
+
+        var pages = [];
+        if (good) {
+            pages.push({
+                decor: 'qg', npc: 'detective-partner',
+                text: {
+                    fr: 'Vous réunissez toutes les preuves : ' + titleTxt + ' est coupable. ' + TDScenario.t(truth.methode, ui.language),
+                    en: 'You gather all the evidence : ' + titleTxt + ' is guilty. ' + TDScenario.t(truth.methode, ui.language)
+                }
+            });
+            pages.push({
+                decor: 'crimeScene', npc: null,
+                text: {
+                    fr: 'Le coupable est arrêté : ' + TDScenario.t(truth.prison, ui.language),
+                    en: 'The culprit is arrested : ' + TDScenario.t(truth.prison, ui.language)
+                }
+            });
+            pages.push({
+                decor: 'qg', npc: 'detective-partner',
+                text: {
+                    fr: 'Promotion ! Vous recevez une médaille de détective supérieur. ' + morale,
+                    en: 'Promotion! You receive a top-detective medal. ' + morale
+                }
+            });
+        } else {
+            var innocentTitle = scrChoiceLabel(s.accused);
+            pages.push({
+                decor: 'qg', npc: 'detective-partner',
+                text: {
+                    fr: 'Vous accusez ' + innocentTitle + ', un innocent. La vérité éclate trop tard.',
+                    en: 'You accuse ' + innocentTitle + ', an innocent. The truth comes out too late.'
+                }
+            });
+            pages.push({
+                decor: 'alley', npc: null,
+                text: {
+                    fr: 'Le vrai coupable, ' + titleTxt + ', a pris la fuite avec l\'argent et les bijoux, direction l\'étranger.',
+                    en: 'The real culprit, ' + titleTxt + ', has fled with the money and jewels toward abroad.'
+                }
+            });
+            pages.push({
+                decor: 'clandestine', npc: null,
+                text: {
+                    fr: 'Vous perdez votre badge de détective et sombrez dans la dépression. ' + morale,
+                    en: 'You lose your detective badge and fall into depression. ' + morale
+                }
+            });
+        }
+        var outro = scrCurrentPhase();
+        if (outro) outro.pages = pages;
+    }
+
+    function buildEnding(s) {
+        var truth = TDScenario.getTruth();
+        var good = (s.accused === s.culprit);
+        var lang = s.lang || ui.language;
+        return {
+            good: good,
+            culprit: TDScenario.t(truth.title, lang) || '',
+            mobile: TDScenario.t(truth.mobile, lang) || '',
+            methode: TDScenario.t(truth.methode, lang) || '',
+            revealed: good
+                ? TDScenario.t(truth.prison, lang)
+                : (ui.language === 'fr'
+                    ? 'Le vrai coupable, ' + TDScenario.t(truth.title, lang) + ', s\'est échappé.'
+                    : 'The real culprit, ' + TDScenario.t(truth.title, lang) + ', has escaped.'),
+            morale: TDScenario.t(truth.morale, lang) || '',
+        };
+    }
+
+    function showScenarioEnding(ending) {
+        scr.active = false;
+        if (window.DPMusicPlayer) {
+            try { window.DPMusicPlayer.playTrack('night ride.mp3'); } catch (e) {}
+        }
+        $.gameScreen.classList.remove('active');
+        $.gameScreen.classList.add('hidden');
+        if ($.endScreen) {
+            if ($.endScreenTitle) $.endScreenTitle.textContent = ending.good ? 'Affaire classée' : 'Affaire non résolue';
+            if ($.solutionCulprit) $.solutionCulprit.textContent = ending.culprit;
+            if ($.solutionMotive) $.solutionMotive.textContent = ending.mobile;
+            if ($.solutionMethod) $.solutionMethod.textContent = ending.methode;
+            if ($.solutionRevealText) $.solutionRevealText.textContent = ending.revealed + ' (Score détective : ' + (scrGetState().score || 0) + ')';
+            var morale = document.getElementById('solution-morale');
+            if (morale) morale.textContent = ending.morale;
+            $.endScreen.classList.remove('hidden');
+            $.endScreen.classList.add('active');
+        }
+    }
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

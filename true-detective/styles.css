@@ -862,7 +862,8 @@ html {
 
 .dialogue-container {
     position: fixed;
-    bottom: 0;
+    top: 70px;
+    bottom: auto;
     left: 0;
     width: 100%;
     max-width: 700px;
@@ -1430,3 +1431,72 @@ html {
         align-items: center;
     }
 }
+
+
+/* =====================================================================
+   MINI-JEUX (mode scénario V2) — overlay, hotspots, timer, pads
+===================================================================== */
+.minigame-layer {
+  position: fixed; inset: 0; z-index: 9000;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(5, 8, 14, 0.82); backdrop-filter: blur(4px);
+}
+.minigame-layer.active { display: flex; }
+.minigame-box {
+  width: min(92vw, 720px); max-height: 88vh; overflow: auto;
+  background: linear-gradient(160deg, #141a26, #0b0f18);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 14px; padding: 22px 24px;
+  color: #e8e6df; box-shadow: 0 18px 60px rgba(0,0,0,0.6);
+}
+.mg-title { font-size: 1.15rem; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 6px; color: #f0d890; }
+.mg-desc { font-size: 0.92rem; opacity: 0.85; margin-bottom: 14px; }
+.mg-timer { height: 8px; background: rgba(255,255,255,0.12); border-radius: 4px; overflow: hidden; margin-bottom: 16px; }
+.mg-timer-bar { height: 100%; width: 100%; background: linear-gradient(90deg, #7fd48a, #e8c35a, #d8574a); transition: width 0.25s linear; }
+.mg-timer-bar.low { background: #d8574a; }
+.mg-feedback { min-height: 1.4em; font-size: 0.9rem; margin-top: 10px; color: #f0d890; }
+.mg-feedback.bad { color: #e07a6a; }
+.mg-actions { margin-top: 14px; text-align: right; }
+.mg-actions .btn { margin-left: 8px; }
+
+/* Hotspots (fouille de scène / ADN / sabotage-image) */
+.mg-scene { position: relative; width: 100%; border-radius: 10px; overflow: hidden; }
+.mg-scene img { width: 100%; display: block; }
+.mg-hotspot {
+  position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px;
+  border: 2px solid rgba(240,216,144,0.9); border-radius: 50%;
+  background: rgba(240,216,144,0.18); cursor: pointer;
+  animation: mg-pulse 1.6s ease-in-out infinite;
+  transition: transform 0.15s;
+}
+.mg-hotspot:hover { transform: scale(1.25); }
+.mg-hotspot.found { border-color: #7fd48a; background: rgba(127,212,138,0.35); animation: none; cursor: default; }
+.mg-hotspot.wrong { border-color: #d8574a; background: rgba(216,87,74,0.3); }
+@keyframes mg-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(240,216,144,0.5); } 50% { box-shadow: 0 0 0 10px rgba(240,216,144,0); } }
+
+/* Grille de pièces (sabotage) & items pressions */
+.parts-grid, .pression-box { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 8px; }
+.part-item, .pression-item { padding: 12px 10px; font-size: 0.92rem; }
+.part-item.correct, .pression-item.correct, .btn.correct { border-color: #7fd48a; background: rgba(127,212,138,0.22); color: #c9f2d2; }
+.part-item.wrong, .pression-item.wrong, .btn.wrong { border-color: #d8574a; background: rgba(216,87,74,0.2); color: #f2c1ba; animation: mg-shake 0.35s; }
+@keyframes mg-shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+/* Timeline */
+.mg-timeline { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.mg-timeline .slot { padding: 10px 12px; border: 1px dashed rgba(255,255,255,0.25); border-radius: 8px; min-height: 42px; font-size: 0.9rem; }
+.mg-timeline .slot.filled { border-style: solid; border-color: rgba(240,216,144,0.6); color: #f0d890; }
+.mg-timeline .slot.correct { border-color: #7fd48a; color: #c9f2d2; }
+
+/* Pavé numérique (coffre) */
+.mg-safe-input { width: 100%; text-align: center; font-size: 1.8rem; letter-spacing: 0.5em; padding: 8px; margin-bottom: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #f0d890; }
+.mg-numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.num-key { padding: 14px 0; font-size: 1.1rem; }
+.num-key.del { grid-column: span 3; }
+
+/* Échantillons ADN */
+.mg-dna-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.dna-sample { padding: 10px; text-align: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; }
+.dna-sample.selected { border-color: #f0d890; background: rgba(240,216,144,0.12); }
+.dna-sample.matched { border-color: #7fd48a; background: rgba(127,212,138,0.18); cursor: default; }
+.dna-sample.unknown { border-color: #b58ae0; }
+

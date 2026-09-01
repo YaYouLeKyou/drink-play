@@ -18,6 +18,7 @@
         'sci-fi': 'SF.mp3',
         'lovecraftian': 'peur.mp3',
         'antiquite': 'gaginator.mp3',
+        'film-noir': 'noire.mp3',
     };
 
     /*
@@ -279,6 +280,7 @@
         'sci-fi': 'SF.mp3',
         'lovecraftian': 'peur.mp3',
         'antiquite': 'gaginator.mp3',
+        'film-noir': 'noire.mp3',
     };
 
     var currentMusicPhase = null;
@@ -334,8 +336,35 @@
         }
     }
 
+    var speakSession = 0;
+
+    function chunkText(text, maxLen) {
+        var parts = text.match(/[^.!?…]+[.!?…]+|[^.!?…]+$/g) || [text];
+        var chunks = [];
+        var current = '';
+        parts.forEach(function (p) {
+            p = p.trim();
+            if (!p) { return; }
+            if ((current ? current + ' ' + p : p).length <= maxLen) {
+                current = current ? current + ' ' + p : p;
+            } else {
+                if (current) { chunks.push(current); }
+                if (p.length <= maxLen) {
+                    current = p;
+                } else {
+                    for (var i = 0; i < p.length; i += maxLen) {
+                        chunks.push(p.substring(i, i + maxLen));
+                    }
+                    current = '';
+                }
+            }
+        });
+        if (current) { chunks.push(current); }
+        return chunks.length ? chunks : [text];
+    }
+
     function speak(text, profileId) {
-        if (!text || !global.speechSynthesis || isSpeaking) {
+        if (!text || !global.speechSynthesis) {
             return false;
         }
 
@@ -344,36 +373,64 @@
 
         var profile = VOICE_PROFILES[profileId] || VOICE_PROFILES['narrator'];
 
+        // Cancel any current speech and invalidate previous sessions
+        global.speechSynthesis.cancel();
+        var session = ++speakSession;
+        isSpeaking = true;
+
         return new Promise(function (resolve) {
             ensureVoices(function () {
-                if (muted) { resolve(); return; }
+                if (session !== speakSession) { resolve(); return; }
+                if (muted) { isSpeaking = false; resolve(); return; }
 
-                global.speechSynthesis.cancel();
-                isSpeaking = true;
+                // Chrome/Edge bug: calling cancel() and speak() in the same tick
+                // silently drops the utterance. Delay slightly after cancel.
+                setTimeout(function () {
+                    if (session !== speakSession) { resolve(); return; }
 
-                var utterance = new global.SpeechSynthesisUtterance(cleanText);
-                utterance.lang = profile.lang;
-                utterance.voice = getMatchedVoice(profileId) || selectedVoice || null;
-                utterance.rate = profile.rate;
-                utterance.pitch = profile.pitch;
-                utterance.volume = volume * (profile.volumeBoost || 1.0);
+                    // Chrome cuts utterances longer than ~15s: split into chunks
+                    var chunks = chunkText(cleanText, 220);
+                    var index = 0;
 
-                utterance.onend = function () {
-                    isSpeaking = false;
-                    saveSettings();
-                    resolve();
-                };
-                utterance.onerror = function () {
-                    isSpeaking = false;
-                    resolve();
-                };
+                    function finish() {
+                        if (session === speakSession) { isSpeaking = false; }
+                        resolve();
+                    }
 
-                global.speechSynthesis.speak(utterance);
+                    function speakNext() {
+                        if (session !== speakSession) { return; }
+                        if (index >= chunks.length) { finish(); return; }
+                        var part = chunks[index++];
+                        var utterance = new global.SpeechSynthesisUtterance(part);
+                        utterance.lang = profile.lang;
+                        utterance.voice = getMatchedVoice(profileId) || selectedVoice || null;
+                        utterance.rate = profile.rate;
+                        utterance.pitch = profile.pitch;
+                        utterance.volume = Math.max(0, Math.min(1, volume * (profile.volumeBoost || 1.0)));
+
+                        utterance.onend = function () { speakNext(); };
+                        utterance.onerror = function () { speakNext(); };
+
+                        global.speechSynthesis.speak(utterance);
+                    }
+
+                    // Watchdog: if the engine never fires onend/onerror (Chrome bug),
+                    // release the lock so future speech still works.
+                    setTimeout(function () {
+                        if (session === speakSession && isSpeaking &&
+                            !global.speechSynthesis.speaking && !global.speechSynthesis.pending) {
+                            isSpeaking = false;
+                        }
+                    }, 3000);
+
+                    speakNext();
+                }, 60);
             });
         });
     }
 
     function stopSpeaking() {
+        speakSession++;
         if (global.speechSynthesis) {
             global.speechSynthesis.cancel();
         }
@@ -515,6 +572,18 @@
         if (archetype === 'outsider' || role === 'outsider' || role === 'marginal' || role === 'intrus' || role === 'unhinged') {
             return 'outsider' + langSuffix;
         }
+
+        // Fuzzy fallback: AI-generated NPCs may have free-text roles
+        // (e.g. "héritier fortuné", "the victim's bodyguard") — match keywords.
+        var combined = ((archetype || '') + ' ' + (role || '')).toLowerCase();
+        if (/detect|partenaire|partner|investigat|allie|allié/.test(combined)) { return 'detective' + langSuffix; }
+        if (/riche|rich|noble|heritier|héritier|suspect|arrogant|fortune/.test(combined)) { return 'suspect_rich' + langSuffix; }
+        if (/fatale|seduct|séduct|charme|manipulatric|venimeuse/.test(combined)) { return 'femme_fatale' + langSuffix; }
+        if (/inform|temoin|témoin|witness|nerveux|anxieux|paranoi/.test(combined)) { return 'informant' + langSuffix; }
+        if (/scient|expert|legiste|légiste|docteur|doctor|professeur|professor|chercheur/.test(combined)) { return 'scientist' + langSuffix; }
+        if (/bodyguard|garde|protect|force|videur|security|sécurité/.test(combined)) { return 'bodyguard' + langSuffix; }
+        if (/criminel|criminal|ombre|shadow|mastermind|assassin|meurtrier|coupable/.test(combined)) { return 'criminal' + langSuffix; }
+        if (/marginal|outsider|intrus|unhinged|instable|fou|clochard|vagabond/.test(combined)) { return 'outsider' + langSuffix; }
 
         return 'narrator' + langSuffix;
     }

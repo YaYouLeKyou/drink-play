@@ -137,13 +137,17 @@
                     <span class="solution-label">The Truth</span>
                     <span class="solution-value" id="solution-revealed-text">—</span>
                 </div>
+                <div class="solution-item solution-morale-item">
+                    <span class="solution-label">Morale</span>
+                    <span class="solution-value" id="solution-morale">—</span>
+                </div>
             </div>
             <div class="end-buttons">
                 <button id="new-investigation-btn" class="btn btn-primary">New Investigation</button>
                 <button id="back-to-hub-btn" class="btn btn-secondary">Back to Hub</button>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- ===== LOADING OVERLAY ===== -->
     <div id="loading-overlay" class="loading-overlay">
@@ -156,13 +160,21 @@
     <!-- ===== TOAST ===== -->
     <div id="toast" class="toast"></div>
 
+    <!-- ===== MINI-JEUX (mode scénario) ===== -->
+    <div id="minigame-layer" class="minigame-layer">
+        <!-- rempli par minigames.js -->
+    </div>
+
     <script src="imageService.js"></script>
     <script src="audioService.js"></script>
     <script src="narrativeEngine.js"></script>
+    <script src="scenario.js"></script>
+    <script src="phases.js"></script>
+    <script src="minigames.js"></script>
     <script src="app.js"></script>
     <script src="../music-player.js"
         data-start="generique.mp3"
-        data-tracks="true-detective/music true detective/phases/generique.mp3,true-detective/music true detective/phases/recherche.mp3,true-detective/music true detective/phases/enigme.mp3,true-detective/music true detective/phases/tension.mp3,true-detective/music true detective/phases/stress.mp3,true-detective/music true detective/phases/peur.mp3,true-detective/music true detective/phases/mystere flipant.mp3,true-detective/music true detective/phases/reflexion.mp3,true-detective/music true detective/phases/Act III Revelations.mp3,true-detective/music true detective/phases/Rising Tension.mp3,true-detective/music true detective/univers/victorian.mp3,true-detective/music true detective/univers/sherlock.mp3,true-detective/music true detective/univers/SF.mp3,true-detective/music true detective/univers/noire.mp3,true-detective/music true detective/univers/heroic fantasy.mp3,true-detective/music true detective/univers/cyberpunk.mp3,true-detective/music true detective/univers/paranormal.mp3,true-detective/music true detective/univers/antiquite.mp3"
+        data-tracks="night ride.mp3,true-detective/music true detective/phases/generique.mp3,true-detective/music true detective/phases/recherche.mp3,true-detective/music true detective/phases/enigme.mp3,true-detective/music true detective/phases/tension.mp3,true-detective/music true detective/phases/stress.mp3,true-detective/music true detective/phases/peur.mp3,true-detective/music true detective/phases/mystere flipant.mp3,true-detective/music true detective/phases/reflexion.mp3,true-detective/music true detective/phases/Act III Revelations.mp3,true-detective/music true detective/phases/Rising Tension.mp3,true-detective/music true detective/univers/victorian.mp3,true-detective/music true detective/univers/sherlock.mp3,true-detective/music true detective/univers/SF.mp3,true-detective/music true detective/univers/noire.mp3,true-detective/music true detective/univers/heroic fantasy.mp3,true-detective/music true detective/univers/cyberpunk.mp3,true-detective/music true detective/univers/paranormal.mp3,true-detective/music true detective/univers/antiquite.mp3"
         defer></script>
 </body>
 
