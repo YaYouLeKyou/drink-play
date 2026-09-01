@@ -11,23 +11,13 @@
     var isSpeaking = false;
 
     var THEME_MUSIC = {
-        'agatha-christie': 'Ancient Roman cinematic ambient, mysterious lyre melody, deep war drums, dark desert wind, suspenseful tribal strings, instrumental',
+        'agatha-christie': '1930s vintage orchestral, gentle piano melody, old mystery mansion atmosphere, tense strings, classic detective mood, instrumental',
         'sherlock-holmes': 'Dark Victorian orchestral, tense violin solo, foggy London atmosphere, melancholic harpsichord, cinematic suspense, slow crescendo, instrumental',
-        'film-noir': 'Dark jazz noir, muted trumpet solo, slow brushed drums, moody upright bass, smoky room vibe, melancholic sax, rainy street ambience, instrumental',
         'cyberpunk': 'Cyberpunk synthwave, dark synth, industrial beat, neon noir, heavy distorted bass, futuristic suspense, tempo 90bpm, blade runner style, instrumental',
         'heroic-fantasy': 'Dark fantasy orchestral, ambient harp, deep choir chants, mysterious flute, dungeon tension, cinematic epic suspense, low horns, instrumental',
         'sci-fi': 'Sci-fi dark ambient, cosmic synth drone, pulse bass, eerie space atmosphere, alien mystery, subtle electronic bleeps, cinematic suspense, instrumental',
         'lovecraftian': 'Dark ambient horror, eerie dissonance, haunting soundscapes, low brass drone, psychological thriller, disturbing textures, slow building dread, instrumental',
         'antiquite': 'Ancient Roman cinematic ambient, mysterious lyre melody, deep war drums, dark desert wind, suspenseful tribal strings, instrumental',
-        'pirate': 'Dark pirate ambient, eerie accordion solo, creaking ship wood, stormy ocean ambience, suspenseful cello, instrumental',
-        'western': 'Dark western ambient, lonely electric guitar, whistle in the wind, slow acoustic blues, tense cinematic suspense, instrumental',
-        'steampunk': 'Dark steampunk ambient, ticking clockwork, heavy steam hiss, low brass drone, suspenseful Victorian industrial, instrumental',
-        'post-apoc': 'Dark post-apocalyptic ambient, industrial drone, metallic scraping sounds, low synth pulse, desolate tension, instrumental',
-        'kaiju': 'Dark cinematic monster suspense, heavy orchestral brass, sirens in distance, low sub bass rumble, high stakes tension, instrumental',
-        'psychological': '70s psychological thriller ambient, eerie analog synth, slow electric bass, tense tape delay, subtle vinyl crackle, instrumental',
-        'spy': 'Dark Cold War spy thriller, suspenseful synth bass, minimalist piano, teletype sounds, subtle tension, instrumental',
-        'paranormal': '90s horror synth, eerie EMF static, haunting pad synth, slow creepy music box, dark suspense, instrumental',
-        'cyber-horror': 'Dark cyber horror, glitch ambient, distorted synth drone, creepy digital static, deep dark electronic tension, instrumental',
     };
 
     var VOICE_PROFILES = {
@@ -84,23 +74,13 @@
     };
 
     var THEME_MUSIC_TRACKS = {
-        'agatha-christie': 'noire.mp3',
+        'agatha-christie': 'sherlock.mp3',
         'sherlock-holmes': 'sherlock.mp3',
-        'film-noir': 'noire.mp3',
         'cyberpunk': 'cyberpunk.mp3',
         'heroic-fantasy': 'heroic fantasy.mp3',
         'sci-fi': 'SF.mp3',
-        'lovecraftian': 'cyberpunk.mp3',
-        'antiquite': 'noire.mp3',
-        'pirate': 'noire.mp3',
-        'western': 'noire.mp3',
-        'steampunk': 'cyberpunk.mp3',
-        'post-apoc': 'cyberpunk.mp3',
-        'kaiju': 'cyberpunk.mp3',
-        'psychological': 'noire.mp3',
-        'spy': 'cyberpunk.mp3',
-        'paranormal': 'cyberpunk.mp3',
-        'cyber-horror': 'cyberpunk.mp3',
+        'lovecraftian': 'peur.mp3',
+        'antiquite': 'gaginator.mp3',
     };
 
     var currentMusicPhase = null;
@@ -272,7 +252,7 @@
     }
 
     function getThemeMusic(themeId) {
-        return THEME_MUSIC[themeId] || THEME_MUSIC['film-noir'];
+        return THEME_MUSIC[themeId] || THEME_MUSIC['agatha-christie'];
     }
 
     function setMusicPhase(phase) {
@@ -294,7 +274,7 @@
     }
 
     function getMusicForPhase(themeId, musicPhase) {
-        var base = THEME_MUSIC[themeId] || THEME_MUSIC['film-noir'];
+        var base = THEME_MUSIC[themeId] || THEME_MUSIC['agatha-christie'];
         var phasePrompt = MUSIC_PHASE_PROMPTS[musicPhase] || MUSIC_PHASE_PROMPTS.investigation;
         return phasePrompt + (base ? ' Base theme: ' + base.substring(0, 80) : '');
     }

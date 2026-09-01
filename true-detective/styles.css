@@ -279,7 +279,7 @@ html {
     background: rgba(10, 10, 26, 0.7);
     border: 2px solid rgba(0, 255, 255, 0.3);
     border-radius: 16px;
-    padding: 18px 12px;
+    padding: 16px 12px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -290,6 +290,9 @@ html {
     overflow: hidden;
     height: 100%;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .theme-card:hover {
@@ -321,8 +324,8 @@ html {
 }
 
 .theme-emoji {
-    font-size: 2.5em;
-    margin-bottom: 8px;
+    font-size: 1.5em;
+    margin-bottom: 6px;
     display: block;
 }
 
@@ -477,6 +480,19 @@ html {
     color: rgba(0, 255, 255, 0.6);
     letter-spacing: 1px;
     white-space: nowrap;
+}
+.narration-timer {
+    font-family: 'Special Elite', monospace;
+    font-size: 0.85em;
+    color: rgba(255, 215, 0, 0.7);
+    letter-spacing: 1px;
+    white-space: nowrap;
+    margin-left: 12px;
+    padding: 4px 12px;
+    border-radius: 8px;
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    animation: pulse-glow 2s infinite;
 }
 
 .music-info.phase-tension,

@@ -2,24 +2,96 @@
     'use strict';
 
     var THEMES = [
-        { id: 'agatha-christie', name: 'Agatha Christie', emoji: '🏚️', desc: 'Classic country house mystery' },
-        { id: 'sherlock-holmes', name: 'Sherlock Holmes', emoji: '🔍', desc: 'Victorian London detective' },
-        { id: 'film-noir', name: 'Film Noir', emoji: '🎩', desc: 'Dark city streets, trench coat' },
-        { id: 'cyberpunk', name: 'Cyberpunk', emoji: '🌃', desc: 'Neo-Tokyo dystopia' },
-        { id: 'heroic-fantasy', name: 'Heroic Fantasy', emoji: '⚔️', desc: 'Medieval castle, knights, magic' },
-        { id: 'sci-fi', name: 'Sci-Fi', emoji: '👽', desc: 'Space station mystery' },
-        { id: 'lovecraftian', name: 'Lovecraftian', emoji: '🐙', desc: 'Cosmic horror, ancient entities' },
-        { id: 'antiquite', name: 'Antiquité', emoji: '🏛️', desc: 'Ancient Rome & Egypt' },
-        { id: 'pirate', name: 'Pirate', emoji: '⚓', desc: 'Caribbean piracy' },
-        { id: 'western', name: 'Far West', emoji: '🤠', desc: 'Wild West saloon' },
-        { id: 'steampunk', name: 'Steampunk', emoji: '⚙️', desc: 'Steam-powered industrial' },
-        { id: 'post-apoc', name: 'Post-Apocalypse', emoji: '☢️', desc: 'Wasteland ruins' },
-        { id: 'kaiju', name: 'Kaiju', emoji: '🦎', desc: 'Urban monster disaster' },
-        { id: 'psychological', name: 'Psychological', emoji: '🕶️', desc: '70s thriller' },
-        { id: 'spy', name: 'Espionnage', emoji: '🕵️', desc: 'Cold War spy thriller' },
-        { id: 'paranormal', name: 'Paranormal', emoji: '👻', desc: 'Ghost hunting mystery' },
-        { id: 'cyber-horror', name: 'Cyber-Horror', emoji: '💻', desc: 'AI dystopia horror' },
+        { id: 'agatha-christie', name: 'Agatha Christie', emoji: '🏚️', desc: 'Manoir victorien', category: 'classic' },
+        { id: 'sherlock-holmes', name: 'Sherlock Holmes', emoji: '🔍', desc: 'Londres 19e siècle', category: 'classic' },
+        { id: 'cyberpunk', name: 'Cyberpunk', emoji: '🌃', desc: 'Dystopie néon', category: 'scifi' },
+        { id: 'heroic-fantasy', name: 'Heroic Fantasy', emoji: '⚔️', desc: 'Donjons & Magie', category: 'scifi' },
+        { id: 'sci-fi', name: 'Sci-Fi', emoji: '👽', desc: 'Space Opera', category: 'scifi' },
+        { id: 'lovecraftian', name: 'Horreur Lovecraftienne', emoji: '🐙', desc: 'Paranormal', category: 'horror' },
+        { id: 'antiquite', name: 'Antiquité', emoji: '🏛️', desc: 'Péplum', category: 'horror' },
     ];
+
+    var ASSETS_BASE = 'assets/image true detective/';
+
+    var THEME_ASSETS = {
+        'agatha-christie': {
+            universe: ASSETS_BASE + 'univers/Agatha christie.png',
+            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
+            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
+            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
+            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
+            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
+            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
+            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
+            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
+        },
+        'sherlock-holmes': {
+            universe: ASSETS_BASE + 'univers/sherlock holmes.png',
+            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
+            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
+            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
+            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
+            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
+            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
+            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
+            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
+        },
+        'cyberpunk': {
+            universe: ASSETS_BASE + 'univers/cyberpunk.png',
+            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
+            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
+            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
+            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
+            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
+            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
+            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
+            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
+        },
+        'heroic-fantasy': {
+            universe: ASSETS_BASE + 'univers/heroic fantasy.png',
+            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
+            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
+            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
+            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
+            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
+            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
+            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
+            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
+        },
+        'sci-fi': {
+            universe: ASSETS_BASE + 'univers/sci fi.png',
+            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
+            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
+            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
+            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
+            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
+            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
+            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
+            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
+        },
+        'lovecraftian': {
+            universe: ASSETS_BASE + 'univers/lovecraft.png',
+            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
+            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
+            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
+            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
+            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
+            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
+            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
+            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
+        },
+        'antiquite': {
+            universe: ASSETS_BASE + 'univers/Antiquité.png',
+            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
+            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
+            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
+            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
+            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
+            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
+            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
+            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
+        },
+    };
 
     var TEXTS = {
         en: {
@@ -161,6 +233,7 @@
         langFrBtn: document.getElementById('lang-fr'),
         restartBtn: document.getElementById('restart-btn'),
         musicInfo: document.getElementById('music-info'),
+        narrationTimer: document.getElementById('narration-timer'),
         objectiveDisplay: document.getElementById('objective-display'),
         objectiveText: document.getElementById('objective-text'),
         dialogueHistory: document.getElementById('dialogue-history'),
@@ -200,11 +273,69 @@
         currentSequence: 'intro',
         phaseSequence: [],
         completedPhases: [],
+        fallbackScript: null,
+        fallbackCurrentAct: 0,
+        fallbackCurrentScene: 0,
+        usingFallback: false,
+        narrationTimer: null,
+        narrationSeconds: 30,
+        narrationRemaining: 30,
     };
 
     function getText(key) {
         var langTexts = TEXTS[ui.language] || TEXTS.en;
         return langTexts[key] || key;
+    }
+
+    function getThemeId() {
+        if (!ui.theme) return 'agatha-christie';
+        return typeof ui.theme === 'string' ? ui.theme : (ui.theme.id || 'agatha-christie');
+    }
+
+    var STORAGE_PREFIX = 'trueDetective_cache_';
+
+    function getStorageKey(key) {
+        return STORAGE_PREFIX + key;
+    }
+
+    function loadCachedScript(themeId, language) {
+        try {
+            var raw = localStorage.getItem(getStorageKey('script_' + themeId + '_' + language));
+            if (raw) {
+                return JSON.parse(raw);
+            }
+        } catch (e) {
+            console.warn('[Cache] Failed to load cached script:', e.message);
+        }
+        return null;
+    }
+
+    function saveCachedScript(themeId, language, script) {
+        try {
+            localStorage.setItem(getStorageKey('script_' + themeId + '_' + language), JSON.stringify(script));
+        } catch (e) {
+            console.warn('[Cache] Failed to save cached script:', e.message);
+        }
+    }
+
+    function loadCachedImages(themeId) {
+        try {
+            var raw = localStorage.getItem(getStorageKey('images_' + themeId));
+            if (raw) {
+                return JSON.parse(raw);
+            }
+        } catch (e) {
+            console.warn('[Cache] Failed to load cached images:', e.message);
+        }
+        return null;
+    }
+
+    function saveCachedImages(themeId, imageData) {
+        try {
+            localStorage.setItem(getStorageKey('images_' + themeId), JSON.stringify(imageData));
+        } catch (e) {
+            console.warn('[Cache] Failed to save cached images:', e.message);
+        }
     }
 
     function init() {
@@ -475,26 +606,135 @@
     }
 
     function startGameFromConfig() {
-        if (!ui.theme || !TDNarrativeEngine) {
+        if (!ui.theme) {
             showToast(getText('selectTheme') || 'Please select a theme first.', true);
             return;
         }
 
+        ui.theme = { id: ui.theme.id, name: ui.theme.name, emoji: ui.theme.emoji, desc: ui.theme.desc, category: ui.theme.category };
+
+        if (TDAudioService) {
+            TDAudioService.playThemeMusic(ui.theme.id);
+        }
+        updateMusicInfo('investigation', ui.theme.id);
         showLoading(getText('generatingInvestigation'));
 
-        TDNarrativeEngine.createInvestigation(ui.theme.id, ui.language)
+        var themeId = ui.theme.id;
+
+        var cached = loadCachedScript(themeId, ui.language);
+        if (cached && cached.acts) {
+            ui.fallbackScript = cached;
+            ui.usingFallback = true;
+            ui.fallbackCurrentAct = 0;
+            ui.fallbackCurrentScene = 0;
+            saveCachedScript(themeId, ui.language, cached);
+            hideLoading();
+            startGameWithIntro(cached, themeId);
+            return;
+        }
+
+        generateFallbackScript(themeId, ui.language)
             .then(function (script) {
+                ui.fallbackScript = script;
+                ui.usingFallback = true;
+                ui.fallbackCurrentAct = 0;
+                ui.fallbackCurrentScene = 0;
+                saveCachedScript(themeId, ui.language, script);
                 hideLoading();
-                startGameWithIntro(script, ui.theme.id);
+                startGameWithIntro(script, themeId);
             })
-            .catch(function (err) {
+            .catch(function (fallbackErr) {
                 hideLoading();
-                showToast(err.message || 'Failed to generate investigation', true);
+                showToast('Failed to generate investigation', true);
             });
     }
 
+    function generateFallbackScript(themeId, language) {
+        var theme = THEMES.find(function (t) { return t.id === themeId; }) || THEMES[0];
+        var assets = THEME_ASSETS[themeId] || THEME_ASSETS['agatha-christie'];
+
+        var isFR = language === 'fr';
+
+        var npcs = [
+            { id: 'detective-partner', name: 'Détective partenaire', role: 'detective', archetype: 'detective', imageUrl: assets.detective },
+            { id: 'femme-fatale', name: isFR ? 'La Femme Fatale' : 'The Femme Fatale', role: 'femme_fatale', archetype: 'femme_fatale', imageUrl: assets.femmeFatale },
+            { id: 'seducteur', name: isFR ? 'Le Séducteur' : 'The Seducteur', role: 'seducteur', archetype: 'informant', imageUrl: assets.seducteur },
+            { id: 'suspect', name: isFR ? 'Le Suspect' : 'The Suspect', role: 'suspect_rich', archetype: 'suspect_rich', imageUrl: assets.suspect },
+            { id: 'marginal', name: isFR ? 'Le Marginal' : 'The Marginal', role: 'outsider', archetype: 'outsider', imageUrl: assets.marginal },
+        ];
+
+        var investigationScenes = [
+            { type: 'investigation', location: theme.name + ' investigation', npcId: 'detective-partner', dialogue: isFR
+                ? 'Nous commençons l\'enquête. Regardez autour de vous, cherchez des indices.'
+                : 'We begin the investigation. Look around, search for clues.',
+                objective: isFR ? 'Discutez avec le détective pour trouver des indices.' : 'Discuss with the detective to find clues.',
+                choices: isFR
+                    ? ['Examiner la pièce', 'Questionner le détective', 'Chercher des preuves']
+                    : ['Examine the room', 'Question the detective', 'Search for evidence'],
+                musicPhase: 'investigation' },
+            { type: 'investigation', location: 'Crime scene analysis', npcId: 'detective-partner', dialogue: isFR
+                ? 'Laissez-moi analyser les preuves avec vous. Chaque détail compte.'
+                : 'Let me analyze the evidence with you. Every detail matters.',
+                objective: isFR ? 'Analysez la scène de crime pour découvrir des indices.' : 'Analyze the crime scene to discover clues.',
+                choices: isFR
+                    ? ['Analyser les empreintes', 'Examiner les témoignages', 'Reveindiquer la scène']
+                    : ['Analyze footprints', 'Examine testimonies', 'Revisit the scene'],
+                musicPhase: 'investigation' },
+            { type: 'investigation', location: 'Suspect identification', npcId: 'detective-partner', dialogue: isFR
+                ? 'Nous avons identifié trois suspects. Choisissez celui à interroger en premier.'
+                : 'We have identified three suspects. Choose who to interrogate first.',
+                objective: isFR ? 'Choisissez un suspect à interroger parmi les trois.' : 'Select a suspect to interrogate from the three.',
+                choices: [isFR ? 'La Femme Fatale' : 'The Femme Fatale', isFR ? 'Le Séducteur' : 'The Seducteur', isFR ? 'Le Suspect' : 'The Suspect'],
+                musicPhase: 'investigation' },
+        ];
+
+        var interrogationScenes = [
+            { type: 'interrogation', location: 'Suspect residence', npcId: 'femme-fatale', dialogue: isFR
+                ? 'Je ne sais pas ce que vous cherchez, détective. Mais je peux vous aider... pour un prix.'
+                : 'I don\'t know what you\'re looking for, detective. But I can help you... for a price.',
+                objective: isFR ? 'Interrogez la Femme Fatale pour obtenir des informations.' : 'Interrogate the Femme Fatale to obtain information.',
+                choices: isFR
+                    ? ['Presser la femme fatale', 'Lui proposer un échange', 'Menacer indirectement']
+                    : ['Press the femme fatale', 'Offer a deal', 'Imply threats'],
+                musicPhase: 'tension' },
+        ];
+
+        var revelationScenes = [
+            { type: 'revelation', location: 'Final confrontation', npcId: 'detective-partner', dialogue: isFR
+                ? 'C\'est fait. L\'enquête est terminée.'
+                : 'It\'s done. The investigation is complete.',
+                objective: isFR ? 'La vérité est enfin révélée.' : 'The truth is finally revealed.',
+                choices: [],
+                musicPhase: 'revelation' },
+            { type: 'credits', location: 'Case closed', npcId: null, dialogue: isFR
+                ? 'Affaire classée.'
+                : 'Case closed.',
+                objective: isFR ? 'La vérité est enfin révélée.' : 'The truth is finally revealed.',
+                choices: [],
+                musicPhase: 'credits' },
+        ];
+
+        var script = {
+            theme: themeId,
+            language: language,
+            setting: theme.name + ' investigation',
+            npcs: npcs,
+            acts: [
+                { setting: theme.name + ' investigation', musicPhase: 'investigation', scenes: investigationScenes },
+                { setting: 'Suspect interrogation', musicPhase: 'tension', scenes: interrogationScenes },
+                { setting: 'Final truth', musicPhase: 'revelation', scenes: revelationScenes },
+            ],
+            solution: { culprit: 'La Femme Fatale', motive: isFR ? 'Vengeance' : 'Revenge', method: isFR ? 'Tromperie' : 'Deception', revealed: isFR ? 'La vérité était cachée dans le conflit entre les trois suspects.' : 'The truth was hidden in the conflict between the three suspects.' },
+        };
+
+        return Promise.resolve(script);
+    }
+
     function startGameWithIntro(script, themeId) {
-        ui.theme = themeId;
+        if (typeof ui.theme === 'string') {
+            var themeObj = THEMES.find(function (t) { return t.id === themeId; });
+            ui.theme = themeObj || { id: themeId };
+        }
         ui.sceneCounter = 0;
 
         $.themeScreen.classList.add('hidden');
@@ -541,9 +781,13 @@
 
         updateObjective(sceneData.objective);
 
-        var savedScript = TDNarrativeEngine.getGameState().script;
+        var savedScript = null;
+        if (TDNarrativeEngine) {
+            var state = TDNarrativeEngine.getGameState();
+            savedScript = state ? state.script : null;
+        }
 
-        var introPages = buildIntroPages(savedScript || script);
+        var introPages = buildIntroPages(script);
 
         preGenerateIntroFirstPage(introPages[0], function () {
             if (TDAudioService && TDAudioService.playThemeMusic) {
@@ -557,12 +801,23 @@
     }
 
     function preGenerateIntroFirstPage(firstPage, callback) {
+        if (firstPage.bgImage) {
+            setBackground(firstPage.bgImage);
+            callback();
+            return;
+        }
+        var themeId = getThemeId();
         var musicPrompt = '';
         if (TDAudioService && TDAudioService.getThemeMusic) {
-            musicPrompt = TDAudioService.getThemeMusic(ui.theme);
+            musicPrompt = TDAudioService.getThemeMusic(themeId);
+        }
+        if (firstPage.bgImage) {
+            setBackground(firstPage.bgImage);
+            callback();
+            return;
         }
         var bgPromise = TDImageService
-            ? TDImageService.generateSceneBackground(firstPage.location || 'detective scene', ui.theme, musicPrompt)
+            ? TDImageService.generateSceneBackground(firstPage.location || 'detective scene', themeId, musicPrompt)
             : Promise.resolve(null);
 
         bgPromise.then(function (bgUrl) {
@@ -582,7 +837,7 @@
 
         var state = TDNarrativeEngine.resumeGame();
         if (state && state.script) {
-            ui.theme = state.theme || 'film-noir';
+            ui.theme = state.theme || 'agatha-christie';
             ui.sceneCounter = state.playerChoices.length;
 
             var lastScene = TDNarrativeEngine.getLastSceneData();
@@ -816,95 +1071,119 @@
     }
 
     function buildIntroPages(script) {
-        var themeName = '';
-        if (THEMES) {
-            var t = THEMES.find(function (t) { return t.id === script.theme; });
-            themeName = t ? t.name : script.theme;
-        }
+        var theme = THEMES.find(function (t) { return t.id === script.theme; }) || THEMES[0];
+        var themeName = theme ? theme.name : script.theme;
+        var assets = THEME_ASSETS[script.theme] || THEME_ASSETS['agatha-christie'];
         var location = script.setting || 'the investigation site';
-        var npcs = script.npcs || [];
-        var introNPC = npcs.length ? npcs[0] : null;
+        var introNPC = script.npcs && script.npcs.length ? script.npcs[0] : null;
+
+        var introText = {
+            en: [
+                'Welcome to the ' + themeName + ' case. As the detective says, "Every mystery begins with a single clue." The stage is set in this world where truth waits in the shadows.',
+                'The crime scene has been secured. Something went terribly wrong here. The detective examines the evidence, searching for the truth among the debris.',
+                'I am your partner in this investigation. Calm, methodical, and always thorough. Together, we will uncover what lies beneath the surface.',
+            ],
+            fr: [
+                'Bienvenue dans l\'enquête ' + themeName + '. Comme le dit le détective: "Chaque mystère commence par une seule piste." La scène est dressée dans cet univers où la vérité attend dans les ombres.',
+                'La scène de crime est sécurisée. Quelque chose s\'est terriblement mal passé ici. Le détective examine les preuves, cherchant la vérité parmi les débris.',
+                'Je suis votre partenaire dans cette enquête. Calme, méthodique et toujours approfondi. Ensemble, nous découvrirons ce qui se cache sous la surface.',
+            ],
+        };
+        var texts = ui.language === 'fr' ? introText.fr : introText.en;
 
         return [
             {
                 pageType: 'wide_shot',
-                text: 'The ' + themeName + ' case begins. The detective arrives at ' + location + ', ready to uncover the truth.',
-                location: location,
+                bgImage: assets.universe,
+                text: texts[0],
+                location: themeName + ' universe',
+                showNPC: false,
+                npcId: null,
+                isDialogue: false,
+            },
+            {
+                pageType: 'wide_shot',
+                bgImage: assets.crimeScene,
+                text: texts[1],
+                location: 'Crime scene',
                 showNPC: false,
                 npcId: null,
                 isDialogue: false,
             },
             {
                 pageType: 'character_enter',
-                text: introNPC
-                    ? (introNPC.name || 'A figure') + ' is present at the scene, watching closely.'
-                    : 'The atmosphere is tense. Something is about to unfold.',
-                location: location,
-                showNPC: !!introNPC,
-                npcId: introNPC ? introNPC.id : null,
+                bgImage: assets.crimeScene,
+                text: texts[2],
+                location: 'Crime scene',
+                showNPC: true,
+                npcId: introNPC ? introNPC.id : 'detective-partner',
+                npcName: introNPC ? introNPC.name : 'Partner',
                 npcImageFull: true,
                 isDialogue: false,
-            },
-            {
-                pageType: 'closeup',
-                text: 'The investigation is now underway. Every detail matters. Let the inquiry begin.',
-                location: location,
-                showNPC: !!introNPC,
-                npcId: introNPC ? introNPC.id : null,
-                npcImageCloseup: true,
-                isDialogue: true,
-                choices: null,
-                puzzle: null,
-                objective: 'Begin investigating the scene.',
-                musicPhase: 'investigation',
             },
         ];
     }
 
-    function buildTransitionPages(sceneData) {
-        var themeName = '';
-        if (THEMES) {
-            var t = THEMES.find(function (t) { return t.id === ui.theme; });
-            themeName = t ? t.name : ui.theme;
-        }
-        var location = sceneData.location || 'the investigation site';
-        var npc = null;
-        if (sceneData.npcId && TDNarrativeEngine) {
-            npc = TDNarrativeEngine.getNPC(sceneData.npcId);
-        }
+     function buildTransitionPages(sceneData) {
+        var themeId = getThemeId();
+        var theme = THEMES.find(function (t) { return t.id === themeId; }) || THEMES[0];
+        var themeName = theme ? theme.name : themeId;
+        var assets = THEME_ASSETS[themeId] || THEME_ASSETS['agatha-christie'];
+        var npc = getNPCById(sceneData.npcId) || null;
+        var npcName = npc ? npc.name : '';
+        var npcAsset = assets.marginal;
+        if (sceneData.npcId === 'femme-fatale') { npcAsset = assets.femmeFatale; npcAsset = assets.femmeFatale; }
+        if (sceneData.npcId === 'seducteur') npcAsset = assets.seducteur;
+        if (sceneData.npcId === 'suspect') npcAsset = assets.suspect;
+        if (npcAsset === assets.marginal && sceneData.npcId === 'detective-partner') npcAsset = assets.detective;
+
+        var transText = {
+            en: [
+                'The investigation leads us through ' + themeName + '. The detective follows a new lead.',
+                'In the shadows of ' + themeName + ', a figure watches. They may know something about the case.',
+                'We have arrived at the suspect\'s location. The detective is ready to make contact.',
+            ],
+            fr: [
+                'L\'enquête nous mène à travers ' + themeName + '. Le détective suit une nouvelle piste.',
+                'Dans les ombres de ' + themeName + ', une figure regarde. Ils pourraient savoir quelque chose sur l\'affaire.',
+                'Nous avons arrivé à l\'endroit du suspect. Le détective est prêt à prendre contact.',
+            ],
+        };
+        var texts = ui.language === 'fr' ? transText.fr : transText.en;
 
         return [
             {
                 pageType: 'wide_shot',
-                text: 'The investigation continues through the ' + themeName + ' case. A new lead has emerged.',
-                location: location,
+                bgImage: assets.alley,
+                text: texts[0],
+                location: 'Dark alley',
                 showNPC: false,
                 npcId: null,
                 isDialogue: false,
             },
             {
                 pageType: 'character_enter',
-                text: npc
-                    ? (npc.name || 'A figure') + ' reappears, holding new information.'
-                    : 'The detective follows the trail to a new location.',
-                location: location,
-                showNPC: !!npc,
-                npcId: sceneData.npcId || null,
+                bgImage: assets.alley,
+                text: texts[1],
+                location: 'Dark alley',
+                showNPC: true,
+                npcId: 'marginal',
+                npcName: npcName || 'The Marginal',
                 npcImageFull: true,
+                npcImageUrl: npcAsset,
                 isDialogue: false,
             },
             {
-                pageType: 'closeup',
-                text: 'The detective presses forward, piecing together the evidence. What secrets will be uncovered next?',
-                location: location,
-                showNPC: !!npc,
+                pageType: 'wide_shot',
+                bgImage: assets.residence,
+                text: texts[2],
+                location: 'Suspect residence',
+                showNPC: true,
                 npcId: sceneData.npcId || null,
-                npcImageCloseup: true,
-                isDialogue: true,
-                choices: null,
-                puzzle: null,
-                objective: sceneData.objective || 'Continue the investigation.',
-                musicPhase: 'investigation',
+                npcName: npcName,
+                npcImageFull: true,
+                npcImageUrl: npcAsset,
+                isDialogue: false,
             },
         ];
     }
@@ -924,35 +1203,45 @@
             $.continueBtn.classList.add('hidden');
         }
 
+        var themeId = getThemeId();
         var musicPrompt = '';
         var musicPhase = pageData.musicPhase || sceneData.musicPhase || ui.currentSceneType || 'investigation';
         if (TDAudioService && TDAudioService.getMusicForPhase) {
             if (sceneData.type === 'narration') {
-                musicPrompt = TDAudioService.getThemeMusic(ui.theme);
+                musicPrompt = TDAudioService.getThemeMusic(themeId);
             } else {
-                musicPrompt = TDAudioService.getMusicForPhase(ui.theme, musicPhase);
+                musicPrompt = TDAudioService.getMusicForPhase(themeId, musicPhase);
             }
         }
 
-        var backgroundPromise = TDImageService
-            ? TDImageService.generateSceneBackground(pageData.location || 'detective scene', ui.theme, musicPrompt)
-            : Promise.reject(new Error('ImageService not loaded'));
+        var backgroundPromise = pageData.bgImage
+            ? Promise.resolve(pageData.bgImage)
+            : (TDImageService
+                ? TDImageService.generateSceneBackground(pageData.location || 'detective scene', themeId, musicPrompt)
+                : Promise.reject(new Error('ImageService not loaded')));
 
         var npcImagePromise = Promise.resolve(null);
-        if (pageData.showNPC && pageData.npcId && TDNarrativeEngine) {
-            var npc = TDNarrativeEngine.getNPC(pageData.npcId);
-            if (npc) {
-                ui.currentNPCId = pageData.npcId;
-                $.npcName.textContent = npc.name || '';
+        if (pageData.showNPC && pageData.npcId) {
+            ui.currentNPCId = pageData.npcId;
+            $.npcName.textContent = pageData.npcName || '';
+            if (pageData.npcImageUrl) {
+                npcImagePromise = Promise.resolve(pageData.npcImageUrl);
+            } else if (TDNarrativeEngine) {
+                var npc = TDNarrativeEngine.getNPC(pageData.npcId);
+                if (npc) {
+                    $.npcName.textContent = npc.name || pageData.npcName || '';
 
-                if (npc.imagePrompt) {
-                    npcImagePromise = TDImageService
-                        ? TDImageService.generateImage(npc.imagePrompt, { width: 512, height: 512 })
-                        : Promise.reject(new Error('ImageService not loaded'));
-                } else {
-                    npcImagePromise = TDImageService
-                        ? TDImageService.generateNpcImage(npc, ui.theme)
-                        : Promise.reject(new Error('ImageService not loaded'));
+                    if (npc.imageUrl) {
+                        npcImagePromise = Promise.resolve(npc.imageUrl);
+                    } else if (npc.imagePrompt) {
+                        npcImagePromise = TDImageService
+                            ? TDImageService.generateImage(npc.imagePrompt, { width: 512, height: 512 })
+                            : Promise.reject(new Error('ImageService not loaded'));
+                    } else {
+                         npcImagePromise = TDImageService
+                            ? TDImageService.generateNpcImage(npc, themeId)
+                            : Promise.reject(new Error('ImageService not loaded'));
+                    }
                 }
             }
         } else {
@@ -963,7 +1252,46 @@
             }
         }
 
-        showLoading(getText('loadingScene'));
+        hideLoading();
+
+        typeWriter(pageData.text || '...', function () {
+            onPageComplete(pageNumber, sceneData);
+        });
+
+        if (TDAudioService && pageData.text) {
+            var profileKey = ui.language === 'fr' ? 'narrator_fr' : 'narrator';
+            if (sceneData.type === 'narration') {
+                profileKey = ui.language === 'fr' ? 'narrator_fr' : 'narrator';
+                startNarrationTimer(function () {
+                    if (ui.currentPage < ui.totalPages) {
+                        nextPage();
+                    } else {
+                        if (ui._narrationCallback) {
+                            var cb = ui._narrationCallback;
+                            ui._narrationCallback = null;
+                            hidePageNav();
+                            cb();
+                        }
+                    }
+                });
+            } else if (pageData.npcId && TDNarrativeEngine) {
+                var npcObj = TDNarrativeEngine.getNPC(pageData.npcId);
+                if (npcObj) {
+                    profileKey = TDAudioService.getVoiceProfileKey
+                        ? TDAudioService.getVoiceProfileKey(npcObj)
+                        : profileKey;
+                }
+            }
+            TDAudioService.speak(pageData.text, profileKey);
+        }
+
+        if (pageData.isDialogue) {
+            if (pageData.showNPC && pageData.npcId) {
+                $.conversationInput.classList.remove('hidden');
+            }
+        } else {
+            $.conversationInput.classList.add('hidden');
+        }
 
         Promise.all([
             backgroundPromise.catch(function () { return null; }),
@@ -985,39 +1313,11 @@
             } else {
                 hideNPC();
             }
-
-            hideLoading();
-
-            if (pageData.isDialogue) {
-                if (pageData.showNPC && pageData.npcId) {
-                    $.conversationInput.classList.remove('hidden');
-                }
-            } else {
-                $.conversationInput.classList.add('hidden');
-            }
-
-            typeWriter(pageData.text || '...', function () {
-                onPageComplete(pageNumber, sceneData);
-            });
-
-            if (TDAudioService && pageData.text) {
-                var profileKey = ui.language === 'fr' ? 'narrator_fr' : 'narrator';
-                if (sceneData.type === 'narration') {
-                    profileKey = ui.language === 'fr' ? 'narrator_fr' : 'narrator';
-                } else if (pageData.npcId && TDNarrativeEngine) {
-                    var npcObj = TDNarrativeEngine.getNPC(pageData.npcId);
-                    if (npcObj) {
-                        profileKey = TDAudioService.getVoiceProfileKey
-                            ? TDAudioService.getVoiceProfileKey(npcObj)
-                            : profileKey;
-                    }
-                }
-                TDAudioService.speak(pageData.text, profileKey);
-            }
         });
     }
 
     function onPageComplete(pageNumber, sceneData) {
+        stopNarrationTimer();
         ui.isTyping = false;
         ui.skipPending = false;
         ui.isWaiting = false;
@@ -1081,7 +1381,7 @@
 
         updatePageDots();
         showPageNav();
-        updateMusicInfo('investigation', ui.theme);
+        updateMusicInfo('investigation', getThemeId());
 
         goToPage(1);
 
@@ -1167,6 +1467,7 @@
     }
 
     function handleContinue() {
+        stopNarrationTimer();
         if (ui.isWaiting) return;
 
         if (ui.currentPage < ui.totalPages) {
@@ -1192,8 +1493,7 @@
             return;
         }
 
-        if (TDNarrativeEngine) {
-            TDNarrativeEngine.advanceGameState(null)
+        advanceGameState(null)
                 .then(function (data) {
                     ui.isWaiting = false;
 
@@ -1215,9 +1515,6 @@
                     ui.isWaiting = false;
                     showToast('Failed to continue investigation: ' + (err.message || 'Unknown error'), true);
                 });
-        } else {
-            ui.isWaiting = false;
-        }
     }
 
     function renderPuzzle(puzzle) {
@@ -1281,8 +1578,7 @@
             }
             TDAudioService.speak(getText('puzzleSolved') || 'Correct! The puzzle is solved.', 'narrator');
             setTimeout(function () {
-                if (TDNarrativeEngine) {
-                    TDNarrativeEngine.advanceGameState(getText('puzzleCorrect') || 'Correct answer')
+                advanceGameState(getText('puzzleCorrect') || 'Correct answer')
                         .then(function (data) {
                             ui.isWaiting = false;
                             if (data.gameComplete) {
@@ -1295,19 +1591,51 @@
                             ui.isWaiting = false;
                             showToast('Failed to continue investigation: ' + (err.message || 'Unknown error'), true);
                         });
-                }
             }, 1500);
         } else {
             showToast(getText('puzzleWrong') || 'That doesn\'t seem right. Try again.', true);
         }
     }
 
-    function skipTypeWriter() {
+     function startNarrationTimer(onExpire) {
+        stopNarrationTimer();
+        ui.narrationRemaining = ui.narrationSeconds;
+
+        if ($.narrationTimer) {
+            $.narrationTimer.classList.remove('hidden');
+            $.narrationTimer.textContent = '⏱ ' + ui.narrationRemaining + 's';
+        }
+
+        ui.narrationTimer = setInterval(function () {
+            ui.narrationRemaining--;
+            if (ui.narrationRemaining <= 0) {
+                stopNarrationTimer();
+                if (onExpire) { onExpire(); }
+            } else {
+                if ($.narrationTimer) {
+                    $.narrationTimer.textContent = '⏱ ' + ui.narrationRemaining + 's';
+                }
+            }
+        }, 1000);
+    }
+
+    function stopNarrationTimer() {
+        if (ui.narrationTimer) {
+            clearInterval(ui.narrationTimer);
+            ui.narrationTimer = null;
+        }
+        if ($.narrationTimer) {
+            $.narrationTimer.classList.add('hidden');
+        }
+    }
+
+     function skipTypeWriter() {
+        stopNarrationTimer();
         ui.skipPending = true;
         TDAudioService.stopSpeaking();
         $.dialogueText.textContent = getCurrentSceneText();
         onCompleteTyping();
-    }
+     }
 
     var _currentDialogue = '';
 
@@ -1377,14 +1705,14 @@
         if (ui.isWaiting || ui.isTyping) return;
         ui.isWaiting = true;
         ui.isTyping = false;
+        stopNarrationTimer();
         clearTypeWriter();
 
         if (TDAudioService) {
             TDAudioService.stopSpeaking();
         }
 
-        if (TDNarrativeEngine) {
-            TDNarrativeEngine.advanceGameState(choice)
+        advanceGameState(choice)
                 .then(function (data) {
                     ui.isWaiting = false;
 
@@ -1403,7 +1731,97 @@
                     showToast('Failed to continue investigation: ' + (err.message || 'Unknown error'), true);
                     setTimeout(function () { ui.isWaiting = false; }, 1000);
                 });
+    }
+
+    function advanceFallbackGameState(playerChoice) {
+        if (!ui.fallbackScript || !ui.fallbackScript.acts) {
+            return Promise.reject(new Error('No fallback script'));
         }
+
+        var acts = ui.fallbackScript.acts;
+        var currentAct = ui.fallbackCurrentAct;
+        var currentScene = ui.fallbackCurrentScene + 1;
+        var nextActTransition = null;
+
+        if (currentScene >= acts[currentAct].scenes.length) {
+            currentScene = 0;
+            if (currentAct + 1 < acts.length) {
+                currentAct++;
+                nextActTransition = acts[currentAct].setting || 'A new act begins.';
+            } else {
+                ui.fallbackCurrentAct = currentAct;
+                ui.fallbackCurrentScene = currentScene;
+                return Promise.resolve({
+                    gameComplete: true,
+                    solution: ui.fallbackScript.solution,
+                    clue: null,
+                    event: null,
+                    npcId: null,
+                    dialogue: '',
+                    location: '',
+                    type: 'credits',
+                    objective: '',
+                    choices: [],
+                    musicPhase: 'credits',
+                    nextActTransition: null,
+                });
+            }
+        }
+
+        ui.fallbackCurrentAct = currentAct;
+        ui.fallbackCurrentScene = currentScene;
+
+        var scenes = acts[currentAct].scenes;
+        var scene = scenes[Math.min(currentScene, scenes.length - 1)];
+
+        return Promise.resolve({
+            gameComplete: false,
+            nextActTransition: nextActTransition,
+            clue: null,
+            event: null,
+            npcId: scene.npcId || null,
+            dialogue: scene.dialogue || '',
+            location: scene.location || '',
+            type: scene.type || 'investigation',
+            objective: scene.objective || '',
+            choices: scene.choices || [],
+            musicPhase: scene.musicPhase || 'investigation',
+            puzzle: scene.puzzle || null,
+        });
+    }
+
+    function advanceGameState(choice) {
+        if (ui.usingFallback) {
+            return advanceFallbackGameState(choice);
+        }
+        if (TDNarrativeEngine) {
+            return TDNarrativeEngine.advanceGameState(choice || null);
+        }
+        return advanceFallbackGameState(choice);
+    }
+
+    function getGameState() {
+        if (TDNarrativeEngine && !ui.usingFallback) {
+            return TDNarrativeEngine.getGameState();
+        }
+        return {
+            currentAct: ui.fallbackCurrentAct + 1,
+            currentSceneIndex: ui.fallbackCurrentScene,
+            discoveredClues: [],
+            investigationSteps: [],
+            npcsEncountered: (ui.fallbackScript && ui.fallbackScript.npcs || []).map(function(n) { return n.id; }),
+            script: ui.fallbackScript,
+        };
+    }
+
+    function getNPCById(npcId) {
+        if (TDNarrativeEngine && !ui.usingFallback) {
+            return TDNarrativeEngine.getNPC(npcId);
+        }
+        if (ui.fallbackScript && ui.fallbackScript.npcs) {
+            return ui.fallbackScript.npcs.find(function (n) { return n.id === npcId; }) || null;
+        }
+        return null;
     }
 
     function continueAfterTransition(data) {
@@ -1563,8 +1981,12 @@
     function setBackground(url) {
         if (!$.bgLayer) return;
         var img = new Image();
-        img.onload = function () {
+        img.onload = function() {
+            $.bgLayer.style.opacity = '0';
             $.bgLayer.style.backgroundImage = 'url(' + url + ')';
+            setTimeout(function() {
+                $.bgLayer.style.opacity = '1';
+            }, 50);
         };
         img.src = url;
     }

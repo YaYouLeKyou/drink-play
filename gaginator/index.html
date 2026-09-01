@@ -11,6 +11,14 @@
 <body>
     <a id="backToHubBtn" class="back-to-hub-btn" href="../index.html">&#8592; Back to Hub</a>
     <a id="echoDonjonBtn" class="echo-donjon-btn" title="Echo Donjon">&#8593; Echo Donjon</a>
+    <div class="lang-dropdown-wrapper">
+        <button id="lang-change-btn" class="lang-change-btn" title="Change Language">Language</button>
+        <div id="lang-dropdown" class="lang-dropdown-content">
+            <button class="lang-option" data-lang="en">EN</button>
+            <button class="lang-option" data-lang="fr">FR</button>
+            <button class="lang-option" data-lang="es">ES</button>
+        </div>
+    </div>
     <div class="container">
         <h1>Gaginator</h1>
         <img id="gaginator-img" src="./img/gaginator.png" alt="Gaginator Hero">
@@ -18,88 +26,12 @@
         <div id="suggestion-box">
             <p id="suggestion-text"></p>
         </div>
+        <button id="timer-display" class="timer-display hidden">&#128276; 60s</button>
         <button id="generate-btn">Generate</button>
-    <button id="echo-sound-btn" class="echo-sound-btn hidden">🔊 Echo Donjon</button>
-    </div>
-    <div class="language-selector">
-        <button id="language-toggle-btn">Languages</button>
-        <div id="language-dropdown" class="dropdown-content">
-            <button class="lang-option" data-lang="en">English</button>
-            <button class="lang-option" data-lang="fr">Français</button>
-            <button class="lang-option" data-lang="es">Español</button>
-        </div>
+        <button id="echo-sound-btn" class="echo-sound-btn hidden">&#128276; Echo Donjon</button>
     </div>
     <script src="script.js"></script>
-    <script>
-        // Echo Donjon: dungeon echo sound effect on button clicks
-        (function () {
-            var echoActive = false;
-            var echoBtn = document.getElementById('echo-sound-btn');
-            var echoToggleBtn = document.getElementById('echoDonjonBtn');
-            var ctx = null;
-            var echoBuffer = null;
-
-            function initAudio() {
-                if (ctx) return;
-                try {
-                    var AudioCtx = window.AudioContext || window.webkitAudioContext;
-                    if (!AudioCtx) return;
-                    ctx = new AudioCtx();
-
-                    // Generate a short "dungeon echo" buffer: low tone + delayed repeats
-                    var sampleRate = ctx.sampleRate;
-                    var length = sampleRate * 0.4;
-                    var buf = ctx.createBuffer(1, length, sampleRate);
-                    var data = buf.getChannelData(0);
-                    for (var i = 0; i < length; i++) {
-                        var t = i / sampleRate;
-                        var base = Math.sin(2 * Math.PI * 120 * t) * Math.exp(-t * 8);
-                        var echo1 = Math.sin(2 * Math.PI * 110 * t) * Math.exp(-(t - 0.05) * 6) * (t > 0.05 ? 1 : 0);
-                        var echo2 = Math.sin(2 * Math.PI * 100 * t) * Math.exp(-(t - 0.12) * 4) * (t > 0.12 ? 0.6 : 0);
-                        data[i] = (base + echo1 + echo2) * 0.15;
-                    }
-                    echoBuffer = buf;
-                } catch (e) {
-                    ctx = null;
-                }
-            }
-
-            function playEcho() {
-                if (!echoActive || !ctx || !echoBuffer) return;
-                try {
-                    var source = ctx.createBufferSource();
-                    source.buffer = echoBuffer;
-                    source.connect(ctx.destination);
-                    source.start(0);
-                } catch (e) {
-                    // ignore
-                }
-            }
-
-            function toggleEcho() {
-                echoActive = !echoActive;
-                if (echoActive) {
-                    initAudio();
-                    echoBtn.classList.remove('hidden');
-                    echoToggleBtn.classList.add('active');
-                } else {
-                    echoBtn.classList.add('hidden');
-                    echoToggleBtn.classList.remove('active');
-                }
-            }
-
-            if (echoToggleBtn) {
-                echoToggleBtn.addEventListener('click', toggleEcho);
-            }
-
-            // Attach echo to all buttons except the echo controls themselves
-            document.querySelectorAll('button').forEach(function (btn) {
-                if (btn.id === 'echoDonjonBtn' || btn.id === 'echo-sound-btn') return;
-                btn.addEventListener('click', playEcho);
-            });
-        })();
-    </script>
-    <script src="../music-player.js" data-start="gigator.mp3" data-tracks="gigator/img/gigator.mp3" data-loop-track defer></script>
+    <script src="../music-player.js" data-start="gaginator.mp3" data-tracks="gaginator/img/gaginator.mp3" data-loop-track defer></script>
 </body>
 
 </html>
