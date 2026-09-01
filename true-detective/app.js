@@ -649,9 +649,20 @@ langEnBtn: document.getElementById('lang-en'),
         if ($.startGameBtn && !$.startGameBtn.classList.contains('hidden')) {
             $.startGameBtn.textContent = startGameText;
         }
+        // Écran d'accueil : sous-titre + bouton de démarrage traduits
+        var homeSubtitle = document.querySelector('.home-subtitle');
+        if (homeSubtitle) {
+            homeSubtitle.textContent = ui.language === 'fr'
+                ? 'Enquête détective interactive. 8 univers, PNJ dynamiques et narration immersive.'
+                : 'Interactive detective investigation. 8 universes, dynamic NPCs and immersive narration.';
+        }
+        if ($.startBtn) {
+            $.startBtn.textContent = ui.language === 'fr' ? "Commencer l'enquête" : 'Start Investigation';
+        }
     }
 
     function setLanguage(lang) {
+        var changed = (ui.language !== lang);
         ui.language = lang;
         if (TDAudioService) {
             TDAudioService.setLanguage(lang);
@@ -661,6 +672,10 @@ langEnBtn: document.getElementById('lang-en'),
         }
         updateLanguageUI();
         updateLanguageButtons();
+        // Mode scénario : ré-affiche la page courante dans la nouvelle langue
+        if (changed && typeof scr !== 'undefined' && scr && scr.active && typeof renderScenarioPage === 'function' && !ui.isTyping) {
+            renderScenarioPage();
+        }
     }
 
     function updateLanguageButtons() {
@@ -669,6 +684,13 @@ langEnBtn: document.getElementById('lang-en'),
         }
         if ($.langFrBtn) {
             $.langFrBtn.classList.toggle('active-lang', ui.language === 'fr');
+        }
+        // Boutons de l'écran d'accueil (sinon aucun retour visuel au clic)
+        if ($.langEnHomeBtn) {
+            $.langEnHomeBtn.classList.toggle('active-lang', ui.language === 'en');
+        }
+        if ($.langFrHomeBtn) {
+            $.langFrHomeBtn.classList.toggle('active-lang', ui.language === 'fr');
         }
     }
 
