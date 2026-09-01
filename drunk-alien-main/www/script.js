@@ -1,5 +1,74 @@
-const canvas = document.getElementById("canvas");
+﻿const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const timerEl = document.getElementById("gameTimer");
+const liveScoreEl = document.getElementById("liveScore");
+const liveKillsEl = document.getElementById("liveKills");
+const liveBeersEl = document.getElementById("liveBeers");
+
+const STORAGE_KEY = "drunkAlienBestStats";
+
+function loadBestStats() {
+    try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw);
+    } catch (e) {
+        return null;
+    }
+}
+
+function saveBestStats(stats) {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+    } catch (e) {
+        // no-op
+    }
+}
+
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+}
+
+function updateTimerDisplay() {
+    if (timerEl) timerEl.textContent = formatTime(gameState.gameTime);
+}
+
+function persistBestStats() {
+    saveBestStats({
+        score: gameState.bestScore,
+        kills: gameState.bestKills,
+        beers: gameState.bestBeerScore
+    });
+}
+
+function resetLiveStats() {
+    if (liveScoreEl) liveScoreEl.textContent = "0";
+    if (liveKillsEl) liveKillsEl.textContent = "0";
+    if (liveBeersEl) liveBeersEl.textContent = "0";
+}
+
+function updateLiveStats() {
+    if (liveScoreEl) liveScoreEl.textContent = gameState.currentScore;
+    if (liveKillsEl) liveKillsEl.textContent = gameState.currentKills;
+    if (liveBeersEl) liveBeersEl.textContent = gameState.beerScore;
+}
+
+function startGameTimer() {
+    stopGameTimer();
+    gameState.timerInterval = setInterval(function () {
+        gameState.gameTime++;
+        updateTimerDisplay();
+    }, 1000);
+}
+
+function stopGameTimer() {
+    if (gameState.timerInterval) {
+        clearInterval(gameState.timerInterval);
+        gameState.timerInterval = null;
+    }
+}
 
 function createImage(src) {
     const img = new Image;
@@ -157,7 +226,9 @@ const gameState = {
     itemParticles: [],
     collectionParticles: [],
     lastItemSpawnScore: 0,
-    enemyCounter: 0
+    enemyCounter: 0,
+    gameTime: 0,
+    timerInterval: null
 };
 const isMobile = /Mobi|Android/i.test(navigator.userAgent);
 if (isMobile) {
@@ -465,12 +536,27 @@ function setup() {
     gameState.boss3Defeated = false;
     gameState.boss3AppearedOnce = false;
     gameState.boss3AppearedTwice = false;
+    gameState.gameTime = 0;
+    stopGameTimer();
+    updateTimerDisplay();
+    resetLiveStats();
+    var best = loadBestStats();
+    if (best) {
+        gameState.bestScore = best.score || 0;
+        gameState.bestKills = best.kills || 0;
+        gameState.bestBeerScore = best.beers || 0;
+    } else {
+        gameState.bestScore = 0;
+        gameState.bestKills = 0;
+        gameState.bestBeerScore = 0;
+    }
     if (window.DA_Audio) window.DA_Audio.playLevel('home');
     effectiveEnemyMinInterval = isMobile ? enemyMinInterval * 2 : enemyMinInterval;
     gameState.lastAlternatingEnemyType = "enemy1";
     gameState.onFire = false;
     gameState.onFireTimer = 0;
     gameState.lastOnFireBeerScore = 0;
+    if (window.DA_Audio && window.DA_Audio.sfx.onFireStop) window.DA_Audio.sfx.onFireStop();
     gameState.showMessage = false;
     gameState.messageTimer = 0;
     gameState.fireworks = [];
@@ -590,6 +676,8 @@ function update() {
         if (gameState.index > 0 && gameState.index % 100 === 0) {
             gameState.currentScore++;
             gameState.bestScore = Math.max(gameState.bestScore, gameState.currentScore);
+            persistBestStats();
+            updateLiveStats();
         }
     }
     if (gameState.weaponCooldown > 0) gameState.weaponCooldown--;
@@ -598,7 +686,8 @@ function update() {
     if (gameState.onFire) {
         gameState.onFireTimer--;
         if (gameState.onFireTimer <= 0) {
-            gameState.onFire = false
+            gameState.onFire = false;
+            if (window.DA_Audio && window.DA_Audio.sfx.onFireStop) window.DA_Audio.sfx.onFireStop();
         }
     }
     
@@ -668,7 +757,7 @@ function update() {
                         gameState.boss2Defeated = true;
                         gameState.enemySpeed += 1
                     } else if (currentLevel === 3) {
-                        gameState.boss3Defeated = true;
+                        gameState.boss3Defeated = true
                     }
                     gameState.activeBoss = null;
                     gameState.bossMode = false;
@@ -678,13 +767,10 @@ function update() {
                     gameState.enemies = []; // Clear all enemies
                     gameState.pipesEntered = 0;
                     showMessageWithDuration("Congratulation!", "", "gold", 120);
-                    if (currentLevel === 3 && window.DA_Audio) {
-                        window.DA_Audio.playLevel('ending');
-                    } else if (window.DA_Audio) {
-                        // Resume level music after boss fight
+                    if (window.DA_Audio) {
                         if (currentLevel === 1) window.DA_Audio.playLevel('level2');
                         else if (currentLevel === 2) window.DA_Audio.playLevel('level3');
-                        else if (currentLevel === 3) window.DA_Audio.playLevel('level4');
+                        else if (currentLevel === 3) window.DA_Audio.playLevel('ending');
                     }
                     setTimeout(() => {
                         let nextMessage = currentLevel < 3 ? `Level ${currentLevel + 1}` : "You are";
@@ -714,6 +800,8 @@ function update() {
                     gameState.enemies.splice(j, 1);
                     gameState.currentKills++;
                     gameState.bestKills = Math.max(gameState.bestKills, gameState.currentKills);
+                    persistBestStats();
+                    updateLiveStats();
                     if (gameState.currentKills > 0 && gameState.currentKills % 10 === 0) {
                         spawnShieldItem(gameState.lastEnemyKillPosition.x, gameState.lastEnemyKillPosition.y)
                     }
@@ -900,7 +988,7 @@ function update() {
                         else if (playerState.weaponLevel === 2) message = "Triple Shot!";
                         else if (playerState.weaponLevel === 3) message = "Max Weapon!";
                         showMessageWithDuration(message, "", "gold", 90);
-                        if (window.DA_Audio) window.DA_Audio.sfx.weaponUpgrade();
+                        if (window.DA_Audio) window.DA_Audio.sfx.item();
                     } else {
                         showMessageWithDuration("Max Weapon", "Level!", "gold", 90)
                     }
@@ -910,14 +998,13 @@ function update() {
                 } else if (item.type === "vomit") {
                     if (playerState.weaponLevel > 0) {
                         playerState.weaponLevel = 0;
-                        showMessageWithDuration("Basic Shot!", "", "orange", 90);
-                        if (window.DA_Audio) window.DA_Audio.sfx.weaponDowngrade();
-                    } else {
-                        if (window.DA_Audio) window.DA_Audio.sfx.weaponReset();
+                        showMessageWithDuration("Basic Shot!", "", "orange", 90)
                     }
                 } else if (item.type === "beer") {
                     gameState.beerScore++;
                     gameState.bestBeerScore = Math.max(gameState.bestBeerScore, gameState.beerScore);
+                    persistBestStats();
+                    updateLiveStats();
                     if (window.DA_Audio) window.DA_Audio.sfx.beer();
                 }
                 gameState.items.splice(i, 1)
@@ -992,7 +1079,10 @@ if (gameState.beerScore > 0 && gameState.beerScore % 10 === 0 && gameState.beerS
                     gameState.onFireTimer = gameSettings.ON_FIRE_DURATION;
                     showMessageWithDuration("ON FIRE!", "", "red", 120);
                     gameState.lastOnFireBeerScore = gameState.beerScore;
-                    if (window.DA_Audio) window.DA_Audio.sfx.onFire();
+                    if (window.DA_Audio) {
+                        window.DA_Audio.sfx.onFire();
+                        if (window.DA_Audio.sfx.onFireStart) window.DA_Audio.sfx.onFireStart();
+                    }
                 }
             }
             const playerHitbox = {
@@ -1238,12 +1328,6 @@ function draw() {
                 ctx.drawImage(currentEnemyImage, 0, 0, currentEnemyImage.width, currentEnemyImage.height, e.x, e.y, e.width, e.height)
             }
         }
-        ctx.textAlign = "right";
-        ctx.font = "bold 16px courier";
-        ctx.fillStyle = "black";
-        ctx.fillText(`Score : ${gameState.currentScore}`, canvas.width - 10, 40);
-        ctx.fillText(`Kills : ${gameState.currentKills}`, canvas.width - 10, 64);
-        ctx.fillText(`Beers : ${gameState.beerScore}`, canvas.width - 10, 88);
         if (playerState.specialWeaponActive) {
             ctx.textAlign = "center";
             ctx.font = "bold 20px courier";
@@ -1372,13 +1456,7 @@ function fireShot() {
             fireSingleShot(weaponColors[3], shotSpeedValue, 0, false, 10)
         }
     }
-    if (window.DA_Audio) {
-        if (gameState.onFire) window.DA_Audio.sfx.shoot('fire');
-        else if (playerState.weaponLevel === 0) window.DA_Audio.sfx.shoot('basic');
-        else if (playerState.weaponLevel === 1) window.DA_Audio.sfx.shoot('double');
-        else if (playerState.weaponLevel === 2) window.DA_Audio.sfx.shoot('triple');
-        else if (playerState.weaponLevel >= 3) window.DA_Audio.sfx.shoot('max');
-    }
+    if (window.DA_Audio) window.DA_Audio.sfx.shoot();
 }
 
 function clearScreen() {
@@ -1398,6 +1476,8 @@ function clearScreen() {
         gameState.currentKills++;
         gameState.bestKills = Math.max(gameState.bestKills, gameState.currentKills)
     });
+    persistBestStats();
+    updateLiveStats();
     gameState.enemies = []
 }
 
@@ -1407,8 +1487,8 @@ function handleInteractionStart() {
         playerState.isThrusting = true;
         gameState.firstClickDone = true;
         if (window.DA_Audio) window.DA_Audio.playLevel('level1');
-        if (window.DA_Audio) window.DA_Audio.sfx.start();
         if (window.DA_Audio) window.DA_Audio.sfx.jump();
+        startGameTimer();
         showMessageWithDuration("Level 1", "Start!", "white", 120)
     } else if (gameState.gamePlaying && !gameState.isPaused) {
         playerState.isThrusting = true;
@@ -1432,6 +1512,7 @@ function togglePause() {
     gameState.isPaused = !gameState.isPaused;
     if (gameState.isPaused) {
         cancelAnimationFrame(gameState.animationFrameId);
+        stopGameTimer();
         pauseButton.textContent = "Resume";
         ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -1441,6 +1522,7 @@ function togglePause() {
         ctx.fillText("PAUSED", canvas.width / 2, canvas.height / 2)
     } else {
         gameState.animationFrameId = requestAnimationFrame(render);
+        startGameTimer();
         pauseButton.textContent = "Pause"
     }
 }

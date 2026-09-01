@@ -7,24 +7,68 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Language button in top corner -->
-    <button id="langBtn" class="lang-btn" title="Language"><span class="lang-flag">🌐</span> <span id="langLabel">EN</span></button>
-    <div id="langDropdown" class="lang-dropdown">
-        <select id="language">
-            <option value="en">English</option>
-            <option value="fr">Français</option>
-            <option value="es">Español</option>
-            <option value="it">Italiano</option>
-        </select>
+    <!-- Language and Cowboy profile buttons in top corner -->
+    <div class="top-controls">
+        <button id="langBtn" class="lang-btn" title="Language"><span class="lang-flag">🌐</span> <span id="langLabel">EN</span></button>
+        <div id="langDropdown" class="lang-dropdown">
+            <select id="language">
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="es">Español</option>
+                <option value="it">Italiano</option>
+            </select>
+        </div>
+        <button id="cowboyBtn" class="cowboy-btn" title="Cowboy accent">🤠<span id="cowboyLabel">Texan M</span></button>
+        <div id="cowboyDropdown" class="cowboy-dropdown">
+            <select id="cowboySelect">
+                <optgroup label="English • Male">
+                    <option value="texan_m">🤠 Texan M</option>
+                    <option value="australian_m">🦘 Australian M</option>
+                    <option value="british_m">🧥 British Rustic M</option>
+                </optgroup>
+                <optgroup label="English • Female">
+                    <option value="texan_f">🤠 Texan F</option>
+                    <option value="australian_f">🦘 Australian F</option>
+                    <option value="british_f">🧥 British Rustic F</option>
+                </optgroup>
+                <optgroup label="Français • Male">
+                    <option value="berrichon_m">🌾 Berrichon M</option>
+                    <option value="marseillais_m">⚽ Marseillais M</option>
+                    <option value="toulousain_m">🌹 Toulousain M</option>
+                    <option value="alsacien_m">🥨 Alsacien M</option>
+                </optgroup>
+                <optgroup label="Français • Female">
+                    <option value="berrichon_f">🌾 Berrichon F</option>
+                    <option value="marseillais_f">⚽ Marseillais F</option>
+                    <option value="toulousain_f">🌹 Toulousain F</option>
+                    <option value="alsacien_f">🥨 Alsacien F</option>
+                </optgroup>
+                <optgroup label="Español • Male">
+                    <option value="andalou_m">💃 Andalou M</option>
+                    <option value="mexicain_m">🌮 Mexicain M</option>
+                </optgroup>
+                <optgroup label="Español • Female">
+                    <option value="andalou_f">💃 Andalou F</option>
+                    <option value="mexicain_f">🌮 Mexicain F</option>
+                </optgroup>
+                <optgroup label="Italiano • Male">
+                    <option value="napolitain_m">🍕 Napolitain M</option>
+                </optgroup>
+                <optgroup label="Italiano • Female">
+                    <option value="napolitain_f">🍕 Napolitain F</option>
+                </optgroup>
+            </select>
+        </div>
     </div>
 
-    <!-- Rules button below language -->
+    <!-- Rules button -->
     <button id="rulesBtn" class="rules-btn" title="Rules">?
         <span class="rules-tooltip">Click to view game rules</span>
     </button>
 
-    <!-- Cowboy host mute button -->
-    <button id="cowboyMuteBtn" class="cowboy-mute-btn" title="Toggle voice">🤠</button>
+    <!-- Cowboy host mute and volume buttons -->
+    <button id="cowboyMuteBtn" class="cowboy-mute-btn" title="Toggle cowboy voice">🔊</button>
+    <button id="cowboyVolumeBtn" class="cowboy-volume-btn" title="Cowboy voice volume (100%)">🔊100%</button>
 
     <!-- Rules Modal (kept for when users want expanded view) -->
     <div id="rulesModal" class="rules-modal">

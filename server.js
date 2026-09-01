@@ -180,6 +180,106 @@ app.post('/api/never-ever/generate', async (req, res) => {
     }
 });
 
+app.post('/api/true-detective/master-script', async (req, res) => {
+    try {
+        const { theme = 'noir', language = 'en' } = req.body || {};
+
+        const { TrueDetectiveAI } = require('./lib/true-detective-ai');
+        const tdAI = new TrueDetectiveAI(aiClient);
+
+        const result = await tdAI.generateMasterScript({ theme, language });
+
+        if (result.source === 'ai' && result.script) {
+            return res.json({
+                source: 'ai',
+                model: result.model,
+                script: result.script,
+            });
+        }
+
+        res.status(500).json({
+            source: 'fallback',
+            error: result.error || 'AI script generation failed',
+            message: 'AI unavailable. Please try again later.',
+        });
+    } catch (error) {
+        console.error('[API] True Detective master-script error:', error.message);
+        res.status(500).json({
+            source: 'error',
+            error: 'Failed to generate investigation',
+            details: error.message,
+        });
+    }
+});
+
+app.post('/api/true-detective/advance', async (req, res) => {
+    try {
+        const { state = {}, language = 'en' } = req.body || {};
+
+        const { TrueDetectiveAI } = require('./lib/true-detective-ai');
+        const tdAI = new TrueDetectiveAI(aiClient);
+
+        const result = await tdAI.advanceStory({ ...state, language });
+
+        if (result.source === 'ai' && result.data) {
+            return res.json({
+                source: 'ai',
+                model: result.model,
+                data: result.data,
+            });
+        }
+
+        res.status(500).json({
+            source: 'fallback',
+            error: result.error || 'AI advance failed',
+            message: 'AI unavailable. Please try again later.',
+        });
+    } catch (error) {
+        console.error('[API] True Detective advance error:', error.message);
+        res.status(500).json({
+            source: 'error',
+            error: 'Failed to advance story',
+            details: error.message,
+        });
+    }
+});
+
+app.post('/api/true-detective/npc-response', async (req, res) => {
+    try {
+        const { state = {}, npcId, playerText = '' } = req.body || {};
+
+        if (!npcId) {
+            return res.status(400).json({ error: 'npcId is required' });
+        }
+
+        const { TrueDetectiveAI } = require('./lib/true-detective-ai');
+        const tdAI = new TrueDetectiveAI(aiClient);
+
+        const result = await tdAI.generateNPCResponse(state, npcId, playerText);
+
+        if (result.source === 'ai' && result.data) {
+            return res.json({
+                source: 'ai',
+                model: result.model,
+                data: result.data,
+            });
+        }
+
+        res.status(500).json({
+            source: 'fallback',
+            error: result.error || 'AI NPC response failed',
+            message: 'AI unavailable. Please try again later.',
+        });
+    } catch (error) {
+        console.error('[API] True Detective npc-response error:', error.message);
+        res.status(500).json({
+            source: 'error',
+            error: 'Failed to get NPC response',
+            details: error.message,
+        });
+    }
+});
+
 app.use(express.static(rootDir, {
     dotfiles: 'deny',
 }));

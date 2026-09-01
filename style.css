@@ -37,7 +37,7 @@ h1 {
 }
 
 .col {
-    width: calc(25% - 2rem);
+    width: calc(20% - 2rem);
     margin: 1rem;
     cursor: pointer;
 }
@@ -181,7 +181,7 @@ h1 {
 
 @media screen and (max-width: 64rem) {
     .col {
-        width: calc(33.333333% - 2rem);
+        width: calc(25% - 2rem);
     }
 }
 
@@ -196,6 +196,15 @@ h1 {
         width: 100%;
         margin: 0 0 2rem 0;
     }
+}
+
+.td-front .inner p {
+    color: #00ffff;
+    text-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
+}
+
+.td-front .inner span {
+    color: rgba(224, 224, 255, 0.6);
 }
 
 input {

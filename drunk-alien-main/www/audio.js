@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    Drunkin' Alien — Audio System
    ------------------------------------------------------------
    1) Music player (level-based playlist with controls)
@@ -34,12 +34,14 @@
     }
 
     var masterSfxGain = null;
+    var userSfxMuted = false;
+    var masterSfxVolume = 0.5;
     function getSfxGain() {
         if (masterSfxGain) return masterSfxGain;
         var ctx = getCtx();
         if (!ctx) return null;
         masterSfxGain = ctx.createGain();
-        masterSfxGain.gain.value = 0.4;
+        masterSfxGain.gain.value = userSfxMuted ? 0 : masterSfxVolume;
         masterSfxGain.connect(ctx.destination);
         return masterSfxGain;
     }
@@ -54,8 +56,8 @@
     musicAudio.loop = true;
 
     var currentTrackKey = null;
-    var levelTrackBeforeBoss = null;
     var userMuted = false;
+    var levelTrackBeforeBoss = null;
 
     function trackUrl(file) {
         return MUSIC_BASE + encodeURIComponent(file);
@@ -82,7 +84,6 @@
         musicAudio.currentTime = 0;
         if (!userMuted) {
             musicAudio.play().catch(function () {
-                // autoplay blocked, will resume on user interaction
                 pendingMusicAutoplay = true;
                 updatePlayButton();
             });
@@ -100,6 +101,7 @@
     function resumeLevelMusic() {
         if (levelTrackBeforeBoss) {
             playTrack(levelTrackBeforeBoss);
+            levelTrackBeforeBoss = null;
         }
     }
 
@@ -145,7 +147,31 @@
     volumeEl.min = '0';
     volumeEl.max = '100';
     volumeEl.value = String(Math.round(DEFAULT_VOLUME * 100));
-    volumeEl.title = 'Volume';
+    volumeEl.title = 'Music volume';
+
+    var muteSfxBtn = document.createElement('button');
+    muteSfxBtn.className = 'da-music-btn';
+    muteSfxBtn.title = 'Mute SFX';
+    muteSfxBtn.textContent = '🔊';
+    muteSfxBtn.addEventListener('click', function () {
+        userSfxMuted = !userSfxMuted;
+        var gain = getSfxGain();
+        if (gain) gain.gain.value = userSfxMuted ? 0 : masterSfxVolume;
+        muteSfxBtn.textContent = userSfxMuted ? '🔇' : '🔊';
+    });
+
+    var sfxVolumeEl = document.createElement('input');
+    sfxVolumeEl.type = 'range';
+    sfxVolumeEl.className = 'da-music-volume';
+    sfxVolumeEl.min = '0';
+    sfxVolumeEl.max = '100';
+    sfxVolumeEl.value = String(Math.round(masterSfxVolume * 100));
+    sfxVolumeEl.title = 'SFX volume';
+    sfxVolumeEl.addEventListener('input', function () {
+        masterSfxVolume = Number(sfxVolumeEl.value) / 100;
+        var gain = getSfxGain();
+        if (gain && !userSfxMuted) gain.gain.value = masterSfxVolume;
+    });
 
     var selectEl = document.createElement('select');
     selectEl.className = 'da-music-select';
@@ -162,6 +188,8 @@
     playerRoot.appendChild(nextBtn);
     playerRoot.appendChild(selectEl);
     playerRoot.appendChild(volumeEl);
+    playerRoot.appendChild(muteSfxBtn);
+    playerRoot.appendChild(sfxVolumeEl);
 
     var style = document.createElement('style');
     style.textContent = [
@@ -212,7 +240,8 @@
         '    transform: scale(1.12);',
         '}',
         '#da-music-player .da-music-play { font-size: 16px; }',
-        '#da-music-player .da-music-volume {',
+        '#da-music-player .da-music-volume,',
+        '#da-music-player .da-sfx-volume {',
         '    width: 60px;',
         '    accent-color: #7ec8ff;',
         '    cursor: pointer;',
@@ -233,7 +262,7 @@
         '@media (max-width: 480px) {',
         '    #da-music-player { font-size: 8px; padding: 4px 6px; gap: 4px; }',
         '    #da-music-player .da-music-title { max-width: 60px; font-size: 8px; }',
-        '    #da-music-player .da-music-volume { width: 40px; }',
+        '    #da-music-player .da-music-volume, #da-music-player .da-sfx-volume { width: 40px; }',
         '    #da-music-player .da-music-btn { font-size: 12px; padding: 3px 4px; }',
         '    #da-music-player .da-music-play { font-size: 13px; }',
         '}'
@@ -395,88 +424,142 @@
 
     /* ---------- Specific SFX ---------- */
 
-    function sfxJump() {
-        playSweep(400, 800, 0.12, 'square', 0.12);
+    var fireSoundNodes = null;
+    function sfxOnFireStart() {
+        stopFireSound();
+        var ctx = getCtx();
+        if (!ctx) return;
+        if (ctx.state === 'suspended') ctx.resume();
+        var dest = getSfxGain();
+        if (!dest) return;
+
+        var now = ctx.currentTime;
+        var duration = 4;
+        var bufferSize = Math.floor(ctx.sampleRate * duration);
+        var buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        var data = buffer.getChannelData(0);
+        for (var i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * (0.6 + 0.4 * Math.random());
+        }
+
+        var source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.loop = true;
+
+        var filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 400;
+        filter.Q.value = 0.8;
+
+        var gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.35, now);
+
+        source.connect(filter);
+        filter.connect(gain);
+        gain.connect(dest);
+        source.start(now);
+
+        var crackOsc = ctx.createOscillator();
+        crackOsc.type = 'sawtooth';
+        crackOsc.frequency.setValueAtTime(180, now);
+        var crackGain = ctx.createGain();
+        crackGain.gain.setValueAtTime(0.08, now);
+        crackOsc.connect(crackGain);
+        crackGain.connect(dest);
+        crackOsc.start(now);
+
+        fireSoundNodes = { source: source, gain: gain, crackOsc: crackOsc, crackGain: crackGain };
     }
 
-    function sfxShoot(type) {
-        // Default to basic shot
-        if (type === 'fire') {
-            // Rapid fire for on-fire mode
-            playTone(1000, 0.03, 'square', 0.1);
-            playTone(1200, 0.03, 'square', 0.08);
-            playTone(800, 0.03, 'square', 0.06);
-        } else if (type === 'basic') {
-            // Basic single shot
-            playTone(800, 0.05, 'square', 0.08);
-            playTone(600, 0.05, 'square', 0.06);
-        } else if (type === 'double') {
-            // Double shot - slightly higher pitch
-            playTone(1000, 0.05, 'square', 0.09);
-            playTone(800, 0.05, 'square', 0.07);
-        } else if (type === 'triple') {
-            // Triple shot - even higher
-            playTone(1200, 0.05, 'square', 0.1);
-            playTone(1000, 0.05, 'square', 0.08);
-            playTone(800, 0.05, 'square', 0.06);
-        } else if (type === 'max') {
-            // Max weapon - powerful sound
-            playTone(1500, 0.06, 'square', 0.12);
-            playTone(1000, 0.06, 'square', 0.1);
-            playTone(500, 0.06, 'square', 0.08);
-        } else {
-            // Default/fallback
-            playTone(1200, 0.05, 'square', 0.08);
-            playTone(600, 0.05, 'square', 0.06);
-        }
+    function stopFireSound() {
+        if (!fireSoundNodes) return;
+        try {
+            fireSoundNodes.source.stop();
+            fireSoundNodes.crackOsc.stop();
+            fireSoundNodes.gain.disconnect();
+            fireSoundNodes.crackGain.disconnect();
+        } catch (e) {}
+        fireSoundNodes = null;
+    }
+
+    function sfxOnFire() {
+        sfxOnFireStart();
+        playSweep(300, 1200, 0.5, 'sawtooth', 0.25);
+        playSequence([
+            { freq: 600, dur: 0.12 },
+            { freq: 800, dur: 0.12 },
+            { freq: 1000, dur: 0.25 }
+        ], 120, 'square', 0.18);
+    }
+
+    function sfxSpeedBoost() {
+        playNoise(0.5, 0.35, 1200);
+        playSweep(400, 1800, 0.5, 'sawtooth', 0.3);
+        playSequence([
+            { freq: 700, dur: 0.12 },
+            { freq: 1000, dur: 0.15 },
+            { freq: 1400, dur: 0.2 }
+        ], 110, 'square', 0.2);
+    }
+
+    function sfxBomb() {
+        playNoise(0.7, 0.4, 400);
+        playSweep(300, 20, 0.6, 'sawtooth', 0.3);
+        playSweep(150, 40, 0.5, 'square', 0.25);
+    }
+
+    function sfxExplosion() {
+        playNoise(0.6, 0.35, 700);
+        playSweep(200, 50, 0.4, 'sawtooth', 0.2);
+    }
+
+    function sfxBossDeath() {
+        playNoise(0.8, 0.45, 500);
+        playSweep(180, 25, 0.7, 'sawtooth', 0.35);
+        setTimeout(function () { playNoise(0.5, 0.3, 300); }, 80);
+        setTimeout(function () { playNoise(0.4, 0.25, 200); }, 160);
+        playSequence([
+            { freq: 523, dur: 0.2 },
+            { freq: 392, dur: 0.2 },
+            { freq: 262, dur: 0.6 }
+        ], 160, 'square', 0.2);
+    }
+
+    function sfxJump() {
+        playSweep(400, 800, 0.12, 'square', 0.15);
+    }
+
+    function sfxShoot() {
+        playTone(1200, 0.05, 'square', 0.1);
+        playTone(600, 0.05, 'square', 0.08);
     }
 
     function sfxBeer() {
-        // happy "gulp" jingle
         playSequence([
             { freq: 523, dur: 0.08 },
             { freq: 659, dur: 0.08 },
             { freq: 784, dur: 0.15 }
-        ], 70, 'square', 0.12);
+        ], 70, 'square', 0.15);
     }
 
     function sfxItem() {
-        // pickup bling
         playSequence([
             { freq: 880, dur: 0.06 },
             { freq: 1320, dur: 0.1 }
-        ], 60, 'triangle', 0.1);
-    }
-
-    function sfxExplosion() {
-        playNoise(0.3, 0.2, 800);
-        playSweep(200, 50, 0.25, 'sawtooth', 0.1);
-    }
-
-    function sfxBossDeath() {
-        // epic victory fanfare
-        playSequence([
-            { freq: 523, dur: 0.15 },
-            { freq: 659, dur: 0.15 },
-            { freq: 784, dur: 0.15 },
-            { freq: 1047, dur: 0.4 }
-        ], 130, 'square', 0.15);
-        // explosion underneath
-        setTimeout(function () { playNoise(0.4, 0.18, 600); }, 0);
+        ], 60, 'triangle', 0.12);
     }
 
     function sfxBossEntry() {
-        // ominous rising tone
-        playSweep(100, 600, 0.8, 'sawtooth', 0.12);
+        playSweep(100, 600, 0.8, 'sawtooth', 0.15);
         playSequence([
             { freq: 200, dur: 0.2 },
             { freq: 250, dur: 0.2 },
             { freq: 300, dur: 0.3 }
-        ], 200, 'square', 0.08);
+        ], 200, 'square', 0.1);
     }
 
     function sfxHit() {
-        playTone(150, 0.08, 'sawtooth', 0.12);
+        playTone(150, 0.08, 'sawtooth', 0.15);
     }
 
     function sfxGameOver() {
@@ -485,82 +568,11 @@
             { freq: 392, dur: 0.2 },
             { freq: 349, dur: 0.2 },
             { freq: 294, dur: 0.4 }
-        ], 180, 'square', 0.12);
+        ], 180, 'square', 0.15);
     }
 
     function sfxShield() {
-        playSweep(300, 900, 0.2, 'triangle', 0.1);
-    }
-
-    function sfxBomb() {
-        // big explosion
-        playNoise(0.5, 0.25, 500);
-        playSweep(300, 30, 0.4, 'sawtooth', 0.15);
-    }
-
-    function sfxOnFire() {
-        // rising whoosh for "on fire" activation
-        playSweep(300, 1200, 0.4, 'sawtooth', 0.15);
-        playSequence([
-            { freq: 600, dur: 0.1 },
-            { freq: 800, dur: 0.1 },
-            { freq: 1000, dur: 0.2 }
-        ], 100, 'square', 0.12);
-    }
-
-    function sfxSpeedBoost() {
-        // speed-up whoosh
-        playSweep(500, 1500, 0.3, 'triangle', 0.12);
-        playSequence([
-            { freq: 700, dur: 0.1 },
-            { freq: 1000, dur: 0.15 }
-        ], 100, 'square', 0.1);
-    }
-
-    function sfxWeaponUpgrade() {
-        // rising power-up sound
-        playSequence([
-            { freq: 523, dur: 0.1 },
-            { freq: 659, dur: 0.1 },
-            { freq: 784, dur: 0.1 },
-            { freq: 1047, dur: 0.2 }
-        ], 80, 'square', 0.15);
-    }
-
-    function sfxWeaponDowngrade() {
-        // sad descending sound
-        playSequence([
-            { freq: 784, dur: 0.1 },
-            { freq: 659, dur: 0.1 },
-            { freq: 523, dur: 0.15 },
-            { freq: 392, dur: 0.2 }
-        ], 100, 'triangle', 0.12);
-    }
-
-    function sfxWeaponReset() {
-        // neutral "reset" beep
-        playSequence([
-            { freq: 440, dur: 0.1 },
-            { freq: 440, dur: 0.1 }
-        ], 80, 'square', 0.1);
-    }
-
-    function sfxStart() {
-        // energetic start jingle
-        playSequence([
-            { freq: 523, dur: 0.1 },
-            { freq: 659, dur: 0.1 },
-            { freq: 784, dur: 0.1 },
-            { freq: 1047, dur: 0.3 }
-        ], 80, 'square', 0.18);
-    }
-
-    function sfxItemBoost() {
-        // power-up collect sound
-        playSequence([
-            { freq: 880, dur: 0.08 },
-            { freq: 1320, dur: 0.12 }
-        ], 60, 'triangle', 0.15);
+        playSweep(300, 900, 0.2, 'triangle', 0.12);
     }
 
     /* ============================================================
@@ -600,13 +612,21 @@
             shield: sfxShield,
             bomb: sfxBomb,
             onFire: sfxOnFire,
-            speedBoost: sfxSpeedBoost,
-            weaponUpgrade: sfxWeaponUpgrade,
-            weaponDowngrade: sfxWeaponDowngrade,
-            weaponReset: sfxWeaponReset,
-            start: sfxStart,
-            itemBoost: sfxItemBoost
-        }
+            onFireStart: sfxOnFireStart,
+            onFireStop: stopFireSound,
+            speedBoost: sfxSpeedBoost
+        },
+        muteSfx: function () {
+            userSfxMuted = true;
+            var gain = getSfxGain();
+            if (gain) gain.gain.value = 0;
+        },
+        unmuteSfx: function () {
+            userSfxMuted = false;
+            var gain = getSfxGain();
+            if (gain) gain.gain.value = masterSfxVolume;
+        },
+        isSfxMuted: function () { return userSfxMuted; }
     };
 
     window.DA_Audio = DA_Audio;

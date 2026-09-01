@@ -25,7 +25,7 @@
                     </div>
                     <div class="back">
                         <div class="inner">
-                            <input type="button" onClick="javascript:window.open('./jackpot/index.html', '_blank');"
+                            <input type="button" onClick="javascript:window.location.href='./jackpot/index.html';"
                                 value="Play">
                         </div>
                     </div>
@@ -43,7 +43,7 @@
                     </div>
                     <div class="back">
                         <div class="inner">
-                            <input type="button" onClick="javascript:window.open('./gaginator/index.html', '_blank');"
+                            <input type="button" onClick="javascript:window.location.href='./gaginator/index.html';"
                                 value="Play">
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                     </div>
                     <div class="back">
                         <div class="inner">
-                            <input type="button" onClick="javascript:window.open('./never-ever/index.html', '_blank');"
+                            <input type="button" onClick="javascript:window.location.href='./never-ever/index.html';"
                                 value="Play">
                         </div>
                     </div>
@@ -79,7 +79,24 @@
                     <div class="back">
                         <div class="inner">
                             <input type="button"
-                                onClick="javascript:window.open('./drunk-alien-main/www/index.html', '_blank');"
+                                onClick="javascript:window.location.href='./drunk-alien-main/www/index.html';"
+                                value="Play">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col" ontouchstart="this.classList.toggle('hover');">
+                <div class="container">
+                    <div class="front td-front" style="background-image: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #00ffff 30%);">
+                        <div class="inner">
+                            <p>True Detective</p>
+                            <span>AI-powered detective investigation across 17 themes. Dynamic NPCs and voice narration.</span>
+                        </div>
+                    </div>
+                    <div class="back">
+                        <div class="inner">
+                            <input type="button" onClick="javascript:window.location.href='./true-detective/index.html';"
                                 value="Play">
                         </div>
                     </div>
@@ -176,6 +193,7 @@
         </div>
     </div>
     <script src="ai.js"></script>
+    <script src="music-player.js" data-start="Together.mp3" defer></script>
 </body>
 
 </html>

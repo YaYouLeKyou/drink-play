@@ -12,6 +12,7 @@ const modalContent = actionModal.querySelector('.modal-content');
 const card = document.querySelector('.card');
 const langMenuButton = document.getElementById('lang-menu-button');
 const hostMuteButton = document.getElementById('host-mute-button');
+const hostVolumeButton = document.getElementById('host-volume-button');
 const hostVoiceSelect = document.getElementById('host-voice-select');
 const hostTimerButton = document.getElementById('host-timer-button');
 const hostResetButton = document.getElementById('host-reset-button');
@@ -60,10 +61,11 @@ let learnedAll = {};
 
 const AI_STATE_KEY = 'neverEverAIState';
 
-const AI_TIMEOUT = 5000;
+const AI_TIMEOUT = 3500;
 
 let hostEnabled = false;
 let hostMuted = false;
+let hostVolume = 1.0;
 let currentHostPlayer = '';
 let hostCommentsHistory = [];
 let isSpeaking = false;
@@ -400,10 +402,11 @@ function loadAISettings() {
         const data = JSON.parse(raw);
         if (Array.isArray(data.questionHistory)) questionHistory = data.questionHistory.slice(-40);
         if (Array.isArray(data.actionHistory)) actionHistory = data.actionHistory.slice(-40);
-        if (Array.isArray(data.players)) players = data.players.slice(0, 8);
-        if (data.playersMode === 'solo' || data.playersMode === 'multi') playersMode = data.playersMode;
+        // NOTE: les prénoms ne sont volontairement PAS restaurés :
+        // la liste des joueurs se réinitialise à chaque rechargement de page.
         if (typeof data.hostMuted === 'boolean') hostMuted = data.hostMuted;
         if (typeof data.hostEnabled === 'boolean') hostEnabled = data.hostEnabled;
+        if (typeof data.hostVolume === 'number') hostVolume = data.hostVolume;
         if (typeof data.hostVoiceIndex === 'number' && hostVoiceSelect) {
             hostVoiceSelect.value = data.hostVoiceIndex;
             const voices = window.speechSynthesis.getVoices();
@@ -412,9 +415,6 @@ function loadAISettings() {
         if (typeof data.questionTimerEnabled === 'boolean') questionTimerEnabled = data.questionTimerEnabled;
         if (typeof data.questionTimerDuration === 'number' && data.questionTimerDuration > 0) {
             questionTimerDuration = Math.min(data.questionTimerDuration, 120);
-        }
-        if (Array.isArray(data.players) && data.players.length > 0) {
-            userInteracted = true;
         }
         updatePlayersDisplay();
     } catch (error) {
@@ -427,10 +427,10 @@ function saveAISettings() {
         localStorage.setItem(AI_STATE_KEY, JSON.stringify({
             questionHistory: questionHistory.slice(-40),
             actionHistory: actionHistory.slice(-40),
-            players,
-            playersMode,
+            // NOTE: les prénoms ne sont pas sauvegardés (reset à chaque partie)
             hostMuted,
             hostEnabled,
+            hostVolume,
             hostVoiceIndex: hostVoiceSelect ? parseInt(hostVoiceSelect.value, 10) : null,
             questionTimerEnabled,
             questionTimerDuration,
@@ -737,6 +737,7 @@ function resetGame() {
     userInteracted = true;
     hostEnabled = true;
     hostMuted = false;
+    hostVolume = 1.0;
     selectedVoice = null;
     questionTimerEnabled = false;
     clearQuestionTimer();
@@ -776,6 +777,7 @@ function resetGame() {
     updatePlayersDisplay();
     updateWelcomePlayersList();
     updateHostMuteButton();
+    updateHostVolumeButton();
     updateTimerDisplay();
     if (hostVoiceSelect) hostVoiceSelect.selectedIndex = 0;
     
@@ -815,7 +817,7 @@ function speak(text, options = {}) {
     const isQuestionText = options.questionText || false;
     utterance.rate = isWelcome ? 1.1 : isQuestionText ? 0.95 : isQuestion ? 1.0 : isAction ? 1.05 : 1.0;
     utterance.pitch = isWelcome ? 1.3 : isQuestionText ? 1.1 : isQuestion ? 1.2 : isAction ? 1.15 : 1.1;
-    utterance.volume = 1;
+    utterance.volume = hostVolume;
     isSpeaking = true;
     utterance.onend = () => { isSpeaking = false; };
     utterance.onerror = () => { isSpeaking = false; };
@@ -827,12 +829,35 @@ function pickFreshHostComment() {
     return pickFresh(pool, new Set(hostCommentsHistory), '');
 }
 
+function whenDoneSpeaking(callback) {
+    return new Promise(resolve => {
+        if (!isSpeaking) {
+            resolve();
+        } else {
+            const checkInterval = setInterval(() => {
+                if (!isSpeaking) {
+                    clearInterval(checkInterval);
+                    resolve();
+                }
+            }, 150);
+        }
+    }).then(callback);
+}
+
 async function triggerWelcome() {
     if (welcomeSpoken || !hostEnabled) return;
     welcomeSpoken = true;
-    const welcomeText = currentLanguage === 'fr'
-        ? 'Yo ! C\'est April, bienvenue dans Never Ever ! Allez, balancez vos prénoms, ça va déchirer ce soir !'
-        : 'Hey everyone! Welcome to Never Ever. We\'re here to drop the act and spill the juicy secrets. So, who\'s playing the saint and who\'s a lowkey demon here?';
+    const names = players.length > 0 ? players.join(', ') : '';
+    let welcomeText;
+    if (players.length > 0) {
+        welcomeText = currentLanguage === 'fr'
+            ? `C'est parti ! Bienvenue à ${names} ! Moi c'est April, et ce soir on joue à Never Ever. Balancez vos secrets, ou buvez !`
+            : `Here we go! Welcome ${names}! I'm April, and tonight we're playing Never Ever. Spill the secrets, or drink!`;
+    } else {
+        welcomeText = currentLanguage === 'fr'
+            ? 'Yo ! C\'est April, bienvenue dans Never Ever ! Allez, balancez vos prénoms, ça va déchirer ce soir !'
+            : 'Hey everyone! Welcome to Never Ever. We\'re here to drop the act and spill the juicy secrets. So, who\'s playing the saint and who\'s a lowkey demon here?';
+    }
     speak(welcomeText);
     hostCommentsHistory.push(welcomeText);
 }
@@ -849,6 +874,7 @@ async function getHostComment(contextType, extra = {}) {
             lastAction: extra.lastAction || '',
             players: playersMode === 'multi' && players.length > 0 ? players : [],
             pressureLevel: extra.level || 1,
+            question: extra.question || '',
         });
     }
 
@@ -899,12 +925,18 @@ async function displayNewQuestion() {
     card.classList.remove('super-spicy', 'glitch');
 
     setTimeout(async () => {
-        let content = null;
         const useAI = shouldUseAI() || isPoolExhausted('questions');
+        const wantsNarrative = shouldUseAI() && !isPoolExhausted('questions');
+        const wantsMostLikely = shouldUseAI();
 
-        if (useAI) {
-            content = await fetchAIContent('question');
-        }
+        // Tous les appels IA partent en parallèle : la question s'affiche et
+        // se fait entendre dès qu'elle est prête (latence max = 1 appel au
+        // lieu de 3 enchaînés).
+        const questionPromise = useAI ? fetchAIContent('question') : null;
+        const narrativePromise = wantsNarrative ? fetchAIContent('narrative') : null;
+        const mostLikelyPromise = wantsMostLikely ? fetchAIContent('most_likely') : null;
+
+        let content = questionPromise ? await questionPromise : null;
 
         if (!content) {
             content = getNewQuestion();
@@ -915,25 +947,17 @@ async function displayNewQuestion() {
         }
         saveAISettings();
 
-        let displayText = content;
+        let narrative = null;
+        let mostLikely = null;
+        const renderCard = () => {
+            const parts = [];
+            if (narrative) parts.push(narrative);
+            parts.push(content);
+            if (mostLikely) parts.push(mostLikely);
+            questionText.innerText = parts.join('\n\n');
+        };
 
-        if (shouldUseAI() && !isPoolExhausted('questions')) {
-            const narrative = await fetchAIContent('narrative');
-            if (narrative) {
-                currentNarrative = narrative;
-                displayText = `${narrative}\n\n${content}`;
-            }
-        }
-
-        if (shouldUseAI()) {
-            const mostLikely = await fetchAIContent('most_likely');
-            if (mostLikely) {
-                currentMostLikely = mostLikely;
-                displayText = `${displayText}\n\n${mostLikely}`;
-            }
-        }
-
-        questionText.innerText = displayText;
+        renderCard();
         if (isSpicy) {
             card.classList.add('super-spicy');
             card.classList.add('glitch');
@@ -941,8 +965,8 @@ async function displayNewQuestion() {
         questionText.classList.remove('fade');
         choicesContainer.classList.remove('hidden');
 
-        if (hostEnabled && displayText) {
-            const spokenText = String(displayText).replace(/\s+/g, ' ').trim();
+        if (hostEnabled && content) {
+            const spokenText = String(content).replace(/\s+/g, ' ').trim();
             if (spokenText) {
                 speak(spokenText, { questionText: true });
             }
@@ -950,13 +974,34 @@ async function displayNewQuestion() {
 
         startQuestionTimer();
 
+        // Narrative / most_likely arrivent après : simple mise à jour visuelle
+        // de la carte, sans couper la voix en cours.
+        if (narrativePromise) {
+            narrativePromise.then(value => {
+                if (value) {
+                    narrative = value;
+                    currentNarrative = narrative;
+                    renderCard();
+                }
+            });
+        }
+        if (mostLikelyPromise) {
+            mostLikelyPromise.then(value => {
+                if (value) {
+                    mostLikely = value;
+                    currentMostLikely = mostLikely;
+                    renderCard();
+                }
+            });
+        }
+
         if (hostEnabled) {
-            const hostComment = await getHostComment('question_start', { question: displayText });
+            const hostComment = await getHostComment('question_start', { question: content });
             if (hostComment) {
                 speak(hostComment, { question: true });
             }
         }
-    }, 500);
+    }, 300);
 }
 
 function setLanguage(lang) {
@@ -967,6 +1012,7 @@ function setLanguage(lang) {
         document.body.classList.remove('rtl');
     }
     updateHostMuteButton();
+    updateHostVolumeButton();
     updateUIText();
     displayNewQuestion();
     langModal.classList.add('hidden');
@@ -985,6 +1031,17 @@ hostMuteButton.addEventListener('click', () => {
     updateHostMuteButton();
     saveAISettings();
 });
+
+if (hostVolumeButton) {
+    hostVolumeButton.addEventListener('click', () => {
+        const levels = [0.25, 0.5, 0.75, 1.0];
+        const currentIndex = levels.indexOf(hostVolume);
+        const nextIndex = currentIndex === -1 ? 3 : (currentIndex + 1) % 4;
+        hostVolume = levels[nextIndex];
+        saveAISettings();
+        updateHostVolumeButton();
+    });
+}
 
 hostTimerButton.addEventListener('click', () => {
     toggleQuestionTimer();
@@ -1031,6 +1088,14 @@ function updateHostMuteButton() {
     hostMuteButton.innerText = hostMuted ? '🔇' : '🔊';
 }
 
+function updateHostVolumeButton() {
+    if (!hostVolumeButton) return;
+    const pct = Math.round(hostVolume * 100);
+    const icon = hostVolume <= 0.5 ? '🔉' : '🔊';
+    hostVolumeButton.innerText = icon + pct + '%';
+    hostVolumeButton.title = 'Host voice volume: ' + pct + '%. Click to change.';
+}
+
 document.querySelectorAll('.lang-select').forEach(button => {
     button.addEventListener('click', () => {
         setLanguage(button.getAttribute('data-lang'));
@@ -1073,15 +1138,28 @@ doButton.addEventListener('click', async () => {
     const flavorPrefix = isTruth ? '🎤' : isGroup ? '👥' : '';
     let displayAction = flavorPrefix ? `${flavorPrefix} ${action}` : action;
 
-    if (shouldUseAI()) {
-        const comment = await fetchAIContent('sarcastic_comment', { lastAction: action });
-        if (comment) {
-            displayAction = `${displayAction}\n\n— ${comment}`;
+    // Affichage immédiat de l'action (aucune attente IA avant la modale) ...
+    actionText.innerText = displayAction;
+    actionModal.classList.remove('hidden');
+
+    // ... la voix lit l'action tout de suite ...
+    if (hostEnabled && displayAction) {
+        const spokenAction = String(displayAction).replace(/\s+/g, ' ').trim();
+        if (spokenAction) {
+            speak(spokenAction, { action: true });
         }
     }
 
-    actionText.innerText = displayAction;
-    actionModal.classList.remove('hidden');
+    // ... et le commentaire sarcastique complète la carte quand il arrive
+    // (sans retarder l'affichage ni la voix).
+    if (shouldUseAI()) {
+        fetchAIContent('sarcastic_comment', { lastAction: action, question: lastQuestionText }).then(comment => {
+            if (comment) {
+                displayAction = `${displayAction}\n\n— ${comment}`;
+                actionText.innerText = displayAction;
+            }
+        });
+    }
 
     if (hostEnabled) {
         getHostComment('action_result', { lastAction: action }).then(comment => {
@@ -1149,6 +1227,7 @@ async function initGame() {
         updateWelcomePlayersList();
         hostEnabled = true;
         updateHostMuteButton();
+        updateHostVolumeButton();
         updateTimerDisplay();
         
         if (welcomeOverlay) {
@@ -1177,6 +1256,10 @@ function startGame() {
     if (gameStarted) return;
     gameStarted = true;
     userInteracted = true;
+    // Switch the music player to the Never Ever track
+    if (window.DPMusicPlayer && typeof window.DPMusicPlayer.playTrack === 'function') {
+        window.DPMusicPlayer.playTrack('night ride.mp3');
+    }
     if (welcomeOverlay) {
         welcomeOverlay.classList.add('hidden');
     }
@@ -1185,8 +1268,13 @@ function startGame() {
     }
     const container = document.querySelector('.container');
     if (container) container.classList.add('active');
-    displayNewQuestion();
+    // À chaque début de partie : la voix présente le jeu (avec les prénoms)
+    // avant que la première question n'apparaisse.
+    welcomeSpoken = false;
     triggerWelcome();
+    whenDoneSpeaking(() => {
+        displayNewQuestion();
+    });
 }
 
 initGame();
