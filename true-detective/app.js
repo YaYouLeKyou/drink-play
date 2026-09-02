@@ -2,7 +2,7 @@
     'use strict';
 
     var THEMES = [
-        { id: 'agatha-christie', name: 'Agatha Christie', emoji: '🏚️', desc: 'Manoir victorien', category: 'classic' },
+        { id: 'agatha-christie', name: 'Classic', emoji: '🏚️', desc: 'Scénario complet', category: 'classic' },
         { id: 'sherlock-holmes', name: 'Sherlock Holmes', emoji: '🔍', desc: 'Londres 19e siècle', category: 'classic' },
         { id: 'cyberpunk', name: 'Cyberpunk', emoji: '🌃', desc: 'Dystopie néon', category: 'scifi' },
         { id: 'heroic-fantasy', name: 'Heroic Fantasy', emoji: '⚔️', desc: 'Donjons & Magie', category: 'scifi' },
