@@ -11,8 +11,8 @@ const PORT = process.env.PORT || 4000;
 const rootDir = __dirname;
 
 if (!process.env.OPENROUTER_API_KEY && !process.env.GEMINI_API_KEY) {
-    console.error('ERROR: No AI API keys configured. Set OPENROUTER_API_KEY or GEMINI_API_KEY in .env');
-    process.exit(1);
+    // Don't exit: on Vercel, missing env vars must not kill the function.
+    console.error('WARNING: No AI API keys configured. Set OPENROUTER_API_KEY or GEMINI_API_KEY (local .env or Vercel env vars).');
 }
 
 if (!process.env.OPENROUTER_API_KEY) {
@@ -293,7 +293,11 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
-    console.log(`[Server] Drink & Play server running at http://localhost:${PORT}`);
-    console.log(`[Server] AI assistant available at /api/chat`);
-});
+module.exports = app;
+
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`[Server] Drink & Play server running at http://localhost:${PORT}`);
+        console.log(`[Server] AI assistant available at /api/chat`);
+    });
+}
