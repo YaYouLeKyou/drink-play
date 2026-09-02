@@ -14,136 +14,46 @@
 
     var ASSETS_BASE = 'assets/image true detective/';
 
-    var THEME_ASSETS = {
-        'agatha-christie': {
-            universe: ASSETS_BASE + 'univers/Agatha christie.png',
-            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
-            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
-            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
-            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
-            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
-            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
-            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
-            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
-            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
-            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
-            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
-            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
-            music: 'sherlock.mp3',
-        },
-        'sherlock-holmes': {
-            universe: ASSETS_BASE + 'univers/sherlock holmes.png',
-            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
-            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
-            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
-            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
-            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
-            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
-            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
-            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
-            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
-            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
-            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
-            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
-            music: 'sherlock.mp3',
-        },
-        'cyberpunk': {
-            universe: ASSETS_BASE + 'univers/cyberpunk.png',
-            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
-            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
-            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
-            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
-            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
-            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
-            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
-            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
-            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
-            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
-            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
-            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
-            music: 'cyberpunk.mp3',
-        },
-        'heroic-fantasy': {
-            universe: ASSETS_BASE + 'univers/heroic fantasy.png',
-            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
-            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
-            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
-            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
-            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
-            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
-            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
-            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
-            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
-            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
-            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
-            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
-            music: 'heroic fantasy.mp3',
-        },
-        'sci-fi': {
-            universe: ASSETS_BASE + 'univers/sci fi.png',
-            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
-            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
-            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
-            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
-            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
-            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
-            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
-            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
-            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
-            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
-            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
-            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
-            music: 'SF.mp3',
-        },
-        'lovecraftian': {
-            universe: ASSETS_BASE + 'univers/lovecraft.png',
-            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
-            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
-            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
-            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
-            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
-            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
-            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
-            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
-            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
-            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
-            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
-            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
-            music: 'peur.mp3',
-        },
-        'antiquite': {
-            universe: ASSETS_BASE + 'univers/Antiquité.png',
-            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
-            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
-            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
-            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
-            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
-            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
-            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
-            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
-            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
-            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
-            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
-            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
-            music: 'gaginator.mp3',
-        },
-        'film-noir': {
-            universe: ASSETS_BASE + 'univers/film noire.png',
-            crimeScene: ASSETS_BASE + 'lieux/Scène-du-Crime.png',
-            detective: ASSETS_BASE + 'characteres/Détective__Partenaire-removebg-preview.png',
-            femmeFatale: ASSETS_BASE + 'characteres/La_Femme_Fatale-removebg-preview.png',
-            seducteur: ASSETS_BASE + 'characteres/le_seducteur-removebg-preview.png',
-            suspect: ASSETS_BASE + 'characteres/le_suspect-removebg-preview.png',
-            marginal: ASSETS_BASE + 'characteres/Le_marginal-removebg-preview.png',
-            residence: ASSETS_BASE + 'lieux/La-Résidence-du-Suspect.png',
-            alley: ASSETS_BASE + 'lieux/Le-Quartier-Sombre-La-Ruelle.png',
-            publicPlace: ASSETS_BASE + 'lieux/Le-Lieu-Public-Le-Point-de-Rendez-vous.png',
-            secretPlace: ASSETS_BASE + 'lieux/Le-Lieu-Clandestin-La-Cachette.png',
-            laboratory: ASSETS_BASE + 'lieux/Le-Laboratoire-L_Atelier.png',
-            headquarters: ASSETS_BASE + 'lieux/Le-Bureau-Quartier-Général.png',
-            music: 'noire.mp3',
-        },
+    // Images CLASSIC (nouveaux assets lieux/classic + characteres/classic)
+    var CLASSIC_ASSETS = {
+        universe: ASSETS_BASE + 'lieux/classic/manoir.png',
+        crimeScene: ASSETS_BASE + 'lieux/classic/scene de crime manoir.png',
+        detective: ASSETS_BASE + 'characteres/classic/detective-partenaire.png',
+        femmeFatale: ASSETS_BASE + 'characteres/classic/femme-fatal.png',
+        seducteur: ASSETS_BASE + 'characteres/classic/le-seducteur.png',
+        suspect: ASSETS_BASE + 'characteres/classic/Le-suspect.png',
+        marginal: ASSETS_BASE + 'characteres/classic/Le-marginal.png',
+        protecteur: ASSETS_BASE + 'characteres/classic/Le_Protecteur.png',
+        scientifique: ASSETS_BASE + 'characteres/classic/le-scientific.png',
+        criminel: ASSETS_BASE + 'characteres/classic/le-criminel.png',
+        residence: ASSETS_BASE + 'lieux/classic/interieur manoir.png',
+        alley: ASSETS_BASE + 'lieux/classic/ruelle.png',
+        publicPlace: ASSETS_BASE + 'lieux/classic/exterieur bar.png',
+        secretPlace: ASSETS_BASE + 'lieux/classic/appartement suspect.png',
+        laboratory: ASSETS_BASE + 'lieux/classic/laboratoire.png',
+        headquarters: ASSETS_BASE + 'lieux/classic/quartier general.png',
+        prison: ASSETS_BASE + 'lieux/classic/prison.png',
+        music: 'sherlock.mp3',
     };
+
+    // Un seul scénario classic : tous les thèmes pointent vers les assets classic
+    var THEME_ASSETS = {
+        'agatha-christie': CLASSIC_ASSETS,
+        'sherlock-holmes': CLASSIC_ASSETS,
+        'cyberpunk': CLASSIC_ASSETS,
+        'heroic-fantasy': CLASSIC_ASSETS,
+        'sci-fi': CLASSIC_ASSETS,
+        'lovecraftian': CLASSIC_ASSETS,
+        'antiquite': CLASSIC_ASSETS,
+        'film-noir': CLASSIC_ASSETS,
+    };
+    THEME_ASSETS['heroic-fantasy'] = Object.assign({}, CLASSIC_ASSETS);
+    THEME_ASSETS['sci-fi'] = Object.assign({}, CLASSIC_ASSETS);
+    THEME_ASSETS['lovecraftian'] = Object.assign({}, CLASSIC_ASSETS);
+    THEME_ASSETS['antiquite'] = Object.assign({}, CLASSIC_ASSETS);
+    THEME_ASSETS['film-noir'] = Object.assign({}, CLASSIC_ASSETS);
+    THEME_ASSETS['cyberpunk'] = Object.assign({}, CLASSIC_ASSETS);
+    THEME_ASSETS['sherlock-holmes'] = Object.assign({}, CLASSIC_ASSETS);
 
     var TEXTS = {
         en: {
@@ -432,7 +342,9 @@ langEnBtn: document.getElementById('lang-en'),
 
     function renderThemeCards() {
         $.themeGrid.innerHTML = '';
-        THEMES.forEach(function (theme) {
+        // Un seul scénario classic visible dans la config
+        var visibleThemes = THEMES.filter(function (th) { return th.id === 'agatha-christie'; });
+        visibleThemes.forEach(function (theme) {
             var card = document.createElement('div');
             card.className = 'theme-card';
             card.dataset.theme = theme.id;
@@ -2455,11 +2367,11 @@ langEnBtn: document.getElementById('lang-en'),
         'criminel': { fr: 'Le Criminel', en: 'The Criminal' },
     };
 
-    // personnages non présents dans THEME_ASSETS générique -> fichiers dédiés
+    // personnages non présents dans THEME_ASSETS générique -> fichiers dédiés (assets classic)
     var EXTRA_NPC_IMAGES = {
-        'protecteur': ASSETS_BASE + 'characteres/Le_Protecteur-removebg-preview.png',
-        'scientifique': ASSETS_BASE + 'characteres/Le_Scientifique-removebg-preview.png',
-        'criminel': ASSETS_BASE + 'characteres/Le_criminel-removebg-preview.png',
+        'protecteur': ASSETS_BASE + 'characteres/classic/Le_Protecteur.png',
+        'scientifique': ASSETS_BASE + 'characteres/classic/le-scientific.png',
+        'criminel': ASSETS_BASE + 'characteres/classic/le-criminel.png',
     };
 
     function scrGetState() { return TDScenario.getState(); }
