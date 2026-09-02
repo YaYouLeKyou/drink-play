@@ -1,0 +1,108 @@
+/******************************************************************************
+ * TRUE DETECTIVE — "La Onzième Heure" — Liste des assets graphiques réquis
+ * pour les mini-jeux interactifs.
+ *
+ * Chaque ligne donne le chemin relatif à créer (dossier + nom de fichier)
+ * et une courte description de ce que le graphiste doit produire.
+ * Format de nommage : kebab-case, extension .webp ou .png selon l'élément.
+ ******************************************************************************/
+
+# ─── LABORATOIRE (Analyse chimique + Inspection) ───
+
+mini-games/laboratoire/labo-interieur.webp
+  Vue plongeante d’un laboratoire industriel. Étagères métalliques, verres à pied,
+  pileuse cassée. Plan de travail central en acier inox éclairé par une lampe bleue.
+  Réfrigérateur miniature à gauche, bureau avec un tiroir ouvert (carnet de labo).
+  Ambiance froide, bleutée, légèrement inquiétante.
+
+mini-games/laboratoire/verrou-rechaudi.png
+  Verrou de port de laboratoire, légèrement brûlé — indice d’un accès forcé.
+  Texture métallique, reflet orangé en bas.
+
+# ─── CHRONOS (Manipulation — train de sonnerie) ───
+
+mini-games/chronos/mecanisme-closeup.webp
+  Vue en cross-section du cœur du Chronos : engrenages dorés, ressort tendu.
+  Cache arrière ouvert (bande magnétique visible). Traces de doigts en poudre.
+  Éclairage tamisé, filtré par de la poussière d’âge.
+
+mini-games/chronos/roue-temps.webp
+  Roue de temps en or massif, motif Zodiaque. Vue 3/4 avec reflets changeants.
+  Arrêtée visuellement sur 23h47 (indexeur subtil).
+
+mini-games/chronos/pince-a-jouet.webp
+  Pince à joindre miniaturisée, style horloger. À comparer avec empreinte.
+
+# ─── MONTRE DU DUC (Décodage) ───
+
+mini-games/montre/montre-du-duc-face.webp
+  Montre de poche ancienne, gravure florale. Écran brillant ; reflet suggère
+  un motif au revers.
+
+mini-games/montre/montre-du-duc-dos.webp
+  Revers de la montre : code gravé sous forme de lignes ondulées (3 onglets
+  tournants). Texture or terni pour le code.
+
+mini-games/montre/equerre-lumineux.webp
+  Équerre lumineuse style steampunk. Active le soulignement du code.
+
+# ─── INTERROGATOIRE (Under Pressure) ───
+
+mini-games/interrogatoire/veronique-interro.webp
+  Décor minimaliste : fauteuil cuir suspect, table métallique, lampe clignotante.
+  Fond strié type "blind à lames" (tension visuelle).
+
+mini-games/interrogatoire/gants-blancs.webp
+  Paquet de gants propres sur la table — indice de manipulation post-crime.
+
+# ─── PRESCRIPTION (Analyse chimique / Inspection) ───
+
+mini-games/prescription/prescription-eliane.webp
+  Ordonnance vieillie, couche de correction où la molécule B est rayée.
+  Empreinte de doigt gras couvre la correction.
+
+mini-games/prescription/pipette-numerique.webp
+  Pipette affichant dose. Écran clignote 5.0 mL vs 10.0 mL.
+
+# ─── CÂBLE DE GRAPHITE (Inspection / Décodage) ───
+
+mini-games/cable/cable-section.webp
+  Câble de cuivre sectionné : un bout grillé (marquage "A"), l’autre propre.
+
+mini-games/cable/graffiti-1.webp
+  Close-up du graffiti en graphite : "A". À faire correspondre à pince-marquage.
+
+# ─── ÉCLAT DE CARAFE (fausse piste) ───
+
+mini-games/carafe/verre-herite.webp
+  Éclat de verre bleu pâle (teinte ≠ carafe du salon ambrée).
+
+mini-games/carafe/carafe-pleine.webp
+  Carafe complète presque pleine sur table à vins.
+
+# ─── BANDE MAGNETIQUE FINALE (Manipulation / Fin) ───
+
+mini-games/bande/bande-cassure.webp
+  Fragment de bande magnétique tordu, empreinte au bout.
+  Contient le message final d’Éliane Vasseur.
+
+# ─── ASSETS PERSONNAGES (déjà existants dans le dossier characteres/) ───
+# À réutiliser via SCENARIO_NPC_ASSETS / EXTRA_NPC_IMAGES / THEME_ASSETS :
+#   - Détective__Partenaire-removebg-preview.png
+#   - La_Femme_Fatale-removebg-preview.png
+#   - le_seducteur-removebg-preview.png  (Adrien)
+#   - le_suspect-removebg-preview.png   (Victor)
+#   - Le_marginal-removebg-preview.png  (Yann)
+#   - Le_Protecteur-removebg-preview.png (Bastien)
+#   - Le_criminel-removebg-preview.png  (Braun)
+#   - Le_Scientifique-removebg-preview.png (Dr Kader)
+#   - (réutiliser les décors lieux existants : universe, crimeScene, qg, etc.)
+
+# ─── NOTES DE RÉALISATION ───
+# 1. Tous les nouveaux assets doivent être exportés en .webp (moderne, léger) ;
+#    sauf les objets manipulables précis (pince, pipsette) en .png (transparence).
+# 2. Résolution cible : 800x600 minimum (desktop) ; éviter fichiers > 500 Ko.
+# 3. La palette couleur reste dans les tons froids (bleus, gris, or terni) pour
+#    rester dans l’atmosphère horlogerie du jeu.
+# 4. Aucun texte n’est intégré dans les assets — tout texte dynamique passe par
+#    la couche JS/i18n (index.html / script.js) pour le multilingue FR/EN.

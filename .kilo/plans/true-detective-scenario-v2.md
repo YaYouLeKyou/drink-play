@@ -85,7 +85,7 @@ Total ≈ 2 + 2 + 2 + 3 phases + 1 générique = **9 phases de 3 pages + 1 page*
 Fond = image **univers**. Voix-off. Présentation de l'univers (issue du descriptif univers.txt, adapté au thème) + "Une affaire de taille vous attend : le crime d'un magnat de l'immobilier retrouvé sans vie dans son appartement." Choix : [Continuer].
 
 **P2** — *la découverte de la scène de crime*.
-Fond = **Scène-du-Crime** (utiliser le descriptif lieux #1). Narration illustrant la pièce, l'appartement retourné, le coffre. "Vous êtes sur le lieu du drame." Choix : [Entrer / Inspecter].
+Fond = **Scène-du-Crime** (utiliser le descriptif lieux #1). Narration illustrant la pièce, l'appartement retourné, le coffre, et un exterior du manoir de la victime. "Vous êtes sur le lieu du drame." Choix : [Entrer / Inspecter].
 
 **P3** — *arrivée du Détective Partenaire*.
 Fond = **Scène-du-Crime**, personnage = **Détective Partenaire**, apparaît en bord. Dialogue (enrichi) : il nous informe que la victime est un **riche magnat de l'immobilier** ; 1 seule personne a découvert le cadavre : **LE PROTECTEUR**, son garde du corps. Base d'enquête posée.

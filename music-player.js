@@ -336,9 +336,15 @@
             var wanted = String(name).toLowerCase();
             for (var k = 0; k < PLAYLIST.length; k++) {
                 if (PLAYLIST[k].toLowerCase() === wanted || matchesTrackName(PLAYLIST[k], wanted)) {
+                    if (k === currentIndex && !audio.paused) {
+                        // Track already playing (e.g. same phase across pages) — keep it running
+                        return true;
+                    }
                     userPaused = false;
                     pendingAutoplay = false;
-                    loadTrack(k);
+                    if (k !== currentIndex) {
+                        loadTrack(k);
+                    }
                     play();
                     return true;
                 }
