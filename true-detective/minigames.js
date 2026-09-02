@@ -39,6 +39,10 @@
         var maxTime = Math.max(timeLeft, 1);
         var timerId = null;
         var resultAnnounced = false;
+        var hintShown = false;
+        /* Difficulté adaptative : à 60% du temps écoulé, halo sur les bons éléments */
+        function registerHint(fn) { hintFn = fn; }
+        var hintFn = null;
 
         function finish(won) {
             if (resultAnnounced) return;
@@ -79,11 +83,15 @@
                 }
                 fill.style.width = Math.max(0, (timeLeft / maxTime) * 100) + '%';
                 timerSpan.textContent = Math.ceil(timeLeft) + 's';
+                if (!hintShown && timeLeft <= maxTime * 0.4 && hintFn) {
+                    hintShown = true;
+                    try { hintFn(); } catch (e) { /* ignore */ }
+                }
             }, 100);
         }
 
         /* Fabriques de jeux */
-        var creators = BUILD_CREATORS(cfg, lang, finish);
+        var creators = BUILD_CREATORS(cfg, lang, finish, registerHint);
 
         var factory = creators[cfg.type];
         var body = document.createElement('div');
@@ -280,6 +288,201 @@
                     }
                 });
                 box.appendChild(b);
+            });
+        },
+
+        /* V3 — MINI-JEUX AVEC ASSETS */
+        'labo_verrou': function (body, registerHint) {
+            var wrap = document.createElement('div');
+            wrap.className = 'mg-scene';
+            wrap.style.backgroundImage = 'url(mini-games/laboratoire/labo-interieur.jpg)';
+            var verrou = document.createElement('img');
+            verrou.className = 'mg-item';
+            verrou.src = 'mini-games/laboratoire/verrou-rechaudi.png';
+            wrap.appendChild(verrou);
+            body.appendChild(wrap);
+            var spots = (cfg.hotspots || []);
+            var found = 0;
+            var hintEls = [];
+            spots.forEach(function (h) {
+                var spot = document.createElement('button');
+                spot.className = 'fouille-spot thermo';
+                spot.style.left = h.x + '%';
+                spot.style.top = h.y + '%';
+                spot.textContent = '?';
+                wrap.appendChild(spot);
+                if (h.correct) hintEls.push(spot);
+                spot.addEventListener('click', function () {
+                    if (spot.dataset.done) return;
+                    spot.dataset.done = '1';
+                    spot.textContent = h.correct ? '🔥' : '✕';
+                    spot.classList.add(h.correct ? 'found' : 'wrong');
+                    if (h.correct) {
+                        found++;
+                        if (found >= hintEls.length) complete(true);
+                    } else {
+                        setTimeout(function () { spot.textContent = '?'; spot.classList.remove('wrong'); spot.dataset.done = ''; }, 500);
+                    }
+                });
+            });
+            registerHint(function () { hintEls.forEach(function (el) { el.classList.add('hint'); }); });
+        },
+
+        'montre_code': function (body, registerHint) {
+            var wrap = document.createElement('div');
+            wrap.className = 'mg-scene mg-montre';
+            var face = document.createElement('img');
+            face.className = 'mg-item';
+            face.src = 'mini-games/montre/montre-du-duc-face.jpg';
+            var dos = document.createElement('img');
+            dos.className = 'mg-item';
+            dos.src = 'mini-games/montre/montre-du-duc-dos.png';
+            wrap.appendChild(face);
+            wrap.appendChild(dos);
+            var equerre = document.createElement('img');
+            equerre.className = 'mg-equerre';
+            equerre.src = 'mini-games/montre/equerre-lumineux.png';
+            wrap.appendChild(equerre);
+            body.appendChild(wrap);
+            var symbols = (cfg.symbols || ['◁', '◆', '●', '✕']);
+            var answer = (cfg.code || [1, 2, 0, 3]).slice();
+            var pos = answer.map(function () { return 0; });
+            var dials = document.createElement('div');
+            dials.className = 'dial-row';
+            body.appendChild(dials);
+            var dialsEls = [];
+            answer.forEach(function (_, i) {
+                var d = document.createElement('button');
+                d.className = 'btn dial';
+                d.textContent = symbols[0];
+                dials.appendChild(d);
+                dialsEls.push(d);
+                d.addEventListener('click', function () {
+                    pos[i] = (pos[i] + 1) % symbols.length;
+                    d.textContent = symbols[pos[i]];
+                    check();
+                });
+            });
+            function check() {
+                for (var i = 0; i < answer.length; i++) {
+                    if (pos[i] !== answer[i]) return;
+                }
+                dialsEls.forEach(function (d) { d.classList.add('correct'); });
+                complete(true);
+            }
+            registerHint(function () {
+                dialsEls.forEach(function (d, i) { if (pos[i] !== answer[i]) d.classList.add('hint'); });
+            });
+        },
+
+        'chronos_roue': function (body, registerHint) {
+            var wrap = document.createElement('div');
+            wrap.className = 'mg-scene';
+            wrap.style.backgroundImage = 'url(mini-games/chronos/mecanisme-closeup.jpg)';
+            var roue = document.createElement('img');
+            roue.className = 'mg-item';
+            roue.src = 'mini-games/chronos/roue-temps.png';
+            wrap.appendChild(roue);
+            body.appendChild(wrap);
+            var gears = (cfg.order || []).map(function (s) { return t(s, lang); });
+            var idx = 0;
+            var box = document.createElement('div');
+            box.className = 'timeline-box';
+            body.appendChild(box);
+            var shuffled = gears.slice().sort(function () { return Math.random() - 0.5; });
+            var gearEls = [];
+            shuffled.forEach(function (label) {
+                var b = document.createElement('button');
+                b.className = 'btn timeline-step';
+                b.textContent = label;
+                box.appendChild(b);
+                gearEls.push(b);
+                b.addEventListener('click', function () {
+                    if (b.dataset.done) return;
+                    if (label === gears[idx]) {
+                        b.dataset.done = '1';
+                        b.classList.add('correct');
+                        idx++;
+                        if (idx >= gears.length) complete(true);
+                    } else {
+                        b.classList.add('wrong');
+                        setTimeout(function () { b.classList.remove('wrong'); }, 400);
+                    }
+                });
+            });
+            var pince = document.createElement('img');
+            pince.className = 'mg-item mg-pince';
+            pince.src = 'mini-games/chronos/pince-a-jouet.png';
+            pince.title = (lang === 'fr' ? 'Une fibre de soie est accrochée à la pince…' : 'A silk fibre is caught on the tweezers…');
+            body.appendChild(pince);
+            registerHint(function () {
+                gearEls.forEach(function (b) { if (!b.dataset.done && b.textContent === gears[idx]) b.classList.add('hint'); });
+            });
+        },
+
+        'cable_match': function (body, registerHint) {
+            var wrap = document.createElement('div');
+            wrap.className = 'mg-scene';
+            wrap.style.backgroundImage = 'url(mini-games/cable/cable-section.jpg)';
+            body.appendChild(wrap);
+            var wires = (cfg.wires || []);
+            var good = (cfg.good || [0, 1, 2]);
+            var grid = document.createElement('div');
+            grid.className = 'wire-grid';
+            body.appendChild(grid);
+            var linked = 0;
+            var wireEls = [];
+            wires.forEach(function (w, i) {
+                var b = document.createElement('button');
+                b.className = 'btn wire';
+                b.textContent = t(w, lang);
+                grid.appendChild(b);
+                wireEls.push(b);
+                b.addEventListener('click', function () {
+                    if (b.dataset.done) return;
+                    if (good.indexOf(i) !== -1) {
+                        b.dataset.done = '1';
+                        b.classList.add('correct');
+                        linked++;
+                        if (linked >= good.length) showGraffiti();
+                    } else {
+                        b.classList.add('wrong');
+                        setTimeout(function () { b.classList.remove('wrong'); }, 400);
+                    }
+                });
+            });
+            var graffitiImg = document.createElement('img');
+            graffitiImg.className = 'mg-item';
+            graffitiImg.src = 'mini-games/cable/graffiti-1.png';
+            graffitiImg.style.display = 'none';
+            body.appendChild(graffitiImg);
+            var writings = (cfg.writings || []);
+            var match = (typeof cfg.match === 'number') ? cfg.match : 0;
+            var done = false;
+            var sampleEls = [];
+            writings.forEach(function (w, i) {
+                var b = document.createElement('button');
+                b.className = 'btn writing-sample';
+                b.style.display = 'none';
+                b.textContent = t(w, lang);
+                body.appendChild(b);
+                sampleEls.push(b);
+                b.addEventListener('click', function () {
+                    if (done) return;
+                    if (i === match) { b.classList.add('correct'); done = true; complete(true); }
+                    else { b.classList.add('wrong'); setTimeout(function () { b.classList.remove('wrong'); }, 400); }
+                });
+            });
+            function showGraffiti() {
+                graffitiImg.style.display = '';
+                sampleEls.forEach(function (b) { b.style.display = ''; });
+            }
+            registerHint(function () {
+                if (linked < good.length) {
+                    wireEls.forEach(function (b, i) { if (!b.dataset.done && good.indexOf(i) !== -1) b.classList.add('hint'); });
+                } else {
+                    sampleEls.forEach(function (b, i) { if (i === match) b.classList.add('hint'); });
+                }
             });
         },
     };

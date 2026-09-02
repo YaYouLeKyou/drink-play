@@ -723,11 +723,11 @@ langEnBtn: document.getElementById('lang-en'),
         var isFR = language === 'fr';
 
         var npcs = [
-            { id: 'detective-partner', name: 'Détective partenaire', role: 'detective', archetype: 'detective', imageUrl: assets.detective },
-            { id: 'femme-fatale', name: isFR ? 'La Femme Fatale' : 'The Femme Fatale', role: 'femme_fatale', archetype: 'femme_fatale', imageUrl: assets.femmeFatale },
-            { id: 'seducteur', name: isFR ? 'Le Séducteur' : 'The Seducteur', role: 'seducteur', archetype: 'informant', imageUrl: assets.seducteur },
-            { id: 'suspect', name: isFR ? 'Le Suspect' : 'The Suspect', role: 'suspect_rich', archetype: 'suspect_rich', imageUrl: assets.suspect },
-            { id: 'marginal', name: isFR ? 'Le Marginal' : 'The Marginal', role: 'outsider', archetype: 'outsider', imageUrl: assets.marginal },
+            { id: 'detective-partner', name: 'Inspecteur Wexford', role: 'detective', archetype: 'detective', imageUrl: assets.detective },
+            { id: 'femme-fatale', name: isFR ? 'Lady Vivienne' : 'Lady Vivienne', role: 'femme_fatale', archetype: 'femme_fatale', imageUrl: assets.femmeFatale },
+            { id: 'seducteur', name: isFR ? 'Julian Pembrooke' : 'The Seducteur', role: 'seducteur', archetype: 'informant', imageUrl: assets.seducteur },
+            { id: 'suspect', name: isFR ? 'Rupert Blackwood' : 'Rupert Blackwood', role: 'suspect_rich', archetype: 'suspect_rich', imageUrl: assets.suspect },
+            { id: 'marginal', name: isFR ? 'Silas Crane' : 'Silas Crane', role: 'outsider', archetype: 'outsider', imageUrl: assets.marginal },
         ];
 
         var investigationScenes = [
@@ -751,7 +751,7 @@ langEnBtn: document.getElementById('lang-en'),
                 ? 'Nous avons identifié trois suspects. Choisissez celui à interroger en premier.'
                 : 'We have identified three suspects. Choose who to interrogate first.',
                 objective: isFR ? 'Choisissez un suspect à interroger parmi les trois.' : 'Select a suspect to interrogate from the three.',
-                choices: [isFR ? 'La Femme Fatale' : 'The Femme Fatale', isFR ? 'Le Séducteur' : 'The Seducteur', isFR ? 'Le Suspect' : 'The Suspect'],
+                choices: [isFR ? 'Lady Vivienne' : 'Lady Vivienne', isFR ? 'Julian Pembrooke' : 'The Seducteur', isFR ? 'Rupert Blackwood' : 'Rupert Blackwood'],
                 musicPhase: 'investigation' },
         ];
 
@@ -759,7 +759,7 @@ langEnBtn: document.getElementById('lang-en'),
             { type: 'interrogation', location: 'Suspect residence', npcId: 'femme-fatale', dialogue: isFR
                 ? 'Je ne sais pas ce que vous cherchez, détective. Mais je peux vous aider... pour un prix.'
                 : 'I don\'t know what you\'re looking for, detective. But I can help you... for a price.',
-                objective: isFR ? 'Interrogez la Femme Fatale pour obtenir des informations.' : 'Interrogate the Femme Fatale to obtain information.',
+                objective: isFR ? 'Interrogez Lady Vivienne pour obtenir des informations.' : 'Interrogate Lady Vivienne to obtain information.',
                 choices: isFR
                     ? ['Presser la femme fatale', 'Lui proposer un échange', 'Menacer indirectement']
                     : ['Press the femme fatale', 'Offer a deal', 'Imply threats'],
@@ -791,7 +791,7 @@ langEnBtn: document.getElementById('lang-en'),
                 { setting: 'Suspect interrogation', musicPhase: 'tension', scenes: interrogationScenes },
                 { setting: 'Final truth', musicPhase: 'revelation', scenes: revelationScenes },
             ],
-            solution: { culprit: 'La Femme Fatale', motive: isFR ? 'Vengeance' : 'Revenge', method: isFR ? 'Tromperie' : 'Deception', revealed: isFR ? 'La vérité était cachée dans le conflit entre les trois suspects.' : 'The truth was hidden in the conflict between the three suspects.' },
+            solution: { culprit: 'Lady Vivienne', motive: isFR ? 'Vengeance' : 'Revenge', method: isFR ? 'Tromperie' : 'Deception', revealed: isFR ? 'La vérité était cachée dans le conflit entre les trois suspects.' : 'The truth was hidden in the conflict between the three suspects.' },
         };
 
         return Promise.resolve(script);
@@ -1249,7 +1249,7 @@ langEnBtn: document.getElementById('lang-en'),
                 location: 'Dark alley',
                 showNPC: true,
                 npcId: 'marginal',
-                npcName: npcName || 'The Marginal',
+                npcName: npcName || 'Silas Crane',
                 npcImageFull: true,
                 npcImageUrl: npcAsset,
                 isDialogue: false,
@@ -2357,14 +2357,14 @@ langEnBtn: document.getElementById('lang-en'),
     };
 
     var SCENARIO_NPC_NAMES = {
-        'detective-partner': { fr: 'Détective partenaire', en: 'Partner detective' },
-        'protecteur': { fr: 'Le Protecteur', en: 'The Protector' },
-        'femme-fatale': { fr: 'La Femme Fatale', en: 'The Femme Fatale' },
-        'seducteur': { fr: 'Le Séducteur', en: 'The Seductor' },
-        'suspect': { fr: 'Le Suspect', en: 'The Suspect' },
-        'marginal': { fr: 'Le Marginal', en: 'The Marginal' },
-        'scientifique': { fr: 'Le Scientifique', en: 'The Scientist' },
-        'criminel': { fr: 'Le Criminel', en: 'The Criminal' },
+        'detective-partner': { fr: 'Inspecteur Wexford', en: 'Inspector Wexford' },
+        'protecteur': { fr: 'Le Major Hale', en: 'Major Hale' },
+        'femme-fatale': { fr: 'Lady Vivienne', en: 'Lady Vivienne' },
+        'seducteur': { fr: 'Julian Pembrooke', en: 'Julian Pembrooke' },
+        'suspect': { fr: 'Rupert Blackwood', en: 'Rupert Blackwood' },
+        'marginal': { fr: 'Silas Crane', en: 'Silas Crane' },
+        'scientifique': { fr: 'Dr Whitmore', en: 'Dr Whitmore' },
+        'criminel': { fr: 'Victor Krane', en: 'Victor Krane' },
     };
 
     // personnages non présents dans THEME_ASSETS générique -> fichiers dédiés (assets classic)
@@ -2418,12 +2418,12 @@ langEnBtn: document.getElementById('lang-en'),
 
     function scrChoiceLabel(choiceId) {
         var map = {
-            'femme-fatale': ui.language === 'fr' ? 'La Femme Fatale' : 'The Femme Fatale',
-            'seducteur': ui.language === 'fr' ? 'Le Séducteur' : 'The Seductor',
-            'suspect': ui.language === 'fr' ? 'Le Suspect' : 'The Suspect',
-            'protecteur': ui.language === 'fr' ? 'Le Protecteur' : 'The Protector',
-            'marginal': ui.language === 'fr' ? 'Le Marginal' : 'The Marginal',
-            'criminel': ui.language === 'fr' ? 'Le Criminel' : 'The Criminal',
+            'femme-fatale': ui.language === 'fr' ? 'Lady Vivienne' : 'Lady Vivienne',
+            'seducteur': ui.language === 'fr' ? 'Julian Pembrooke' : 'Julian Pembrooke',
+            'suspect': ui.language === 'fr' ? 'Rupert Blackwood' : 'Rupert Blackwood',
+            'protecteur': ui.language === 'fr' ? 'Le Major Hale' : 'Major Hale',
+            'marginal': ui.language === 'fr' ? 'Silas Crane' : 'Silas Crane',
+            'criminel': ui.language === 'fr' ? 'Victor Krane' : 'Victor Krane',
         };
         return map[choiceId] || choiceId;
     }

@@ -34,7 +34,7 @@
             { // page 2
                 decor: 'crimeScene',
                 text: {
-                    fr: 'Vous poussez la porte de la scène de crime. Le sang a séché sur le parquet, le coffre est béant, et sur une table, une montre brisée semble marquer une heure fatale : 20h12.',
+                    fr: 'Vous poussez la porte de la scène de crime. Le sang a séché sur le parquet, le coffre est béant, et sur une table, une montre brisée semble marquer une heure fatale : 22h09.',
                     en: 'You push open the door of the crime scene. Blood has dried on the floor, the safe gapes open, and on a table a broken watch seems to mark a fatal hour : 20:12.'
                 }
             },
@@ -42,8 +42,8 @@
                 decor: 'crimeScene',
                 npc: 'detective-partner',
                 text: {
-                    fr: 'Votre partenaire vous rejoint, l\'air grave : « La victime, un magnat, n\'a qu\'un seul domestique : son garde du corps, le Protecteur. C\'est lui qui a découvert le corps. L\'affaire commence ici. »',
-                    en: 'Your partner joins you, looking grave : "The victim, a tycoon, had one servant : his bodyguard, the Protector. He found the body. The case begins here."'
+                    fr: 'Votre partenaire vous rejoint, l\'air grave : « La victime, un magnat, n\'a qu\'un seul domestique : son garde du corps, le Major Hale. C\'est lui qui a découvert le corps. L\'affaire commence ici. »',
+                    en: 'Your partner joins you, looking grave : "The victim, a tycoon, had one servant : his bodyguard, Major Hale. He found the body. The case begins here."'
                 }
             }
         ]
@@ -78,12 +78,12 @@
                     en: '"Examine the room before asking questions," your partner whispers. You inspect every corner : the scene tells a story only a sharp eye can read.'
                 }
             },
-            { // page 2 — le Protecteur
+            { // page 2 — le Major Hale
                 decor: 'crimeScene',
                 npc: 'protecteur',
                 text: {
-                    fr: 'Le Protecteur tremble : « Je suis parti à 20h dépanner le Séducteur en panne. À mon retour, 21h, je l\'ai trouvé... sur le sol, une mare de sang. L\'appartement était cambriolé, le coffre vidé. » Il ajoute : « Le Suspect était passé à 19h. Il lui devait beaucoup d\'argent. »',
-                    en: 'The Protector trembles : "I left at 8pm to help the Seductor whose car had broken down. When I came back, 9pm, I found him... on the floor, a pool of blood. The place had been robbed, the safe emptied." He adds : "The Suspect had come at 7pm. He owed him a lot of money."'
+                    fr: 'Le Major Hale tremble : « Je suis parti à 20h dépanner Julian Pembrooke en panne. À mon retour, 21h, je l\'ai trouvé... sur le sol, une mare de sang. L\'appartement était cambriolé, le coffre vidé. » Il ajoute : « Rupert Blackwood était passé à 19h. Il lui devait beaucoup d\'argent. »',
+                    en: 'Major Hale trembles : "I left at 10pm to help Julian Pembrooke whose car had broken down. When I came back, 9pm, I found him... on the floor, a pool of blood. The place had been robbed, the safe emptied." He adds : "Rupert Blackwood had come at 9pm. He owed him a lot of money."'
                 }
             },
             { // page 3 — choix du prochain suspect
@@ -92,8 +92,8 @@
                 choiceKey: 'choisirSuspect',
                 choices: ['femme-fatale', 'seducteur', 'suspect'],
                 text: {
-                    fr: '« Trois pistes maintenant », annonce votre partenaire : « la Femme Fatale, le Séducteur et le Suspect. Qui interrogez-vous en premier ? »',
-                    en: '"Three leads now," your partner announces : "the Femme Fatale, the Seductor and the Suspect. Who do you question first?"'
+                    fr: '« Trois pistes maintenant », annonce votre partenaire : « Lady Vivienne, Julian Pembrooke et Rupert Blackwood. Qui interrogez-vous en premier ? »',
+                    en: '"Three leads now," your partner announces : "Lady Vivienne, Julian Pembrooke and Rupert Blackwood. Who do you question first?"'
                 }
             }
         ]
@@ -112,16 +112,27 @@
             {
                 decor: 'alley',
                 text: {
-                    fr: 'Le soir tombe sur la ruelle sombre et humide. La route vers la résidence du Suspect serpente entre les façades noires. Un visage surgit de l\'ombre, adossé au mur : le Marginal.',
-                    en: 'Night falls over the dark, damp alley. The road to the Suspect\'s residence winds between black façades. A face emerges from the shadows, leaning against the wall : the Marginal.'
+                    fr: 'Le soir tombe sur la ruelle sombre et humide. La route vers la résidence du Suspect serpente entre les façades noires. Un visage surgit de l\'ombre, adossé au mur : Silas Crane.',
+                    en: 'Night falls over the dark, damp alley. The road to Rupert Blackwood\'s residence winds between black façades. A face emerges from the shadows, leaning against the wall : Silas Crane.'
                 }
             },
             {
                 decor: 'alley',
                 npc: 'marginal',
+                minigame: {
+                    type: 'pression',
+                    title: { fr: 'Interrogatoire sous pression', en: 'Interrogation under pressure' },
+                    desc: { fr: 'Remettez les questions dans l\'ordre qui fera parler Silas Crane.', en: 'Order the questions to make Silas Crane talk.' },
+                    time: 40,
+                    order: [
+                        { fr: 'Le proposer de partager un café', en: 'Offer to share a coffee' },
+                        { fr: 'La pièce qu\'il garde précieusement', en: 'The coin he treasures' },
+                        { fr: 'Le rôdeur de 22h09', en: 'The lurker at 10:09pm' }
+                    ]
+                },
                 text: {
-                    fr: '« La manche ? » Il tend une main sale. « J\'étais là, assis, quand un rôdeur est passé vers 20h. La victime, elle, m\'a donné une pièce. » Il ricane : « Le Séducteur ? Lui, il traîne au bar, pas ici. »',
-                    en: '"Spare a coin?" He holds out a dirty hand. "I was here, sitting, when a lurker passed by around 8pm. The victim gave me a coin." He sneers : "The Seductor? He hangs out at the bar, not here." '
+                    fr: '« La manche ? » Il tend une main sale. « J\'étais là, assis, quand un rôdeur est passé vers 22h. La victime, elle, m\'a donné une pièce. » Il ricane : « Julian Pembrooke ? Lui, il traîne au bar, pas ici. »',
+                    en: '"Spare a coin?" He holds out a dirty hand. "I was here, sitting, when a lurker passed by around 10pm. The victim gave me a coin." He sneers : "Julian Pembrooke? He hangs out at the bar, not here." '
                 }
             },
             {
@@ -129,7 +140,7 @@
                 npc: null,
                 text: {
                     fr: 'Vous arrivez enfin à la résidence du Suspect. La façade est cossue, les rideaux tirés. À l\'intérieur vous attend l\'un de ceux que vous avez choisi d\'interroger.',
-                    en: 'You finally reach the Suspect\'s residence. The façade is wealthy, the curtains drawn. Inside awaits the one you chose to question.'
+                    en: 'You finally reach Rupert Blackwood\'s residence. The façade is wealthy, the curtains drawn. Inside awaits the one you chose to question.'
                 }
             }
         ]
@@ -159,16 +170,16 @@
                 decor: 'dynamic',
                 npc: 'dynamic',
                 text: {
-                    fr: '« Chacun d\'entre nous a un mobile », affirme le suivant. « La Femme Fatale hériterait, le Suspect doit de l\'argent, le Séducteur la veut, elle. Accusez qui vous voulez, ils diront tous la même chose. »',
-                    en: '"Each of us has a motive," the next one claims. "The Femme Fatale would inherit, the Suspect owes money, the Seductor wants her. Accuse whoever you want, they\'ll all say the same."'
+                    fr: '« Chacun d\'entre nous a un mobile », affirme le suivant. « Lady Vivienne hériterait, Rupert Blackwood doit de l\'argent, Julian Pembrooke la veut, elle. Accusez qui vous voulez, ils diront tous la même chose. »',
+                    en: '"Each of us has a motive," the next one claims. "Lady Vivienne would inherit, Rupert Blackwood owes money, Julian Pembrooke wants her. Accuse whoever you want, they\'ll all say the same."'
                 }
             },
             { // page 3
                 decor: 'dynamic',
                 npc: 'dynamic',
                 text: {
-                    fr: 'Le dernier des trois se défend : « J\'étais au domicile à 19h, pour affaires, et je suis parti avant 20h. Le Marginal peut le confirmer. » Les accusations ont tourné, sans qu\'aucune ne convainque pleinement.',
-                    en: 'The last of the three defends himself : "I was at the flat at 7pm, on business, and left before 8pm. The Marginal can confirm." The accusations have circled without any fully convincing.'
+                    fr: 'Le dernier des trois se défend : « J\'étais au domicile à 21h, pour affaires, et je suis parti avant 21h30. Silas Crane peut le confirmer. » Les accusations ont tourné, sans qu\'aucune ne convainque pleinement.',
+                    en: 'The last of the three defends himself : "I was at the flat at 9pm, on business, and left before 10pm. Silas Crane can confirm." The accusations have circled without any fully convincing.'
                 }
             }
         ]
@@ -187,24 +198,44 @@
                 decor: 'qg',
                 npc: 'detective-partner',
                 text: {
-                    fr: 'Au quartier général, votre partenaire vous tend un dossier : « Le scientifique est passé sur les lieux. Il a du nouveau. Petit détail au passage : le Marginal a un casier pour cambriolage. »',
-                    en: 'At headquarters, your partner hands you a file : "The scientist inspected the scene. He has news. Small detail by the way : the Marginal has a burglary record."'
+                    fr: 'Au quartier général, votre partenaire vous tend un dossier : « Le Dr Whitmore est passé sur les lieux. Il a du nouveau. Petit détail au passage : Silas Crane a un casier pour cambriolage. »',
+                    en: 'At headquarters, your partner hands you a file : "Dr Whitmore inspected the scene. He has news. Small detail by the way : Silas Crane has a burglary record."'
                 }
             },
             {
                 decor: 'labo',
                 npc: 'scientifique',
+                minigame: {
+                    type: 'labo_verrou',
+                    title: { fr: 'Le verrou réchauffé', en: 'The warmed lock' },
+                    desc: { fr: 'Passez le verrou au thermique : repérez les zones réchauffées par une ouverture récente.', en: 'Run thermal analysis on the lock : find the zones warmed by a recent opening.' },
+                    time: 45,
+                    hotspots: [
+                        { x: 30, y: 40, correct: false },
+                        { x: 55, y: 55, correct: true },
+                        { x: 75, y: 35, correct: true },
+                        { x: 45, y: 75, correct: true }
+                    ]
+                },
                 text: {
-                    fr: 'Le scientifique ajuste ses lunettes : « Vu la violence, l\'assassin est probablement un homme. J\'ai retrouvé plusieurs ADN : celui de la Femme Fatale, du Séducteur, du Protecteur, du Suspect... et un inconnu. » Il marque une pause. « Plusieurs traces. Trop, pour être innocent. »',
-                    en: 'The scientist adjusts his glasses : "Given the violence, the killer is probably a man. I found several DNA : the Femme Fatale, the Seductor, the Protector, the Suspect... and one unknown." He pauses. "Several traces. Too many, to be innocent."'
+                    fr: 'Le Dr Whitmore ajuste ses lunettes : « Vu la violence, l\'assassin est probablement un homme. J\'ai retrouvé plusieurs ADN : celui de Lady Vivienne, de Julian Pembrooke, du Major Hale, de Rupert Blackwood... et un inconnu. » Il marque une pause. « Plusieurs traces. Trop, pour être innocent. »',
+                    en: 'Dr Whitmore adjusts his glasses : "Given the violence, the killer is probably a man. I found several DNA : Lady Vivienne, Julian Pembrooke, Major Hale, Rupert Blackwood... and one unknown." He pauses. "Several traces. Too many, to be innocent."'
                 }
             },
             {
                 decor: 'alley',
                 npc: null,
+                minigame: {
+                    type: 'montre_code',
+                    title: { fr: 'Le Cadette trahi', en: 'The betrayed Cadette' },
+                    desc: { fr: 'Alignez l\'équerre, décodez le numéro gravé au dos de la montre... 22h09 ? L\'heure est-elle sincère ?', en: 'Align the light tool, decode the engraved number on the watch back... 10:09pm? Is the time sincere?' },
+                    time: 50,
+                    code: [2, 2, 0, 9],
+                    symbols: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+                },
                 text: {
-                    fr: 'Vous reprenez la route vers la ruelle. Cette ADN inconnue... et ce rôdeur que le Marginal a croisé vers 20h. Une certitude : il faut reparler au Marginal.',
-                    en: 'You head back toward the alley. That unknown DNA... and that lurker the Marginal crossed around 8pm. One thing is certain : you must speak to the Marginal again.'
+                    fr: 'Vous reprenez la route vers la ruelle. Le dos de la montre grave « 2209 » : la fameuse heure fatale. Mais un détail cloche — et ce rôdeur que Silas Crane a croisé vers 22h. Une certitude : il faut reparler à Silas Crane.',
+                    en: 'You head back toward the alley. The watch back is engraved "2209" : the famous fatal hour. But something is off — and that lurker Silas Crane crossed around 10pm. One thing is certain : you must speak to Silas Crane again.'
                 }
             }
         ]
@@ -233,31 +264,31 @@
                         { fr: 'Éch. 4', en: 'S.4' }, { fr: 'Éch. 5 — INCONNU', en: 'S.5 — UNKNOWN' }
                     ],
                     profiles: [
-                        { fr: 'Femme Fatale', en: 'Femme Fatale' }, { fr: 'Séducteur', en: 'Seductor' },
-                        { fr: 'Protecteur', en: 'Protector' }, { fr: 'Suspect', en: 'Suspect' },
+                        { fr: 'Lady Vivienne', en: 'Lady Vivienne' }, { fr: 'Julian Pembrooke', en: 'Julian Pembrooke' },
+                        { fr: 'Major Hale', en: 'Major Hale' }, { fr: 'Rupert Blackwood', en: 'Rupert Blackwood' },
                         { fr: 'Aucun dossier', en: 'No record' }
                     ],
                     match: 4
                 },
                 text: {
-                    fr: '« J\'ai pas tué, je vous jure », insiste le Marginal. Le scientifique a transmis les échantillons. Un est sans correspondance : il faut le confirmer par vous-même.',
-                    en: '"I didn\'t kill, I swear," insists the Marginal. The scientist has sent the samples. One has no match : you must confirm it yourself.'
+                    fr: '« J\'ai pas tué, je vous jure », insiste Silas Crane. Le scientifique a transmis les échantillons. Un est sans correspondance : il faut le confirmer par vous-même.',
+                    en: '"I didn\'t kill, I swear," insists Silas Crane. Dr Whitmore has sent the samples. One has no match : you must confirm it yourself.'
                 }
             },
             {
                 decor: 'bar',
                 npc: 'criminel',
                 text: {
-                    fr: 'Au bar, vous repérez un homme patibulaire, au fond : le Criminel. « Je connaissais la victime, on se voyait parfois ici. On a bu un verre à 18h, le barman peut le dire. Je rentrais chez moi. » Sa voix est trop calme.',
-                    en: 'At the bar, you spot a sinister man in the back : the Criminal. "I knew the victim, we met here sometimes. We had a drink at 6pm, the bartender can tell you. I was heading home." His voice is too calm.'
+                    fr: 'Au bar, vous repérez un homme patibulaire, au fond : Victor Krane. « Je connaissais la victime, on se voyait parfois ici. On a bu un verre à 18h, le barman peut le dire. Je rentrais chez moi. » Sa voix est trop calme.',
+                    en: 'At the bar, you spot a sinister man in the back : Victor Krane. "I knew the victim, we met here sometimes. We had a drink at 6pm, the bartender can tell you. I was heading home." His voice is too calm.'
                 }
             },
             {
                 decor: 'alley',
                 npc: 'femme-fatale',
                 text: {
-                    fr: 'La Femme Fatale surgit sur le chemin : « La victime recevait des menaces de mort, vous savez. » Elle hésite : « Le Criminel... il pourrait être le corbeau derrière tout ça. » Travaille-t-elle à brouiller les pistes pour s\'innocenter ?',
-                    en: 'The Femme Fatale appears on the path : "The victim received death threats, you know." She hesitates : "The Criminal... he could be the crow behind all this." Is she muddying the waters to clear herself?'
+                    fr: 'Lady Vivienne surgit sur le chemin : « La victime recevait des menaces de mort, vous savez. » Elle hésite : « Victor Krane... il pourrait être le corbeau derrière tout ça. » Travaille-t-elle à brouiller les pistes pour s\'innocenter ?',
+                    en: 'Lady Vivienne appears on the path : "The victim received death threats, you know." She hesitates : "Victor Krane... he could be the crow behind all this." Is she muddying the waters to clear herself?'
                 }
             }
         ]
@@ -276,8 +307,8 @@
                 decor: 'qg',
                 npc: 'detective-partner',
                 text: {
-                    fr: '« Tout le monde a un alibi, tout le monde a un mobile », soupire votre partenaire. « On approche. Regardons la chronologie : 19h le Suspect, 19h30 il part, 20h12 la montre s\'arrête, 20h la panne du Séducteur, 21h le Protecteur retrouve le corps. »',
-                    en: '"Everyone has an alibi, everyone has a motive," your partner sighs. "We\'re getting close. Let\'s look at the timeline : 7pm the Suspect, 7:30 he leaves, 8:12 the watch stops, 8pm the Seductor\'s breakdown, 9pm the Protector finds the body."'
+                    fr: '« Tout le monde a un alibi, tout le monde a un mobile », soupire votre partenaire. « On approche. Regardons la chronologie : 21h Rupert Blackwood, 21h30 il part, 22h la panne de Julian Pembrooke, 22h09 la montre s\'arrête, 23h le Major Hale retrouve le corps. »',
+                    en: '"Everyone has an alibi, everyone has a motive," your partner sighs. "We\'re getting close. Let\'s look at the timeline : 9pm Rupert Blackwood, 9:30 he leaves, 10pm Julian Pembrooke\'s breakdown, 10:09 the watch stops, 11pm Major Hale finds the body."'
                 }
             },
             {
@@ -289,24 +320,36 @@
                     desc: { fr: 'Cliquez les événements dans l\'ordre chronologique.', en: 'Click the events in chronological order.' },
                     time: 30,
                     order: [
-                        { fr: '19h — Suspect arrive', en: '7pm — Suspect arrives' },
-                        { fr: '19h30 — Suspect part (témoin)', en: '7:30pm — Suspect leaves (witness)' },
-                        { fr: '20h — Panne du Séducteur', en: '8pm — Seductor breaks down' },
-                        { fr: '20h12 — La montre s\'arrête', en: '8:12pm — The watch stops' },
-                        { fr: '21h — Protecteur trouve le corps', en: '9pm — Protector finds the body' }
+                        { fr: '21h — Rupert Blackwood arrive', en: '9pm — Rupert Blackwood arrives' },
+                        { fr: '21h30 — Rupert part (témoin)', en: '9:30pm — Rupert leaves (witness)' },
+                        { fr: '22h — Panne de Julian Pembrooke', en: '10pm — Pembrooke breaks down' },
+                        { fr: '22h09 — La montre s\'arrête', en: '10:09pm — The watch stops' },
+                        { fr: '23h — Le Major Hale trouve le corps', en: '11pm — Major Hale finds the body' }
                     ]
                 },
                 text: {
-                    fr: 'Vous alignez les faits. Une faille apparaît : l\'alibi du Protecteur (20h) tombe pile à l\'heure de la mort (20h12). Le doute s\'installe.',
-                    en: 'You line up the facts. A flaw appears : the Protector\'s alibi (8pm) falls right at the hour of death (8:12). Doubt creeps in.'
+                    fr: 'Vous alignez les faits. Une faille apparaît : l\'alibi du Major Hale (22h) tombe pile à l\'heure de la mort (22h09). Le doute s\'installe.',
+                    en: 'You line up the facts. A flaw appears : Major Hale\'s alibi (10pm) falls right at the hour of death (10:09). Doubt creeps in.'
                 }
             },
             {
                 decor: 'crimeScene',
                 npc: null,
+                minigame: {
+                    type: 'chronos_roue',
+                    title: { fr: 'La roue du temps', en: 'The wheel of time' },
+                    desc: { fr: 'Remontez l\'horloge-mère du pavillon : remettez les engrenages en ordre pour lire l\'heure exacte de l\'arrêt.', en: 'Wind the pavilion master clock : reorder the gears to read the exact stopping time.' },
+                    time: 45,
+                    order: [
+                        { fr: 'Grand rouage', en: 'Large gear' },
+                        { fr: 'Rouage moyen', en: 'Medium gear' },
+                        { fr: 'Petit rouage', en: 'Small gear' },
+                        { fr: 'Balancier', en: 'Balance wheel' }
+                    ]
+                },
                 text: {
-                    fr: 'La tension monte. Les suspects convergent vers la scène. Il est temps de confronter, puis de trancher. La vérité, quelle qu\'elle soit, ne ressortira pas indemne.',
-                    en: 'Tension rises. The suspects converge on the scene. Time to confront, then to decide. The truth, whatever it is, will not come out unscathed.'
+                    fr: 'La tension monte. Les suspects convergent vers la scène. L\'horloge-mère du pavillon s\'est arrêtée net à 22h09 — un choc, pas un vol. Il est temps de confronter, puis de trancher.',
+                    en: 'Tension rises. The suspects converge on the scene. The pavilion master clock stopped dead at 10:09pm — a fall, not a theft. Time to confront, then to decide.'
                 }
             }
         ]
@@ -325,8 +368,8 @@
                 decor: 'clandestine',
                 npc: 'detective-partner',
                 text: {
-                    fr: 'Surveillance. Le Séducteur et la Femme Fatale se retrouvent en secret dans une cachette. La panne du Séducteur était-elle un mensonge pour les laisser ensemble ? Les langues se délient.',
-                    en: 'Surveillance. The Seductor and the Femme Fatale meet in secret in a hideout. Was the Seductor\'s breakdown a lie to let them be together? Tongues start to loosen.'
+                    fr: 'Surveillance. Julian Pembrooke et Lady Vivienne se retrouvent en secret dans une cachette. La panne de Pembrooke était-elle un mensonge pour les laisser ensemble ? Les langues se délient.',
+                    en: 'Surveillance. Julian Pembrooke and Lady Vivienne meet in secret in a hideout. Was Julian Pembrooke\'s breakdown a lie to let them be together? Tongues start to loosen.'
                 }
             },
             {
@@ -346,16 +389,33 @@
                     ]
                 },
                 text: {
-                    fr: 'Le scientifique vous montre le rapport du garagiste : « La panne n\'était pas naturelle. Quelqu\'un a sectionné la durite pour coincer le Séducteur... et offrir un alibi au Protecteur. »',
-                    en: 'The scientist shows you the mechanic\'s report : "The breakdown was not natural. Someone cut the hose to trap the Seductor... and give the Protector an alibi."'
+                    fr: 'Le Dr Whitmore vous montre le rapport du garagiste : « La panne n\'était pas naturelle. Quelqu\'un a sectionné la durite pour coincer Julian Pembrooke... et offrir un alibi au Major Hale. »',
+                    en: 'Dr Whitmore shows you the mechanic\'s report : "The breakdown was not natural. Someone cut the hose to trap Julian Pembrooke... and give Major Hale an alibi."'
                 }
             },
             {
                 decor: 'qg',
                 npc: 'detective-partner',
+                minigame: {
+                    type: 'cable_match',
+                    title: { fr: 'Graphite', en: 'Graphite' },
+                    desc: { fr: 'Reconnectez les 3 bons fils de l\'alarme, puis identifiez à quelle écriture correspond le graffiti au charbon.', en: 'Reconnect the 3 right alarm wires, then match the charcoal graffiti to a handwriting sample.' },
+                    time: 50,
+                    wires: [
+                        { fr: 'Fil A', en: 'Wire A' }, { fr: 'Fil B', en: 'Wire B' }, { fr: 'Fil ♦', en: 'Wire ♦' },
+                        { fr: 'Fil mort', en: 'Dead wire' }, { fr: 'Fil coupé', en: 'Cut wire' }, { fr: 'Fil tordu', en: 'Twisted wire' }
+                    ],
+                    good: [0, 1, 2],
+                    writings: [
+                        { fr: 'Écriture de Rupert', en: 'Rupert\'s writing' },
+                        { fr: 'Écriture du Major Hale', en: 'Major Hale\'s writing' },
+                        { fr: 'Écriture de Lady Vivienne', en: 'Lady Vivienne\'s writing' }
+                    ],
+                    match: 0
+                },
                 text: {
-                    fr: '« Attendez... » Votre partenaire fronce les sourcils. « Si la durite a été coupée, alors le Protecteur savait où et quand aider le Séducteur. C\'est lui qui a scénarisé toute la soirée. »',
-                    en: '"Wait..." Your partner frowns. "If the hose was cut, then the Protector knew where and when to help the Seductor. He staged the whole evening."'
+                    fr: '« Attendez... » Votre partenaire fronce les sourcils. « Si la durite a été coupée, alors le Major Hale savait où et quand aider Julian Pembrooke. Et ce graffiti au charbon sur le câble de l\'alarme... ce n\'est pas sa main. »',
+                    en: '"Wait..." Your partner frowns. "If the hose was cut, then Major Hale knew where and when to help Julian Pembrooke. And that charcoal graffiti on the alarm cable... it is not his hand."'
                 }
             }
         ]
@@ -376,16 +436,16 @@
                 decor: 'crimeScene',
                 npc: 'criminel',
                 text: {
-                    fr: 'Sous la pression, le Criminel avoue en partie : « Je ne connaissais pas la victime par hasard... je suis payé pour la violence. » L\'ADN inconnue, le rôdeur qu\'a vu le Marginal : tout converge.',
-                    en: 'Under pressure, the Criminal half confesses : "I didn\'t know the victim by chance... I am paid for violence." The unknown DNA, the lurker the Marginal saw : everything converges.'
+                    fr: 'Sous la pression, Victor Krane avoue en partie : « Je ne connaissais pas la victime par hasard... je suis payé pour la violence. » L\'ADN inconnue, le rôdeur qu\'a vu Silas Crane : tout converge.',
+                    en: 'Under pressure, Victor Krane half confesses : "I didn\'t know the victim by chance... I am paid for violence." The unknown DNA, the lurker Silas Crane saw : everything converges.'
                 }
             },
             {
                 decor: 'crimeScene',
                 npc: 'protecteur',
                 text: {
-                    fr: 'Le Protecteur se contredit soudain : il décrit la mare de sang avec trop de précision... alors que la porte était verrouillée à son retour. Son alibi est un faux, c\'est certain.',
-                    en: 'The Protector suddenly contradicts himself : he describes the pool of blood with too much precision... while the door was locked when he returned. His alibi is false, that is certain.'
+                    fr: 'Le Major Hale se contredit soudain : il décrit la mare de sang avec trop de précision... alors que la porte était verrouillée à son retour. Son alibi est un faux, c\'est certain.',
+                    en: 'Major Hale suddenly contradicts himself : he describes the pool of blood with too much precision... while the door was locked when he returned. His alibi is false, that is certain.'
                 }
             },
             {
