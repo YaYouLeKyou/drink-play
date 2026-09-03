@@ -1521,6 +1521,57 @@ html {
 .mg-dos-wrap { position: absolute; right: 6px; bottom: 6px; width: 40%; height: 92%; z-index: 2; cursor: none; }
 .mg-montre-dos { position: relative !important; right: auto !important; bottom: auto !important; width: 100%; height: 100%; object-fit: contain; }
 .mg-montre .mg-item { max-width: 40%; max-height: 92%; }
+.hidden-dos { display: none !important; }
+.hidden-face { display: none !important; }
+
+/* Loupe qui magnifie la face de la montre */
+.face-loupe {
+  position: absolute; width: 180px; height: 180px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,235,180,0.4), rgba(10,12,16,0.85) 70%);
+  border: 4px solid #c9a227; pointer-events: none; display: none; z-index: 6;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 22px rgba(255,215,120,0.5), inset 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* Bouton pour retourner la montre */
+.flip-btn {
+  margin-top: 6px;
+  font-family: 'Special Elite', monospace;
+  font-size: 0.9rem;
+  background: rgba(120,80,20,0.3);
+  border: 1px solid rgba(255,215,120,0.45);
+  color: #f0d890;
+  padding: 6px 14px;
+  border-radius: 6px;
+}
+.flip-btn:hover { background: rgba(160,100,20,0.4); }
+
+/* Box de notes du joueur (en bas de l'écran après la montre) */
+.montre-note-box {
+  position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%);
+  width: min(96vw, 540px); z-index: 50;
+  background: linear-gradient(160deg, #1b2230, #10151f);
+  border: 1px solid rgba(255,215,120,0.5); border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.7);
+  font-family: 'Special Elite', monospace;
+  animation: note-slide-up 0.4s ease;
+}
+@keyframes note-slide-up { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translateX(-50%); } }
+.montre-note-title { color: #f0d890; font-weight: 700; font-size: 1.05rem; margin-bottom: 4px; }
+.montre-note-sub { color: #c0b8a0; font-size: 0.85rem; margin-bottom: 10px; }
+.note-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+.note-row label { color: #e8e6df; font-size: 0.9rem; min-width: 180px; }
+.note-row input {
+  flex: 1; padding: 6px 10px; border-radius: 6px;
+  background: rgba(0,0,0,0.35); border: 1px solid rgba(255,215,120,0.4);
+  color: #ffe9a8; font-family: 'Courier New', monospace; font-size: 1.05rem; letter-spacing: 0.12em;
+  text-align: center;
+}
+.note-row input:focus { outline: none; border-color: #c9a227; box-shadow: 0 0 8px rgba(255,215,120,0.5); }
+.note-btn-row { display: flex; gap: 10px; margin-top: 12px; justify-content: flex-end; }
+.note-save { background: rgba(110,160,80,0.4); border-color: #7fd48a; color: #e8f5d8; }
+.note-skip { background: rgba(80,80,80,0.3); color: #c0b8a0; }
 
 /* Loupe grossissante — les gravures ne sont lisibles qu'à travers le verre */
 .loupe {
@@ -1580,19 +1631,21 @@ html {
   box-shadow: 0 0 0 1px rgba(255,255,255,0.15), 0 10px 40px rgba(0,0,0,0.6);
 }
 .scene-loupe {
-  position: absolute; width: 190px; height: 190px; border-radius: 50%;
+  position: absolute; width: 200px; height: 200px; border-radius: 50%;
   background-repeat: no-repeat; background-color: #0b0f18;
   border: 4px solid #c9a227; box-shadow: 0 0 24px rgba(255,215,120,0.5), inset 0 0 20px rgba(0,0,0,0.6);
   pointer-events: none; display: none; z-index: 5;
   transform: translate(-50%, -50%);
+  transition: left 0.05s linear, top 0.05s linear;
 }
 .fouille-zone {
-  position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px;
+  position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px;
   border-radius: 50%; border: 2px solid rgba(255,215,120,0.9);
   background: rgba(160,40,30,0.85); color: #ffe9a8;
-  font-family: 'Special Elite', monospace; font-weight: 700; font-size: 0.95em;
-  cursor: pointer; z-index: 4; padding: 0; line-height: 30px; text-align: center;
+  font-family: 'Special Elite', monospace; font-weight: 700; font-size: 0.85em;
+  cursor: pointer; z-index: 4; padding: 0; line-height: 22px; text-align: center;
   animation: zone-pulse 2s ease-in-out infinite;
+  touch-action: manipulation;
 }
 .fouille-zone:hover { background: rgba(230,70,50,0.95); box-shadow: 0 0 14px rgba(255,215,120,0.8); }
 .fouille-zone.found { background: rgba(40,110,50,0.85); border-color: #7fd48a; animation: none; }

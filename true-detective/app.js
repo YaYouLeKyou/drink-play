@@ -2407,10 +2407,31 @@ langEnBtn: document.getElementById('lang-en'),
         var s = scrGetState();
         s.lang = ui.language;
         s.theme = getThemeId();
+        s.watchCode = scrGenerateWatchCode();
+        s.watchTime = scrGenerateWatchTime();
+        s.watchCodeStr = s.watchCode.join('');
+        s.watchTimeStr = s.watchTime.h + 'h' + String(s.watchTime.m).padStart(2, '0');
         scr.phaseIdx = 0;
         scr.pageIdx = 0;
         scr.active = true;
         scr.awaitingChoice = false;
+    }
+
+    /* Génère un code à 4 chiffres pour la montre (entre 1842 et 1981).
+       Évite 1981 par défaut pour ne pas spoiler, tire une année plausible XIXe/début XXe. */
+    function scrGenerateWatchCode() {
+        var years = [1842, 1847, 1853, 1859, 1864, 1871, 1878, 1885, 1891, 1897,
+                     1903, 1909, 1914, 1921, 1928, 1934, 1941, 1947, 1953, 1959,
+                     1965, 1972, 1978];
+        var y = years[Math.floor(Math.random() * years.length)];
+        return [Math.floor(y / 1000) % 10, Math.floor(y / 100) % 10, Math.floor(y / 10) % 10, y % 10];
+    }
+
+    /* Génère une heure plausible (20h-23h) avec minutes 00-59. */
+    function scrGenerateWatchTime() {
+        var h = 20 + Math.floor(Math.random() * 4);
+        var m = Math.floor(Math.random() * 60);
+        return { h: h, m: m };
     }
 
     function scrDecorImage(decorKey) {
@@ -2559,7 +2580,18 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
 
         if (page.minigame && window.TDMiniGames) {
             $.continueBtn.classList.add('hidden');
-            TDMiniGames.play(page.minigame, ui.language, function (res) {
+            var mgCfg = page.minigame;
+            var s0 = scrGetState();
+            if (s0 && s0.watchCode) {
+                if (mgCfg.type === 'montre_code') {
+                    mgCfg.code = s0.watchCode.slice();
+                    mgCfg.timeStr = s0.watchTimeStr;
+                }
+                if (mgCfg.type === 'coffre_code') {
+                    mgCfg.code = s0.watchCode.slice();
+                }
+            }
+            TDMiniGames.play(mgCfg, ui.language, function (res) {
                 if (res && res.won) {
                     var s = scrGetState();
                     s.miniGamesWon++;
@@ -2574,6 +2606,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                         }
                     }
                     showClueToast(clue);
+                    if (mgCfg.type === 'montre_code' && res.notes) {
+                        s.playerNotes = res.notes;
+                    }
                 }
                 scrNext();
             });

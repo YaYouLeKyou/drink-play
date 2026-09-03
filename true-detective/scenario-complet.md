@@ -111,18 +111,18 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 2. *(crimeScene, Wexford)* Le carnet déchiré révèle des pages manquantes → versements réguliers à « V.K. ».
 3. *(crimeScene, Wexford)* Le partenaire : « Vous tenez quelque chose ? Ces indices dessinent un mobile. Continuons. »
 
-### ACTE I — Phase 1 « Confrontation » (dialogue, musique recherche)
-1. *(residence, Hale)* Major Hale, **garde du corps et majordome en chef**, accueille le détective avec nervosité. « La maison est en deuil, faites vite. »
-2. *(residence, Lady Vivienne)* « Mon mari avait des ennemis, certes. Mais l'auteur de ce crime… c'est quelqu'un de la maison. »
-3. **MINI-JEU `montre_code`** *(scène de crime, manoir)* — examiner la montre du Duc :
-   - Face : aiguille figée à **22h09** = heure probable du crime.
-   - Dos : gravure « 1981 » = code du coffre (Acte II).
-   - **INDICE MAJEUR** : 22h09, à retenir pour le twist final. 1981 pour le coffre.
+### ACTE I — Phase 1 « Interrogatoires » (dialogue, musique recherche)
+1. *(residence, Hale)* Major Hale, **garde du corps et majordome en chef**, accueille le détective dans le salon du manoir. Vous l'interrogez : « Vous sembliez proche de la victime. Quel genre d'homme était-il ? » Hale hésite : « Distant. Il parlait souvent de changer le testament — c'est l'affaire de Blackwood. » **[Indice Témoin]** Hale mentionne le testament et Blackwood spontanément.
+2. *(residence, Lady Vivienne)* Dans le boudoir, vous la testez : « Votre mari voyait d'autres femmes ? » Elle sourit froidement : « Nous avions nos arrangements. » **[Indice Mobile]** Aucune émotion visible : à creuser.
+3. **MINI-JEU `montre_code`** *(salon du manoir)* — la montre du Duc, brisée, gît sur la table. Wexford soupire : « Elle a dû valser dans la bagarre. Voyez ce qu'elle peut encore nous apprendre. » Après examen : « Bien. Maintenant, qui interroger en premier ? Blackwood, le notaire ? Le témoin dans la ruelle ? Pembrooke, au bar ? » → choix du prochain suspect.
+   - Face : aiguille figée à l'heure du crime.
+   - Dos : code à 4 chiffres = code du coffre (Acte II).
+   - **INDICE MAJEUR** : heure du crime + code coffre, à retenir.
 
 ### ACTE I — Phase 2 « Témoignages » (dialogue, musique réflexion)
-1. *(alley, Silas Crane)* « J'ai vu un rôdeur bien habillé aux alentours de 22h. » Premier maillon témoin.
-2. *(residence)* Le coffre-fort est vide mais 50 000 £ y figuraient → mobile financier.
-3. *(secretPlace, Rupert Blackwood)* « Quelqu'un a vidé les comptes ! Le testament a été modifié la semaine dernière. »
+1. *(residence, Wexford)* Dans le vestibule du manoir, avant de partir : « Le clochard de la ruelle a vu quelque chose cette nuit-là. Commençons par lui — un témoin oculaire vaut tous les alibis. On ira chez Blackwood juste après. » → transition cohérente.
+2. *(alley, Silas Crane)* **À la sortie du manoir**, dans la ruelle adjacente. Vous glissez une pièce au clochard. Il se détend : « Un rôdeur bien habillé est passé par ici vers les 22h. Pressé, nerveux. Il regardait sans arrêt sa montre — une tocante en or. » **[Indice Témoin / Chronologie]** À corréler avec la montre du Duc et l'alibi de Pembrooke.
+3. *(secretPlace, Rupert Blackwood)* Chez Blackwood, dans son appartement. « Je ne sais pas ce que trafique le Duc, mais les tensions sur le testament se multiplient. Assez pour savoir qu'il voulait déshériter sa femme. » **[Indice Mobile / Témoin]** Blackwood mentionne la déshérence — il en sait plus qu'il ne le dit.
 
 ### ACTE II — Phase 1 « Piste du bar » (dialogue, musique énigme)
 1. **MINI-JEU `carnet_dechire` (QG)** — reconstituer les pages arrachées du livre de comptes :

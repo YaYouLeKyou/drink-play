@@ -177,6 +177,81 @@
     }
 
     /* ------------------------------------------------------------------
+       showMontreNoteBox — s'ouvre en bas de l'écran après la résolution
+       de la montre. Permet au joueur de noter lui-même l'heure relevée
+       et le code à 4 chiffres. Ces notes seront stockées dans le journal.
+    ------------------------------------------------------------------ */
+    function showMontreNoteBox(body, lang, codeStr, timeStr, complete, registerHint) {
+        var box = document.createElement('div');
+        box.className = 'montre-note-box';
+        var title = document.createElement('div');
+        title.className = 'montre-note-title';
+        title.textContent = lang === 'fr'
+            ? '? Vos notes d\'observation'
+            : '? Your observation notes';
+        var sub = document.createElement('div');
+        sub.className = 'montre-note-sub';
+        sub.textContent = lang === 'fr'
+            ? 'Notez les indices relevés sur la montre. Ils vous serviront plus tard.'
+            : 'Note the clues you found on the watch. They will be useful later.';
+        box.appendChild(title);
+        box.appendChild(sub);
+
+        function field(label, ph, max) {
+            var row = document.createElement('div');
+            row.className = 'note-row';
+            var lab = document.createElement('label');
+            lab.textContent = label;
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.maxLength = max;
+            input.placeholder = ph;
+            row.appendChild(lab);
+            row.appendChild(input);
+            box.appendChild(row);
+            return input;
+        }
+        var timeInput = field(
+            lang === 'fr' ? 'Heure du crime relevée (ex: 22h09)' : 'Time of death (e.g. 10:09pm)',
+            lang === 'fr' ? 'HHhMM' : 'HH:MM',
+            8
+        );
+        var codeInput = field(
+            lang === 'fr' ? 'Code à 4 chiffres (dos de la montre)' : '4-digit code (watch back)',
+            '0000',
+            4
+        );
+        var save = document.createElement('button');
+        save.className = 'btn btn-primary note-save';
+        save.textContent = lang === 'fr' ? '?? Consigner dans le journal' : '?? Save to notebook';
+        save.addEventListener('click', function () {
+            var t = timeInput.value.trim();
+            var c = codeInput.value.trim();
+            var notes = { time: t, code: c };
+            if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addStep === 'function') {
+                window.TDNarrativeEngine.addStep('montre_notes',
+                    (lang === 'fr' ? 'Notes montre — heure : ' : 'Watch notes — time : ') + (t || '—') +
+                    ' / ' + (lang === 'fr' ? 'code : ' : 'code : ') + (c || '—'));
+            }
+            box.remove();
+            if (complete) complete(true, notes);
+        });
+        var skip = document.createElement('button');
+        skip.className = 'btn note-skip';
+        skip.textContent = lang === 'fr' ? 'Passer' : 'Skip';
+        skip.addEventListener('click', function () {
+            box.remove();
+            if (complete) complete(true, {});
+        });
+        var btnRow = document.createElement('div');
+        btnRow.className = 'note-btn-row';
+        btnRow.appendChild(save);
+        btnRow.appendChild(skip);
+        box.appendChild(btnRow);
+        body.appendChild(box);
+    }
+
+    /* ------------------------------------------------------------------
        MONTRE_PHASE2 — cadrans + équerre draggable + question finale
        (utilisé par le mini-jeu 'montre_code')
     ------------------------------------------------------------------ */
@@ -184,6 +259,8 @@
         var body = ctx.body, lang = ctx.lang, wrap = ctx.wrap, dosWrap = ctx.dosWrap;
         var engraveEls = ctx.engraveEls, answer = ctx.answer;
         var getRevealed = ctx.getRevealed, setRevealed = ctx.setRevealed;
+        var timeStr = ctx.timeStr || '22h09';
+        var codeStr = answer.join('');
         var ZOOM = 2.2, LOUPE_R = 75;
 
         /* Cadrans — verrouillés tant que les gravures ne sont pas révélées */
@@ -276,14 +353,14 @@
             var q = document.createElement('p');
             q.className = 'sincerity-q';
             q.textContent = lang === 'fr'
-                ? '« 1981 », gravé au dos… Mais qu\u2019avez-vous remarqué SUR LA FACE de la montre ?'
-                : '"1981" engraved on the back… But what did you notice on the WATCH FACE?';
+                ? '« ' + codeStr + ' », gravé au dos… Mais qu\'avez-vous remarqué SUR LA FACE de la montre ?'
+                : '"' + codeStr + '" engraved on the back… But what did you notice on the WATCH FACE?';
             questionBox.appendChild(q);
             var yes = document.createElement('button');
             yes.className = 'btn';
             yes.textContent = lang === 'fr'
-                ? 'L\u2019aiguille figée à 22h09 : voilà l\u2019heure probable du crime — et 1981 ouvrira peut-être un coffre'
-                : 'The hand frozen at 10:09pm : that is the likely time of death — and 1981 may open a safe';
+                ? 'L\'aiguille figée à ' + timeStr + ' : voilà l\'heure probable du crime — et ' + codeStr + ' ouvrira peut-être un coffre'
+                : 'The hand frozen at ' + timeStr + ' : that is the likely time of death — and ' + codeStr + ' may open a safe';
             var no = document.createElement('button');
             no.className = 'btn';
             no.textContent = lang === 'fr'
@@ -293,9 +370,13 @@
                 yes.classList.add('correct');
                 questionBox.classList.add('solved');
                 setStatus(lang === 'fr'
-                    ? 'Heure du crime établie : 22h09 (à confirmer). Ce détail sera décisif — et 1981 servira.'
-                    : 'Time of death established : 10:09pm (to be confirmed). This detail will matter — and 1981 will serve.');
-                ctx.complete(true);
+                    ? 'Heure du crime établie : ' + timeStr + ' (à confirmer). Ce détail sera décisif — et ' + codeStr + ' servira.'
+                    : 'Time of death established : ' + timeStr + ' (to be confirmed). This detail will matter — and ' + codeStr + ' will serve.');
+                if (ctx.onSolved) {
+                    ctx.onSolved(codeStr, timeStr);
+                } else if (ctx.complete) {
+                    ctx.complete(true, { code: codeStr, time: timeStr });
+                }
             });
             no.addEventListener('click', function () {
                 no.classList.add('wrong');
@@ -603,15 +684,31 @@
             var face = document.createElement('img');
             face.className = 'mg-item mg-montre-face';
             face.src = 'mini-games/montre/montre-du-duc-face.png';
-            face.title = lang === 'fr' ? 'La montre figée à 22h09…' : 'The watch frozen at 10:09pm…';
+            face.alt = lang === 'fr' ? 'Face de la montre' : 'Watch face';
+            var timeStr = cfg.timeStr || '22h09';
+            face.title = lang === 'fr' ? 'La montre figée à ' + timeStr + '…' : 'The watch frozen at ' + timeStr + '…';
             var dosWrap = document.createElement('div');
-            dosWrap.className = 'mg-dos-wrap';
+            dosWrap.className = 'mg-dos-wrap hidden-dos';
             var dos = document.createElement('img');
             dos.className = 'mg-item mg-montre-dos';
             dos.src = 'mini-games/montre/montre-du-duc-dos.png';
             dosWrap.appendChild(dos);
             wrap.appendChild(face);
             wrap.appendChild(dosWrap);
+
+            var status = document.createElement('div');
+            status.className = 'mg-status';
+            status.textContent = lang === 'fr'
+                ? 'Approchez la loupe de la face. Une aiguille s\'y est figée…'
+                : 'Bring the magnifier to the face. A hand is frozen there…';
+            body.appendChild(status);
+            body.appendChild(wrap);
+
+            /* Loupe qui couvre toute la face au début — pour repérer l'aiguille figée.
+               Quand on clique sur la face, on révèle le dos, où se trouve la gravure. */
+            var faceLoupe = document.createElement('div');
+            faceLoupe.className = 'face-loupe';
+            body.appendChild(faceLoupe);
 
             /* Gravures cachées sur le dos de la montre (lisibles à la loupe) */
             var answer = (cfg.code || [1, 9, 8, 1]).slice();
@@ -643,17 +740,65 @@
             loupe.appendChild(loupeInner);
             dosWrap.appendChild(loupe);
 
-            var status = document.createElement('div');
-            status.className = 'mg-status';
-            status.textContent = lang === 'fr'
-                ? 'Passez la loupe sur le dos de la montre : les gravures ne sont lisibles qu\u2019au grossissement…'
-                : 'Sweep the magnifier over the watch back : the engravings are only readable when magnified…';
-            body.appendChild(status);
-            body.appendChild(wrap);
+            /* Bouton "Retourner la montre" — permet au joueur de passer du dos à la face */
+            var flipBtn = document.createElement('button');
+            flipBtn.className = 'btn flip-btn';
+            flipBtn.textContent = lang === 'fr' ? '? Retourner la montre' : '? Flip the watch';
+            flipBtn.addEventListener('click', function () {
+                if (dosWrap.classList.contains('hidden-dos')) {
+                    /* On va vers le dos */
+                    dosWrap.classList.remove('hidden-dos');
+                    face.classList.add('hidden-face');
+                    faceLoupe.style.display = 'none';
+                    flipBtn.textContent = lang === 'fr' ? '? Voir la face' : '? See the face';
+                    status.textContent = lang === 'fr'
+                        ? 'Passez la loupe sur le dos de la montre : les gravures ne sont lisibles qu\'au grossissement…'
+                        : 'Sweep the magnifier over the watch back : the engravings are only readable when magnified…';
+                } else {
+                    /* On revient à la face */
+                    dosWrap.classList.add('hidden-dos');
+                    face.classList.remove('hidden-face');
+                    faceLoupe.style.display = 'block';
+                    flipBtn.textContent = lang === 'fr' ? '? Retourner la montre' : '? Flip the watch';
+                    status.textContent = lang === 'fr'
+                        ? 'Approchez la loupe de la face. Une aiguille s\'y est figée…'
+                        : 'Bring the magnifier to the face. A hand is frozen there…';
+                }
+            });
+            body.appendChild(flipBtn);
+
+            /* Loupe qui magnifie la face pour repérer l'aiguille figée */
+            function moveFaceLoupe(clientX, clientY) {
+                var fr = face.getBoundingClientRect();
+                var cx = clientX - fr.left, cy = clientY - fr.top;
+                if (cx < 0 || cy < 0 || cx > fr.width || cy > fr.height) {
+                    faceLoupe.style.display = 'none';
+                    return;
+                }
+                faceLoupe.style.display = 'block';
+                faceLoupe.style.left = cx + 'px';
+                faceLoupe.style.top = cy + 'px';
+            }
+            face.addEventListener('mousemove', function (e) { moveFaceLoupe(e.clientX, e.clientY); });
+            face.addEventListener('mouseleave', function () { faceLoupe.style.display = 'none'; });
+
+            /* Quand le joueur clique sur la face après avoir bien observé l'aiguille figée,
+               on lui pose la question et on ouvre la voie vers le dos */
+            var faceClicked = false;
+            face.addEventListener('click', function () {
+                if (faceClicked) return;
+                faceClicked = true;
+                status.textContent = lang === 'fr'
+                    ? 'L\'aiguille est figée. Notez mentalement l\'heure. Cliquez sur "Retourner la montre" pour examiner le dos.'
+                    : 'The hand is frozen. Mentally note the time. Click "Flip the watch" to examine the back.';
+            });
+
             MONTRE_PHASE2({
                 body: body, registerHint: registerHint, lang: lang, complete: complete,
                 wrap: wrap, dosWrap: dosWrap, engraveEls: engraveEls, answer: answer,
-                getRevealed: function () { return revealed; }, setRevealed: function (v) { revealed = v; }
+                getRevealed: function () { return revealed; }, setRevealed: function (v) { revealed = v; },
+                timeStr: timeStr,
+                onSolved: function (codeStr, timeStr) { showMontreNoteBox(body, lang, codeStr, timeStr, complete, registerHint); }
             });
         },
 
