@@ -1,8 +1,8 @@
 /* =====================================================================
-   TRUE DETECTIVE — MINI-JEUX OPTIONNELS (bonus d'indices + timer)
+   TRUE DETECTIVE ï¿½ MINI-JEUX OPTIONNELS (bonus d'indices + timer)
    ---------------------------------------------------------------------
-   Chaque mini-jeu est OPTIONNEL : le joueur peut toujours « Passer ».
-   Le timer crée la pression ; un échec = perte de l'indice bonus,
+   Chaque mini-jeu est OPTIONNEL : le joueur peut toujours ï¿½ Passer ï¿½.
+   Le timer crï¿½e la pression ; un ï¿½chec = perte de l'indice bonus,
    jamais de game over. Mobile-friendly (clic).
 ===================================================================== */
 (function (global) {
@@ -10,7 +10,7 @@
 
     var t = function (obj, lang) { return obj[lang] || obj.fr || obj.en || ''; };
 
-    /* Calcule les messages / boutons partagés */
+    /* Calcule les messages / boutons partagï¿½s */
     function play(cfg, lang, onDone) {
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
         var layer = document.getElementById('minigame-layer');
@@ -41,7 +41,7 @@
         var timerId = null;
         var resultAnnounced = false;
         var hintShown = false;
-        /* Difficulté adaptative : à 60% du temps écoulé, halo sur les bons éléments */
+        /* Difficultï¿½ adaptative : ï¿½ 60% du temps ï¿½coulï¿½, halo sur les bons ï¿½lï¿½ments */
         function registerHint(fn) { hintFn = fn; }
         var hintFn = null;
 
@@ -50,11 +50,11 @@
             resultAnnounced = true;
             if (timerId) clearInterval(timerId);
             if (won) cfg.bonusIndex = (cfg.bonusIndex || 1);
-            /* Enregistrer la catégorie de preuve pour le faisceau */
+            /* Enregistrer la catï¿½gorie de preuve pour le faisceau */
             if (won && cfg.evidence && global.TDScenario) {
                 global.TDScenario.recordEvidence(cfg.evidence);
             }
-            /* Récompense : panneau d'indice majeur + faisceau de preuves */
+            /* Rï¿½compense : panneau d'indice majeur + faisceau de preuves */
             if (won && cfg.clue) {
                 var reward = document.createElement('div');
                 reward.className = 'clue-reward';
@@ -66,7 +66,7 @@
                 rText.textContent = t(cfg.clue, lang);
                 reward.appendChild(rHead);
                 reward.appendChild(rText);
-                /* Faisceau de preuves (barres par catégorie) */
+                /* Faisceau de preuves (barres par catï¿½gorie) */
                 if (global.TDScenario) {
                     var beam = document.createElement('div');
                     beam.className = 'evidence-beam';
@@ -75,7 +75,7 @@
                         { key: 'mobile', label: lang === 'fr' ? 'Mobile' : 'Motive' },
                         { key: 'opportunity', label: lang === 'fr' ? 'Occasion' : 'Opportunity' },
                         { key: 'forensic', label: lang === 'fr' ? 'Forensique' : 'Forensic' },
-                        { key: 'witness', label: lang === 'fr' ? 'Témoins' : 'Witnesses' },
+                        { key: 'witness', label: lang === 'fr' ? 'Tï¿½moins' : 'Witnesses' },
                         { key: 'timeline', label: lang === 'fr' ? 'Chronologie' : 'Timeline' },
                     ];
                     var st = global.TDScenario.getState();
@@ -83,7 +83,7 @@
                     var max = global.TDScenario.getEvidenceMax();
                     var beamTitle = document.createElement('div');
                     beamTitle.className = 'evidence-beam-title';
-                    beamTitle.textContent = (lang === 'fr' ? 'FAISCEAUX DE PREUVES' : 'EVIDENCE BEAM') + ' — ' + score + '/' + max;
+                    beamTitle.textContent = (lang === 'fr' ? 'FAISCEAUX DE PREUVES' : 'EVIDENCE BEAM') + ' ï¿½ ' + score + '/' + max;
                     beam.appendChild(beamTitle);
                     categories.forEach(function (cat) {
                         var row = document.createElement('div');
@@ -164,7 +164,7 @@
             finish(true);
         }
 
-        /* Bouton « Passer » (optionnel) */
+        /* Bouton ï¿½ Passer ï¿½ (optionnel) */
         if (cfg.type !== 'code_safe') {
             var skip = document.createElement('button');
             skip.className = 'btn btn-skip minigame-skip';
@@ -177,9 +177,9 @@
     }
 
     /* ------------------------------------------------------------------
-       showMontreNoteBox — s'ouvre en bas de l'écran après la résolution
-       de la montre. Permet au joueur de noter lui-même l'heure relevée
-       et le code à 4 chiffres. Ces notes seront stockées dans le journal.
+       showMontreNoteBox ï¿½ s'ouvre en bas de l'ï¿½cran aprï¿½s la rï¿½solution
+       de la montre. Permet au joueur de noter lui-mï¿½me l'heure relevï¿½e
+       et le code ï¿½ 4 chiffres. Ces notes seront stockï¿½es dans le journal.
     ------------------------------------------------------------------ */
     function showMontreNoteBox(body, lang, codeStr, timeStr, complete, registerHint) {
         var box = document.createElement('div');
@@ -192,7 +192,7 @@
         var sub = document.createElement('div');
         sub.className = 'montre-note-sub';
         sub.textContent = lang === 'fr'
-            ? 'Notez les indices relevés sur la montre. Ils vous serviront plus tard.'
+            ? 'Notez les indices relevï¿½s sur la montre. Ils vous serviront plus tard.'
             : 'Note the clues you found on the watch. They will be useful later.';
         box.appendChild(title);
         box.appendChild(sub);
@@ -212,12 +212,12 @@
             return input;
         }
         var timeInput = field(
-            lang === 'fr' ? 'Heure du crime relevée (ex: 22h09)' : 'Time of death (e.g. 10:09pm)',
+            lang === 'fr' ? 'Heure du crime relevï¿½e (ex: 22h09)' : 'Time of death (e.g. 10:09pm)',
             lang === 'fr' ? 'HHhMM' : 'HH:MM',
             8
         );
         var codeInput = field(
-            lang === 'fr' ? 'Code à 4 chiffres (dos de la montre)' : '4-digit code (watch back)',
+            lang === 'fr' ? 'Code ï¿½ 4 chiffres (dos de la montre)' : '4-digit code (watch back)',
             '0000',
             4
         );
@@ -230,8 +230,8 @@
             var notes = { time: t, code: c };
             if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addStep === 'function') {
                 window.TDNarrativeEngine.addStep('montre_notes',
-                    (lang === 'fr' ? 'Notes montre — heure : ' : 'Watch notes — time : ') + (t || '—') +
-                    ' / ' + (lang === 'fr' ? 'code : ' : 'code : ') + (c || '—'));
+                    (lang === 'fr' ? 'Notes montre ï¿½ heure : ' : 'Watch notes ï¿½ time : ') + (t || 'ï¿½') +
+                    ' / ' + (lang === 'fr' ? 'code : ' : 'code : ') + (c || 'ï¿½'));
             }
             box.remove();
             if (complete) complete(true, notes);
@@ -252,8 +252,8 @@
     }
 
     /* ------------------------------------------------------------------
-       MONTRE_PHASE2 — cadrans + équerre draggable + question finale
-       (utilisé par le mini-jeu 'montre_code')
+       MONTRE_PHASE2 ï¿½ cadrans + ï¿½querre draggable + question finale
+       (utilisï¿½ par le mini-jeu 'montre_code')
     ------------------------------------------------------------------ */
     function MONTRE_PHASE2(ctx) {
         var body = ctx.body, lang = ctx.lang, wrap = ctx.wrap, dosWrap = ctx.dosWrap;
@@ -263,7 +263,7 @@
         var codeStr = answer.join('');
         var ZOOM = 2.2, LOUPE_R = 75;
 
-        /* Cadrans — verrouillés tant que les gravures ne sont pas révélées */
+        /* Cadrans ï¿½ verrouillï¿½s tant que les gravures ne sont pas rï¿½vï¿½lï¿½es */
         var symbols = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
         var pos = answer.map(function () { return 0; });
         var dials = document.createElement('div');
@@ -273,7 +273,7 @@
         answer.forEach(function (_, i) {
             var d = document.createElement('button');
             d.className = 'btn dial locked';
-            d.textContent = '—';
+            d.textContent = 'ï¿½';
             dials.appendChild(d);
             dialsEls.push(d);
             d.addEventListener('click', function () {
@@ -320,8 +320,8 @@
                     var n = engraveEls.filter(function (e2) { return e2.dataset.done; }).length;
                     setRevealed(n);
                     setStatus(lang === 'fr'
-                        ? ('Gravure déchiffrée (' + n + '/' + answer.length + ')…')
-                        : ('Engraving decoded (' + n + '/' + answer.length + ')…'));
+                        ? ('Gravure dï¿½chiffrï¿½e (' + n + '/' + answer.length + ')ï¿½')
+                        : ('Engraving decoded (' + n + '/' + answer.length + ')ï¿½'));
                     if (n >= answer.length) unlockDials();
                 }
             });
@@ -329,8 +329,8 @@
         function unlockDials() {
             dialsEls.forEach(function (d) { d.classList.remove('locked'); });
             setStatus(lang === 'fr'
-                ? 'Composez maintenant le numéro gravé sur les cadrans…'
-                : 'Now dial the engraved number…');
+                ? 'Composez maintenant le numï¿½ro gravï¿½ sur les cadransï¿½'
+                : 'Now dial the engraved numberï¿½');
         }
         wrap.addEventListener('mousemove', function (e) { moveLoupe(e.clientX, e.clientY); });
         wrap.addEventListener('mouseleave', function () {
@@ -345,7 +345,7 @@
             moveLoupe(e.touches[0].clientX, e.touches[0].clientY);
         });
 
-        /* Question finale : le dos a attiré l'attention… mais la face parle */
+        /* Question finale : le dos a attirï¿½ l'attentionï¿½ mais la face parle */
         var questionBox = null;
         function askSincerity() {
             questionBox = document.createElement('div');
@@ -353,25 +353,25 @@
             var q = document.createElement('p');
             q.className = 'sincerity-q';
             q.textContent = lang === 'fr'
-                ? '« ' + codeStr + ' », gravé au dos… Mais qu\'avez-vous remarqué SUR LA FACE de la montre ?'
-                : '"' + codeStr + '" engraved on the back… But what did you notice on the WATCH FACE?';
+                ? 'ï¿½ ' + codeStr + ' ï¿½, gravï¿½ au dosï¿½ Mais qu\'avez-vous remarquï¿½ SUR LA FACE de la montre ?'
+                : '"' + codeStr + '" engraved on the backï¿½ But what did you notice on the WATCH FACE?';
             questionBox.appendChild(q);
             var yes = document.createElement('button');
             yes.className = 'btn';
             yes.textContent = lang === 'fr'
-                ? 'L\'aiguille figée à ' + timeStr + ' : voilà l\'heure probable du crime — et ' + codeStr + ' ouvrira peut-être un coffre'
-                : 'The hand frozen at ' + timeStr + ' : that is the likely time of death — and ' + codeStr + ' may open a safe';
+                ? 'L\'aiguille figï¿½e ï¿½ ' + timeStr + ' : voilï¿½ l\'heure probable du crime ï¿½ et ' + codeStr + ' ouvrira peut-ï¿½tre un coffre'
+                : 'The hand frozen at ' + timeStr + ' : that is the likely time of death ï¿½ and ' + codeStr + ' may open a safe';
             var no = document.createElement('button');
             no.className = 'btn';
             no.textContent = lang === 'fr'
-                ? 'Rien de plus : une montre cassée ne dit rien'
+                ? 'Rien de plus : une montre cassï¿½e ne dit rien'
                 : 'Nothing else : a broken watch tells nothing';
             yes.addEventListener('click', function () {
                 yes.classList.add('correct');
                 questionBox.classList.add('solved');
                 setStatus(lang === 'fr'
-                    ? 'Heure du crime établie : ' + timeStr + ' (à confirmer). Ce détail sera décisif — et ' + codeStr + ' servira.'
-                    : 'Time of death established : ' + timeStr + ' (to be confirmed). This detail will matter — and ' + codeStr + ' will serve.');
+                    ? 'Heure du crime ï¿½tablie : ' + timeStr + ' (ï¿½ confirmer). Ce dï¿½tail sera dï¿½cisif ï¿½ et ' + codeStr + ' servira.'
+                    : 'Time of death established : ' + timeStr + ' (to be confirmed). This detail will matter ï¿½ and ' + codeStr + ' will serve.');
                 if (ctx.onSolved) {
                     ctx.onSolved(codeStr, timeStr);
                 } else if (ctx.complete) {
@@ -404,7 +404,7 @@
     }
 
     /* ------------------------------------------------------------------
-       BUILD_CREATORS — contient les fabriques de jeux
+       BUILD_CREATORS ï¿½ contient les fabriques de jeux
     ------------------------------------------------------------------ */
     function BUILD_CREATORS(cfg, lang, complete, registerHint) {
 
@@ -420,11 +420,11 @@
             wrap.style.backgroundImage = 'url("' + sceneImageUrl + '")';
             body.appendChild(wrap);
 
-            /* Loupe : grossit la scène sous le curseur */
+            /* Loupe : grossit la scï¿½ne sous le curseur */
             var loupe = document.createElement('div');
             loupe.className = 'scene-loupe';
             var ZOOM = 2, LR = 95;
-            // La loupe doit avoir la même image de fond pour le zoom
+            // La loupe doit avoir la mï¿½me image de fond pour le zoom
             loupe.style.backgroundImage = 'url("' + sceneImageUrl + '")';
             wrap.appendChild(loupe);
             function moveLoupe(clientX, clientY) {
@@ -444,7 +444,7 @@
             }, { passive: false });
             wrap.addEventListener('touchstart', function (e) { moveLoupe(e.touches[0].clientX, e.touches[0].clientY); });
 
-            /* Fenêtre d'indice de zone */
+            /* Fenï¿½tre d'indice de zone */
             var win = null;
             function openZoneWin(h, spot) {
                 if (win) win.remove();
@@ -452,7 +452,7 @@
                 win.className = 'zone-window';
                 var head = document.createElement('div');
                 head.className = 'zone-window-head';
-                head.textContent = (lang === 'fr' ? 'Pièce à conviction ' : 'Evidence ') + h.label;
+                head.textContent = (lang === 'fr' ? 'Piï¿½ce ï¿½ conviction ' : 'Evidence ') + h.label;
                 var txt = document.createElement('div');
                 txt.className = 'zone-window-text';
                 txt.textContent = t(h.info, lang);
@@ -476,14 +476,14 @@
                 spot.style.top = h.y + '%';
                 spot.textContent = h.label;
                 spot.title = lang === 'fr' ? 'Examiner' : 'Examine';
-                // Ouvrir la fenêtre d'indice au survol (avec la loupe)
+                // Ouvrir la fenï¿½tre d'indice au survol (avec la loupe)
                 spot.addEventListener('mouseenter', function () {
                     openZoneWin(h, spot);
                 });
                 spot.addEventListener('click', function () {
                     openZoneWin(h, spot);
                     if (!spot.dataset.journaled && global.TDNarrativeEngine && typeof global.TDNarrativeEngine.addClue === 'function') {
-                        var clueText = lang === 'fr' ? 'Pièce ' + h.label + ' : ' + t(h.info, lang) : 'Evidence ' + h.label + ' : ' + t(h.info, lang);
+                        var clueText = lang === 'fr' ? 'Piï¿½ce ' + h.label + ' : ' + t(h.info, lang) : 'Evidence ' + h.label + ' : ' + t(h.info, lang);
                         global.TDNarrativeEngine.addClue(clueText);
                         if (typeof global.TDNarrativeEngine.addStep === 'function') {
                             global.TDNarrativeEngine.addStep('fouille', clueText);
@@ -527,6 +527,11 @@
             var samples = (cfg.samples || []).map(function (s) { return t(s, lang); });
             var profiles = (cfg.profiles || []).map(function (p) { return t(p, lang); });
             var match = cfg.match;
+            var pipette = document.createElement('img');
+            pipette.className = 'mg-item mg-pipette';
+            pipette.src = 'mini-games/prescription/pipette-numerique.png';
+            pipette.alt = lang === 'fr' ? 'Pipette numÃ©rique du laboratoire' : 'Lab digital pipette';
+            body.appendChild(pipette);
             var col = document.createElement('div');
             col.className = 'match-col';
             body.appendChild(col);
@@ -616,6 +621,13 @@
         },
 
         'pression': function (body) {
+            /* Dossier d'interrogatoire : photo du suspect sous pression (si fournie) */
+            if (cfg.asset) {
+                var photo = document.createElement('div');
+                photo.className = 'mg-scene pression-scene';
+                photo.style.backgroundImage = "url('" + cfg.asset + "')";
+                body.appendChild(photo);
+            }
             var order = (cfg.order || []).map(function (s) { return t(s, lang); });
             var currentIndex = 0;
             var box = document.createElement('div');
@@ -641,7 +653,7 @@
             });
         },
 
-        /* V3 — MINI-JEUX AVEC ASSETS */
+        /* V3 ï¿½ MINI-JEUX AVEC ASSETS */
         'labo_verrou': function (body, registerHint) {
             var wrap = document.createElement('div');
             wrap.className = 'mg-scene';
@@ -686,7 +698,7 @@
             face.src = 'mini-games/montre/montre-du-duc-face.png';
             face.alt = lang === 'fr' ? 'Face de la montre' : 'Watch face';
             var timeStr = cfg.timeStr || '22h09';
-            face.title = lang === 'fr' ? 'La montre figée à ' + timeStr + '…' : 'The watch frozen at ' + timeStr + '…';
+            face.title = lang === 'fr' ? 'La montre figï¿½e ï¿½ ' + timeStr + 'ï¿½' : 'The watch frozen at ' + timeStr + 'ï¿½';
             var dosWrap = document.createElement('div');
             dosWrap.className = 'mg-dos-wrap hidden-dos';
             var dos = document.createElement('img');
@@ -699,18 +711,18 @@
             var status = document.createElement('div');
             status.className = 'mg-status';
             status.textContent = lang === 'fr'
-                ? 'Approchez la loupe de la face. Une aiguille s\'y est figée…'
-                : 'Bring the magnifier to the face. A hand is frozen there…';
+                ? 'Approchez la loupe de la face. Une aiguille s\'y est figï¿½eï¿½'
+                : 'Bring the magnifier to the face. A hand is frozen thereï¿½';
             body.appendChild(status);
             body.appendChild(wrap);
 
-            /* Loupe qui couvre toute la face au début — pour repérer l'aiguille figée.
-               Quand on clique sur la face, on révèle le dos, où se trouve la gravure. */
+            /* Loupe qui couvre toute la face au dï¿½but ï¿½ pour repï¿½rer l'aiguille figï¿½e.
+               Quand on clique sur la face, on rï¿½vï¿½le le dos, oï¿½ se trouve la gravure. */
             var faceLoupe = document.createElement('div');
             faceLoupe.className = 'face-loupe';
             body.appendChild(faceLoupe);
 
-            /* Gravures cachées sur le dos de la montre (lisibles à la loupe) */
+            /* Gravures cachï¿½es sur le dos de la montre (lisibles ï¿½ la loupe) */
             var answer = (cfg.code || [1, 9, 8, 1]).slice();
             var engravBox = document.createElement('div');
             engravBox.className = 'engrave-zone';
@@ -740,7 +752,7 @@
             loupe.appendChild(loupeInner);
             dosWrap.appendChild(loupe);
 
-            /* Bouton "Retourner la montre" — permet au joueur de passer du dos à la face */
+            /* Bouton "Retourner la montre" ï¿½ permet au joueur de passer du dos ï¿½ la face */
             var flipBtn = document.createElement('button');
             flipBtn.className = 'btn flip-btn';
             flipBtn.textContent = lang === 'fr' ? '? Retourner la montre' : '? Flip the watch';
@@ -752,22 +764,22 @@
                     faceLoupe.style.display = 'none';
                     flipBtn.textContent = lang === 'fr' ? '? Voir la face' : '? See the face';
                     status.textContent = lang === 'fr'
-                        ? 'Passez la loupe sur le dos de la montre : les gravures ne sont lisibles qu\'au grossissement…'
-                        : 'Sweep the magnifier over the watch back : the engravings are only readable when magnified…';
+                        ? 'Passez la loupe sur le dos de la montre : les gravures ne sont lisibles qu\'au grossissementï¿½'
+                        : 'Sweep the magnifier over the watch back : the engravings are only readable when magnifiedï¿½';
                 } else {
-                    /* On revient à la face */
+                    /* On revient ï¿½ la face */
                     dosWrap.classList.add('hidden-dos');
                     face.classList.remove('hidden-face');
                     faceLoupe.style.display = 'block';
                     flipBtn.textContent = lang === 'fr' ? '? Retourner la montre' : '? Flip the watch';
                     status.textContent = lang === 'fr'
-                        ? 'Approchez la loupe de la face. Une aiguille s\'y est figée…'
-                        : 'Bring the magnifier to the face. A hand is frozen there…';
+                        ? 'Approchez la loupe de la face. Une aiguille s\'y est figï¿½eï¿½'
+                        : 'Bring the magnifier to the face. A hand is frozen thereï¿½';
                 }
             });
             body.appendChild(flipBtn);
 
-            /* Loupe qui magnifie la face pour repérer l'aiguille figée */
+            /* Loupe qui magnifie la face pour repï¿½rer l'aiguille figï¿½e */
             function moveFaceLoupe(clientX, clientY) {
                 var fr = face.getBoundingClientRect();
                 var cx = clientX - fr.left, cy = clientY - fr.top;
@@ -782,14 +794,14 @@
             face.addEventListener('mousemove', function (e) { moveFaceLoupe(e.clientX, e.clientY); });
             face.addEventListener('mouseleave', function () { faceLoupe.style.display = 'none'; });
 
-            /* Quand le joueur clique sur la face après avoir bien observé l'aiguille figée,
+            /* Quand le joueur clique sur la face aprï¿½s avoir bien observï¿½ l'aiguille figï¿½e,
                on lui pose la question et on ouvre la voie vers le dos */
             var faceClicked = false;
             face.addEventListener('click', function () {
                 if (faceClicked) return;
                 faceClicked = true;
                 status.textContent = lang === 'fr'
-                    ? 'L\'aiguille est figée. Notez mentalement l\'heure. Cliquez sur "Retourner la montre" pour examiner le dos.'
+                    ? 'L\'aiguille est figï¿½e. Notez mentalement l\'heure. Cliquez sur "Retourner la montre" pour examiner le dos.'
                     : 'The hand is frozen. Mentally note the time. Click "Flip the watch" to examine the back.';
             });
 
@@ -802,7 +814,7 @@
             });
         },
 
-        /* Coffre-fort de l'Acte 2 — le code 1981 de la montre récompense le joueur attentif */
+        /* Coffre-fort de l'Acte 2 ï¿½ le code 1981 de la montre rï¿½compense le joueur attentif */
         'coffre_code': function (body) {
             var wrap = document.createElement('div');
             wrap.className = 'mg-scene mg-coffre';
@@ -887,7 +899,7 @@
             var pince = document.createElement('img');
             pince.className = 'mg-item mg-pince';
             pince.src = 'mini-games/chronos/pince-a-jouet.png';
-            pince.title = (lang === 'fr' ? 'Une fibre de soie est accrochée à la pince…' : 'A silk fibre is caught on the tweezers…');
+            pince.title = (lang === 'fr' ? 'Une fibre de soie est accrochï¿½e ï¿½ la pinceï¿½' : 'A silk fibre is caught on the tweezersï¿½');
             body.appendChild(pince);
             registerHint(function () {
                 gearEls.forEach(function (b) { if (!b.dataset.done && b.textContent === gears[idx]) b.classList.add('hint'); });
@@ -900,10 +912,10 @@
             wrap.style.backgroundImage = 'url(mini-games/prescription/prescription-eliane.png)';
             body.appendChild(wrap);
             var strips = [
-                { fr: '…versement de 12 000 £ à V.K.', en: '…payment of £12,000 to V.K.', order: 0 },
-                { fr: '…pour services rendus — contrat', en: '…for services rendered — contract', order: 1 },
-                { fr: '…le 14 du mois, comme convenu…', en: '…on the 14th of the month, as agreed…', order: 2 },
-                { fr: '…ne pas laisser de traces', en: '…leave no traces', order: 3 }
+                { fr: 'ï¿½versement de 12 000 ï¿½ ï¿½ V.K.', en: 'ï¿½payment of ï¿½12,000 to V.K.', order: 0 },
+                { fr: 'ï¿½pour services rendus ï¿½ contrat', en: 'ï¿½for services rendered ï¿½ contract', order: 1 },
+                { fr: 'ï¿½le 14 du mois, comme convenuï¿½', en: 'ï¿½on the 14th of the month, as agreedï¿½', order: 2 },
+                { fr: 'ï¿½ne pas laisser de traces', en: 'ï¿½leave no traces', order: 3 }
             ];
             var currentOrder = strips.slice().sort(function () { return Math.random() - 0.5; });
             var stripEls = [];
@@ -918,11 +930,11 @@
                 list.appendChild(el);
                 stripEls.push(el);
             });
-            /* --- Phase 2 : empreintes digitales sur la page reconstituée --- */
+            /* --- Phase 2 : empreintes digitales sur la page reconstituï¿½e --- */
             var fingerprints = [
                 { x: 30, y: 55, found: false, label: { fr: 'Empreinte sur la mention V.K.', en: 'Fingerprint on the V.K. mention' } },
-                { x: 45, y: 38, found: false, label: { fr: 'Empreinte près du 14 — la date du contrat', en: 'Fingerprint near the 14th — contract date' } },
-                { x: 62, y: 68, found: false, label: { fr: 'Empreinte sur le montant — 12 000 £', en: 'Fingerprint on the amount — £12,000' } },
+                { x: 45, y: 38, found: false, label: { fr: 'Empreinte prï¿½s du 14 ï¿½ la date du contrat', en: 'Fingerprint near the 14th ï¿½ contract date' } },
+                { x: 62, y: 68, found: false, label: { fr: 'Empreinte sur le montant ï¿½ 12 000 ï¿½', en: 'Fingerprint on the amount ï¿½ ï¿½12,000' } },
                 { x: 75, y: 42, found: false, label: { fr: 'Empreinte sur la signature', en: 'Fingerprint on the signature' } }
             ];
             var fpFound = 0;
@@ -946,7 +958,7 @@
                     zone.classList.add('found');
                     var toast = document.createElement('div');
                     toast.className = 'carnet-clue-toast';
-                    toast.textContent = (lang === 'fr' ? 'Empreinte relevée (' : 'Fingerprint found (') + fpFound + '/' + fingerprints.length + ') : ' + t(fp.label, lang);
+                    toast.textContent = (lang === 'fr' ? 'Empreinte relevï¿½e (' : 'Fingerprint found (') + fpFound + '/' + fingerprints.length + ') : ' + t(fp.label, lang);
                     body.appendChild(toast);
                     setTimeout(function () { toast.remove(); }, 2500);
                     if (fpFound >= 3) complete(true);
@@ -968,7 +980,7 @@
                 wrap.addEventListener('mouseleave', carnetMouseleaveHandler);
                 var hint = document.createElement('div');
                 hint.className = 'carnet-hint';
-                hint.textContent = lang === 'fr' ? '?? Loupe active — relevez au moins 3 empreintes sur la page.' : '?? Magnifier active — find at least 3 fingerprints on the page.';
+                hint.textContent = lang === 'fr' ? '?? Loupe active ï¿½ relevez au moins 3 empreintes sur la page.' : '?? Magnifier active ï¿½ find at least 3 fingerprints on the page.';
                 body.appendChild(hint);
             };
             var selectedIdx = -1;
@@ -997,7 +1009,7 @@
         'cryptogramme': function (body, registerHint) {
             var wrap = document.createElement('div');
             wrap.className = 'mg-scene crypto-scene';
-            wrap.style.backgroundImage = 'url(mini-games/puzzle/krane-coded-note.png.jfif)';
+            wrap.style.backgroundImage = 'url(mini-games/puzzle/krane-coded-note.png.png)';
             body.appendChild(wrap);
             var message = { fr: 'HALE ENGAGE KRANE', en: 'HALE HIRES KRANE' };
             var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -1005,15 +1017,15 @@
             var encoded = '', plain = t(message, lang).toUpperCase();
             for (var i = 0; i < plain.length; i++) { var idx = alphabet.indexOf(plain[i]); encoded += idx === -1 ? plain[i] : alphabet[(idx + shift) % 26]; }
             var keyBox = document.createElement('div'); keyBox.className = 'crypto-key';
-            keyBox.textContent = (lang === 'fr' ? 'Clé de lecture : +' : 'Cipher key: +') + shift;
+            keyBox.textContent = (lang === 'fr' ? 'Clï¿½ de lecture : +' : 'Cipher key: +') + shift;
             body.appendChild(keyBox);
             var encodedEl = document.createElement('div'); encodedEl.className = 'crypto-encoded'; encodedEl.textContent = encoded;
             body.appendChild(encodedEl);
             var input = document.createElement('input'); input.className = 'crypto-input';
-            input.placeholder = lang === 'fr' ? 'Décodez le message…' : 'Decode the message…'; input.maxLength = 30;
+            input.placeholder = lang === 'fr' ? 'Dï¿½codez le messageï¿½' : 'Decode the messageï¿½'; input.maxLength = 30;
             body.appendChild(input);
             var submit = document.createElement('button'); submit.className = 'btn';
-            submit.textContent = lang === 'fr' ? 'Vérifier' : 'Check'; body.appendChild(submit);
+            submit.textContent = lang === 'fr' ? 'Vï¿½rifier' : 'Check'; body.appendChild(submit);
             submit.addEventListener('click', function () {
                 if (input.value.trim().toUpperCase() === plain) complete(true);
                 else { input.classList.add('wrong'); setTimeout(function () { input.classList.remove('wrong'); }, 400); }
@@ -1024,7 +1036,7 @@
         'cablage_alarme': function (body, registerHint) {
             var wrap = document.createElement('div');
             wrap.className = 'mg-scene cablage-scene';
-            wrap.style.backgroundImage = 'url(mini-games/puzzle/alarm-circuit-blueprint.png.jfif)';
+            wrap.style.backgroundImage = 'url(mini-games/puzzle/alarm-circuit-blueprint.png.png)';
             body.appendChild(wrap);
             var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('viewBox', '0 0 400 200'); svg.className = 'cablage-svg'; body.appendChild(svg);
@@ -1055,12 +1067,12 @@
         'roue_alibis': function (body, registerHint) {
             var wrap = document.createElement('div');
             wrap.className = 'mg-scene roue-scene';
-            wrap.style.backgroundImage = 'url(mini-games/puzzle/pocket-watch-dial.png.jfif)';
+            wrap.style.backgroundImage = 'url(mini-games/puzzle/pocket-watch-dial.png.png)';
             body.appendChild(wrap);
             var dial = document.createElement('div'); dial.className = 'roue-dial'; body.appendChild(dial);
             var cursors = [
                 { label: lang === 'fr' ? 'Montre (22h09)' : 'Watch (10:09pm)', target: 22.15, color: '#7fd48a' },
-                { label: lang === 'fr' ? 'Horloge-mère' : 'Grandfather clock', target: 22.15, color: '#f0d890' },
+                { label: lang === 'fr' ? 'Horloge-mï¿½re' : 'Grandfather clock', target: 22.15, color: '#f0d890' },
                 { label: lang === 'fr' ? 'Alibi de Hale' : "Hale's alibi", target: 20.0, color: '#d8574a' }
             ];
             var cursorEls = [];
@@ -1082,6 +1094,85 @@
             });
             function checkRoue() { if (cursorEls.every(function (c) { return Math.abs(parseFloat(c.slider.value) - c.target) < 0.3; })) complete(true); }
             registerHint(function () { cursorEls.forEach(function (c) { if (Math.abs(parseFloat(c.slider.value) - c.target) >= 0.3) { c.slider.value = c.target; c.el.style.width = ((c.target - 18) / 6) * 100 + '%'; var h = Math.floor(c.target); var m = Math.round((c.target - h) * 60); c.val.textContent = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m; } }); });
+        },
+
+        /* Puzzle image : l'image est dÃ©coupÃ©e en tuiles, clic sur deux tuiles pour les Ã©changer */
+        'image_puzzle': function (body, registerHint) {
+            var wrap = document.createElement('div');
+            wrap.className = 'mg-scene jigsaw-scene';
+            body.appendChild(wrap);
+            var asset = cfg.asset || 'mini-games/puzzle/alarm-circuit-blueprint.png.png';
+            var rows = cfg.rows || 3;
+            var cols = cfg.cols || 3;
+            var total = rows * cols;
+            /* ordre[pos] = index de la piÃ¨ce affichÃ©e Ã  la position pos */
+            var order = [];
+            for (var i = 0; i < total; i++) order.push(i);
+            function isSolved() {
+                for (var p = 0; p < total; p++) { if (order[p] !== p) return false; }
+                return true;
+            }
+            do {
+                order.sort(function () { return Math.random() - 0.5; });
+            } while (isSolved());
+            var grid = document.createElement('div');
+            grid.className = 'jigsaw-grid';
+            grid.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+            wrap.appendChild(grid);
+            var tileEls = [];
+            var selected = -1;
+            var status = document.createElement('div');
+            status.className = 'jigsaw-status';
+            status.textContent = lang === 'fr'
+                ? 'Cliquez sur une tuile, puis sur une autre pour les Ã©changer.'
+                : 'Click a tile, then another one to swap them.';
+            body.appendChild(status);
+            function render() {
+                for (var pos = 0; pos < total; pos++) {
+                    var piece = order[pos];
+                    var el = tileEls[pos];
+                    el.className = 'jigsaw-tile' + (pos === selected ? ' selected' : '');
+                    var bx = cols > 1 ? (piece % cols) / (cols - 1) * 100 : 0;
+                    var by = rows > 1 ? Math.floor(piece / cols) / (rows - 1) * 100 : 0;
+                    el.style.backgroundImage = "url('" + asset + "')";
+                    el.style.backgroundSize = (cols * 100) + '% ' + (rows * 100) + '%';
+                    el.style.backgroundPosition = bx + '% ' + by + '%';
+                }
+            }
+            for (var pos = 0; pos < total; pos++) {
+                (function (p) {
+                    var el = document.createElement('div');
+                    el.className = 'jigsaw-tile';
+                    el.addEventListener('click', function () {
+                        if (selected === -1) {
+                            selected = p;
+                        } else if (selected === p) {
+                            selected = -1;
+                        } else {
+                            var tmp = order[selected];
+                            order[selected] = order[p];
+                            order[p] = tmp;
+                            selected = -1;
+                            if (isSolved()) {
+                                render();
+                                status.textContent = lang === 'fr' ? 'Le schÃ©ma est reconstituÃ© !' : 'The blueprint is rebuilt!';
+                                setTimeout(function () { complete(true); }, 600);
+                                return;
+                            }
+                        }
+                        render();
+                    });
+                    grid.appendChild(el);
+                    tileEls.push(el);
+                })(pos);
+            }
+            render();
+            registerHint(function () {
+                /* Met en Ã©vidence une piÃ¨ce mal placÃ©e */
+                for (var p = 0; p < total; p++) {
+                    if (order[p] !== p) { tileEls[p].classList.add('hint'); break; }
+                }
+            });
         },
 
         'cable_match': function (body, registerHint) {

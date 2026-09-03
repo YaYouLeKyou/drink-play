@@ -1738,6 +1738,21 @@ html {
 }
 .clue-reward-text { font-size: 0.98rem; line-height: 1.55; color: #f3efdd; }
 
+/* ===== Puzzle image (schéma déchiré — Acte 2) ===== */
+.jigsaw-grid { display: grid; gap: 4px; width: 100%; height: min(48vh, 360px); }
+.jigsaw-tile {
+    border-radius: 6px; cursor: pointer;
+    background-repeat: no-repeat; background-color: #0b0f1c;
+    border: 1px solid rgba(220, 205, 150, 0.25);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.jigsaw-tile:hover { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4), 0 0 8px rgba(230, 200, 120, 0.45); }
+.jigsaw-tile.selected { outline: 2px solid #f0d080; transform: scale(0.97); }
+.jigsaw-tile.hint { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4), 0 0 12px rgba(140, 220, 255, 0.8); }
+.jigsaw-status { margin-top: 8px; font-size: 0.9rem; color: #cfc7a5; text-align: center; }
+.pression-scene { height: 200px; background-size: cover; background-position: center 18%; border-radius: 10px; border: 1px solid rgba(220, 205, 150, 0.3); }
+
 /* ===== Coffre-fort (Acte 2) ===== */
 .mg-coffre { height: 220px; }
 .mg-coffre .mg-coffre-img { max-width: 46%; max-height: 95%; transition: transform 0.7s ease, filter 0.7s ease; }

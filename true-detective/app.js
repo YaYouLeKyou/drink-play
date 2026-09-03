@@ -29,6 +29,7 @@
         residence: ASSETS_BASE + 'lieux/classic/interieur manoir.png',
         alley: ASSETS_BASE + 'lieux/classic/ruelle.png',
         publicPlace: ASSETS_BASE + 'lieux/classic/exterieur bar.png',
+        barInterieur: ASSETS_BASE + 'lieux/classic/interieur bar.png',
         secretPlace: ASSETS_BASE + 'lieux/classic/appartement suspect.png',
         laboratory: ASSETS_BASE + 'lieux/classic/laboratoire.png',
         headquarters: ASSETS_BASE + 'lieux/classic/quartier general.png',
@@ -2442,10 +2443,17 @@ langEnBtn: document.getElementById('lang-en'),
             alley: assets.alley,
             residence: assets.residence,
             bar: assets.publicPlace,
+            barInterieur: assets.barInterieur,
             clandestine: assets.secretPlace,
+            secretPlace: assets.secretPlace,
             labo: assets.laboratory,
             laboratoire: assets.laboratory,
+            laboratory: assets.laboratory,
             qg: assets.headquarters,
+            headquarters: assets.headquarters,
+            prison: assets.prison,
+            exile: assets.exile || assets.universe,
+            paradise: assets.exile || assets.universe
         };
         return map[decorKey] || null;
     }
@@ -2766,10 +2774,10 @@ function scrApplyChoice(choiceKey, choiceId) {
                 }
             });
             pages.push({
-                decor: 'crimeScene', npc: null,
+                decor: 'prison', npc: null,
                 text: {
-                    fr: 'Le coupable est arrêté : ' + TDScenario.t(truth.prison, lang),
-                    en: 'The culprit is arrested : ' + TDScenario.t(truth.prison, lang)
+                    fr: 'Derrière les barreaux, le coupable s\'effondre. ' + TDScenario.t(truth.prison, lang) + '\n\n[Décor : prison — Le coupable croupit en cellule, son règne est terminé.]',
+                    en: 'Behind the bars, the culprit breaks down. ' + TDScenario.t(truth.prison, lang) + '\n\n[Scene: prison — The culprit rots in a cell, his reign is over.]'
                 }
             });
             pages.push({
@@ -2786,6 +2794,13 @@ function scrApplyChoice(choiceKey, choiceId) {
                 text: {
                     fr: '<div class="accuse-screen"><div class="accuse-result failure">❌ ACCUSATION ERRONÉE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Vous accusez ' + innocentTitle + ', un innocent. Le vrai coupable, ' + titleTxt + ', s\'est échappé.</div></div>',
                     en: '<div class="accuse-screen"><div class="accuse-result failure">❌ WRONG ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">You accuse ' + innocentTitle + ', an innocent. The real culprit, ' + titleTxt + ', has escaped.</div></div>'
+                }
+            });
+            pages.push({
+                decor: 'exile', npc: null,
+                text: {
+                    fr: '[Décor : exil — Sous le soleil des tropiques, le vrai coupable sirote un cocktail au bord de la piscine d\'un palace. Il rit de vous, loin, très loin de votre juridiction.]',
+                    en: '[Scene: exile — Under the tropical sun, the real culprit sips a cocktail by the pool of a palace. He laughs at you, far, very far from your jurisdiction.]'
                 }
             });
             pages.push({
