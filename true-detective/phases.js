@@ -70,17 +70,17 @@
                     time: 60,
                     sceneImage: 'assets/image true detective/lieux/classic/scene de crime manoir.png',
                     hotspots: [
-                        { label: '1', x: 27.5, y: 59, info: { fr: 'Un cachet de cire intact. Personne \' forcé le bureau : \'ssassin connaissait la maison… ou y avait accès.', en: 'An intact wax seal. No one forced the desk : the killer knew the house… or had access to it.' } },
-                        { label: '2', x: 38.5, y: 57.5, info: { fr: 'La carafe renversée. DEUX verres ont été utilisés : la victime attendait quelqu\'un en qui elle avait confiance.', en: 'The overturned decanter. TWO glasses were used : the victim was expecting someone they trusted.' } },
-                        { label: '3', x: 48, y: 58.5, info: { fr: 'Un livre de comptes taché de sang. Plusieurs pages ont été arrachées : celles qui mentionnaient les dettes.', en: 'A blood-stained ledger. Several pages were torn out : the ones mentioning debts.' } },
-                        { label: 'A', x: 26, y: 70, info: { fr: 'Sous l\'encrier renversé, une lettre à moitié brûlée : des menaces rédigées \'ne écriture élégante et soignée.', en: 'Under the overturned inkwell, a half-burned letter : threats written in an elegant, careful hand.' } },
-                        { label: 'C', x: 32, y: 69.5, info: { fr: 'L\'autre encrier est intact et la plume sèche depuis des heures : on a écrit ici AVANT le meurtre, pas après.', en: 'The other inkwell is untouched and the pen dry for hours : writing happened here BEFORE the murder, not after.' } },
-                        { label: '4', x: 66.5, y: 78.5, info: { fr: 'Un fauteuil renversé près du tapis : la lutte a été brève, loin du bureau, près de la fenêtre.', en: 'An overturned chair by the rug : the struggle was brief, away from the desk, near the window.' } },
-                        { label: '5', x: 70, y: 84.5, info: { fr: 'La mare de sang. La victime est tombée face à sa propre effigie : pas une scratch de défense. Elle connaissait son agresseur.', en: 'The pool of blood. The victim fell facing his own portrait : not a single scratch of defense. He knew his attacker.' } },
-                        { label: '6', x: 82.5, y: 85, info: { fr: 'Près de la main du corps : un reçu froissé signé « V.K. » — une forte somme versée en espèces, sans explication.', en: 'Near the bod\' hand : a crumpled receipt signed "V.K." — a large sum paid in cash, unexplained.' } }
-                    ],
+                    { label: '1', info: { fr: 'Un cachet de cire intact. Personne n a force le bureau : l assassin connaissait la maison ou y avait acces.', en: 'An intact wax seal. No one forced the desk : the killer knew the house or had access to it.' } },
+                    { label: '2', info: { fr: 'La carafe renversee. DEUX verres ont ete utilises : la victime attendait quelqu un en qui elle avait confiance.', en: 'The overturned decanter. TWO glasses were used : the victim was expecting someone they trusted.' } },
+                    { label: '3', info: { fr: 'Un livre de comptes tache de sang. Plusieurs pages d impayes arrachees : celles qui mentionnaient les dettes de Hale.', en: 'A blood-stained ledger. Several debt pages torn out : the ones mentioning Hale\'s debts.' } },
+                    { label: 'A', info: { fr: 'Sous l encrier renverse, une lettre a moitie brulee : des menaces redigees d une ecriture elegante.', en: 'Under the overturned inkwell, a half-burned letter : threats in an elegant hand.' } },
+                    { label: 'C', info: { fr: 'L autre encrier est intact et la plume seche : on a ecrit ici AVANT le meurtre, pas apres.', en: 'The other inkwell is untouched and the pen dry : writing happened here BEFORE the murder.' } },
+                    { label: '4', info: { fr: 'Un fauteuil renverse pres de la fenetre : la lutte a ete breve, loin du bureau.', en: 'An overturned chair by the window : the struggle was brief, away from the desk.' } },
+                    { label: '5', info: { fr: 'La mare de sang, la victime face a son effigie, aucune trace de defense : elle connaissait son agresseur.', en: 'The pool of blood, the victim facing his portrait, no trace of defense : he knew his attacker.' } },
+                    { label: '6', info: { fr: 'Pres de la main : un recu froisse signe V.K. - une forte somme en especes.', en: 'Near the hand : a crumpled receipt signed "V.K." - a large sum in cash.' } }
+                ],
                     evidence: 'forensic',
-                    clue: { fr: 'Synthèse de la scène : un proche de confiance, deux verres, des pages de dettes arrachées, une écriture élégante dans les menaces… et un reçu signé « V.K. ». Le meurtre était prévu — le vol, simulé.', en: 'Scene summary : a trusted close one, two glasses, torn debt pages, elegant handwriting in the threats… and a receipt signed "V.K.". The murder was planned — the robbery, staged.' }
+                    clue: { fr: 'Un proche de confiance, deux verres, des dettes effacees, une ecriture elegante et un recu signe V.K. Le meurtre etait prevu - le vol, simule.', en: 'A trusted close one, two glasses, erased debts, elegant handwriting and a receipt signed "V.K.". The murder was planned - the robbery, staged.' }
                 },
                 text: {
                     fr: '« Examinez la pièce avant de poser vos questions », souffle le partenaire. Vous inspectez chaque recoin : la scène raconte une histoire que seul un œil aiguisé peut lire.',
@@ -103,7 +103,7 @@
                         { fr: '...ne pas laisser de traces', en: '...leave no traces', order: 3 }
                     ],
                     evidence: 'mobile',
-                    clue: { fr: 'Le carnet reconstitué + les empreintes digitales révèlent des versements réguliers à V.K. (Victor Krane) — le mobile financier est établi. Les empreintes confirment que la page a été manipulée par le coupable.', en: 'The rebuilt ledger + fingerprints reveal regular payments to V.K. (Victor Krane) — the financial motive is proven. The fingerprints confirm the page was handled by the killer.' }
+                    clue: { fr: 'Le carnet reconstitue revele des versements reguliers a V.K. (Victor Krane). Le mobile financier de Hale est etabli.', en: 'The rebuilt ledger reveals regular payments to V.K. (Victor Krane). Hale\'s financial motive is proven.' }
                 },
                 text: {
                     fr: 'Regardez — les pages arrachées du livre de comptes. quelqu\'un a voulu effacer les dettes.',
@@ -162,7 +162,7 @@
                         { fr: 'Le rôdeur de 22h09', en: 'The lurker at 10:09pm' }
                     ],
                     evidence: 'witness',
-                    clue: { fr: 'Silas Crane a vu un rôdeur vers 22h — pas un marginal, quelqu\'un de « bien habillé, pressé ». Le rôdeur ressemble à Julian Pembrooke, et l\'alibi de sa « panne » tombe pile à cette heure.', en: 'Silas Crane saw a lurker around 10pm — not a drifter, someone "well dressed, in a hurry". The lurker looks like Julian Pembrooke, and his "breakdown" alibi falls exactly at that hour.' }
+                    clue: { fr: 'Silas Crane a vu un rodeur bien habille vers 22h - ressemble a Pembrooke, mais la panne etait une couverture.', en: 'Silas Crane saw a well-dressed lurker around 10pm - looks like Pembrooke, but the breakdown was a cover.' }
                 },
                 text: {
                     fr: '« La manche ? » Il tend une main sale. « \'tais là, assis, quand un rôdeur est passé vers 22h. La victime, elle, \' donné une pièce. » Il ricane : « Julian Pembrooke ? Lui, il traîne au bar, pas ici. »',
@@ -263,7 +263,7 @@
                         { x: 45, y: 75, correct: true }
                     ],
                     evidence: 'timeline',
-                    clue: { fr: 'Le verrou a été ouvert avec une clé, pas forcé : \'ssassin a eu accès au trousseau du Major Hale. Et la chaleur date de 22h — Hale prétendait être dehors à cette heure.', en: 'The lock was opened with a key, not forced : the killer had access to Major Hal\' key ring. And the heat dates from 10pm — Hale claimed to be outside at that hour.' }
+                    clue: { fr: 'Le verrou s est ouvert avec une cle, pas force : acces au trousseau du garde du corps Hale. Chaleur datee 22h.', en: 'The lock opened with a key, not forced : access to bodyguard Hale\'s keys. Heat dated 10pm.' }
                 },
                 text: {
                     fr: 'Le Dr Whitmore ajuste ses lunettes : « Vu la violence, \'ssassin est probablement un homme. \'i retrouvé plusieurs ADN : celui de Lady Vivienne, de Julian Pembrooke, du Major Hale, de Rupert Blackwood... et un inconnu. » Il marque une pause. « Plusieurs traces. Trop, pour être innocent. »',
@@ -303,7 +303,7 @@
                     code: [1, 9, 8, 1],
                     symbols: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
                     evidence: 'timeline',
-                    clue: { fr: 'INDICE MINEUR : « 1981 » gravé au dos — le millésime \'n coffre-fort, quelque part. INDICE MAJEUR : sur la face, \'iguille est figée à 22h09. Si la montre est sincère, voilà \'eure du crime. Retenez-la : elle décidera du twist final.', en: 'MINOR CLUE : "1981" engraved on the back — the make-year of some safe. MAJOR CLUE : on the face, the hand is frozen at 10:09pm. If the watch is sincere, that is the time of death. Remember it : it will decide the final twist.' }
+                    clue: { fr: 'INDICE MINEUR : 1981 (coffre). INDICE MAJEUR : l aiguille figee a 22h09 - l heure du crime. Retenez-la.', en: 'MINOR : 1981 (safe). MAJOR : the hand frozen at 10:09pm - the time of death. Remember it.' }
                 },
                 text: {
                     fr: 'Vous reprenez la route vers la ruelle. « 1981 » au dos, une année — rien de plus. Mais vous \'vez pas manqué \'iguille figée à 22h09 sur la face : si la montre est sincère, voilà \'eure du crime, que personne \' encore établie. Et ce rôdeur que Silas Crane a croisé vers 22h... Il faut le reparler.',
@@ -341,7 +341,7 @@
                     time: 30,
                     code: [1, 9, 8, 1],
                     evidence: 'mobile',
-                    clue: { fr: 'Le coffre \'uvre : à \'ntérieur, un carnet de versements. Le Major Hale payait Victor Krane — des mensualités régulières. Hale finançait le tueur.', en: 'The safe opens : inside, a payment ledger. Major Hale was paying Victor Krane — regular monthly installments. Hale was funding the killer.' }
+                    clue: { fr: 'Le carnet du coffre (code 1981) : Hale payait Victor Krane en plusieurs fois, dernier paiement la veille du meurtre.', en: 'The safe ledger (code 1981) : Hale paid Victor Krane in installments, last one the day before the murder.' }
                 },
                 text: {
                     fr: 'Le coffre-fort est là, dans le bureau. Composez le code.',
@@ -385,7 +385,7 @@
                         { fr: '22h30 — Hale « revient »', en: '10:30pm — Hale "returns"' }
                     ],
                     evidence: 'timeline',
-                    clue: { fr: 'La chronologie révèle le trou : Hale prétendait être en panne à 22h09, mais le verrou et le rôdeur placent quelqu\'un sur les lieux à ce moment. l\'alibi de Hale \'ffondre.', en: 'The timeline reveals the gap : Hale claimed to be broken down at 10:09pm, but the lock and the prowler place someone on scene at that moment. Hal\' alibi collapses.' }
+                    clue: { fr: 'La chronologie revele le trou : Hale pretendait etre en panne a 22h, mais le verrou et le rodeur le placent sur les lieux. Son alibi s effondre.', en: 'The timeline reveals the gap : Hale claimed to be broken down at 10pm, but the lock and the prowler place him on scene. His alibi collapses.' }
                 },
                 text: {
                     fr: 'Votre partenaire étale les notes : « Remettons les événements dans l\'ordre. À quelle heure exactement la victime est-elle morte ? »',
@@ -403,7 +403,7 @@
                     asset: 'mini-games/puzzle/pocket-watch-dial.png.jfif',
                     target: '22:09',
                     evidence: 'timeline',
-                    clue: { fr: 'Les trois horloges s\'accordent sur 22h09 : Hale prétendait être en panne avec Pembrooke à cet instant, mais l\'horloge-mère situe le choc au même moment. Son alibi est pulvérisé. Le dossier d\'accusation est verrouillé.', en: 'The three clocks agree on 10:09pm : Hale claimed to be broken down with Pembrooke at that instant, but the mother clock places the impact at the same time. His alibi is shattered. The case is sealed.' }
+                    clue: { fr: 'Les trois horloges s accordent sur 22h09 : l alibi de panne de Hale est pulverise. Le dossier est verrouille.', en: 'The three clocks agree on 10:09pm : Hale\'s breakdown alibi is shattered. The case is sealed.' }
                 },
                 text: {
                     fr: 'Sur le bureau, la montre figée, le récit de la panne et la grande horloge-mère. « Synchronisons-les… la vérité éclatera. »',
