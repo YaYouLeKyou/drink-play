@@ -86,6 +86,43 @@ Interact with the AI assistant from the main hub:
 *   Get game recommendations
 *   Ask for rules and tips
 
+## 🕵️ True Detective — Le jeu
+
+Un jeu d'enquête **textuel et visuel** hautement logique, en 4 actes (fixes) :
+
+- **Phase 1** — Intro & Fouille de scène : 8 zones interactives à la loupe (image plein écran `scene de crime manoir.png`), reconstitution du carnet déchiré + recherche d'empreintes (`prescription-eliane.png`).
+- **Phase 2** — Piste & Interrogatoires : témoignage de Silas Crane, confrontation des suspects, cryptogramme de la note de Krane.
+- **Phase 3** — Indices techniques & énigmes : verrou thermique, montre (heure du crime), ADN, code du coffre.
+- **Phase 4** — Le Nœud, Tension & Révélation : chronologie, roue synchrone des alibis, sabotage, accusation finale.
+
+### Faisceau de preuves (mécanique de résolution)
+
+Pas d'indice « clé unique ». Chaque mini-jeu gagné alimente **6 catégories** de preuves (`alibi`, `mobile`, `opportunity`, `forensic`, `witness`, `timeline`), cumulées en un score de dossier. Le coupable fixe est **le Major Hale**, maître d'œuvre, avec Victor Krane comme exécutant et Julian Pembrooke comme fausse piste.
+
+L'**heure du crime (22h09)** se reconstitue de multiples façons (montre = raccourci, sinon croisement { Silas + verrou + horloge-mère }) et détruit l'alibi du coupable. Le joueur qui rate la montre peut toujours aboutir logiquement.
+
+Aucun mini-jeu n'est bloquant : résoudre récompense d'un **indice majeur** visible et renforce le dossier d'accusation.
+
+### Les 13 mini-jeux
+
+| Type | Evidence | Indice (payoff) |
+|---|---|---|
+| `scene_fouille` | forensic | Proche de confiance, vol simulé, reçu V.K. |
+| `carnet_dechire` | mobile | Versements à Krane + empreintes |
+| `pression` | witness | Rôdeur bien habillé à ~22h |
+| `cryptogramme` | mobile | Contrat payé par Hale |
+| `labo_verrou` | timeline | Ouvert à la clé, chaleur 22h |
+| `adn_analyse` | forensic | Tueur de contrat (Krane) |
+| `montre_code` | timeline | **22h09** = heure du crime (twist) |
+| `coffre_code` | mobile | Hale payait Krane |
+| `chronologie` | timeline | Trou dans l'alibi de Hale |
+| `roue_alibis` | timeline | Aligne montre + panne + horloge-mère |
+| `sabotage` | alibi | Durite sectionnée = faux alibi |
+| `cablage_alarme` | opportunity | Alarme neutralisée de l'intérieur |
+| `cable_match` | opportunity | Graffiti ≠ main de Hale |
+
+---
+
 ## 🕵️ True Detective — Pont de scénario
 
 True Detective possède un **document canonique** (`true-detective/scenario-complet.md`) qui sert de base de travail narrative. Un petit « pont » vérifie que ce document reste aligné avec le code de l'app (`phases.js`), puis expose la lecture/écriture du scénario à travers l'API du serveur.
