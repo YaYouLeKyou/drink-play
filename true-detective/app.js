@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
     'use strict';
 
     var THEMES = [
@@ -2545,7 +2545,39 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         return ui.language === 'fr' ? ('Indice relevé : ' + labels) : ('Clue found : ' + labels);
     }
 
+    function renderEvidenceBeam(summary) {
+        if (!summary) return;
+        var s = scrGetState();
+        var ev = s.evidence || {};
+        var cats = [
+            ['alibi', 'Alibi'], ['mobile', 'Mobile'], ['opportunity', 'Opportunité'],
+            ['forensic', 'Scientifique'], ['witness', 'Témoins'], ['timeline', 'Chronologie']
+        ];
+        var html = '<div class="evidence-beam">';
+        html += '<div class="evidence-beam-title">FAISCEAU DE PREUVES \u2014 ' + summary.score + '/' + summary.max + ' indices rassembl\u00e9s</div>';
+        cats.forEach(function (cc) {
+            var val = ev[cc[0]] || 0;
+            var pct = Math.round((val / 3) * 100);
+            html += '<div class="evidence-row">';
+            html += '<span class="evidence-label">' + cc[1] + '</span>';
+            html += '<span class="evidence-track"><span class="evidence-fill ' + (val > 0 ? 'active' : '') + '" style="width:' + pct + '%"></span></span>';
+            html += '<span class="evidence-count">' + val + '/3</span>';
+            html += '</div>';
+        });
+        html += '</div>';
+        var div = document.createElement('div');
+        div.innerHTML = html;
+        $.choicesContainer.appendChild(div);
+    }
+
     function scrShowAdvance(page) {
+        if (page.evidenceSummary) {
+            renderEvidenceBeam(page.evidenceSummary);
+            $.continueBtn.classList.remove('hidden');
+            $.continueBtn.textContent = getText('continue') || 'Continuer';
+            $.continueBtn.onclick = function () { scrNext(); };
+            return;
+        }
         if (page.choiceKey) {
             var choices = page.choices || [];
             scr.awaitingChoice = true;
@@ -2619,24 +2651,41 @@ function scrApplyChoice(choiceKey, choiceId) {
 
     function buildOutroPages(s) {
         var truth = TDScenario.getTruth();
-        var good = (s.accused === s.culprit);
-        var titleTxt = truth.title ? TDScenario.t(truth.title, ui.language) : (truth.coupable || '');
-        var morale = truth.morale ? TDScenario.t(truth.morale, ui.language) : '';
+        var lang = ui.language;
+        var evalResult = TDScenario.evaluateAccusation(s.accused);
+        var good = evalResult.correct;
+        var titleTxt = truth.title ? TDScenario.t(truth.title, lang) : (truth.culprit || '');
+        var morale = truth.morale ? TDScenario.t(truth.morale, lang) : '';
+        var score = evalResult.score;
+        var maxScore = evalResult.max;
+        var reaction = evalResult.reaction;
+
+        var beamHtml = '<div class="evidence-beam"><div class="evidence-beam-title">📋 FAISCEAU DE PREUVES (' + score + '/' + maxScore + ')</div>';
+        var cats = state().evidence;
+        var labels = { alibi: 'Alibi', mobile: 'Mobile', opportunity: 'Opportunité', forensic: 'Forensique', witness: 'Témoin', timeline: 'Chronologie' };
+        var catKeys = ['alibi', 'mobile', 'opportunity', 'forensic', 'witness', 'timeline'];
+        for (var i = 0; i < catKeys.length; i++) {
+            var k = catKeys[i];
+            var v = cats[k] || 0;
+            var pct = Math.min(100, (v / 3) * 100);
+            beamHtml += '<div class="evidence-row"><span class="evidence-label">' + labels[k] + '</span><div class="evidence-track"><div class="evidence-fill' + (v > 0 ? ' active' : '') + '" style="width:' + pct + '%"></div></div><span class="evidence-count">' + v + '/3</span></div>';
+        }
+        beamHtml += '</div>';
 
         var pages = [];
         if (good) {
             pages.push({
                 decor: 'qg', npc: 'detective-partner',
                 text: {
-                    fr: 'Vous réunissez toutes les preuves : ' + titleTxt + ' est coupable. ' + TDScenario.t(truth.methode, ui.language),
-                    en: 'You gather all the evidence : ' + titleTxt + ' is guilty. ' + TDScenario.t(truth.methode, ui.language)
+                    fr: '<div class="accuse-screen"><div class="accuse-result success">✅ ACCUSATION JUSTE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">' + titleTxt + ' est coupable. ' + TDScenario.t(truth.methode, lang) + '</div></div>',
+                    en: '<div class="accuse-screen"><div class="accuse-result success">✅ RIGHT ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">' + titleTxt + ' is guilty. ' + TDScenario.t(truth.methode, lang) + '</div></div>'
                 }
             });
             pages.push({
                 decor: 'crimeScene', npc: null,
                 text: {
-                    fr: 'Le coupable est arrêté : ' + TDScenario.t(truth.prison, ui.language),
-                    en: 'The culprit is arrested : ' + TDScenario.t(truth.prison, ui.language)
+                    fr: 'Le coupable est arrêté : ' + TDScenario.t(truth.prison, lang),
+                    en: 'The culprit is arrested : ' + TDScenario.t(truth.prison, lang)
                 }
             });
             pages.push({
@@ -2651,15 +2700,15 @@ function scrApplyChoice(choiceKey, choiceId) {
             pages.push({
                 decor: 'qg', npc: 'detective-partner',
                 text: {
-                    fr: 'Vous accusez ' + innocentTitle + ', un innocent. La vérité éclate trop tard.',
-                    en: 'You accuse ' + innocentTitle + ', an innocent. The truth comes out too late.'
+                    fr: '<div class="accuse-screen"><div class="accuse-result failure">❌ ACCUSATION ERRONÉE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Vous accusez ' + innocentTitle + ', un innocent. Le vrai coupable, ' + titleTxt + ', s\'est échappé.</div></div>',
+                    en: '<div class="accuse-screen"><div class="accuse-result failure">❌ WRONG ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">You accuse ' + innocentTitle + ', an innocent. The real culprit, ' + titleTxt + ', has escaped.</div></div>'
                 }
             });
             pages.push({
                 decor: 'alley', npc: null,
                 text: {
-                    fr: 'Le vrai coupable, ' + titleTxt + ', a pris la fuite avec l\'argent et les bijoux, direction l\'étranger.',
-                    en: 'The real culprit, ' + titleTxt + ', has fled with the money and jewels toward abroad.'
+                    fr: 'Le vrai coupable a pris la fuite avec l\'argent et les bijoux, direction l\'étranger.',
+                    en: 'The real culprit has fled with the money and jewels toward abroad.'
                 }
             });
             pages.push({
@@ -2673,6 +2722,8 @@ function scrApplyChoice(choiceKey, choiceId) {
         var outro = scrCurrentPhase();
         if (outro) outro.pages = pages;
     }
+
+    function state() { return TDScenario.getState(); }
 
     function buildEnding(s) {
         var truth = TDScenario.getTruth();

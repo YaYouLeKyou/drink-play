@@ -91,6 +91,41 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+/* =====================================================================
+   SCENARIO BRIDGE — lecture / écriture / validation du scénario canonique
+   ===================================================================== */
+const scenarioBridge = require('./tools/scenario-bridge');
+
+// Le document de scénario (markdown) — source de vérité narrative
+app.get('/api/scenario', (req, res) => {
+    try {
+        res.type('text/markdown; charset=utf-8').send(scenarioBridge.loadScenarioDoc());
+    } catch (e) {
+        res.status(500).json({ error: 'Lecture du scénario impossible', details: e.message });
+    }
+});
+
+// Mise à jour du scénario (avec backup horodaté automatique)
+app.post('/api/scenario', (req, res) => {
+    try {
+        const { content } = req.body || {};
+        const result = scenarioBridge.saveScenarioDoc(content);
+        res.json(result);
+    } catch (e) {
+        res.status(400).json({ error: 'Écriture du scénario refusée', details: e.message });
+    }
+});
+
+// Validation de cohérence doc <-> app
+app.get('/api/scenario/validate', (req, res) => {
+    try {
+        res.json(scenarioBridge.validate());
+    } catch (e) {
+        res.status(500).json({ error: 'Validation impossible', details: e.message });
+    }
+});
+
+
 app.post('/api/jackpot/challenge', async (req, res) => {
     try {
         const { mode = 'classic', round = 1, players = [], history = [], language = 'en', emojiCombo = '' } = req.body || {};

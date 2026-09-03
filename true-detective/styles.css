@@ -1513,6 +1513,182 @@ html {
 .mg-equerre { position: absolute; left: 6px; bottom: 6px; max-height: 40%; opacity: 0.9; animation: equerre-sweep 3s ease-in-out infinite; }
 @keyframes equerre-sweep { 0%,100% { transform: translateX(0) } 50% { transform: translateX(24px) } }
 .fouille-spot.thermo { width: 44px; height: 44px; font-size: 1.1em; }
+
+/* ===== Mini-jeu « Le Cadette trahi » (montre_code) ===== */
+.mg-status { font-size: 0.9rem; color: #f0d890; margin: 4px 0 8px; min-height: 1.3em; font-family: 'Special Elite', monospace; }
+.mg-montre { height: 240px; cursor: none; touch-action: none; }
+.mg-montre .mg-montre-face { left: 6px; right: auto; }
+.mg-dos-wrap { position: absolute; right: 6px; bottom: 6px; width: 40%; height: 92%; z-index: 2; cursor: none; }
+.mg-montre-dos { position: relative !important; right: auto !important; bottom: auto !important; width: 100%; height: 100%; object-fit: contain; }
+.mg-montre .mg-item { max-width: 40%; max-height: 92%; }
+
+/* Loupe grossissante — les gravures ne sont lisibles qu'à travers le verre */
+.loupe {
+  position: absolute; width: 150px; height: 150px; border-radius: 50%;
+  overflow: hidden; pointer-events: none; display: none; z-index: 6;
+  transform: translate(-50%, -50%);
+  border: 4px solid #c9a227;
+  box-shadow: 0 0 22px rgba(255,215,120,0.55), inset 0 0 18px rgba(0,0,0,0.55);
+  background: rgba(10,12,16,0.25);
+}
+.loupe-inner { position: absolute; font-size: 2.2em; }
+.loupe-inner > img { width: 100%; height: 100%; object-fit: contain; opacity: 0.95; }
+.loupe-inner .engrave-zone-loupe { z-index: 4; }
+
+/* Gravures cachées sur le dos de la montre — alignées sur le bandeau du blason */
+.engrave-zone {
+  position: absolute; left: 28%; right: 28%; top: 63%; height: 13%;
+  display: flex; align-items: center; justify-content: center; gap: 2px;
+  z-index: 3; pointer-events: none;
+}
+.engrave-digit {
+  font-family: 'Special Elite', monospace; font-size: 1.05em; font-weight: 700;
+  color: #cdbb92; opacity: 0; transition: opacity 0.2s linear;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.9), 0 -1px 0 rgba(255,240,200,0.25);
+  user-select: none; letter-spacing: 0.05em;
+}
+.engrave-digit.seen { opacity: 0.45; }
+.engrave-zone-loupe .engrave-digit { opacity: 1; color: #e8d9ae; }
+.engrave-digit.hint { animation: engrave-hint 0.8s ease-in-out infinite alternate; }
+@keyframes engrave-hint { from { opacity: 0; } to { opacity: 0.4; } }
+
+/* Cadrans verrouillés / débloqués */
+.dial.locked { opacity: 0.35; cursor: not-allowed; filter: grayscale(0.6); }
+.dial.hint { box-shadow: 0 0 10px rgba(255,215,120,0.7); }
+
+/* Question finale : l'heure est-elle sincère ? */
+.sincerity-box {
+  margin-top: 12px; padding: 12px; border-radius: 10px;
+  background: rgba(255,215,120,0.07); border: 1px solid rgba(255,215,120,0.35);
+  animation: sincerity-in 0.4s ease;
+}
+@keyframes sincerity-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.sincerity-q { font-family: 'Special Elite', monospace; font-weight: 700; color: #f0d890; margin: 0 0 10px; }
+.sincerity-box .btn { margin: 0 8px 6px 0; }
+.sincerity-box .btn.correct { background: rgba(110,200,110,0.3); border-color: #7fd48a; }
+.sincerity-box .btn.wrong { background: rgba(216,87,74,0.25); border-color: #d8574a; transform: translateX(3px); }
+.sincerity-box.solved { border-color: #7fd48a; }
+
+/* ===== Fouille de scène : grand écran + loupe + zones ===== */
+.minigame-content.scene-wide { width: min(96vw, 1080px); }
+.fouille-scene {
+  position: relative; width: 100%; aspect-ratio: 1376 / 768;
+  border-radius: 10px; overflow: hidden;
+  background-size: cover; background-position: center;
+  cursor: none; touch-action: none;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.15), 0 10px 40px rgba(0,0,0,0.6);
+}
+.scene-loupe {
+  position: absolute; width: 190px; height: 190px; border-radius: 50%;
+  background-repeat: no-repeat; background-color: #0b0f18;
+  border: 4px solid #c9a227; box-shadow: 0 0 24px rgba(255,215,120,0.5), inset 0 0 20px rgba(0,0,0,0.6);
+  pointer-events: none; display: none; z-index: 5;
+  transform: translate(-50%, -50%);
+}
+.fouille-zone {
+  position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px;
+  border-radius: 50%; border: 2px solid rgba(255,215,120,0.9);
+  background: rgba(160,40,30,0.85); color: #ffe9a8;
+  font-family: 'Special Elite', monospace; font-weight: 700; font-size: 0.95em;
+  cursor: pointer; z-index: 4; padding: 0; line-height: 30px; text-align: center;
+  animation: zone-pulse 2s ease-in-out infinite;
+}
+.fouille-zone:hover { background: rgba(230,70,50,0.95); box-shadow: 0 0 14px rgba(255,215,120,0.8); }
+.fouille-zone.found { background: rgba(40,110,50,0.85); border-color: #7fd48a; animation: none; }
+@keyframes zone-pulse { 0%,100% { box-shadow: 0 0 4px rgba(255,215,120,0.4); } 50% { box-shadow: 0 0 16px rgba(255,215,120,0.9); } }
+
+/* Fenêtre d'indice de zone */
+.zone-window {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: min(88%, 520px); z-index: 20;
+  background: linear-gradient(160deg, #1b2230, #10151f);
+  border: 1px solid rgba(255,215,120,0.5); border-radius: 12px;
+  padding: 18px 20px; box-shadow: 0 16px 50px rgba(0,0,0,0.7);
+  animation: sincerity-in 0.3s ease;
+}
+.zone-window-head { font-family: 'Special Elite', monospace; font-weight: 700; color: #f0d890; font-size: 1.05rem; margin-bottom: 10px; letter-spacing: 0.04em; }
+.zone-window-text { font-size: 0.95rem; line-height: 1.5; color: #e8e6df; margin-bottom: 14px; }
+
+/* ===== Panneau de récompense d'indice (fin de mini-jeu gagné) ===== */
+.clue-reward {
+  margin-top: 14px; padding: 16px 18px; border-radius: 12px;
+  background: linear-gradient(160deg, rgba(255,215,120,0.12), rgba(120,80,20,0.12));
+  border: 2px solid rgba(255,215,120,0.65);
+  box-shadow: 0 0 26px rgba(255,215,120,0.25), inset 0 0 24px rgba(255,215,120,0.06);
+  animation: clue-in 0.5s ease;
+}
+@keyframes clue-in { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: none; } }
+
+/* ===== Faisceau de preuves (preuve beam) ===== */
+.evidence-beam {
+  margin-top: 14px; padding: 10px 12px; border-radius: 10px;
+  background: rgba(0,0,0,0.35); border: 1px solid rgba(255,215,120,0.3);
+}
+.evidence-beam-title {
+  font-family: 'Special Elite', monospace; font-weight: 700;
+  color: #f0d890; font-size: 0.85rem; letter-spacing: 0.06em;
+  margin-bottom: 8px; text-align: center;
+}
+.evidence-row {
+  display: flex; align-items: center; gap: 8px;
+  margin: 4px 0; font-size: 0.78rem;
+}
+.evidence-label {
+  width: 90px; color: #c8c6bf; text-align: right;
+  font-family: 'Special Elite', monospace;
+}
+.evidence-track {
+  flex: 1; height: 14px; border-radius: 7px;
+  background: rgba(255,255,255,0.08); overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+}
+.evidence-fill {
+  height: 100%; width: 0%; border-radius: 7px;
+  background: rgba(120,120,120,0.4);
+  transition: width 0.6s ease;
+}
+.evidence-fill.active {
+  background: linear-gradient(90deg, #c9a227, #f0d890);
+  box-shadow: 0 0 10px rgba(255,215,120,0.5);
+}
+.evidence-count {
+  width: 36px; color: #a0a0a0; text-align: left;
+  font-family: 'Special Elite', monospace; font-size: 0.75rem;
+}
+
+/* ===== Écran d'accusation (fin) ===== */
+.accuse-screen {
+  padding: 20px; border-radius: 14px;
+  background: linear-gradient(160deg, #1b2230, #10151f);
+  border: 2px solid rgba(255,215,120,0.5);
+  animation: sincerity-in 0.5s ease;
+}
+.accuse-result {
+  font-family: 'Special Elite', monospace; font-weight: 700;
+  font-size: 1.3rem; margin-bottom: 14px;
+}
+.accuse-result.success { color: #7fd48a; }
+.accuse-result.failure { color: #d8574a; }
+.accuse-reaction {
+  font-size: 1rem; line-height: 1.6; color: #e8e6df;
+  margin-bottom: 16px; font-style: italic;
+}
+.accuse-summary {
+  font-size: 0.85rem; color: #a0a0a0; margin-top: 14px;
+  padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);
+}
+.clue-reward-head {
+  font-family: 'Special Elite', monospace; font-weight: 700; font-size: 1.1rem;
+  color: #ffdf80; letter-spacing: 0.08em; margin-bottom: 8px;
+  text-shadow: 0 0 12px rgba(255,215,120,0.6);
+}
+.clue-reward-text { font-size: 0.98rem; line-height: 1.55; color: #f3efdd; }
+
+/* ===== Coffre-fort (Acte 2) ===== */
+.mg-coffre { height: 220px; }
+.mg-coffre .mg-coffre-img { max-width: 46%; max-height: 95%; transition: transform 0.7s ease, filter 0.7s ease; }
+.mg-coffre .mg-coffre-img.coffre-open { transform: scale(1.06); filter: brightness(1.5) drop-shadow(0 0 24px rgba(255,215,120,0.8)); }
+
 .dial-row { display: flex; gap: 10px; justify-content: center; }
 .dial { font-size: 1.5em; min-width: 54px; }
 .wire-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -1520,3 +1696,104 @@ html {
 .writing-sample { margin: 4px; }
 .hint { animation: mg-hint 1s ease-in-out infinite; border-color: #ffd75e !important; box-shadow: 0 0 14px rgba(255,215,94,0.7); }
 @keyframes mg-hint { 0%,100% { box-shadow: 0 0 6px rgba(255,215,94,0.4) } 50% { box-shadow: 0 0 18px rgba(255,215,94,0.9) } }
+
+/* ===== Carnet déchiré : reconstitution + empreintes ===== */
+.carnet-scene {
+  position: relative; height: 320px; border-radius: 10px; overflow: hidden;
+  background-size: contain; background-position: center; background-repeat: no-repeat;
+  background-color: #1a1d28;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 8px 30px rgba(0,0,0,0.5);
+  cursor: none; touch-action: none;
+}
+.carnet-loupe {
+  position: absolute; width: 130px; height: 130px; border-radius: 50%;
+  background-repeat: no-repeat; background-color: #0b0f18;
+  border: 3px solid #c9a227; box-shadow: 0 0 18px rgba(255,215,120,0.4), inset 0 0 14px rgba(0,0,0,0.6);
+  pointer-events: none; display: none; z-index: 5; transform: translate(-50%, -50%);
+}
+.carnet-fingerprint {
+  position: absolute; width: 28px; height: 28px; margin: -14px 0 0 -14px;
+  border-radius: 50%; cursor: pointer; z-index: 4; padding: 0;
+  background: rgba(120,200,160,0); border: 2px solid rgba(120,200,160,0);
+  transition: all 0.3s ease;
+}
+.carnet-fingerprint::after {
+  content: '🖐'; font-size: 18px; opacity: 0; transition: opacity 0.4s ease;
+  display: block; text-align: center; line-height: 24px;
+}
+.carnet-fingerprint.revealed::after { opacity: 0.85; }
+.carnet-fingerprint.found {
+  background: rgba(40,110,50,0.7); border-color: #7fd48a;
+  box-shadow: 0 0 14px rgba(127,212,138,0.7);
+}
+.carnet-fingerprint.found::after { opacity: 1; }
+@keyframes fp-pulse { 0%,100% { box-shadow: 0 0 4px rgba(127,212,138,0.3); } 50% { box-shadow: 0 0 14px rgba(127,212,138,0.7); } }
+.carnet-fingerprint:not(.found):not(.revealed) { animation: fp-pulse 2.5s ease-in-out infinite; }
+
+.carnet-strips {
+  display: flex; flex-direction: column; gap: 8px; margin-top: 12px;
+}
+.carnet-strip {
+  padding: 10px 14px; border-radius: 8px;
+  background: linear-gradient(160deg, #2a2f3e, #1e2230);
+  border: 1px solid rgba(255,255,255,0.12);
+  font-family: 'Special Elite', monospace; font-size: 0.95rem;
+  color: #e8e6df; cursor: pointer; user-select: none;
+  transition: all 0.2s ease;
+}
+.carnet-strip:hover { border-color: rgba(255,215,120,0.5); transform: translateX(4px); }
+.carnet-strip.selected { border-color: #c9a227; box-shadow: 0 0 14px rgba(255,215,120,0.4); }
+.carnet-strip.locked { opacity: 0.5; cursor: default; }
+.carnet-strip.hint { animation: mg-hint 1s ease-in-out infinite; }
+
+.carnet-progress {
+  text-align: center; font-family: 'Special Elite', monospace;
+  font-size: 0.85rem; color: #a0a0a0; margin-top: 10px;
+}
+.carnet-progress-dots { display: inline-flex; gap: 6px; margin-left: 8px; vertical-align: middle; }
+.carnet-progress-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: rgba(255,255,255,0.15); transition: all 0.3s ease;
+}
+.carnet-progress-dot.found { background: #7fd48a; box-shadow: 0 0 8px rgba(127,212,138,0.5); }
+
+/* Toast d'indice d'empreinte */
+.carnet-clue-toast {
+  position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%) translateY(20px);
+  padding: 8px 16px; border-radius: 8px;
+  background: linear-gradient(160deg, #1b2230, #10151f);
+  border: 1px solid rgba(127,212,138,0.5);
+  font-family: 'Special Elite', monospace; font-size: 0.85rem;
+  color: #c8e6c9; box-shadow: 0 0 18px rgba(127,212,138,0.3);
+  opacity: 0; transition: all 0.4s ease; z-index: 30;
+  max-width: 80%; text-align: center; pointer-events: none;
+}
+.carnet-clue-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Zone d'empreinte cliquable (cachée au départ) */
+.carnet-fp-zone {
+  position: absolute; width: 36px; height: 36px; margin: -18px 0 0 -18px;
+  border-radius: 50%; cursor: pointer; z-index: 4;
+  background: rgba(120,200,160,0); border: 2px dashed rgba(120,200,160,0);
+  transition: all 0.3s ease;
+}
+.carnet-fp-zone.found {
+  background: rgba(40,110,50,0.7); border-color: #7fd48a; border-style: solid;
+  box-shadow: 0 0 14px rgba(127,212,138,0.7);
+}
+.carnet-fp-zone.found::after {
+  content: '✓'; display: block; text-align: center;
+  line-height: 32px; font-size: 18px; color: #c8e6c9; font-weight: 700;
+}
+.carnet-scene.loupe-active .carnet-fp-zone:not(.found) {
+  border-color: rgba(120,200,160,0.4);
+  animation: fp-pulse 2s ease-in-out infinite;
+}
+.carnet-strips.solved { opacity: 0.6; }
+.carnet-hint {
+  text-align: center; font-family: 'Special Elite', monospace;
+  font-size: 0.9rem; color: #c8e6c9; margin-top: 10px;
+  padding: 8px; border-radius: 8px;
+  background: rgba(127,212,138,0.1); border: 1px solid rgba(127,212,138,0.3);
+  animation: sincerity-in 0.4s ease;
+}

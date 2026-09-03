@@ -91,18 +91,17 @@
     /* ------------------------------------------------------------------
        2. ÉTAT DE PARTIE + API DE BASE
     ------------------------------------------------------------------ */
-    var state = { lang: 'fr', theme: 'agatha-christie', culprit: 'protecteur', prochainSuspect: null, suspectOrdre: [], phaseIdx: 0, pageIdx: 0, clues: [], miniGamesWon: 0, accused: null, score: 0, ending: null };
+    var state = { lang: 'fr', theme: 'agatha-christie', culprit: 'protecteur', prochainSuspect: null, suspectOrdre: [], phaseIdx: 0, pageIdx: 0, clues: [], miniGamesWon: 0, accused: null, score: 0, ending: null, evidence: { alibi: 0, mobile: 0, opportunity: 0, forensic: 0, witness: 0, timeline: 0 } };
     var SUSPECTS = ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel'];
 
-    function randomCulprit() {
-        var pool = ['protecteur', 'protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel'];
-        return pool[Math.floor(Math.random() * pool.length)];
-    }
+    /* Le coupable est FIXE (Major Hale) — plus de random */
+    function randomCulprit() { return 'protecteur'; }
     function reset() {
-        state.culprit = randomCulprit();
+        state.culprit = 'protecteur';
         state.prochainSuspect = null; state.suspectOrdre = [];
         state.phaseIdx = 0; state.pageIdx = 0; state.clues = [];
         state.miniGamesWon = 0; state.accused = null; state.score = 0; state.ending = null;
+        state.evidence = { alibi: 0, mobile: 0, opportunity: 0, forensic: 0, witness: 0, timeline: 0 };
     }
     function truth() { return TRUTH[state.culprit] || TRUTH.protecteur; }
     function t(obj, lang) {
@@ -112,9 +111,66 @@
         return obj[l] || obj.fr || obj.en || '';
     }
 
+    /* --- Réactions d'accusation (mauvais suspect) --- */
+    var REACTIONS = {};
+    REACTIONS['femme-fatale'] = {
+        fr: 'Lady Vivienne éclate d\'un rire amer. « Moi ? La meurtrière ? Regardez plutôt du côté de votre précieux Major Hale. Ses dettes, ses versements à Krane… Et ce faux alibi de panne : c\'est lui qui l\'a monté. » Elle s\'éloigne, laissant le vrai coupable s\'échapper. ÉCHEC.',
+        en: 'Lady Vivienne bursts into bitter laughter. "Me? The murderess? Look instead at your precious Major Hale. His debts, his payments to Krane… And that fake breakdown alibi: he staged it." She walks away, letting the real killer escape. FAILURE.'
+    };
+    REACTIONS['seducteur'] = {
+        fr: 'Julian Pembrooke blêmit. « C\'est une erreur… J\'étais en panne, je vous l\'ai dit ! » Il a raison : la panne était un faux, mais lui n\'était que l\'alibi. Le vrai coupable, celui qui a monté la panne, court encore. ÉCHEC.',
+        en: 'Julian Pembrooke turns pale. "This is a mistake… I broke down, I told you!" He\'s right: the breakdown was staged, but he was just the alibi. The real killer, the one who staged it, is still free. FAILURE.'
+    };
+    REACTIONS['suspect'] = {
+        fr: 'Rupert Blackwood ricane. « Accusez-moi, moi ? J\'étais parti à 21h30,Silas Crane peut le confirmer. Ce n\'est pas moi qui ai sectionné cette durite… ni payé Krane. » Il serre le poing et sort. Le vrai coupable reste en liberté. ÉCHEC.',
+        en: 'Rupert Blackwood sneers. "Accuse me? I left at 9:30pm, Silas Crane can confirm. I didn\'t cut that hose… nor pay Krane." He clenches his fist and leaves. The real killer remains free. FAILURE.'
+    };
+    REACTIONS['marginal'] = {
+        fr: 'Silas Crane secoue la tête. « Je ne suis qu\'un clochard, pas un meurtrier. J\'ai VU le rôdeur à 22h — suivez cette piste, trouvez qui il était. » Il disparaît dans la nuit. Sans suivre l\'indice du rôdeur, le vrai coupable vous échappe. ÉCHEC.',
+        en: 'Silas Crane shakes his head. "I\'m just a homeless man, not a killer. I SAW the prowler at 10pm — follow that lead, find out who it was." He vanishes into the night. Without following the prowler clue, the real killer escapes you. FAILURE.'
+    };
+    REACTIONS['criminel'] = {
+        fr: 'Victor Krane sourit lentement. « Je ne suis que le bras, inspecteur. La main qui m\'a guidé, c\'est Hale — mon employeur. Relisez les versements dans le coffre. » Il ne dira rien de plus. Le commanditaire s\'échappe. ÉCHEC.',
+        en: 'Victor Krane smiles slowly. "I am just the arm, inspector. The hand that guided me is Hale — my employer. Reread the payments in the safe." He says nothing more. The mastermind escapes. FAILURE.'
+    };
+    REACTIONS['protecteur'] = {
+        fr: 'Le Major Hale s\'effondre. « Tout ça pour elle… mais elle ne m\'a jamais aimé. » La vérité éclate : amour obsessionnel, Krane payé, Pembrooke alibi, crime maîtré. JUSTICE EST FAITE.',
+        en: 'Major Hale collapses. "All of this for her… but she never loved me." The truth bursts out: obsessive love, Krane paid, Pembrooke alibi, crime mastered. JUSTICE IS SERVED.'
+    };
+
+    /* --- Système de preuves (faisceau d'indices) --- */
+    function recordEvidence(category) {
+        if (state.evidence.hasOwnProperty(category)) {
+            state.evidence[category] = Math.min(3, state.evidence[category] + 1);
+        }
+    }
+    function getEvidenceScore() {
+        var e = state.evidence;
+        return e.alibi + e.mobile + e.opportunity + e.forensic + e.witness + e.timeline;
+    }
+    function getEvidenceMax() { return 18; }
+
+    /* --- Évaluation de l'accusation --- */
+    function evaluateAccusation(suspectId) {
+        state.accused = suspectId;
+        var correct = (suspectId === state.culprit);
+        var score = getEvidenceScore();
+        var reaction = REACTIONS[suspectId] || REACTIONS['protecteur'];
+        return {
+            correct: correct,
+            score: score,
+            max: getEvidenceMax(),
+            reaction: t(reaction, state.lang),
+            truth: truth(),
+        };
+    }
+
     global.TDScenario = {
         reset: reset, getState: function () { return state; }, getTruth: truth,
         randomCulprit: randomCulprit, SUSPECTS: SUSPECTS, TRUTH: TRUTH, t: t,
+        recordEvidence: recordEvidence, getEvidenceScore: getEvidenceScore,
+        getEvidenceMax: getEvidenceMax, evaluateAccusation: evaluateAccusation,
+        REACTIONS: REACTIONS,
     };
 
 }(typeof globalThis !== 'undefined' ? globalThis : this));

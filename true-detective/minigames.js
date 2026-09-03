@@ -1,4 +1,4 @@
-/* =====================================================================
+﻿/* =====================================================================
    TRUE DETECTIVE — MINI-JEUX OPTIONNELS (bonus d'indices + timer)
    ---------------------------------------------------------------------
    Chaque mini-jeu est OPTIONNEL : le joueur peut toujours « Passer ».
@@ -21,6 +21,7 @@
 
         var content = document.createElement('div');
         content.className = 'minigame-content';
+        if (cfg.wide) content.classList.add('scene-wide');
         layer.appendChild(content);
 
         var title = document.createElement('div');
@@ -49,10 +50,70 @@
             resultAnnounced = true;
             if (timerId) clearInterval(timerId);
             if (won) cfg.bonusIndex = (cfg.bonusIndex || 1);
+            /* Enregistrer la catégorie de preuve pour le faisceau */
+            if (won && cfg.evidence && global.TDScenario) {
+                global.TDScenario.recordEvidence(cfg.evidence);
+            }
+            /* Récompense : panneau d'indice majeur + faisceau de preuves */
+            if (won && cfg.clue) {
+                var reward = document.createElement('div');
+                reward.className = 'clue-reward';
+                var rHead = document.createElement('div');
+                rHead.className = 'clue-reward-head';
+                rHead.textContent = lang === 'fr' ? '🔎 INDICE MAJEUR' : '🔎 MAJOR CLUE';
+                var rText = document.createElement('div');
+                rText.className = 'clue-reward-text';
+                rText.textContent = t(cfg.clue, lang);
+                reward.appendChild(rHead);
+                reward.appendChild(rText);
+                /* Faisceau de preuves (barres par catégorie) */
+                if (global.TDScenario) {
+                    var beam = document.createElement('div');
+                    beam.className = 'evidence-beam';
+                    var categories = [
+                        { key: 'alibi', label: lang === 'fr' ? 'Alibi' : 'Alibi' },
+                        { key: 'mobile', label: lang === 'fr' ? 'Mobile' : 'Motive' },
+                        { key: 'opportunity', label: lang === 'fr' ? 'Occasion' : 'Opportunity' },
+                        { key: 'forensic', label: lang === 'fr' ? 'Forensique' : 'Forensic' },
+                        { key: 'witness', label: lang === 'fr' ? 'Témoins' : 'Witnesses' },
+                        { key: 'timeline', label: lang === 'fr' ? 'Chronologie' : 'Timeline' },
+                    ];
+                    var st = global.TDScenario.getState();
+                    var score = global.TDScenario.getEvidenceScore();
+                    var max = global.TDScenario.getEvidenceMax();
+                    var beamTitle = document.createElement('div');
+                    beamTitle.className = 'evidence-beam-title';
+                    beamTitle.textContent = (lang === 'fr' ? 'FAISCEAUX DE PREUVES' : 'EVIDENCE BEAM') + ' — ' + score + '/' + max;
+                    beam.appendChild(beamTitle);
+                    categories.forEach(function (cat) {
+                        var row = document.createElement('div');
+                        row.className = 'evidence-row';
+                        var label = document.createElement('span');
+                        label.className = 'evidence-label';
+                        label.textContent = cat.label;
+                        var track = document.createElement('div');
+                        track.className = 'evidence-track';
+                        var fill = document.createElement('div');
+                        fill.className = 'evidence-fill';
+                        fill.style.width = ((st.evidence[cat.key] || 0) / 3 * 100) + '%';
+                        if ((st.evidence[cat.key] || 0) > 0) fill.classList.add('active');
+                        track.appendChild(fill);
+                        var count = document.createElement('span');
+                        count.className = 'evidence-count';
+                        count.textContent = (st.evidence[cat.key] || 0) + '/3';
+                        row.appendChild(label);
+                        row.appendChild(track);
+                        row.appendChild(count);
+                        beam.appendChild(row);
+                    });
+                    reward.appendChild(beam);
+                }
+                content.appendChild(reward);
+            }
             var btn = document.createElement('button');
             btn.className = 'btn btn-primary';
             btn.textContent = won
-                ? (lang === 'fr' ? 'Indice obtenu !' : 'Clue obtained !')
+                ? (lang === 'fr' ? 'Consigner l\u2019indice' : 'Record the clue')
                 : (lang === 'fr' ? 'Continuer' : 'Continue');
             btn.addEventListener('click', function () {
                 layer.classList.remove('active');
@@ -98,7 +159,7 @@
         body.className = 'minigame-body';
         content.appendChild(body);
         if (factory) {
-            factory(body);
+            factory(body, registerHint);
         } else {
             finish(true);
         }
@@ -116,33 +177,226 @@
     }
 
     /* ------------------------------------------------------------------
+       MONTRE_PHASE2 — cadrans + équerre draggable + question finale
+       (utilisé par le mini-jeu 'montre_code')
+    ------------------------------------------------------------------ */
+    function MONTRE_PHASE2(ctx) {
+        var body = ctx.body, lang = ctx.lang, wrap = ctx.wrap, dosWrap = ctx.dosWrap;
+        var engraveEls = ctx.engraveEls, answer = ctx.answer;
+        var getRevealed = ctx.getRevealed, setRevealed = ctx.setRevealed;
+        var ZOOM = 2.2, LOUPE_R = 75;
+
+        /* Cadrans — verrouillés tant que les gravures ne sont pas révélées */
+        var symbols = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        var pos = answer.map(function () { return 0; });
+        var dials = document.createElement('div');
+        dials.className = 'dial-row';
+        body.appendChild(dials);
+        var dialsEls = [];
+        answer.forEach(function (_, i) {
+            var d = document.createElement('button');
+            d.className = 'btn dial locked';
+            d.textContent = '—';
+            dials.appendChild(d);
+            dialsEls.push(d);
+            d.addEventListener('click', function () {
+                if (getRevealed() < answer.length) return;
+                pos[i] = (pos[i] + 1) % symbols.length;
+                d.textContent = symbols[pos[i]];
+                check();
+            });
+        });
+
+        var status = wrap.previousSibling;
+        function setStatus(txt) { if (status && status.classList && status.classList.contains('mg-status')) status.textContent = txt; }
+
+        /* Loupe grossissante : suit le curseur, magnifie le dos de la montre */
+        function moveLoupe(clientX, clientY) {
+            var loupe = dosWrap.querySelector('.loupe');
+            var inner = dosWrap.querySelector('.loupe-inner');
+            if (!loupe || !inner) return;
+            var r = dosWrap.getBoundingClientRect();
+            var cx = clientX - r.left, cy = clientY - r.top;
+            if (cx < 0 || cy < 0 || cx > r.width || cy > r.height) {
+                loupe.style.display = 'none';
+                return;
+            }
+            loupe.style.display = 'block';
+            loupe.style.left = cx + 'px';
+            loupe.style.top = cy + 'px';
+            inner.style.width = (r.width * ZOOM) + 'px';
+            inner.style.height = (r.height * ZOOM) + 'px';
+            inner.style.left = (LOUPE_R - cx * ZOOM) + 'px';
+            inner.style.top = (LOUPE_R - cy * ZOOM) + 'px';
+            engraveEls.forEach(function (el) {
+                if (el.dataset.done) return;
+                var er = el.getBoundingClientRect();
+                var dx = (er.left + er.width / 2) - clientX;
+                var dy = (er.top + er.height / 2) - clientY;
+                var dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 55) {
+                    el.dataset.done = '1';
+                    el.classList.add('seen');
+                    var idx = engraveEls.indexOf(el);
+                    var loupeDigits = dosWrap.querySelectorAll('.engrave-zone-loupe .engrave-digit');
+                    if (loupeDigits[idx]) loupeDigits[idx].classList.add('revealed');
+                    var n = engraveEls.filter(function (e2) { return e2.dataset.done; }).length;
+                    setRevealed(n);
+                    setStatus(lang === 'fr'
+                        ? ('Gravure déchiffrée (' + n + '/' + answer.length + ')…')
+                        : ('Engraving decoded (' + n + '/' + answer.length + ')…'));
+                    if (n >= answer.length) unlockDials();
+                }
+            });
+        }
+        function unlockDials() {
+            dialsEls.forEach(function (d) { d.classList.remove('locked'); });
+            setStatus(lang === 'fr'
+                ? 'Composez maintenant le numéro gravé sur les cadrans…'
+                : 'Now dial the engraved number…');
+        }
+        wrap.addEventListener('mousemove', function (e) { moveLoupe(e.clientX, e.clientY); });
+        wrap.addEventListener('mouseleave', function () {
+            var loupe = dosWrap.querySelector('.loupe');
+            if (loupe) loupe.style.display = 'none';
+        });
+        wrap.addEventListener('touchmove', function (e) {
+            e.preventDefault();
+            moveLoupe(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: false });
+        wrap.addEventListener('touchstart', function (e) {
+            moveLoupe(e.touches[0].clientX, e.touches[0].clientY);
+        });
+
+        /* Question finale : le dos a attiré l'attention… mais la face parle */
+        var questionBox = null;
+        function askSincerity() {
+            questionBox = document.createElement('div');
+            questionBox.className = 'sincerity-box';
+            var q = document.createElement('p');
+            q.className = 'sincerity-q';
+            q.textContent = lang === 'fr'
+                ? '« 1981 », gravé au dos… Mais qu\u2019avez-vous remarqué SUR LA FACE de la montre ?'
+                : '"1981" engraved on the back… But what did you notice on the WATCH FACE?';
+            questionBox.appendChild(q);
+            var yes = document.createElement('button');
+            yes.className = 'btn';
+            yes.textContent = lang === 'fr'
+                ? 'L\u2019aiguille figée à 22h09 : voilà l\u2019heure probable du crime — et 1981 ouvrira peut-être un coffre'
+                : 'The hand frozen at 10:09pm : that is the likely time of death — and 1981 may open a safe';
+            var no = document.createElement('button');
+            no.className = 'btn';
+            no.textContent = lang === 'fr'
+                ? 'Rien de plus : une montre cassée ne dit rien'
+                : 'Nothing else : a broken watch tells nothing';
+            yes.addEventListener('click', function () {
+                yes.classList.add('correct');
+                questionBox.classList.add('solved');
+                setStatus(lang === 'fr'
+                    ? 'Heure du crime établie : 22h09 (à confirmer). Ce détail sera décisif — et 1981 servira.'
+                    : 'Time of death established : 10:09pm (to be confirmed). This detail will matter — and 1981 will serve.');
+                ctx.complete(true);
+            });
+            no.addEventListener('click', function () {
+                no.classList.add('wrong');
+                setTimeout(function () { no.classList.remove('wrong'); }, 500);
+            });
+            questionBox.appendChild(yes);
+            questionBox.appendChild(no);
+            body.appendChild(questionBox);
+        }
+
+        function check() {
+            for (var i = 0; i < answer.length; i++) {
+                if (pos[i] !== answer[i]) return;
+            }
+            dialsEls.forEach(function (d) { d.classList.add('correct'); });
+            if (!questionBox) askSincerity();
+        }
+
+        ctx.registerHint(function () {
+            engraveEls.forEach(function (el) { if (!el.dataset.done) el.classList.add('hint'); });
+            if (getRevealed() >= answer.length) {
+                dialsEls.forEach(function (d, i) { if (pos[i] !== answer[i]) d.classList.add('hint'); });
+            }
+        });
+    }
+
+    /* ------------------------------------------------------------------
        BUILD_CREATORS — contient les fabriques de jeux
     ------------------------------------------------------------------ */
-    function BUILD_CREATORS(cfg, lang, complete) {
+    function BUILD_CREATORS(cfg, lang, complete, registerHint) {
 
     return {
 'scene_fouille': function (body) {
-            var spots = (cfg.hotspots || []).map(function (h) { return t(h, lang); });
+            var spots = (cfg.hotspots || []);
             var found = 0;
             var needed = spots.length;
-            var box = document.createElement('div');
-            box.className = 'fouille-box';
-            body.appendChild(box);
-            spots.forEach(function (label, i) {
-                var spot = document.createElement('button');
-                spot.className = 'fouille-spot';
-                spot.style.left = (12 + i * 26) + '%';
-                spot.style.top = (18 + (i % 3) * 24) + '%';
-                spot.textContent = '?';
-                spot.addEventListener('click', function () {
-                    if (spot.dataset.done) return;
+
+            var wrap = document.createElement('div');
+            wrap.className = 'fouille-scene';
+            wrap.style.backgroundImage = 'url(' + (cfg.sceneImage || 'assets/image true detective/lieux/classic/scene de crime manoir.png') + ')';
+            body.appendChild(wrap);
+
+            /* Loupe : grossit la scène sous le curseur */
+            var loupe = document.createElement('div');
+            loupe.className = 'scene-loupe';
+            var ZOOM = 2, LR = 95;
+            wrap.appendChild(loupe);
+            function moveLoupe(clientX, clientY) {
+                var r = wrap.getBoundingClientRect();
+                var cx = clientX - r.left, cy = clientY - r.top;
+                if (cx < 0 || cy < 0 || cx > r.width || cy > r.height) { loupe.style.display = 'none'; return; }
+                loupe.style.display = 'block';
+                loupe.style.left = cx + 'px';
+                loupe.style.top = cy + 'px';
+                loupe.style.backgroundSize = (r.width * ZOOM) + 'px ' + (r.height * ZOOM) + 'px';
+                loupe.style.backgroundPosition = (LR - cx * ZOOM) + 'px ' + (LR - cy * ZOOM) + 'px';
+            }
+            wrap.addEventListener('mousemove', function (e) { moveLoupe(e.clientX, e.clientY); });
+            wrap.addEventListener('mouseleave', function () { loupe.style.display = 'none'; });
+            wrap.addEventListener('touchmove', function (e) {
+                e.preventDefault(); moveLoupe(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: false });
+            wrap.addEventListener('touchstart', function (e) { moveLoupe(e.touches[0].clientX, e.touches[0].clientY); });
+
+            /* Fenêtre d'indice de zone */
+            var win = null;
+            function openZoneWin(h, spot) {
+                if (win) win.remove();
+                win = document.createElement('div');
+                win.className = 'zone-window';
+                var head = document.createElement('div');
+                head.className = 'zone-window-head';
+                head.textContent = (lang === 'fr' ? 'Pièce à conviction ' : 'Evidence ') + h.label;
+                var txt = document.createElement('div');
+                txt.className = 'zone-window-text';
+                txt.textContent = t(h.info, lang);
+                var close = document.createElement('button');
+                close.className = 'btn zone-window-close';
+                close.textContent = lang === 'fr' ? 'Poursuivre l\u2019examen' : 'Keep examining';
+                close.addEventListener('click', function () { win.remove(); win = null; });
+                win.appendChild(head); win.appendChild(txt); win.appendChild(close);
+                body.appendChild(win);
+                if (!spot.dataset.done) {
                     spot.dataset.done = '1';
-                    spot.textContent = '✓';
                     spot.classList.add('found');
                     found++;
+                }
+            }
+
+            spots.forEach(function (h) {
+                var spot = document.createElement('button');
+                spot.className = 'fouille-zone';
+                spot.style.left = h.x + '%';
+                spot.style.top = h.y + '%';
+                spot.textContent = h.label;
+                spot.title = lang === 'fr' ? 'Examiner' : 'Examine';
+                spot.addEventListener('click', function () {
+                    openZoneWin(h, spot);
                     if (found >= needed) complete(true);
                 });
-                box.appendChild(spot);
+                wrap.appendChild(spot);
             });
         },
 
@@ -332,47 +586,107 @@
             var wrap = document.createElement('div');
             wrap.className = 'mg-scene mg-montre';
             var face = document.createElement('img');
-            face.className = 'mg-item';
-            face.src = 'mini-games/montre/montre-du-duc-face.jpg';
+            face.className = 'mg-item mg-montre-face';
+            face.src = 'mini-games/montre/montre-du-duc-face.png';
+            face.title = lang === 'fr' ? 'La montre figée à 22h09…' : 'The watch frozen at 10:09pm…';
+            var dosWrap = document.createElement('div');
+            dosWrap.className = 'mg-dos-wrap';
             var dos = document.createElement('img');
-            dos.className = 'mg-item';
+            dos.className = 'mg-item mg-montre-dos';
             dos.src = 'mini-games/montre/montre-du-duc-dos.png';
+            dosWrap.appendChild(dos);
             wrap.appendChild(face);
-            wrap.appendChild(dos);
-            var equerre = document.createElement('img');
-            equerre.className = 'mg-equerre';
-            equerre.src = 'mini-games/montre/equerre-lumineux.png';
-            wrap.appendChild(equerre);
-            body.appendChild(wrap);
-            var symbols = (cfg.symbols || ['◁', '◆', '●', '✕']);
-            var answer = (cfg.code || [1, 2, 0, 3]).slice();
-            var pos = answer.map(function () { return 0; });
-            var dials = document.createElement('div');
-            dials.className = 'dial-row';
-            body.appendChild(dials);
-            var dialsEls = [];
+            wrap.appendChild(dosWrap);
+
+            /* Gravures cachées sur le dos de la montre (lisibles à la loupe) */
+            var answer = (cfg.code || [1, 9, 8, 1]).slice();
+            var engravBox = document.createElement('div');
+            engravBox.className = 'engrave-zone';
+            var engraveEls = [];
+            var revealed = 0;
+            var loupe = document.createElement('div');
+            loupe.className = 'loupe';
+            var loupeInner = document.createElement('div');
+            loupeInner.className = 'loupe-inner';
+            var loupeImg = document.createElement('img');
+            loupeImg.src = dos.src;
+            loupeInner.appendChild(loupeImg);
+            var loupeZone = document.createElement('div');
+            loupeZone.className = 'engrave-zone engrave-zone-loupe';
             answer.forEach(function (_, i) {
-                var d = document.createElement('button');
-                d.className = 'btn dial';
-                d.textContent = symbols[0];
-                dials.appendChild(d);
-                dialsEls.push(d);
-                d.addEventListener('click', function () {
-                    pos[i] = (pos[i] + 1) % symbols.length;
-                    d.textContent = symbols[pos[i]];
-                    check();
+                var s = document.createElement('span');
+                s.className = 'engrave-digit';
+                s.textContent = answer[i];
+                engravBox.appendChild(s);
+                engraveEls.push(s);
+                var s2 = document.createElement('span');
+                s2.className = 'engrave-digit';
+                s2.textContent = answer[i];
+                loupeZone.appendChild(s2);
+            });
+            loupeInner.appendChild(loupeZone);
+            loupe.appendChild(loupeInner);
+            dosWrap.appendChild(loupe);
+
+            var status = document.createElement('div');
+            status.className = 'mg-status';
+            status.textContent = lang === 'fr'
+                ? 'Passez la loupe sur le dos de la montre : les gravures ne sont lisibles qu\u2019au grossissement…'
+                : 'Sweep the magnifier over the watch back : the engravings are only readable when magnified…';
+            body.appendChild(status);
+            body.appendChild(wrap);
+            MONTRE_PHASE2({
+                body: body, registerHint: registerHint, lang: lang, complete: complete,
+                wrap: wrap, dosWrap: dosWrap, engraveEls: engraveEls, answer: answer,
+                getRevealed: function () { return revealed; }, setRevealed: function (v) { revealed = v; }
+            });
+        },
+
+        /* Coffre-fort de l'Acte 2 — le code 1981 de la montre récompense le joueur attentif */
+        'coffre_code': function (body) {
+            var wrap = document.createElement('div');
+            wrap.className = 'mg-scene mg-coffre';
+            var img = document.createElement('img');
+            img.className = 'mg-item mg-coffre-img';
+            img.src = 'mini-games/coffre/coffre-fort.png';
+            wrap.appendChild(img);
+            body.appendChild(wrap);
+            var answer = (cfg.code || [1, 9, 8, 1]).join('');
+            var input = '';
+            var padBtn = document.createElement('input');
+            padBtn.className = 'safe-input';
+            padBtn.readOnly = true;
+            body.appendChild(padBtn);
+            var pad = document.createElement('div');
+            pad.className = 'num-pad';
+            body.appendChild(pad);
+            ['1','2','3','4','5','6','7','8','9'].forEach(function (k) {
+                var b = document.createElement('button');
+                b.className = 'btn num-key';
+                b.textContent = k;
+                b.addEventListener('click', function () {
+                    if (input.length >= answer.length) return;
+                    input += k;
+                    padBtn.value = input;
+                    if (input.length === answer.length) {
+                        if (input === answer) {
+                            padBtn.classList.add('correct');
+                            /* animation : la porte s'ouvre */
+                            img.classList.add('coffre-open');
+                            setTimeout(function () { complete(true); }, 700);
+                        } else {
+                            padBtn.classList.add('wrong');
+                            setTimeout(function () { padBtn.classList.remove('wrong'); padBtn.value = ''; input = ''; }, 500);
+                        }
+                    }
                 });
+                pad.appendChild(b);
             });
-            function check() {
-                for (var i = 0; i < answer.length; i++) {
-                    if (pos[i] !== answer[i]) return;
-                }
-                dialsEls.forEach(function (d) { d.classList.add('correct'); });
-                complete(true);
-            }
-            registerHint(function () {
-                dialsEls.forEach(function (d, i) { if (pos[i] !== answer[i]) d.classList.add('hint'); });
-            });
+            var del = document.createElement('button');
+            del.className = 'btn num-key del';
+            del.textContent = '⌫';
+            del.addEventListener('click', function () { input = input.slice(0, -1); padBtn.value = input; });
+            pad.appendChild(del);
         },
 
         'chronos_roue': function (body, registerHint) {
@@ -418,6 +732,196 @@
             registerHint(function () {
                 gearEls.forEach(function (b) { if (!b.dataset.done && b.textContent === gears[idx]) b.classList.add('hint'); });
             });
+        },
+
+        'carnet_dechire': function (body, registerHint) {
+            var wrap = document.createElement('div');
+            wrap.className = 'mg-scene carnet-scene';
+            wrap.style.backgroundImage = 'url(mini-games/prescription/prescription-eliane.png)';
+            body.appendChild(wrap);
+            var strips = [
+                { fr: '…versement de 12 000 £ à V.K.', en: '…payment of £12,000 to V.K.', order: 0 },
+                { fr: '…pour services rendus — contrat', en: '…for services rendered — contract', order: 1 },
+                { fr: '…le 14 du mois, comme convenu…', en: '…on the 14th of the month, as agreed…', order: 2 },
+                { fr: '…ne pas laisser de traces', en: '…leave no traces', order: 3 }
+            ];
+            var currentOrder = strips.slice().sort(function () { return Math.random() - 0.5; });
+            var stripEls = [];
+            var list = document.createElement('div');
+            list.className = 'carnet-strips';
+            body.appendChild(list);
+            currentOrder.forEach(function (s) {
+                var el = document.createElement('div');
+                el.className = 'carnet-strip';
+                el.textContent = t(s, lang);
+                el.dataset.origOrder = s.order;
+                list.appendChild(el);
+                stripEls.push(el);
+            });
+            /* --- Phase 2 : empreintes digitales sur la page reconstituée --- */
+            var fingerprints = [
+                { x: 30, y: 55, found: false, label: { fr: 'Empreinte sur la mention V.K.', en: 'Fingerprint on the V.K. mention' } },
+                { x: 45, y: 38, found: false, label: { fr: 'Empreinte près du 14 — la date du contrat', en: 'Fingerprint near the 14th — contract date' } },
+                { x: 62, y: 68, found: false, label: { fr: 'Empreinte sur le montant — 12 000 £', en: 'Fingerprint on the amount — £12,000' } },
+                { x: 75, y: 42, found: false, label: { fr: 'Empreinte sur la signature', en: 'Fingerprint on the signature' } }
+            ];
+            var fpFound = 0;
+            var loupe = document.createElement('div');
+            loupe.className = 'carnet-loupe';
+            loupe.style.display = 'none';
+            wrap.appendChild(loupe);
+            var fpEls = [];
+            fingerprints.forEach(function (fp, i) {
+                var zone = document.createElement('div');
+                zone.className = 'carnet-fp-zone';
+                zone.style.left = fp.x + '%';
+                zone.style.top = fp.y + '%';
+                zone.dataset.idx = i;
+                wrap.appendChild(zone);
+                fpEls.push(zone);
+                zone.addEventListener('click', function () {
+                    if (fp.found) return;
+                    fp.found = true;
+                    fpFound++;
+                    zone.classList.add('found');
+                    var toast = document.createElement('div');
+                    toast.className = 'carnet-clue-toast';
+                    toast.textContent = (lang === 'fr' ? 'Empreinte relevée (' : 'Fingerprint found (') + fpFound + '/' + fingerprints.length + ') : ' + t(fp.label, lang);
+                    body.appendChild(toast);
+                    setTimeout(function () { toast.remove(); }, 2500);
+                    if (fpFound >= 3) complete(true);
+                });
+            });
+            var carnetMousemoveHandler = function (e) {
+                var rect = wrap.getBoundingClientRect();
+                var x = ((e.clientX - rect.left) / rect.width) * 100;
+                var y = ((e.clientY - rect.top) / rect.height) * 100;
+                loupe.style.display = 'block';
+                loupe.style.left = x + '%';
+                loupe.style.top = y + '%';
+            };
+            var carnetMouseleaveHandler = function () { loupe.style.display = 'none'; };
+            var activateFingerprints = function () {
+                list.classList.add('solved');
+                wrap.classList.add('loupe-active');
+                wrap.addEventListener('mousemove', carnetMousemoveHandler);
+                wrap.addEventListener('mouseleave', carnetMouseleaveHandler);
+                var hint = document.createElement('div');
+                hint.className = 'carnet-hint';
+                hint.textContent = lang === 'fr' ? '🔍 Loupe active — relevez au moins 3 empreintes sur la page.' : '🔍 Magnifier active — find at least 3 fingerprints on the page.';
+                body.appendChild(hint);
+            };
+            var selectedIdx = -1;
+            stripEls.forEach(function (el, i) {
+                el.addEventListener('click', function () {
+                    if (el.dataset.locked === '1') return;
+                    if (selectedIdx === -1) { selectedIdx = i; el.classList.add('selected'); }
+                    else {
+                        var other = stripEls[selectedIdx];
+                        other.classList.remove('selected');
+                        var tmp = other.textContent; other.textContent = el.textContent; el.textContent = tmp;
+                        var tmpO = other.dataset.origOrder; other.dataset.origOrder = el.dataset.origOrder; el.dataset.origOrder = tmpO;
+                        selectedIdx = -1; checkCarnet();
+                    }
+                });
+            });
+            function checkCarnet() {
+                if (stripEls.every(function (el, i) { return parseInt(el.dataset.origOrder, 10) === i; })) {
+                    stripEls.forEach(function (el) { el.dataset.locked = '1'; el.classList.add('locked'); });
+                    activateFingerprints();
+                }
+            }
+            registerHint(function () { stripEls.forEach(function (el, i) { if (el.dataset.locked !== '1' && parseInt(el.dataset.origOrder, 10) !== i) el.classList.add('hint'); }); });
+        },
+
+        'cryptogramme': function (body, registerHint) {
+            var wrap = document.createElement('div');
+            wrap.className = 'mg-scene crypto-scene';
+            wrap.style.backgroundImage = 'url(mini-games/puzzle/krane-coded-note.png.jfif)';
+            body.appendChild(wrap);
+            var message = { fr: 'HALE ENGAGE KRANE', en: 'HALE HIRES KRANE' };
+            var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            var shift = 0; while (shift === 0 || shift === 13) shift = Math.floor(Math.random() * 24) + 1;
+            var encoded = '', plain = t(message, lang).toUpperCase();
+            for (var i = 0; i < plain.length; i++) { var idx = alphabet.indexOf(plain[i]); encoded += idx === -1 ? plain[i] : alphabet[(idx + shift) % 26]; }
+            var keyBox = document.createElement('div'); keyBox.className = 'crypto-key';
+            keyBox.textContent = (lang === 'fr' ? 'Clé de lecture : +' : 'Cipher key: +') + shift;
+            body.appendChild(keyBox);
+            var encodedEl = document.createElement('div'); encodedEl.className = 'crypto-encoded'; encodedEl.textContent = encoded;
+            body.appendChild(encodedEl);
+            var input = document.createElement('input'); input.className = 'crypto-input';
+            input.placeholder = lang === 'fr' ? 'Décodez le message…' : 'Decode the message…'; input.maxLength = 30;
+            body.appendChild(input);
+            var submit = document.createElement('button'); submit.className = 'btn';
+            submit.textContent = lang === 'fr' ? 'Vérifier' : 'Check'; body.appendChild(submit);
+            submit.addEventListener('click', function () {
+                if (input.value.trim().toUpperCase() === plain) complete(true);
+                else { input.classList.add('wrong'); setTimeout(function () { input.classList.remove('wrong'); }, 400); }
+            });
+            registerHint(function () { input.value = plain.substring(0, 3); });
+        },
+
+        'cablage_alarme': function (body, registerHint) {
+            var wrap = document.createElement('div');
+            wrap.className = 'mg-scene cablage-scene';
+            wrap.style.backgroundImage = 'url(mini-games/puzzle/alarm-circuit-blueprint.png.jfif)';
+            body.appendChild(wrap);
+            var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('viewBox', '0 0 400 200'); svg.className = 'cablage-svg'; body.appendChild(svg);
+            var nodes = [{x:60,y:100},{x:140,y:50},{x:220,y:100},{x:300,y:50},{x:340,y:100}];
+            var segments = [{from:0,to:1,correct:0},{from:1,to:2,correct:2},{from:2,to:3,correct:1},{from:3,to:4,correct:0}];
+            var state = segments.map(function () { return Math.floor(Math.random() * 3); });
+            var segEls = [];
+            segments.forEach(function (seg, i) {
+                var n1 = nodes[seg.from], n2 = nodes[seg.to];
+                var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', n1.x); line.setAttribute('y1', n1.y);
+                line.setAttribute('x2', n2.x); line.setAttribute('y2', n2.y);
+                line.setAttribute('stroke', '#c9a227'); line.setAttribute('stroke-width', '4');
+                line.setAttribute('stroke-dasharray', state[i] === seg.correct ? '0' : '6 4');
+                line.style.cursor = 'pointer'; line.dataset.idx = i; svg.appendChild(line); segEls.push(line);
+                line.addEventListener('click', function () {
+                    state[i] = (state[i] + 1) % 3;
+                    line.setAttribute('stroke-dasharray', state[i] === seg.correct ? '0' : '6 4');
+                    line.setAttribute('stroke', state[i] === seg.correct ? '#7fd48a' : '#c9a227');
+                    checkCablage();
+                });
+            });
+            nodes.forEach(function (n) { var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); c.setAttribute('cx', n.x); c.setAttribute('cy', n.y); c.setAttribute('r', '8'); c.setAttribute('fill', '#f0d890'); svg.appendChild(c); });
+            function checkCablage() { if (segments.every(function (seg, i) { return state[i] === seg.correct; })) complete(true); }
+            registerHint(function () { segEls.forEach(function (line, i) { if (state[i] !== segments[i].correct) line.setAttribute('stroke', '#d8574a'); }); });
+        },
+
+        'roue_alibis': function (body, registerHint) {
+            var wrap = document.createElement('div');
+            wrap.className = 'mg-scene roue-scene';
+            wrap.style.backgroundImage = 'url(mini-games/puzzle/pocket-watch-dial.png.jfif)';
+            body.appendChild(wrap);
+            var dial = document.createElement('div'); dial.className = 'roue-dial'; body.appendChild(dial);
+            var cursors = [
+                { label: lang === 'fr' ? 'Montre (22h09)' : 'Watch (10:09pm)', target: 22.15, color: '#7fd48a' },
+                { label: lang === 'fr' ? 'Horloge-mère' : 'Grandfather clock', target: 22.15, color: '#f0d890' },
+                { label: lang === 'fr' ? 'Alibi de Hale' : "Hale's alibi", target: 20.0, color: '#d8574a' }
+            ];
+            var cursorEls = [];
+            cursors.forEach(function (c) {
+                var row = document.createElement('div'); row.className = 'roue-row';
+                var lbl = document.createElement('span'); lbl.className = 'roue-label'; lbl.textContent = c.label; row.appendChild(lbl);
+                var track = document.createElement('div'); track.className = 'roue-track';
+                var fill = document.createElement('div'); fill.className = 'roue-fill'; fill.style.background = c.color; fill.style.width = '0%';
+                track.appendChild(fill); row.appendChild(track);
+                var slider = document.createElement('input'); slider.type = 'range'; slider.min = '18'; slider.max = '24'; slider.step = '0.25'; slider.value = '18'; slider.className = 'roue-slider'; row.appendChild(slider);
+                var val = document.createElement('span'); val.className = 'roue-val'; val.textContent = '18:00'; row.appendChild(val);
+                dial.appendChild(row);
+                cursorEls.push({ el: fill, val: val, slider: slider, target: c.target });
+                slider.addEventListener('input', function () {
+                    var v = parseFloat(slider.value); fill.style.width = ((v - 18) / 6) * 100 + '%';
+                    var h = Math.floor(v); var m = Math.round((v - h) * 60);
+                    val.textContent = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m; checkRoue();
+                });
+            });
+            function checkRoue() { if (cursorEls.every(function (c) { return Math.abs(parseFloat(c.slider.value) - c.target) < 0.3; })) complete(true); }
+            registerHint(function () { cursorEls.forEach(function (c) { if (Math.abs(parseFloat(c.slider.value) - c.target) >= 0.3) { c.slider.value = c.target; c.el.style.width = ((c.target - 18) / 6) * 100 + '%'; var h = Math.floor(c.target); var m = Math.round((c.target - h) * 60); c.val.textContent = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m; } }); });
         },
 
         'cable_match': function (body, registerHint) {

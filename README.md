@@ -85,3 +85,44 @@ Interact with the AI assistant from the main hub:
 *   Get Jackpot challenges
 *   Get game recommendations
 *   Ask for rules and tips
+
+## 🕵️ True Detective — Pont de scénario
+
+True Detective possède un **document canonique** (`true-detective/scenario-complet.md`) qui sert de base de travail narrative. Un petit « pont » vérifie que ce document reste aligné avec le code de l'app (`phases.js`), puis expose la lecture/écriture du scénario à travers l'API du serveur.
+
+### Pourquoi
+La face cachée de l'app : elle peut **écrire un scénario complet dans un fichier** et l'améliorer en continu. Ce pont matérialise cette capacité — `scenario-complet.md` est la source de vérité, `phases.js` est l'implémentation.
+
+### Validation (CLI)
+```bash
+npm run validate:scenario
+# ou
+node tools/validate-scenario.js
+```
+Compare le doc et l'app et liste les **dérives** (bloquantes) et **avertissements** (info). Vérifie notamment :
+- que chaque mini-jeu `type` du doc existe dans `phases.js` (et inversement),
+- les codes `1981` montre / coffre et que l'heure du crime n'est **pas** établie dans l'intro,
+- que chaque mini-jeu a un `clue` de récompense,
+- la présence des choix clés (`choisirSuspect`, `accuser`).
+
+### Endpoints serveur
+| Méthode | Route | Description |
+|---|---|---|
+| GET | `/api/scenario` | Renvoie le document markdown (source de vérité) |
+| POST | `/api/scenario` | Écrit une nouvelle version (`{ content }`) + **backup horodaté** auto |
+| GET | `/api/scenario/validate` | Renvoie le résultat de la validation (JSON) |
+
+### Flux recommandé
+1. On améliore le scénario **dans `scenario-complet.md`** (ou via `POST /api/scenario`).
+2. On reporte le changement dans `phases.js`.
+3. `npm run validate:scenario` confirme que tout est aligné.
+
+Chaque `POST /api/scenario` crée automatiquement un backup (`scenario-complet.backup-<horodatage>.md`) : jamais de perte de travail.
+
+### Structure du pont
+```
+tools/scenario-bridge.js     — logique (lecture/écriture/validation)
+tools/validate-scenario.js   — CLI
+server.js                    — expose /api/scenario*
+true-detective/scenario-complet.md — document canonique
+```
