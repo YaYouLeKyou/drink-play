@@ -54,8 +54,8 @@
 
     N.act2_2 = {
         page1: { fr: "Au laboratoire, Whitmore vous tend une clé USB : « Les analyses ADN sont sans appel. L'échantillon B appartient au criminel. »", en: "At the laboratory, Whitmore hands you a USB drive : \"The DNA analyses are conclusive. Sample B belongs to the criminal.\"" },
-        page2: { fr: "De retour au quartier général, le schéma de l'alarme révèle que le câble a été marqué au charbon AVANT le sabotage — même signature qu'un outil de garagiste. C'est un détail technique : la même main qui a saboté ce câble a aussi sectionné la durite de la voiture de Pembrooke.", en: "Back at headquarters, the alarm blueprint reveals the cable was marked with charcoal BEFORE the sabotage — the same signature as a garage tool. That's a technical detail : the same hand that sabotaged this cable also cut Pembrooke's car hose." },
-        page3: { fr: "Au manoir, la montre du Duc est intacte. Le Major Hale détourne le regard quand vous la montrez.", en: "At the manor, the Duke's watch is intact. Major Hale looks away when you show it." }
+        page2: { fr: "Au laboratoire, Whitmore pointe le schéma de l'alarme : « Ce câble a été marqué au charbon AVANT le sabotage — même signature qu'un outil de garagiste. C'est la même main qui a saboté ce câble et sectionné la durite de la voiture de Pembrooke. »", en: "At the laboratory, Whitmore points at the alarm blueprint : \"This cable was marked with charcoal BEFORE the sabotage — the same signature as a garage tool. The same hand sabotaged this cable and cut Pembrooke's car hose.\"" },
+        page3: { fr: "Au laboratoire, Whitmore feuillette ses notes : « Une dernière chose — le rapport toxicologique ne montre aucune trace de lutte. La victime n'a pas opposé de résistance. Elle connaissait son agresseur. »", en: "At the laboratory, Whitmore flips through his notes : \"One last thing — the toxicology report shows no sign of a struggle. The victim didn't resist. She knew her assailant.\"" }
     };
 
     N.act3_1 = {
