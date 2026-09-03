@@ -1,22 +1,24 @@
-﻿/* =====================================================================
+/* =====================================================================
    TRUE DETECTIVE — PHASES & DIALOGUES (contenu narratif V3)
-   ---------------------------------------------------------------------
    Structure : 9 phases de 3 pages chacune.
-   types :
-     - 'narration' : pas \'nteraction, bouton continuer
-     - 'dialogue'  : un PNJ parle (+ éventuellement mini-jeu/choix)
-   Chaque page : { text:{fr,en}, decor:clé-asset|URL, npc:id|null,
-                   choices?, minigame?, choiceKey?, nextChoice? }
-   Le runner (app.js) consomme window.TDPhases.
+
+   RÈGLE GÉNÉRALE — LIEUX DES PERSONNAGES (hors besoin du scénario) :
+   - Scientifique (Whitmore)        → laboratoire
+   - Femme fatale (Lady Vivienne)   → intérieur manoir de la victime
+   - Protecteur (Major Hale)        → intérieur manoir de la victime
+   - Détective partenaire           → quartier général (QG)
+                                      Exception : intro + acte 1,
+                                      il est dans le manoir de la victime.
+   - Séducteur (Julian Pembrooke)   → intérieur bar
+   - Marginal (Silas Crane)         → appartement pauvre (ruelle en narration si scénario l'exige)
+   - Suspect (Rupert Blackwood)     → appartement du suspect
+   - Criminel (Victor Krane)        → extérieur bar ou ruelle
 ===================================================================== */
 (function (global) {
     'use strict';
-
     var PHASES = [];
 
-    /* ------------------------------------------------------------------
-       INTRO — Phase 1A : NARRATION \'UVERTURE (musique thème)
-    ------------------------------------------------------------------ */
+    /* ===== INTRO — Phase 1A : OUVERTURE ===== */
     PHASES.push({
         id: 'intro-1',
         label: { fr: 'Prologue', en: 'Prologue' },
@@ -24,34 +26,13 @@
         type: 'narration',
         music: 'theme',
         pages: [
-            { // page 1
-                decor: 'universe',
-                text: {
-                    fr: 'La ville murmure sous la pluie. Dans un appartement cossu, un magnat de \'mmobilier a été retrouvé sans vie. On vous a confié \'nquête : la plus délicate de votre carrière.',
-                    en: 'The city whispers under the rain. In a lavish flat, a real-estate magnate was found dead. You have been assigned the case : the most delicate of your career.'
-                }
-            },
-            { // page 2
-                decor: 'crimeScene',
-                text: {
-                    fr: 'Vous poussez la porte de la scène de crime. Le sang a séché sur le parquet, le coffre est béant, et sur une table gît une montre de poche brisée. Personne ne sait encore quand le magnat est mort : aucune heure \'st établie. \'st à vous de la trouver.',
-                    en: 'You push open the door of the crime scene. Blood has dried on the floor, the safe gapes open, and on a table lies a broken pocket watch. No one knows yet when the magnate died : no time of death is established. Finding it is your job.'
-                }
-            },
-            { // page 3
-                decor: 'crimeScene',
-                npc: 'detective-partner',
-                text: {
-                    fr: 'Votre partenaire vous rejoint, \'ir grave : « La victime, un magnat, \' q\'n seul domestique : son garde du corps, le Major Hale. \'st lui qui a découvert le corps. \'ffaire commence ici. »',
-                    en: 'Your partner joins you, looking grave : "The victim, a tycoon, had one servant : his bodyguard, Major Hale. He found the body. The case begins here."'
-                }
-            }
+            { decor: 'universe', text: { fr: "La ville murmure sous la pluie. Dans un appartement cossu, un magnat de l'immobilier a été retrouvé sans vie. On vous a confié l'enquête : la plus délicate de votre carrière.", en: "The city whispers under the rain. In a lavish flat, a real-estate magnate was found dead. You have been assigned the case : the most delicate of your career." } },
+            { decor: 'crimeScene', text: { fr: "Vous poussez la porte de la scène de crime. Le sang a séché sur le parquet, le coffre est béant, et sur une table gît une montre de poche brisée. Personne ne sait encore quand le magnat est mort : aucune heure n'est établie. C'est à vous de la trouver.", en: "You push open the door of the crime scene. Blood has dried on the floor, the safe gapes open, and on a table lies a broken pocket watch. No one knows yet when the magnate died : no time of death is established. Finding it is your job." } },
+            { decor: 'crimeScene', npc: 'detective-partner', text: { fr: "Votre partenaire vous rejoint, l'air grave : « La victime, un magnat, n'avait qu'un seul domestique : son garde du corps, le Major Hale. C'est lui qui a découvert le corps. L'affaire commence ici. »", en: "Your partner joins you, looking grave : \"The victim, a tycoon, had one servant : his bodyguard, Major Hale. He found the body. The case begins here.\"" } }
         ]
     });
 
-    /* ------------------------------------------------------------------
-       INTRO — Phase 1B : RECHERCHE (musique recherche.mp3)
-    ------------------------------------------------------------------ */
+    /* ===== INTRO — Phase 1B : FOUILLE DE LA SCÈNE ===== */
     PHASES.push({
         id: 'intro-2',
         label: { fr: 'Recherche', en: 'Investigation' },
@@ -59,515 +40,128 @@
         type: 'dialogue',
         music: 'recherche',
         pages: [
-            { // page 1 — interrogation partenaire + minigame scène
-                decor: 'crimeScene',
-                npc: 'detective-partner',
-                minigame: {
-                    type: 'scene_fouille',
-                    wide: true,
-                    title: { fr: 'Fouille de la scène', en: 'Scene search' },
-                    desc: { fr: 'Balayez la scène à la loupe. Chaque pièce à conviction numérotée ouvre une fenêtre : examinez-les toutes.', en: 'Sweep the scene with the magnifier. Each numbered evidence opens a window : examine them all.' },
-                    time: 60,
-                    sceneImage: 'assets/image true detective/lieux/classic/scene de crime manoir.png',
-                    hotspots: [
-                    { label: '1', info: { fr: 'Un cachet de cire intact. Personne n a force le bureau : l assassin connaissait la maison ou y avait acces.', en: 'An intact wax seal. No one forced the desk : the killer knew the house or had access to it.' } },
-                    { label: '2', info: { fr: 'La carafe renversee. DEUX verres ont ete utilises : la victime attendait quelqu un en qui elle avait confiance.', en: 'The overturned decanter. TWO glasses were used : the victim was expecting someone they trusted.' } },
-                    { label: '3', info: { fr: 'Un livre de comptes tache de sang. Plusieurs pages d impayes arrachees : celles qui mentionnaient les dettes de Hale.', en: 'A blood-stained ledger. Several debt pages torn out : the ones mentioning Hale\'s debts.' } },
-                    { label: 'A', info: { fr: 'Sous l encrier renverse, une lettre a moitie brulee : des menaces redigees d une ecriture elegante.', en: 'Under the overturned inkwell, a half-burned letter : threats in an elegant hand.' } },
-                    { label: 'C', info: { fr: 'L autre encrier est intact et la plume seche : on a ecrit ici AVANT le meurtre, pas apres.', en: 'The other inkwell is untouched and the pen dry : writing happened here BEFORE the murder.' } },
-                    { label: '4', info: { fr: 'Un fauteuil renverse pres de la fenetre : la lutte a ete breve, loin du bureau.', en: 'An overturned chair by the window : the struggle was brief, away from the desk.' } },
-                    { label: '5', info: { fr: 'La mare de sang, la victime face a son effigie, aucune trace de defense : elle connaissait son agresseur.', en: 'The pool of blood, the victim facing his portrait, no trace of defense : he knew his attacker.' } },
-                    { label: '6', info: { fr: 'Pres de la main : un recu froisse signe V.K. - une forte somme en especes.', en: 'Near the hand : a crumpled receipt signed "V.K." - a large sum in cash.' } }
-                ],
-                    evidence: 'forensic',
-                    clue: { fr: 'Un proche de confiance, deux verres, des dettes effacees, une ecriture elegante et un recu signe V.K. Le meurtre etait prevu - le vol, simule.', en: 'A trusted close one, two glasses, erased debts, elegant handwriting and a receipt signed "V.K.". The murder was planned - the robbery, staged.' }
-                },
-                text: {
-                    fr: '« Examinez la pièce avant de poser vos questions », souffle le partenaire. Vous inspectez chaque recoin : la scène raconte une histoire que seul un œil aiguisé peut lire.',
-                    en: '"Examine the room before asking questions," your partner whispers. You inspect every corner : the scene tells a story only a sharp eye can read.'
-                }
-            },
-            { // page 2 — Carnet déchiré (mini-puzzle)
-                decor: 'crimeScene',
-                npc: 'detective-partner',
-                minigame: {
-                    type: 'carnet_dechire',
-                    title: { fr: 'Le Carnet déchiré', en: 'The Torn Ledger' },
-                    desc: { fr: 'Reconstituez les pages arrachées du livre de comptes pour révéler un versement à « V.K. ».', en: 'Reassemble the torn ledger pages to reveal a payment to V.K..' },
-                    time: 40,
-                    asset: 'mini-games/prescription/prescription-eliane.png',
-                    strips: [
-                        { fr: '...versement de 5 000 £ à', en: '...payment of £5,000 to', order: 0 },
-                        { fr: '...V.K. pour services', en: '... V.K. for services', order: 1 },
-                        { fr: '...rendez-vous le 14 au soir', en: '...meeting on the 14th evening', order: 2 },
-                        { fr: '...ne pas laisser de traces', en: '...leave no traces', order: 3 }
-                    ],
-                    evidence: 'mobile',
-                    clue: { fr: 'Le carnet reconstitue revele des versements reguliers a V.K. (Victor Krane). Le mobile financier de Hale est etabli.', en: 'The rebuilt ledger reveals regular payments to V.K. (Victor Krane). Hale\'s financial motive is proven.' }
-                },
-                text: {
-                    fr: 'Regardez — les pages arrachées du livre de comptes. quelqu\'un a voulu effacer les dettes.',
-                    en: 'Look — the torn pages from the ledger. Someone wanted to erase the debts.'
-                }
-            },
-            { // page 3 — le Major Hale
-                decor: 'crimeScene',
-                npc: 'protecteur',
-                text: {
-                    fr: 'Le Major Hale tremble : « Je suis parti à 20h dépanner Julian Pembrooke en panne. À mon retour, 21h, je je l\'ai trouvé... sur le sol, une mare de sang. l\'appartement était cambriolé, le coffre vidé. » Il ajoute : « Rupert Blackwood était passé à 19h. Il lui devait beaucoup d\'argent. »',
-                    en: 'Major Hale trembles : "I left at 8pm to help Julian Pembrooke whose car had broken down. When I came back, 9pm, I found him... on the floor, a pool of blood. The place had been robbed, the safe emptied." He adds : "Rupert Blackwood had come at 7pm. He owed him a lot of money."'
-                }
-            },
-            { // page 4 — choix du prochain suspect
-                decor: 'crimeScene',
-                npc: 'detective-partner',
-                choiceKey: 'choisirSuspect',
-                choices: ['femme-fatale', 'seducteur', 'suspect'],
-                text: {
-                    fr: '« Trois pistes maintenant », annonce votre partenaire : « Lady Vivienne, Julian Pembrooke et Rupert Blackwood. Qui interrogez-vous en premier ? »',
-                    en: '"Three leads now," your partner announces : "Lady Vivienne, Julian Pembrooke and Rupert Blackwood. Who do you question first?"'
-                }
-            }
+            { decor: 'crimeScene', npc: 'detective-partner', minigame: { type: 'scene_fouille', wide: true, title: { fr: "Fouille de la scène", en: "Scene search" }, desc: { fr: "Balayez la scène à la loupe. Chaque pièce à conviction numérotée ouvre une fenêtre : examinez-les toutes.", en: "Sweep the scene with the magnifier." }, time: 60, sceneImage: "assets/image true detective/lieux/classic/scene de crime manoir.png", hotspots: [{ label: 'A', x: 11.6, y: 66.1, info: { fr: "Le sceau en or et son cachet posés à l'extrême gauche du bureau. Matériel de correspondance intact, prouvant que le bureau n'a pas été saccagé au hasard et que l'intrus connaissait les lieux ou possédait les accès.", en: "The gold seal and its stamp placed at the far left of the desk. Intact correspondence material, proving that the desk was not ransacked randomly and that the intruder knew the premises or had access." } },{ label: 'B', x: 24.1, y: 70.4, info: { fr: "L'encrier central et son bloc d'écriture. Situé au centre du bureau, il témoigne de la zone où la victime rédigeait ses documents avant l'altercation.", en: "The central inkwell and its writing block. Located at the center of the desk, it testifies to the area where the victim was writing his documents before the altercation." } },{ label: '1', x: 31.2, y: 56.8, info: { fr: "Les papiers administratifs et la plume ouverte sur le bureau. Papiers éparpillés sur le coin gauche du bureau, signalant qu'une recherche rapide ou une consultation de documents a eu lieu.", en: "Administrative papers and the open quill on the desk. Scattered papers on the left corner of the desk, indicating that a quick search or document consultation took place." } },{ label: '2', x: 38.6, y: 57.3, info: { fr: "Les deux verres de vin dressés et la petite coupelle. Témoigne clairement de la présence d'un invité de confiance que la victime attendait pour boire un verre.", en: "The two standing wine glasses and the small saucer. Clearly testifies to the presence of a trusted guest whom the victim was expecting to have a drink with." } },{ label: '3', x: 47.2, y: 58.3, info: { fr: "Le livre ouvert et taché de sang près de la lampe de bureau. Registre ou journal de bord maculé de taches de sang, suggérant une lutte ou un accès brutal survenu en plein travail.", en: "The open book stained with blood near the desk lamp. Register or logbook smeared with bloodstains, suggesting a struggle or brutal access that occurred during work." } },{ label: '4', x: 66.4, y: 79.2, info: { fr: "Le fauteuil de bureau renversé et couché à l'envers sur le tapis. Témoigne d'une bousculade violente et d'une lutte brève juste avant que la victime ne s'effondre près de la fenêtre.", en: "The overturned office chair lying upside down on the carpet. Testifies to a violent scuffle and brief struggle just before the victim collapsed near the window." } },{ label: '5', x: 70.8, y: 85.6, info: { fr: "La trace de sang au sol au cœur de la silhouette à la craie. L'épicentre de l'agression mortelle, marquant l'endroit exact de l'homicide.", en: "The blood trace on the floor at the heart of the chalk silhouette. The epicenter of the fatal assault, marking the exact location of the homicide." } },{ label: '6', x: 78.2, y: 86.3, info: { fr: "Le fragment de papier froissé à côté du corps sur le tapis. Un simple bout de papier chiffonné portant des chiffres ou des inscriptions énigmatiques, posant la première véritable énigme mystérieuse à élucider pour la suite de l'enquête.", en: "The crumpled piece of paper next to the body on the carpet. A simple crumpled piece of paper bearing numbers or enigmatic inscriptions, posing the first true mysterious enigma to elucidate for the rest of the investigation." } }] }, text: { fr: "Examinez la pièce avant de poser vos questions, souffle le partenaire.", en: "Examine the room before asking questions." } },
+            { decor: 'crimeScene', npc: 'detective-partner', text: { fr: "Le carnet déchiré révèle des pages manquantes. En les reconstituant, vous découvrez des versements réguliers à un certain « V.K. »", en: "The torn ledger reveals missing pages. By reassembling them, you discover regular payments to a certain \"V.K.\"." } },
+            { decor: 'crimeScene', npc: 'detective-partner', text: { fr: "Votre partenaire vous observe : « Vous tenez quelque chose ? Ces indices dessinent un mobile. Continuons. »", en: "Your partner watches you : \"Are you onto something? These clues are forming a motive. Let's continue.\"" } }
         ]
     });
 
-    /* ------------------------------------------------------------------
-       ACTE 1 — Phase 2A : NARRATION (musique thème)
-    ------------------------------------------------------------------ */
+    /* ===== ACTE 1 — Phase 1 : CONFRONTATION AU MANOIR ===== */
     PHASES.push({
-        id: 'act1-n1',
-        label: { fr: 'Acte I — Piste', en: 'Act I — Lead' },
+        id: 'act1_1',
+        label: { fr: 'Confrontation', en: 'Confrontation' },
         act: 'Acte 1',
-        type: 'narration',
-        music: 'theme',
+        type: 'dialogue',
+        music: 'recherche',
         pages: [
-            {
-                decor: 'alley',
-                text: {
-                    fr: 'Le soir tombe sur la ruelle sombre et humide. La route vers la résidence du Suspect serpente entre les façades noires. Un visage surgit de l\'ombre, adossé au mur : Silas Crane.',
-                    en: 'Night falls over the dark, damp alley. The road to Rupert Blackwoo\' residence winds between black façades. A face emerges from the shadows, leaning against the wall : Silas Crane.'
-                }
-            },
-            {
-                decor: 'alley',
-                npc: 'marginal',
-                minigame: {
-                    type: 'pression',
-                    title: { fr: 'Interrogatoire sous pression', en: 'Interrogation under pressure' },
-                    desc: { fr: 'Remettez les questions dans l\'ordre qui fera parler Silas Crane.', en: 'Order the questions to make Silas Crane talk.' },
-                    time: 40,
-                    order: [
-                        { fr: 'Le proposer de partager un café', en: 'Offer to share a coffee' },
-                        { fr: 'La pièce q\'l garde précieusement', en: 'The coin he treasures' },
-                        { fr: 'Le rôdeur de 22h09', en: 'The lurker at 10:09pm' }
-                    ],
-                    evidence: 'witness',
-                    clue: { fr: 'Silas Crane a vu un rodeur bien habille vers 22h - ressemble a Pembrooke, mais la panne etait une couverture.', en: 'Silas Crane saw a well-dressed lurker around 10pm - looks like Pembrooke, but the breakdown was a cover.' }
-                },
-                text: {
-                    fr: '« La manche ? » Il tend une main sale. « \'tais là, assis, quand un rôdeur est passé vers 22h. La victime, elle, \' donné une pièce. » Il ricane : « Julian Pembrooke ? Lui, il traîne au bar, pas ici. »',
-                    en: '"Spare a coin?" He holds out a dirty hand. "I was here, sitting, when a lurker passed by around 10pm. The victim gave me a coin." He sneers : "Julian Pembrooke? He hangs out at the bar, not here."'
-                }
-            },
-            {
-                decor: 'residence',
-                npc: null,
-                text: {
-                    fr: 'Vous arrivez enfin à la résidence du Suspect. La façade est cossue, les rideaux tirés. À \'ntérieur vous attend \'n de ceux que vous avez choisi \'nterroger.',
-                    en: 'You finally reach Rupert Blackwoo\' residence. The façade is wealthy, the curtains drawn. Inside awaits the one you chose to question.'
-                }
-            }
+            { decor: 'residence', npc: 'protecteur', text: { fr: "Le Major Hale, garde du corps et majordome en chef, vous accueille dans le salon du manoir avec un mélange de nervosité et d'arrogance. « Je vous ai attendu. La maison est en deuil, faites vite. »", en: "Major Hale, bodyguard and chief butler, greets you in the manor lounge with a mix of nervousness and arrogance. \"I've been expecting you. The house is in mourning, make it quick.\"" } },
+            { decor: 'residence', npc: 'femme-fatale', text: { fr: "Lady Vivienne, d'une voix posée dans le boudoir : « Mon mari avait des ennemis, certes. Mais l'auteur de ce crime… c'est quelqu'un de la maison. »", en: "Lady Vivienne, in a calm voice in the boudoir : \"My husband had enemies, certainly. But the perpetrator… it's someone from the house.\"" } },
+            { decor: 'crimeScene', npc: 'detective-partner', minigame: { type: 'montre_code', time: 45, title: { fr: "La Montre du Duc", en: "The Duke's Watch" }, desc: { fr: "Examinez la montre pour trouver l'heure du crime et un code secret.", en: "Examine the watch to find the time of death and a secret code." }, clue: { fr: "L'aiguille figée à 22h09 indique l'heure probable du crime. La gravure 1981 sert au coffre.", en: "The frozen hand at 10:09pm indicates the probable time of death. The engraving 1981 is for the safe." }, sceneImage: "assets/image true detective/lieux/classic/scene de crime manoir.png" }, text: { fr: "Votre partenaire vous montre la montre : « Si on pouvait lire l'heure exacte, on aurait le moment du crime. »", en: "Your partner shows you the watch : \"If we could read the exact time, we'd have the moment of the crime.\"" } }
         ]
     });
 
-    /* ------------------------------------------------------------------
-       ACTE 1 — Phase 2B : RÉFLEXION (musique reflexion.mp3)
-       l\'ordre \'nterrogation dépend du choix (choisirSuspect).
-    ------------------------------------------------------------------ */
+    /* ===== ACTE 1 — Phase 2 : PREMIERS TÉMOIGNAGES ===== */
     PHASES.push({
-        id: 'act1-r2',
-        label: { fr: 'Acte I — Réflexion', en: 'Act I — Reflection' },
+        id: 'act1_2',
+        label: { fr: 'Témoignages', en: 'Testimonies' },
         act: 'Acte 1',
         type: 'dialogue',
         music: 'reflexion',
-        dynamic: 'interrogations',
         pages: [
-            { // page 1
-                decor: 'dynamic',
-                npc: 'dynamic',
-                text: {
-                    fr: 'Vous êtes face au premier suspect. Il observe vos moindres gestes, pesant chacune de vos questions.',
-                    en: 'You face the first suspect. He watches your every move, weighing each of your questions.'
-                }
-            },
-            { // page 2
-                decor: 'dynamic',
-                npc: 'dynamic',
-                text: {
-                    fr: '« Chacun \'ntre nous a un mobile », affirme le suivant. « Lady Vivienne hériterait, Rupert Blackwood doit de d\'argent, Julian Pembrooke la veut, elle. Accusez qui vous voulez, ils diront tous la même chose. »',
-                    en: '"Each of us has a motive," the next one claims. "Lady Vivienne would inherit, Rupert Blackwood owes money, Julian Pembrooke wants her. Accuse whoever you want, the\'l all say the same."'
-                }
-            },
-            { // page 3
-                decor: 'dynamic',
-                npc: 'dynamic',
-                text: {
-                    fr: 'Le troisième ferme les yeux. « Je \'i rien fait. Mais regardez les faits, pas les mots. »',
-                }
-            },
-            { // page 4 — Cryptogramme de la planque (Bar de Krane)
-                decor: 'alley',
-                npc: 'criminel',
-                minigame: {
-                    type: 'cryptogramme',
-                    title: { fr: 'Le Cryptogramme de la Planque', en: 'The Hideout Cryptogram' },
-                    desc: { fr: 'Décodez la note chiffrée de Victor Krane par substitution.', en: 'Decode Victor Krane cipher note by substitution.' },
-                    time: 45,
-                    asset: 'mini-games/puzzle/krane-coded-note.png.jfif',
-                    cipher: 'XLIW MRJSV QEXL',
-                    key: { A:'V', B:'W', C:'X', D:'Y', E:'Z', F:'A', G:'B', H:'C', I:'D', J:'E', K:'F', L:'G', M:'H', N:'I', O:'J', P:'K', Q:'L', R:'M', S:'N', T:'O', U:'P', V:'Q', W:'R', X:'S', Y:'T', Z:'U' },
-                    solution: 'THIS JOINT PAID',
-                    evidence: 'mobile',
-                    clue: { fr: 'Le message décodé confirme que le contrat a été payé par un proche de \'ntérieur : Hale \' engagé.', en: 'The decoded message confirms the contract was paid by an inside person: Hale hired me.' }
-                },
-                text: {
-                    fr: 'Dans la planque de Krane, vous trouvez une note codée. Les lettres sont décalées... trouvez la clé.',
-                    en: 'In Krane hideout, you find a coded note. The letters are shifted... find the key.'
-                }
-            }
+            { decor: 'alley', npc: 'marginal', text: { fr: "« Intéressant… » murmurez-vous. Dans la ruelle, Silas Crane prétend avoir vu un rôdeur bien habillé aux alentours de 22h.", en: "\"Interesting…\" you murmur. In the alley, Silas Crane claims to have seen a well-dressed prowler around 10pm." } },
+            { decor: 'residence', text: { fr: "Le coffre-fort est vide, mais les montants sont énormes : 50 000 £ en espèces.", en: "The safe is empty, but the amounts are huge : £50,000 in cash." } },
+            { decor: 'secretPlace', npc: 'suspect', text: { fr: "Rupert Blackwood, chez lui, est hors de lui : « Quelqu'un a vidé les comptes ! Le testament a été modifié la semaine dernière. »", en: "Rupert Blackwood, at his place, is frantic : \"Someone drained the accounts! The will was changed last week.\"" } }
         ]
     });
 
-    /* ------------------------------------------------------------------
-       ACTE 2 — Phase 3A : ENQUÊTE (musique enquete.mp3)
-    ------------------------------------------------------------------ */
+    /* ===== ACTE 2 — Phase 1 : PISTE DU BAR ===== */
     PHASES.push({
-        id: 'act2-e1',
-        label: { fr: 'Acte II — Enquête', en: 'Act II — Investigation' },
+        id: 'act2_1',
+        label: { fr: 'Piste du bar', en: 'Bar lead' },
         act: 'Acte 2',
         type: 'dialogue',
-        music: 'enquete',
+        music: 'enigme',
         pages: [
-            {
-                decor: 'labo',
-                npc: 'scientifique',
-                minigame: {
-                    type: 'labo_verrou',
-                    title: { fr: 'Le verrou réchauffé', en: 'The warmed lock' },
-                    desc: { fr: 'Passez le verrou au thermique : repérez les zones réchauffées par une ouverture récente.', en: 'Run thermal analysis on the lock : find the zones warmed by a recent opening.' },
-                    time: 45,
-                    hotspots: [
-                        { x: 30, y: 40, correct: false },
-                        { x: 55, y: 55, correct: true },
-                        { x: 75, y: 35, correct: true },
-                        { x: 45, y: 75, correct: true }
-                    ],
-                    evidence: 'timeline',
-                    clue: { fr: 'Le verrou s est ouvert avec une cle, pas force : acces au trousseau du garde du corps Hale. Chaleur datee 22h.', en: 'The lock opened with a key, not forced : access to bodyguard Hale\'s keys. Heat dated 10pm.' }
-                },
-                text: {
-                    fr: 'Le Dr Whitmore ajuste ses lunettes : « Vu la violence, \'ssassin est probablement un homme. \'i retrouvé plusieurs ADN : celui de Lady Vivienne, de Julian Pembrooke, du Major Hale, de Rupert Blackwood... et un inconnu. » Il marque une pause. « Plusieurs traces. Trop, pour être innocent. »',
-                    en: 'Dr Whitmore adjusts his glasses : "Given the violence, the killer is probably a man. I found several DNA : Lady Vivienne, Julian Pembrooke, Major Hale, Rupert Blackwood... and one unknown." He pauses. "Several traces. Too many, to be innocent."'
-                }
-            },
-            {
-                decor: 'labo',
-                npc: 'scientifique',
-                minigame: {
-                    type: 'adn_analyse',
-                    title: { fr: 'ADN inconnu', en: 'Unknown DNA' },
-                    desc: { fr: 'Identifiez \'chantillon inconnu parmi les profils ADN.', en: 'Identify the unknown sample among the DNA profiles.' },
-                    time: 35,
-                    samples: [
-                        { fr: 'Lady Vivienne', en: 'Lady Vivienne', match: false },
-                        { fr: 'Julian Pembrooke', en: 'Julian Pembrooke', match: false },
-                        { fr: 'Major Hale', en: 'Major Hale', match: false },
-                        { fr: 'Inconnu (Krane)', en: 'Unknown (Krane)', match: true }
-                    ],
-                    evidence: 'forensic',
-                    clue: { fr: '\'DN inconnu est celui de Victor Krane, un tueur à gages. Le meurtre \'st pas un crime passionnel : \'st un contrat.', en: 'The unknown DNA belongs to Victor Krane, a hitman. The murder is not a crime of passion : i\' a contract.' }
-                },
-                text: {
-                    fr: '« \'chantillon inconnu correspond à un homme enregistré dans les fichiers : Victor Krane, un criminel connu. quelqu\'un \' engagé. »',
-                    en: '"The unknown sample matches a man in the files : Victor Krane, a known criminal. Someone hired him."'
-                }
-            },
-            {
-                decor: 'alley',
-                npc: null,
-                minigame: {
-                    type: 'montre_code',
-                    title: { fr: 'Le Cadette trahi', en: 'The betrayed Cadette' },
-                    desc: { fr: 'Passez la loupe sur le dos de la montre : déchiffrez le numéro gravé… puis observez la FACE. Chaque détail compte.', en: 'Sweep the magnifier over the watch back : decode the engraved number… then study the FACE. Every detail counts.' },
-                    time: 50,
-                    code: [1, 9, 8, 1],
-                    symbols: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
-                    evidence: 'timeline',
-                    clue: { fr: 'INDICE MINEUR : 1981 (coffre). INDICE MAJEUR : l aiguille figee a 22h09 - l heure du crime. Retenez-la.', en: 'MINOR : 1981 (safe). MAJOR : the hand frozen at 10:09pm - the time of death. Remember it.' }
-                },
-                text: {
-                    fr: 'Vous reprenez la route vers la ruelle. « 1981 » au dos, une année — rien de plus. Mais vous \'vez pas manqué \'iguille figée à 22h09 sur la face : si la montre est sincère, voilà \'eure du crime, que personne \' encore établie. Et ce rôdeur que Silas Crane a croisé vers 22h... Il faut le reparler.',
-                    en: 'You head back toward the alley. "1981" on the back, a year — nothing more. But you did not miss the hand frozen at 10:09pm on the face : if the watch is sincere, that is the time of death, which no one has established yet. And that lurker Silas Crane crossed around 10pm... You must speak to him again.'
-                }
-            }
+            { decor: 'headquarters', npc: 'detective-partner', minigame: { type: 'carnet_dechire', time: 50, title: { fr: "Le Carnet déchiré", en: "The Torn Ledger" }, desc: { fr: "Reconstituez les pages arrachées du livre de comptes pour révéler un versement à « V.K. ».", en: "Reassemble the torn ledger pages to reveal a payment to V.K.." }, clue: { fr: "Des versements réguliers à Victor Krane et les empreintes du Major Hale sur la mention V.K.", en: "Regular payments to Victor Krane and Major Hale's fingerprints on the V.K. mention." } }, text: { fr: "Au quartier général, votre partenaire recompte les indices. « L'ADN parle d'elle-même. Mais d'abord, reconstituons ce carnet. »", en: "At headquarters, your partner tallies the clues. \"DNA speaks for itself. But first, let's reassemble this ledger.\"" } },
+            { decor: 'bar', npc: 'seducteur', text: { fr: "Julian Pembrooke, au comptoir, esquisse un sourire : « Je n'ai rien vu, rien entendu. Mais si vous cherchez un mobile, regardez du côté des dettes de Hale. »", en: "Julian Pembrooke, at the counter, smiles : \"I saw nothing, heard nothing. But if you're looking for a motive, look into Hale's debts.\"" } },
+            { decor: 'headquarters', npc: 'detective-partner', minigame: { type: 'coffre_fort', time: 40, title: { fr: "Le Coffre-fort", en: "The Safe" }, desc: { fr: "Entrez le code du coffre pour accéder aux documents confidentiels.", en: "Enter the safe code to access confidential documents." }, clue: { fr: "Les documents du coffre révèlent les dettes de Blackwood et la liaison de l'épouse.", en: "The safe documents reveal Blackwood's debts and the wife's affair." } }, text: { fr: "De retour au QG, le coffre saisi attend son code. La gravure 1981 est notre meilleure piste.", en: "Back at headquarters, the seized safe awaits its code. The 1981 engraving is our best lead." } }
         ]
     });
 
-    /* ------------------------------------------------------------------
-       ACTE 2 — Phase 3B : COFFRE-FORT (musique enquete.mp3)
-    ------------------------------------------------------------------ */
+    /* ===== ACTE 2 — Phase 2 : ENQUÊTE AU LABORATOIRE ===== */
     PHASES.push({
-        id: 'act2-coffre',
-        label: { fr: 'Acte II — Le Coffre', en: 'Act II — The Safe' },
+        id: 'act2_2',
+        label: { fr: 'Laboratoire', en: 'Laboratory' },
         act: 'Acte 2',
         type: 'dialogue',
-        music: 'enquete',
+        music: 'enigme',
         pages: [
-            {
-                decor: 'qg',
-                npc: 'detective-partner',
-                text: {
-                    fr: 'Votre partenaire pose un carnet sur la table : « Le coffre-fort de la victime a été retrouvé vide. Mais le code... on \' trouvé. 1981. Le millésime de la montre. »',
-                    en: 'Your partner puts a notebook on the table : "The victi\' safe was found empty. But the code... we found it. 1981. The watc\' make-year."'
-                }
-            },
-            {
-                decor: 'qg',
-                npc: 'detective-partner',
-                minigame: {
-                    type: 'coffre_code',
-                    title: { fr: 'Le Coffre-fort', en: 'The Safe' },
-                    desc: { fr: 'Entrez le code à 4 chiffres. Indice : les coffres de famille datent souvent de leur fabrication.', en: 'Enter the 4-digit code. Hint : family safes are often dated by their make-year.' },
-                    time: 30,
-                    code: [1, 9, 8, 1],
-                    evidence: 'mobile',
-                    clue: { fr: 'Le carnet du coffre (code 1981) : Hale payait Victor Krane en plusieurs fois, dernier paiement la veille du meurtre.', en: 'The safe ledger (code 1981) : Hale paid Victor Krane in installments, last one the day before the murder.' }
-                },
-                text: {
-                    fr: 'Le coffre-fort est là, dans le bureau. Composez le code.',
-                    en: 'The safe is there, in the office. Enter the code.'
-                }
-            },
-            {
-                decor: 'qg',
-                npc: 'detective-partner',
-                text: {
-                    fr: 'Le carnet révèle tout : Hale payait Krane. Le mobile est financier — mais pour quoi faire ?',
-                    en: 'The ledger reveals everything : Hale was paying Krane. The motive is financial — but for what?'
-                }
-            }
+            { decor: 'laboratory', npc: 'scientifique', minigame: { type: 'adn_match', time: 40, title: { fr: "Profil ADN", en: "DNA Profile" }, desc: { fr: "Comparez les échantillons ADN pour identifier l'inconnu.", en: "Compare DNA samples to identify the unknown." }, clue: { fr: "L'ADN inconnue correspond à Victor Krane, le criminel engagé par Hale.", en: "The unknown DNA matches Victor Krane, the criminal hired by Hale." } }, text: { fr: "Au laboratoire, Whitmore vous tend une clé USB : « Les données ADN sont claires. L'échantillon B appartient au criminel. »", en: "At the laboratory, Whitmore hands you a USB drive : \"The DNA data is clear. Sample B belongs to the criminal.\"" } },
+            { decor: 'laboratory', npc: 'scientifique', minigame: { type: 'cablage_alarme', time: 50, title: { fr: "Le Câblage de l'alarme", en: "The Alarm Wiring" }, desc: { fr: "Réparez le circuit de l'alarme pour prouver l'intrusion.", en: "Repair the alarm circuit to prove the intrusion." }, clue: { fr: "Le câble a été marqué au charbon AVANT le sabotage. Une main avertie a guidé l'intrus.", en: "The cable was marked with charcoal BEFORE the sabotage. A knowing hand guided the intruder." } }, text: { fr: "Whitmore pointe le schéma de l'alarme : « Regardez, ce câble a été marqué au charbon AVANT le sabotage. »", en: "Whitmore points at the alarm blueprint : \"Look, this cable was marked with charcoal BEFORE the sabotage.\"" } },
+            { decor: 'residence', npc: 'protecteur', text: { fr: "Au manoir, la montre du Duc est intacte. Le Major Hale détourne le regard quand vous la montrez.", en: "At the manor, the Duke's watch is intact. Major Hale looks away when you show it." } }
         ]
     });
 
-    /* ------------------------------------------------------------------
-       ACTE 3 — Phase 4A : CHRONOLOGIE (musique chronologie.mp3)
-    ------------------------------------------------------------------ */
+    /* ===== ACTE 3 — Phase 1 : TENSION ET TÉMOIN CLÉ ===== */
     PHASES.push({
-        id: 'act3-chrono',
-        label: { fr: 'Acte III — Chronologie', en: 'Act III — Timeline' },
+        id: 'act3_1',
+        label: { fr: 'Tension', en: 'Tension' },
         act: 'Acte 3',
         type: 'dialogue',
-        music: 'chronologie',
+        music: 'tension',
         pages: [
-            {
-                decor: 'qg',
-                npc: 'detective-partner',
-                minigame: {
-                    type: 'chronologie',
-                    title: { fr: 'Reconstituez la chronologie', en: 'Reconstruct the timeline' },
-                    desc: { fr: 'Placez les événements dans l\'ordre chronologique.', en: 'Place the events in chronological order.' },
-                    time: 45,
-                    events: [
-                        { fr: '19h — Rupert Blackwood arrive', en: '7pm — Rupert Blackwood arrives' },
-                        { fr: '20h — Hale part « aider » Pembrooke', en: '8pm — Hale leaves to "help" Pembrooke' },
-                        { fr: '21h30 — Silas voit le rôdeur', en: '9:30pm — Silas sees the prowler' },
-                        { fr: '22h09 — Heure du crime (montre)', en: '10:09pm — Time of death (watch)' },
-                        { fr: '22h30 — Hale « revient »', en: '10:30pm — Hale "returns"' }
-                    ],
-                    evidence: 'timeline',
-                    clue: { fr: 'La chronologie revele le trou : Hale pretendait etre en panne a 22h, mais le verrou et le rodeur le placent sur les lieux. Son alibi s effondre.', en: 'The timeline reveals the gap : Hale claimed to be broken down at 10pm, but the lock and the prowler place him on scene. His alibi collapses.' }
-                },
-                text: {
-                    fr: 'Votre partenaire étale les notes : « Remettons les événements dans l\'ordre. À quelle heure exactement la victime est-elle morte ? »',
-                    en: 'Your partner spreads the notes : "Le\' put the events in order. At what exact time did the victim die?"'
-                }
-            },
-            {
-                decor: 'qg',
-                npc: 'detective-partner',
-                minigame: {
-                    type: 'roue_alibis',
-                    title: { fr: 'La Roue Synchrone des Alibis', en: 'The Synchronous Wheel of Alibis' },
-                    desc: { fr: 'Alignez le cadran de la montre (22h09), l\'alibi de la panne de Pembrooke et l\'horloge-mère pour pulvériser l\'alibi de Hale.', en: 'Align the watch dial (10:09pm), Pembrooke\'s breakdown alibi and the mother clock to shatter Hale\'s alibi.' },
-                    time: 45,
-                    asset: 'mini-games/puzzle/pocket-watch-dial.png.jfif',
-                    target: '22:09',
-                    evidence: 'timeline',
-                    clue: { fr: 'Les trois horloges s accordent sur 22h09 : l alibi de panne de Hale est pulverise. Le dossier est verrouille.', en: 'The three clocks agree on 10:09pm : Hale\'s breakdown alibi is shattered. The case is sealed.' }
-                },
-                text: {
-                    fr: 'Sur le bureau, la montre figée, le récit de la panne et la grande horloge-mère. « Synchronisons-les… la vérité éclatera. »',
-                    en: 'On the desk, the frozen watch, the breakdown story and the great mother clock. "Let\'s synchronize them... the truth will burst out."'
-                }
-            },
-            {
-                decor: 'qg',
-                npc: 'detective-partner',
-                text: {
-                    fr: '« 22h09... \'eure que personne \' établie. Et l\'alibi de Hale recouvre exactement ce moment. »',
-                    en: '"10:09pm... the time no one established. And Hal\' alibi covers exactly that moment."'
-                }
-            },
-            {
-                decor: 'qg',
-                npc: 'detective-partner',
-                text: {
-                    fr: '« Il faut maintenant confronter les suspects. Le sabotage de la panne, \'orloge-mère, tout doit \'mboîter. »',
-                    en: '"Now we must confront the suspects. The sabotage of the breakdown, the mother clock, everything must fit together."'
-                }
-            }
+            { decor: 'headquarters', npc: 'detective-partner', minigame: { type: 'cryptogramme', time: 50, title: { fr: "Le Cryptogramme", en: "The Cryptogram" }, desc: { fr: "Décodez le message crypté pour révéler une connexion entre les suspects.", en: "Decode the cryptic message to reveal a connection between suspects." }, clue: { fr: "La note de Krane révèle : HALE ENGAGE KRANE. La complicité est établie.", en: "Krane's note reveals: HALE HIRES KRANE. The collusion is proven." } }, text: { fr: "Au quartier général, votre partenaire recompte les indices. « L'ADN parle d'elle-même. Mais d'abord, reconstituons ce carnet. »", en: "At headquarters, your partner tallies the clues. \"DNA speaks for itself. But first, let's reassemble this ledger.\"" } },
+            { decor: 'residence', npc: 'femme-fatale', text: { fr: "Les fichiers du coffre contiennent des documents confidentiels : Lady Vivienne trompait la victime avec Hale.", en: "The safe's files contain confidential documents : Lady Vivienne was cheating on the victim with Hale." } },
+            { decor: 'residence', npc: 'protecteur', text: { fr: "Le Major Hale refuse de coopérer : « Je n'ai rien dit de tout cela ! Vous n'avez aucune preuve ! »", en: "Major Hale refuses to cooperate : \"I said none of this! You have no proof!\"" } }
         ]
     });
 
-    /* ------------------------------------------------------------------
-       ACTE 3 — Phase 4B : TENSION (musique rising.mp3)
-    ------------------------------------------------------------------ */
+    /* ===== ACTE 3 — Phase 2 : RÉVÉLATION ===== */
     PHASES.push({
-        id: 'act3-t2',
-        label: { fr: 'Acte III — Tension', en: 'Act III — Tension' },
+        id: 'act3_2',
+        label: { fr: 'Révélation', en: 'Revelation' },
         act: 'Acte 3',
         type: 'dialogue',
-        music: 'rising',
+        music: 'tension',
         pages: [
-            {
-                decor: 'clandestine',
-                npc: 'detective-partner',
-                text: {
-                    fr: 'Surveillance. Julian Pembrooke et Lady Vivienne se retrouvent en secret dans une cachette. La panne de Pembrooke était-elle un mensonge pour les laisser ensemble ? Les langues se délient.',
-                    en: 'Surveillance. Julian Pembrooke and Lady Vivienne meet in secret in a hideout. Was Julian Pembrook\' breakdown a lie to let them be together? Tongues start to loosen.'
-                }
-            },
-            {
-                decor: 'laboratoire',
-                npc: 'scientifique',
-                minigame: {
-                    type: 'sabotage',
-                    title: { fr: 'La panne sabotée', en: 'The sabotaged breakdown' },
-                    desc: { fr: 'Trouvez la pièce falsifiée sur le véhicule.', en: 'Find the part that was tampered with.' },
-                    time: 25,
-                    badIndex: 1,
-                    parts: [
-                        { fr: 'Batterie', en: 'Battery' },
-                        { fr: 'Durite (sectionnée)', en: 'Hose (cut)' },
-                        { fr: 'Radiateur', en: 'Radiator' },
-                        { fr: 'Filtre à air', en: 'Air filter' }
-                    ],
-                    evidence: 'alibi',
-                    clue: { fr: 'La durite a été sectionnée intentionnellement : la « panne » de Pembrooke était un faux, monté avec le Major Hale. Le but : donner un alibi au vrai coupable.', en: 'The hose was cut on purpose : Pembrook\' "breakdown" was staged with Major Hale. The goal : to give the real killer an alibi.' }
-                },
-                text: {
-                    fr: 'Le Dr Whitmore vous montre le rapport du garagiste : « La panne \'tait pas naturelle. quelqu\'un a sectionné la durite pour coincer Julian Pembrooke... et offrir un alibi au Major Hale. »',
-                    en: 'Dr Whitmore shows you the mechani\' report : "The breakdown was not natural. Someone cut the hose to trap Julian Pembrooke... and give Major Hale an alibi."'
-                }
-            },
-            {
-                decor: 'qg',
-                npc: 'detective-partner',
-                minigame: {
-                    type: 'cablage_alarme',
-                    title: { fr: 'Le Câblage de \'larme', en: 'The Alarm Wiring' },
-                    desc: { fr: 'Rétablissez la boucle \'ntégrité du circuit pour prouver que \'larme a été neutralisée de \'ntérieur.', en: 'Restore the circuit integrity loop to prove the alarm was neutralized from inside.' },
-                    time: 40,
-                    asset: 'mini-games/puzzle/alarm-circuit-blueprint.png.jfif',
-                    evidence: 'opportunity',
-                    clue: { fr: 'Le câblage prouve que \'larme a été désactivée par quelqu\'un qui connaissait le système — le garde du corps, Hale. Pas de effraction : \'ntrusion venait de \'ntérieur.', en: 'The wiring proves the alarm was disabled by someone who knew the system — the bodyguard, Hale. No break-in: the intrusion came from inside.' }
-                },
-                text: {
-                    fr: 'Le panneau de sécurité du manoir. Les fils sont coupés, \'larme muette. quelqu\'un savait exactement où intervenir.',
-                    en: 'The manor security panel. Wires cut, alarm silent. Someone knew exactly where to intervene.'
-                }
-            },
-            {
-                decor: 'qg',
-                npc: 'detective-partner',
-                minigame: {
-                    type: 'cable_match',
-                    title: { fr: 'Graphite', en: 'Graphite' },
-                    desc: { fr: 'Reconnectez les 3 bons fils de \'larme, puis identifiez à quelle écriture correspond le graffiti au charbon.', en: 'Reconnect the 3 right alarm wires, then match the charcoal graffiti to a handwriting sample.' },
-                    time: 50,
-                    wires: [
-                        { fr: 'Fil A', en: 'Wire A' }, { fr: 'Fil B', en: 'Wire B' }, { fr: 'Fil ♦', en: 'Wire ♦' },
-                        { fr: 'Fil mort', en: 'Dead wire' }, { fr: 'Fil coupé', en: 'Cut wire' }, { fr: 'Fil tordu', en: 'Twisted wire' }
-                    ],
-                    good: [0, 1, 2],
-                    writings: [
-                        { fr: 'Écriture de Rupert', en: 'Ruper\' writing' },
-                        { fr: 'Écriture du Major Hale', en: 'Major Hal\' writing' },
-                        { fr: 'Écriture de Lady Vivienne', en: 'Lady Vivienn\' writing' }
-                    ],
-                    match: 0,
-                    evidence: 'opportunity',
-                    clue: { fr: 'Le graffiti au charbon \'st pas de la main de Hale : une main avertie a marqué le câble pour couper \'larme au bon moment. La complicité est établie — Hale et Pembrooke se couvraient.', en: 'The charcoal graffiti is not by Hal\' hand : a knowing hand marked the cable to cut the alarm at the right moment. The collusion is proven — Hale and Pembrooke were covering for each other.' }
-                },
-                text: {
-                    fr: '« Attendez... » Votre partenaire fronce les sourcils. « Si la durite a été coupée, alors le Major Hale savait où et quand aider Julian Pembrooke. Et ce graffiti au charbon sur le câble de \'larme... ce \'st pas sa main. »',
-                    en: '"Wait..." Your partner frowns. "If the hose was cut, then Major Hale knew where and when to help Julian Pembrooke. And that charcoal graffiti on the alarm cable... it is not his hand."'
-                }
-            }
+            { decor: 'headquarters', npc: 'detective-partner', text: { fr: "« Attendez… » Votre partenaire fronce les sourcils au quartier général. « Si la durite a été coupée, alors Hale savait où et quand aider Pembrooke. »", en: "\"Wait…\" Your partner frowns at headquarters. \"If the hose was cut, then Hale knew where and when to help Pembrooke.\"" } },
+            { decor: 'secretPlace', npc: 'marginal', text: { fr: "Chez le marginal, Silas Crane, sous pression, avoue : « Blackwood m'a payé pour mentir. Le rôdeur, c'était Pembrooke. »", en: "At the homeless man's place, Silas Crane, under pressure, confesses : \"Blackwood paid me to lie. The prowler was Pembrooke.\"" } },
+            { decor: 'alley', npc: 'criminel', text: { fr: "Dans la ruelle, le téléphone de Hale sonne. C'est Krane : « Tu m'as payé pour le meurtre. C'est fini. »", en: "In the alley, Hale's phone rings. It's Krane : \"You paid me for the murder. It's over.\"" } }
         ]
     });
 
-    /* ------------------------------------------------------------------
-       ACTE 3 — Phase 4C : RÉVÉLATION (musique Act III Revelations.mp3)
-       Rebondissement 2 + CHOIX DU COUPABLE
-    ------------------------------------------------------------------ */
+    /* ===== ACTE 3 — Phase 3 : RÉVÉLATION FINALE ===== */
     PHASES.push({
-        id: 'act3-rev',
-        label: { fr: 'Acte III — Révélation', en: 'Act III — Revelation' },
+        id: 'act3_3',
+        label: { fr: 'Révélation finale', en: 'Final Revelation' },
         act: 'Acte 3',
         type: 'dialogue',
-        music: 'revelation',
+        music: 'stress',
         pages: [
-            {
-                decor: 'crimeScene',
-                npc: 'criminel',
-                text: {
-                    fr: 'Sous la pression, Victor Krane avoue en partie : « Je ne connaissais pas la victime par hasard... je suis payé pour la violence. » \'DN inconnue, le rôdeur q\' vu Silas Crane : tout converge.',
-                    en: 'Under pressure, Victor Krane half confesses : "I did\' know the victim by chance... I am paid for violence." The unknown DNA, the lurker Silas Crane saw : everything converges.'
-                }
-            },
-            {
-                decor: 'crimeScene',
-                npc: 'protecteur',
-                text: {
-                    fr: 'Le Major Hale se contredit soudain : il décrit la mare de sang avec trop de précision... alors que la porte était verrouillée à son retour. Son alibi est un faux, \'st certain.',
-                    en: 'Major Hale suddenly contradicts himself : he describes the pool of blood with too much precision... while the door was locked when he returned. His alibi is false, that is certain.'
-                }
-            },
-            {
-                decor: 'qg',
-                npc: 'detective-partner',
-                choiceKey: 'accuser',
-                choices: ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel'],
-                text: {
-                    fr: '« Le moment est venu. Qui accusez-vous ? Choisissez avec soin : une erreur, et le vrai coupable \'chappera. »',
-                    en: '"The time has come. Who do you accuse? Choose carefully : a mistake, and the real killer will escape."'
-                }
-            }
+            { decor: 'alley', npc: 'criminel', text: { fr: "Dans la ruelle, sous la pression, Victor Krane avoue en partie : « Je ne connaissais pas la victime par hasard. C'est Hale qui m'a contacté. »", en: "In the alley, under pressure, Victor Krane half confesses : \"I didn't know the victim by chance. Hale contacted me.\"" } },
+            { decor: 'residence', npc: 'protecteur', text: { fr: "Au manoir, le Major Hale se contredit soudain : il décrit la mare de sang avec trop de précision.", en: "At the manor, Major Hale suddenly contradicts himself : he describes the pool of blood with too much precision." } },
+            { decor: 'headquarters', npc: 'detective-partner', choices: [
+                { label: { fr: 'Accuser le Major Hale', en: 'Accuse Major Hale' }, id: 'protecteur', choiceKey: 'accuser' },
+                { label: { fr: 'Accuser Lady Vivienne', en: 'Accuse Lady Vivienne' }, id: 'femme-fatale', choiceKey: 'accuser' },
+                { label: { fr: 'Accuser Julian Pembrooke', en: 'Accuse Julian Pembrooke' }, id: 'seducteur', choiceKey: 'accuser' }
+            ], text: { fr: "Au quartier général, le moment est venu. Votre partenaire vous tend le dossier. Qui accusez-vous ?", en: "At headquarters, the time has come. Your partner hands you the file. Who do you accuse?" } }
         ]
     });
 
-    /* ------------------------------------------------------------------
-       OUTRO — narration (musique thème) puis générique (night ride)
-    ------------------------------------------------------------------ */
+    /* ===== OUTRO — ÉPILOGUE ===== */
     PHASES.push({
         id: 'outro',
         label: { fr: 'Épilogue', en: 'Epilogue' },
         act: 'Outro',
         type: 'outro',
         music: 'theme',
-        pages: []
+        pages: [
+            { decor: 'headquarters', npc: 'detective-partner', text: { fr: "L'affaire est classée. Le vrai coupable croupit en prison, le mobile était l'argent, la méthode, la trahison.", en: "Case closed. The real culprit is in prison, the motive was money, the method, betrayal." } },
+            { decor: 'universe', text: { fr: "La ville murmure à nouveau sous la pluie. Une autre affaire vous attend, mais celle-ci est résolue.", en: "The city whispers again under the rain. Another case awaits you, but this one is solved." } },
+            { decor: 'universe', text: { fr: "FIN — True Detective.", en: "END — True Detective." } }
+        ]
     });
+
     global.TDPhases = PHASES;
 
-}(typeof globalThis !== 'undefined' ? globalThis : this));
+})(typeof globalThis !== 'undefined' ? globalThis : this);

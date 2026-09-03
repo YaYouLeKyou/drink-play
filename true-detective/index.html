@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -22,9 +22,30 @@
                     <button id="lang-en-home" class="lang-btn active-lang" title="English">EN</button>
                     <button id="lang-fr-home" class="lang-btn" title="Français">FR</button>
                 </div>
-                <button id="start-btn" class="btn btn-primary start-btn">Commencer l'enquête</button>
+                <button id="start-btn" class="start-btn">Commencer l'enquête</button>
             </div>
+            <button id="dev-btn" class="btn btn-dev">🛠️ Dev</button>
         </section>
+
+        <!-- ===== DEVELOPER MODAL ===== -->
+        <div id="dev-modal" class="dev-modal">
+            <div class="dev-modal-content">
+                <div class="dev-modal-header">
+                    <h2>🛠️ Developer Mode</h2>
+                    <button id="dev-close-btn" class="btn btn-icon">✕</button>
+                </div>
+                <div class="dev-modal-body">
+                    <div class="dev-section">
+                        <h3>Aller à la phase</h3>
+                        <div id="dev-phase-list" class="dev-phase-list"></div>
+                    </div>
+                    <div class="dev-section">
+                        <h3>Phases & Pages</h3>
+                        <div id="dev-page-grid" class="dev-page-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <!-- ===== THEME SELECTOR SCREEN ===== -->
     <section id="theme-selector-screen" class="screen">
@@ -44,7 +65,7 @@
             <div class="top-bar-left">
                 <span class="act-indicator">Act <span id="current-act">1</span> / 3</span>
                 <span class="scene-indicator">Scene <span id="current-scene">1</span></span>
-                <span class="clue-indicator" id="clue-indicator" style="display:none;">🕵️ Clues: <span id="clues-count">0</span></span>
+                <span class="clue-indicator" id="clue-indicator" style="display:none;">🕵︝ Clues: <span id="clues-count">0</span></span>
             </div>
             <div class="top-bar-right">
                 <div class="lang-selector" id="lang-selector">
@@ -58,7 +79,7 @@
                 <button id="mute-btn" class="btn btn-icon" title="Mute narration">🔊</button>
                 <button id="volume-btn" class="btn btn-icon" title="Voice volume">🔊100%</button>
                 <span class="music-info" id="music-info">🎵 Investigation</span>
-                <span class="narration-timer hidden" id="narration-timer">⏱ 30s</span>
+                <span class="narration-timer hidden" id="narration-timer">❱ 30s</span>
             </div>
         </div>
 
@@ -168,9 +189,12 @@
     <script src="imageService.js"></script>
     <script src="audioService.js"></script>
     <script src="narrativeEngine.js"></script>
+    <script src="permutations.js"></script>
     <script src="scenario.js"></script>
     <script src="phases.js"></script>
     <script src="minigames.js"></script>
+    <script src="narration.js"></script>
+    <script src="devmode.js"></script>
     <script src="app.js"></script>
     <script src="../music-player.js"
         data-start="generique.mp3"

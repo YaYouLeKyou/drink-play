@@ -6,6 +6,35 @@
 
 ---
 
+## 0. SYSTÈME DE PERMUTATIONS (rejouabilité)
+
+Le jeu offre **4 permutations** du scénario (même structure fixe, coupable / co-complice / fausse piste / lame variables) :
+
+| Id | Coupable | Co-complice | Fausse piste | Lame |
+|---|---|---|---|---|
+| `protecteur` (défaut) | Major Hale | Victor Krane | Julian Pembrooke | Victor Krane |
+| `femme-fatale` | Lady Vivienne | Major Hale | Julian Pembrooke | Victor Krane |
+| `criminel` | Victor Krane | Rupert Blackwood | Major Hale | Homme de main |
+| `suspect` | Rupert Blackwood | Silas Crane | Major Hale | Victor Krane |
+
+**Moteur** : `true-detective/permutations.js` (données) + `tools/generate-permutation.js` (écriture dans `phases.js` + `scenario.js`).
+**Activer une permutation** :
+```bash
+# désactive/défaut (canonique, documenté par ce fichier)
+npm run permute -- protecteur
+# permutation #1 — Lady Vivienne
+npm run permute -- femme-fatale
+# permutation #2 — Victor Krane
+npm run permute -- criminel
+# permutation #3 — Rupert Blackwood
+npm run permute -- suspect
+```
+Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais de perte). L'heure du crime reste **22h09** dans toutes les permutations ; seuls les textes de fouille, les indices de mini-jeux et le coupable actif changent.
+
+> ⚠️ **Cohérence** : les textes détaillés ci-dessous décrivent la permutation `protecteur` (défaut canonique). Si vous activez une autre permutation, les indices affichés en jeu correspondent — le validateur (`validate:scenario`) ne vérifie que la structure, pas l'identité du coupable.
+
+---
+
 ## 1. VÉRITÉ (fixe par design)
 
 - **Coupable (maître d'œuvre)** : le Major Hale, « LE PROTECTEUR », garde du corps de la victime.
@@ -36,13 +65,25 @@
 | id | Nom | Rôle |
 |---|---|---|
 | detective-partner | Inspecteur Wexford | Partenaire, guide |
-| protecteur | Major Hale | Garde du corps — COUPABLE |
+| protecteur | Major Hale | **Garde du corps et majordome en chef** — COUPABLE |
 | femme-fatale | Lady Vivienne | Héritière, menaces anonymes |
 | seducteur | Julian Pembrooke | Endetté, faux alibi « panne » |
 | suspect | Rupert Blackwood | Créancier, mauvais payeur |
 | marginal | Silas Crane | Clochard-témoin (rôdeur de 22h) |
 | criminel | Victor Krane | Tueur à gages (ADN inconnu) |
 | scientifique | Dr Whitmore | Médecin légiste |
+
+> **Note de cohérence** : Le Major Hale cumule deux fonctions indissociables — **garde du corps** de la victime ET **majordome en chef** de la maison. Cette double casquette lui donne l'accès (clé, alarme, coffre) et la confiance nécessaires au crime. Le joueur ne doit jamais lire « docteur » ou « simple domestique » à son sujet.
+
+**Règle de lieu par défaut (hors besoin scénario)** :
+- Scientifique (Whitmore) → laboratoire
+- Femme fatale (Vivienne) → intérieur manoir
+- Protecteur (Hale) → intérieur manoir
+- Détective partenaire → QG (exception : manoir en intro+acte 1)
+- Séducteur (Pembrooke) → intérieur bar
+- Marginal (Silas) → appartement pauvre (ruelle en narration)
+- Suspect (Blackwood) → appartement du suspect
+- Criminel (Krane) → extérieur bar ou ruelle
 
 ## 3. LIEUX (décor)
 `universe` (intro), `crimeScene` (bureau du magnat), `alley` (ruelle de Silas), `residence` (Rupert), `bar` (Victor Krane), `laboratoire` (Dr Whitmore), `qg` (quarter general), `clandestine` (planque), `prison`.
@@ -57,75 +98,67 @@
 3. *(crimeScene, Wexford)* Présentation du Major Hale, unique domestique, découvreur du corps.
 
 ### INTRO — Phase 1B « Recherche » (dialogue, musique recherche)
-1. **MINI-JEU `scene_fouille` (grand écran + loupe)** — image `scene de crime manoir.png`, 8 zones numérotées :
-   - **1** cachet de cire intact → personne n'a forcé le bureau ; l'assassin connaissait la maison.
-   - **2** carafe renversée → DEUX verres : la victime attendait un proche de confiance.
-   - **3** livre de comptes taché → pages des dettes arrachées.
-   - **A** lettre à moitié brûlée sous l'encrier → menaces d'une écriture élégante.
-   - **C** encrier intact, plume sèche → on a écrit AVANT le meurtre.
-   - **4** fauteuil renversé → lutte brève, près de la fenêtre.
-   - **5** mare de sang → aucune trace de défense : il connaissait son agresseur.
-   - **6** reçu froissé signé **« V.K. »** → forte somme en espèces.
-   - **INDICE MAJEUR (fin)** : meurtre prémédité par un proche ; vol simulé ; reçu V.K.
-2. **MINI-JEU `carnet_dechire`** *(prescription-eliane.png)* — reconstitution des pages arrachées + recherche d'empreintes à la loupe :
-   - Bandes remises en ordre = un versement régulier à **V.K. (Victor Krane)**.
-   - Empreintes révélées → le docteur/majordome a touché la mention V.K.
-   - **INDICE MAJEUR** : mobile financier établi — versements à Krane.
-3. *(protecteur)* Major Hale tremble : parti à 20h dépanner Pembrooke, retour 21h, corps découvert, coffre vidé. Rupert Blackwood est passé à 19h, « il lui devait beaucoup ».
-4. **CHOIX `choisirSuspect`** : Lady Vivienne / Julian Pembrooke / Rupert Blackwood.
+1. **MINI-JEU `scene_fouille` (grand écran + loupe)** — image `scene de crime manoir.png`, 8 zones numérotées (positions exactes sur l'image) :
+   - **A** (x=11.6%, y=66.1%) sceau en or et cachet → matériel de correspondance intact, l'intrus connaissait les lieux.
+   - **B** (x=24.1%, y=70.4%) encrier central et bloc d'écriture → zone où la victime rédigeait.
+   - **1** (x=31.2%, y=56.8%) papiers administratifs et plume ouverte → recherche rapide.
+   - **2** (x=38.6%, y=57.3%) deux verres de vin et coupelle → présence d'un invité de confiance.
+   - **3** (x=47.2%, y=58.3%) livre ouvert taché de sang → lutte en plein travail.
+   - **4** (x=66.4%, y=79.2%) fauteuil de bureau renversé → bousculade violente.
+   - **5** (x=70.8%, y=85.6%) trace de sang au sol → épicentre de l'agression.
+   - **6** (x=78.2%, y=86.3%) papier froissé à côté du corps → première énigme (chiffres/inscriptions).
+   - **INDICE MAJEUR (fin)** : meurtre prémédité par un proche ; vol simulé ; indices physiques précis.
+2. *(crimeScene, Wexford)* Le carnet déchiré révèle des pages manquantes → versements réguliers à « V.K. ».
+3. *(crimeScene, Wexford)* Le partenaire : « Vous tenez quelque chose ? Ces indices dessinent un mobile. Continuons. »
 
-### ACTE I — Phase 2A « Piste » (narration, musique thème)
-1. *(alley)* Soir, ruelle sombre. Silas Crane surgit de l'ombre.
-2. **MINI-JEU `pression`** — remettre dans l'ordre les questions qui font parler Silas :
-   1. Le proposer de partager un café → il se détend.
-   2. La pièce qu'il garde précieusement → « Elle est à moi. »
-   3. Le rôdeur de 22h09 → il craque : « J'ai vu son visage… »
-   - **INDICE MAJEUR** : le rôdeur de 22h était « bien habillé, pressé » — ressemble à Pembrooke ; sa panne tombe pile à cette heure.
-3. *(residence)* Arrivée chez Rupert Blackwood.
-4. *(allier, sans PNJ)* **MINI-JEU `cryptogramme`** *(krane-coded-note.png.jfif)* — décoder la note chiffrée de Victor Krane par substitution (clé dans le décor).
-   - **INDICE MAJEUR** : le contrat a été payé par un proche de l'intérieur — « Hale m'a engagé ». Confirme la piste Krane/coffre.
+### ACTE I — Phase 1 « Confrontation » (dialogue, musique recherche)
+1. *(residence, Hale)* Major Hale, **garde du corps et majordome en chef**, accueille le détective avec nervosité. « La maison est en deuil, faites vite. »
+2. *(residence, Lady Vivienne)* « Mon mari avait des ennemis, certes. Mais l'auteur de ce crime… c'est quelqu'un de la maison. »
+3. **MINI-JEU `montre_code`** *(scène de crime, manoir)* — examiner la montre du Duc :
+   - Face : aiguille figée à **22h09** = heure probable du crime.
+   - Dos : gravure « 1981 » = code du coffre (Acte II).
+   - **INDICE MAJEUR** : 22h09, à retenir pour le twist final. 1981 pour le coffre.
 
-### ACTE I — Phase 2B « Réflexion » (dialogue dynamique `interrogations`, musique réflexion)
-- Interrogatoires dans l'ordre choisi par le joueur (`suspectOrdre`), générés par app.js.
+### ACTE I — Phase 2 « Témoignages » (dialogue, musique réflexion)
+1. *(alley, Silas Crane)* « J'ai vu un rôdeur bien habillé aux alentours de 22h. » Premier maillon témoin.
+2. *(residence)* Le coffre-fort est vide mais 50 000 £ y figuraient → mobile financier.
+3. *(secretPlace, Rupert Blackwood)* « Quelqu'un a vidé les comptes ! Le testament a été modifié la semaine dernière. »
 
-### ACTE II — Phase 3A « Énigme » (dialogue, musique énigme)
-1. *(laboratoire, Dr Whitmore)* **MINI-JEU `labo_verrou`** — balayage thermique du verrou : 3 zones réchauffées.
-   - **INDICE MAJEUR** : verrou ouvert à la clé → accès au trousseau de Hale ; chaleur datée 22h.
-   - Whitmore : ADN de Vivienne, Pembrooke, Hale, Blackwood… **et un inconnu**.
-2. *(alley, sans PNJ)* **MINI-JEU `montre_code`** — la montre du Duc :
-   - Loupe sur le **DOS** → gravure **« 1981 »** (le joueur est volontairement attiré ici).
-   - Question finale : *« qu'avez-vous remarqué SUR LA FACE ? »*
-     - ✅ **L'aiguille figée à 22h09 = heure probable du crime** (+ 1981 servira pour un coffre).
-     - ❌ « Une montre cassée ne dit rien. »
-   - **INDICE MINEUR** : 1981 = millésime d'un coffre-fort. **INDICE MAJEUR** : 22h09, à retenir pour le twist.
-   - Texte de sortie : « si la montre est sincère, voilà l'heure du crime, que personne n'a encore établie. »
-3. **MINI-JEU `adn_analyse`** — relier 5 échantillons ; l'échantillon 5 (INCONNU) n'a aucune correspondance.
-   - **INDICE MAJEUR** : tueur professionnel engagé de l'extérieur — un contrat, pas un crime passionnel.
-4. *(bar, criminel)* Victor Krane, voix trop calme : « bu un verre à 18h… je rentrais chez moi. »
-5. *(alley, femme-fatale)* Vivienne souffle le nom de Krane comme « le corbeau » — brouillage possible.
-6. *(crimeScene, Wexford)* **MINI-JEU `coffre_code`** — le coffre familial : composer **1981** (récompense du joueur attentif).
-   - **INDICE MAJEUR** : carnet de versements — Hale a payé Krane en plusieurs fois, dernière la veille du meurtre. Hale n'était pas le gardien… mais l'employeur.
+### ACTE II — Phase 1 « Piste du bar » (dialogue, musique énigme)
+1. **MINI-JEU `carnet_dechire` (QG)** — reconstituer les pages arrachées du livre de comptes :
+   - Bandes remises en ordre → versements réguliers à **V.K. (Victor Krane)**.
+   - **Empreintes du Major Hale** sur la mention V.K. → lien direct.
+   - **INDICE MAJEUR** : mobile financier établi — Hale a payé Krane.
+2. *(bar, Julian Pembrooke)* « Je n'ai rien vu, rien entendu. Mais si vous cherchez un mobile, regardez du côté des dettes de Hale. » — alibi de panne.
+3. **MINI-JEU `coffre_fort` (QG)** — entrer le code 1981 (issu de la montre) :
+   - Documents : dettes de Blackwood, liaison de l'épouse avec Hale.
+   - **INDICE MAJEUR** : carnets de versements — Hale a payé Krane plusieurs fois, dernière fois la veille du meurtre.
 
-### ACTE III — Phase 4A « Le Nœud » (narration, musique thème)
-1. *(qg, Wexford)* Chronologie DES SUSPECTS : Rupert 21h→21h30, panne Pembrooke 22h, Hale retrouve le corps 23h. **LE TROU : personne ne sait quand la victime est morte. « À moins que votre montre… »**
-2. **MINI-JEU `chronologie`** — reconstituer la soirée (la ligne « 22h09 » est marquée *votre découverte*).
-   - **INDICE MAJEUR** : 22h09 est un fait que PERSONNE d'autre ne connaît — et l'alibi de Hale (22h) recouvre exactement ce créneau.
-3. *(qg, Wexford)* **MINI-JEU `roue_alibis`** — aligner le cadran de la montre, l'alibi de la panne et l'horloge-mère sur 22h09.
-   - **Texte pivot (twist)** : l'horloge-mère **corrobore la montre** : arrêtée net à 22h09. *L'heure du crime est établie* — un choc, pas un vol.
+### ACTE II — Phase 2 « Laboratoire » (dialogue, musique énigme)
+1. **MINI-JEU `adn_match` (Whitmore)** — comparer les échantillons ADN :
+   - Échantillon inconnu → **Victor Krane**.
+   - **INDICE MAJEUR** : tueur professionnel engagé, pas un crime passionnel.
+2. **MINI-JEU `cablage_alarme` (Whitmore)** — réparer le circuit de l'alarme :
+   - Câble marqué au charbon **AVANT** le sabotage → une main avertie a guidé l'intrus.
+   - **INDICE MAJEUR** : alarme neutralisée de l'intérieur par quelqu'un qui connaissait le système.
+3. *(residence, Hale)* Au manoir, la montre du Duc est intacte. Hale détourne le regard quand on la lui montre.
 
-### ACTE III — Phase 4B « Tension » (dialogue, musique Rising Tension)
-1. *(clandestine, Wexford)* Pembrooke et Vivienne se voient en secret ; la panne était-elle un mensonge ?
-2. *(laboratoire, Dr Whitmore)* **MINI-JEU `sabotage`** — la durite sectionnée.
-   - Texte : la panne offrait un alibi à Hale.
-3. *(qg, Wexford)* **MINI-JEU `cablage_alarme`** *(alarm-circuit-blueprint.png.jfif)* — rétablir la boucle d'intégrité du circuit.
-   - **INDICE MAJEUR** : l'alarme a été neutralisée de l'intérieur par quelqu'un qui connaissait le système (Hale). Pas d'effraction.
-4. *(qg, Wexford)* **MINI-JEU `cable_match`** — fils de l'alarme + graffiti au charbon → écriture ≠ Hale.
-   - Texte : Hale savait où et quand « dépanner » Pembrooke ; le graffiti n'est pas sa main.
+### ACTE III — Phase 1 « Tension » (dialogue, musique tension)
+1. **MINI-JEU `cryptogramme` (QG)** — décoder la note chiffrée de Victor Krane :
+   - **« HALE ENGAGE KRANE »** — la complicité est établie.
+   - **INDICE MAJEUR** : le contrat a été payé par un proche de l'intérieur.
+2. *(residence, Lady Vivienne)* Les fichiers du coffre : Vivienne trompait la victime avec Hale.
+3. *(residence, Hale)* « Je n'ai rien dit de tout cela ! Vous n'avez aucune preuve ! »
 
-### ACTE III — Phase 4C « Révélation » (dialogue, musique Act III Revelations)
-1. *(crimeScene, criminel)* Krane avoue en partie : « je suis payé pour la violence. »
-2. *(crimeScene, protecteur)* Hale se contredit : décrit la mare de sang trop précisément, porte verrouillée à son retour.
-3. **CHOIX FINAL `accuser`** : protecteur / femme-fatale / seducteur / suspect / marginal / criminel.
+### ACTE III — Phase 2 « Révélation » (dialogue, musique tension)
+1. *(qg, Wexford)* « Si la durite a été coupée, alors Hale savait où et quand aider Pembrooke. » → la panne était un faux alibi coordonné.
+2. *(secretPlace, Silas Crane)* « Blackwood m'a payé pour mentir. Le rôdeur, c'était Pembrooke. » → confirmation du complice.
+3. *(alley, Krane)* Le téléphone de Hale sonne. C'est Krane : « Tu m'as payé pour le meurtre. C'est fini. »
+
+### ACTE III — Phase 3 « Révélation finale » (dialogue, musique stress)
+1. *(alley, Krane)* « Je ne connaissais pas la victime par hasard. C'est Hale qui m'a contacté. »
+2. *(residence, Hale)* Hale se contredit : il décrit la mare de sang avec trop de précision, porte verrouillée à son retour.
+3. **CHOIX FINAL `accuser`** (QG, Wexford) : protecteur / femme-fatale / seducteur / suspect / marginal / criminel.
 
 ### OUTRO « Épilogue » (généré par app.js selon `accuser`)
 
@@ -135,37 +168,40 @@
 - Lady Vivienne complice démasquée, Julian Pembrooke alibi tombé.
 - Morale : « De l'amour à la folie criminelle, il n'y a qu'une obsession. »
 
-**Mauvaise accusation** — chaque innocent a une réaction unique qui indique au joueur ce qu'il a manqué :
-- **femme-fatale** : Vivienne éclate d'un rire amer. « Regardez plutôt Hale : ses dettes, ses versements à Krane, ce faux alibi. » → indices `mobile` + `alibi` manquants.
-- **seducteur** : Pembrooke blêmit. « J'étais en panne ! La panne était un faux — mais moi je n'étais que l'alibi. » → indice `alibi` (sabotage) manquant.
-- **suspect** : Rupert ricane. « J'étais parti à 21h30, Silas peut confirmer. Ce n'est pas moi qui ai sectionné la durite. » → indice `witness` (Silas) manquant.
-- **marginal** : Silas secoue la tête. « J'ai VU le rôdeur à 22h — suivez cette piste. » → indice `timeline` manquant.
-- **criminel** : Krane sourit. « Je ne suis que le bras. La main, c'est Hale — relisez les versements du coffre. » → indice `mobile` (coffre) manquant.
+**Mauvaise accusation** — chaque innocent a une **réaction unique** qui indique au joueur ce qu'il a manqué :
+- **femme-fatale** : Lady Vivienne esquisse un sourire glacial. « Vous croyez vraiment que je me serais salie les mains ? Vous manquez de preuves, inspecteur. » → Le véritable commanditaire vous échappe. ÉCHEC.
+- **seducteur** : Julian Pembrooke pâle. « C'est une erreur… j'étais en panne, je vous l'ai dit ! » → La panne était factice, mais il n'était que l'alibi. ÉCHEC.
+- **suspect** : Rupert Blackwood ricane. « J'étais parti à 21h30, Silas Crane peut le confirmer. Ce n'est pas moi qui ai sectionné cette durite… ni payé Krane. » ÉCHEC.
+- **marginal** : Silas Crane secoue la tête. « Je ne suis qu'un clochard, pas un meurtrier. J'ai VU le rôdeur à 22h — suivez cette piste, trouvez qui il était. » ÉCHEC.
+- **criminel** : Victor Krane sourit lentement. « Je ne suis que le bras, inspecteur. La main qui m'a guidé, c'est Hale — mon employeur. Relisez les versements dans le coffre. » ÉCHEC.
 
 **Dans tous les cas d'échec** : le vrai coupable s'échappe, le joueur perd son badge, fin dépressive. Le faisceau de preuves (affiché à l'écran) montre exactement quelles catégories étaient insuffisantes.
 
 ---
 
-## 5. ÉCONOMIE DES INDICES (design)
+## 5. ÉCONOMIE DES INDICES (design) — V4 (intégration organique)
 
-| Énigme | Type (phases.js) | Catégorie | Contenu | Payoff |
+| Énigme | Phase | Catégorie | Contenu | Payoff |
 |---|---|---|---|---|
-| Fouille de scène | `scene_fouille` | `forensic` | Préméditation + vol simulé + reçu V.K. | Cible l'entourage + Krane |
-| Carnet déchiré | `carnet_dechire` | `mobile` | Versements à V.K. + empreintes | Mobile financier + preuves matérielles |
-| Pression (Silas) | `pression` | `witness` | Rôdeur bien habillé à ~22h | Pointe Pembrooke/Hale |
-| Verrou thermique | `labo_verrou` | `timeline` | Ouvert à la clé, 22h | Accès de Hale |
-| ADN | `adn_analyse` | `forensic` | Tueur de contrat | Exclut crime passionnel |
-| Montre (face) | `montre_code` | `timeline` | **Heure du crime 22h09** | Twist final |
-| Montre (dos) | `montre_code` | — | Code 1981 | Coffre Acte II |
-| Cryptogramme | `cryptogramme` | `mobile` | Note décodée : Hale engage Krane | Confirme le coffre |
-| Coffre | `coffre_code` | `mobile` | Hale payait Krane | Lie le mobile |
-| Chronologie | `chronologie` | `timeline` | Alibi Hale recouvre 22h09 | Twist final |
-| Câblage alarme | `cablage_alarme` | `opportunity` | Alarme neutralisée de l'intérieur | Connaissance des lieux |
-| Sabotage | `sabotage` | `alibi` | Durite sectionnée | Fausse panne = faux alibi |
-| Câble/graphite | `cable_match` | `opportunity` | Graffiti ≠ main de Hale | Complicité de Pembrooke |
-| Roue des alibis | `roue_alibis` | `timeline` | Alignement 22h09 + horloge-mère | Verrouille l'heure |
+| Fouille de scène | intro-2 | `forensic` | 8 indices visuels (positions exactes) + clic = consigné au journal | Préméditation + indices physiques |
+| Montre du Duc | act1_1 | `timeline` | Face 22h09 + Dos 1981 | Heure du crime + code coffre |
+| Carnet déchiré | act2_1 (QG) | `mobile` | Versements à V.K. + empreintes Hale | Mobile financier |
+| Coffre-fort | act2_1 (QG) | `mobile` | Code 1981 → documents/dettes/liaison | Lie Hale à l'argent |
+| ADN | act2_2 (Labo) | `forensic` | Échantillon B = Krane | Tueur professionnel |
+| Câblage alarme | act2_2 (Labo) | `opportunity` | Charbon AVANT sabotage | Intrusion interne |
+| Cryptogramme | act3_1 (QG) | `mobile` | « HALE ENGAGE KRANE » | Complicité prouvée |
 
-**Règle d'or** : aucune énigme n'est bloquante (bouton « Passer »). Chaque réussite affiche un panneau « 🔎 INDICE MAJEUR » bien visible — résoudre doit donner un avantage réel.
+**Placement narratif** :
+- **Acte 1** (Manoir + scène de crime) : fouille + montre = indices matériels directs
+- **Acte 2** (QG + Labo) : documents (carnet, coffre) puis preuves scientifiques (ADN, alarme)
+- **Acte 3** (Confrontations) : cryptogramme = preuve textuelle avant l'accusation
+
+**Règle d'or** : aucune énigme n'est bloquante (bouton « Passer »). Chaque réussite :
+- Affiche un panneau « 🔎 INDICE MAJEUR »
+- Enregistre l'indice dans le **journal du détective** (carnet 📓) via `TDNarrativeEngine.addClue()`
+- Enregistre l'étape via `TDNarrativeEngine.addStep()` pour l'historique
+
+**Journal/notebook** : tous les indices collectés (fouille, mini-jeux, dialogues) sont stockés dans `gameState.discoveredClues` et visibles en jeu via le bouton 📓 de la barre supérieure.
 
 ## 6. MINI-PUZZLES (énigmes logiques sans assets externes)
 

@@ -549,6 +549,15 @@ langEnBtn: document.getElementById('lang-en'),
         if ($.langFrBtn) {
             $.langFrBtn.addEventListener('click', function () { setLanguage('fr'); });
         }
+
+        // Click global pour skipper le typewriter n'importe où sur l'écran
+        document.addEventListener('click', function (e) {
+            if (ui.isTyping && typeof skipTypeWriter === 'function') {
+                // Ne pas skipper si on clique sur un bouton ou un élément interactif
+                if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+                skipTypeWriter();
+            }
+        });
     }
 
     function updateLanguageUI() {
@@ -1723,17 +1732,29 @@ langEnBtn: document.getElementById('lang-en'),
      function skipTypeWriter() {
         stopNarrationTimer();
         ui.skipPending = true;
-        TDAudioService.stopSpeaking();
-        $.dialogueText.textContent = getCurrentSceneText();
-        onCompleteTyping();
+        if (TDAudioService && typeof TDAudioService.stopSpeaking === 'function') {
+            TDAudioService.stopSpeaking();
+        }
+        if ($.dialogueText && _currentDialogue) {
+            $.dialogueText.textContent = _currentDialogue;
+        }
+        ui.isTyping = false;
+        if ($.typeCursor) $.typeCursor.classList.add('hidden');
+        // Appeler le callback immédiatement
+        if (_typeWriterCallback) {
+            var cb = _typeWriterCallback;
+            _typeWriterCallback = null;
+            cb();
+        }
      }
 
     var _currentDialogue = '';
+    var _typeWriterCallback = null;
 
     function typeWriter(text, onComplete, speed) {
         _currentDialogue = text || '';
+        _typeWriterCallback = onComplete;
         speed = speed || ui.typingSpeed;
-        ui.isTyping = true;
         ui.skipPending = false;
 
         if (!$.dialogueText || !$.typeCursor) {
@@ -1741,31 +1762,36 @@ langEnBtn: document.getElementById('lang-en'),
             return;
         }
 
-        var i = 0;
-        var len = text.length;
+        // Effet machine à écrire avec skip au clic
         $.dialogueText.textContent = '';
         $.typeCursor.classList.remove('hidden');
+        ui.isTyping = true;
+        var i = 0;
 
-        function type() {
+        function typeChar() {
             if (ui.skipPending) {
+                // Afficher tout le texte restant
                 $.dialogueText.textContent = text;
                 ui.isTyping = false;
-                ui.skipPending = false;
-                $.typeCursor.classList.remove('hidden');
+                $.typeCursor.classList.add('hidden');
+                _typeWriterCallback = null;
                 if (onComplete) { onComplete(); }
                 return;
             }
-            if (i < len) {
+
+            if (i < text.length) {
                 $.dialogueText.textContent += text.charAt(i);
                 i++;
-                setTimeout(type, speed);
+                setTimeout(typeChar, speed);
             } else {
                 ui.isTyping = false;
-                $.typeCursor.classList.remove('hidden');
+                $.typeCursor.classList.add('hidden');
+                _typeWriterCallback = null;
                 if (onComplete) { onComplete(); }
             }
         }
-        type();
+
+        typeChar();
     }
 
     function getCurrentSceneText() {
@@ -2511,6 +2537,19 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
 
         hideLoading();
         typeWriter(txt, function () { if (scr.active) renderScenarioPageAfter(); });
+
+        // Click pour skipper le typewriter dans le mode scénario
+        var gameScreen = document.getElementById('game-screen');
+        if (gameScreen) {
+            gameScreen.onclick = function (e) {
+                // Ne pas skipper si on clique sur un bouton ou élément interactif
+                if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+                if (ui.isTyping && typeof skipTypeWriter === 'function') {
+                    skipTypeWriter();
+                }
+            };
+            gameScreen.style.cursor = 'pointer';
+        }
     }
 
     function renderScenarioPageAfter() {
@@ -2528,6 +2567,12 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                     if (!s.clues) s.clues = [];
                     var clue = scrClueFromMinigame(page.minigame);
                     s.clues.push(clue);
+                    if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
+                        window.TDNarrativeEngine.addClue(clue);
+                        if (typeof window.TDNarrativeEngine.addStep === 'function') {
+                            window.TDNarrativeEngine.addStep('minigame', clue);
+                        }
+                    }
                     showClueToast(clue);
                 }
                 scrNext();
@@ -2538,11 +2583,15 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     }
 
     function scrClueFromMinigame(mg) {
-        if (!mg) return 'Indice bonus';
-        var labels = mg.hotspots
-            ? mg.hotspots.map(function (h) { return TDScenario.t(h, ui.language); }).join(', ')
-            : (mg.title ? TDScenario.t(mg.title, ui.language) : 'Indice bonus');
-        return ui.language === 'fr' ? ('Indice relevé : ' + labels) : ('Clue found : ' + labels);
+        if (!mg) return ui.language === 'fr' ? 'Indice bonus' : 'Bonus clue';
+        var lang = ui.language;
+        if (mg.hotspots && mg.hotspots.length) {
+            var first = mg.hotspots[0];
+            var info = (first.info && (first.info[lang] || first.info.fr || first.info.en)) || first.label;
+            return (lang === 'fr' ? 'Indice relevé : ' : 'Clue found : ') + first.label + ' — ' + info;
+        }
+        var title = (mg.title && (mg.title[lang] || mg.title.fr || mg.title.en)) || (lang === 'fr' ? 'Indice bonus' : 'Bonus clue');
+        return (lang === 'fr' ? 'Indice relevé : ' : 'Clue found : ') + title;
     }
 
     function renderEvidenceBeam(summary) {
@@ -2762,6 +2811,15 @@ function scrApplyChoice(choiceKey, choiceId) {
             $.endScreen.classList.add('active');
         }
     }
+        // ===== EXPOSITION MODE DÉVELOPPEUR =====
+    // Expose les fonctions nécessaires pour le mode développeur
+    window.scrResetState = scrResetState;
+    window.renderScenarioPage = renderScenarioPage;
+    window.scrCurrentPhase = scrCurrentPhase;
+    window.scr = scr;
+    window.skipTypeWriter = skipTypeWriter;
+    window.startScenarioGame = startScenarioGame;
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

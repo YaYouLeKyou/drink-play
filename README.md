@@ -121,6 +121,19 @@ Aucun mini-jeu n'est bloquant : résoudre récompense d'un **indice majeur** vis
 | `cablage_alarme` | opportunity | Alarme neutralisée de l'intérieur |
 | `cable_match` | opportunity | Graffiti ≠ main de Hale |
 
+### Permutations (rejouabilité)
+
+Quatre variantes du scénario partagent la même structure fixe et la même heure du crime (**22h09**) ; seul le coupable / co-complice / fausse piste change, avec les textes de fouille et les indices adaptés.
+
+| Id | Coupable | Activer |
+|---|---|---|
+| `protecteur` (défaut) | Major Hale | `npm run permute -- protecteur` |
+| `femme-fatale` | Lady Vivienne | `npm run permute -- femme-fatale` |
+| `criminel` | Victor Krane | `npm run permute -- criminel` |
+| `suspect` | Rupert Blackwood | `npm run permute -- suspect` |
+
+Moteur : `true-detective/permutations.js` (données) + `tools/generate-permutation.js` (écriture dans `phases.js`/`scenario.js`). Chaque exécution fait un backup horodaté.
+
 ---
 
 ## 🕵️ True Detective — Pont de scénario
