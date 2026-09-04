@@ -2558,10 +2558,17 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         if (npcId === 'dynamic') npcId = scrInterrogationConfig(scr.pageIdx).npcId;
         var txt = TDScenario.t(page.text, ui.language);
 
+        if (page.minigame) {
+            npcId = null;
+        }
+
         if (npcId) {
             $.npcName.textContent = scrNpcName(npcId);
             var npcImg = scrNpcImage(npcId);
             if (npcImg) loadNPCImage(npcImg);
+        } else {
+            $.npcName.textContent = '';
+            hideNPC();
         }
 
         if ($.pageNav) {
