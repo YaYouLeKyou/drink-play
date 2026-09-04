@@ -213,7 +213,7 @@
             return input;
         }
         var timeInput = field(
-            lang === 'fr' ? 'Heure du crime relevée (ex: 22h09)' : 'Time of death (e.g. 10:09pm)',
+            lang === 'fr' ? 'Heure du crime relevée (ex: 20h45)' : 'Time of death (e.g. 8:45pm)',
             lang === 'fr' ? 'HHhMM' : 'HH:MM',
             8
         );
@@ -303,7 +303,7 @@
         var timeCell = document.createElement('input');
         timeCell.className = 'time-cell';
         timeCell.type = 'text';
-        timeCell.placeholder = lang === 'fr' ? 'Heure relevée sur la face (ex : 22h09)' : 'Time from the face (e.g. 10:09pm)';
+        timeCell.placeholder = lang === 'fr' ? 'Heure relevée sur la face (ex : 20h45)' : 'Time from the face (e.g. 8:45pm)';
         timeCell.maxLength = 5;
         timeCell.disabled = false;
         timeRow.appendChild(timeCell);
@@ -577,6 +577,139 @@
                     }
                 });
                 stepsBox.appendChild(b);
+            });
+        },
+
+        /* Le Réseau d'Alibis (Cartographie mentale)
+           Le joueur dispose des dépositions des témoins. Chaque carte
+           peut être un VRAI ou un MENSONGE. Le joueur clique sur
+           chaque carte pour l'identifier ; il gagne quand toutes les
+           cartes sont correctement étiquetées.                    */
+        'reseau_alibis': function (body) {
+            var cards = (cfg.testimonies || []).map(function (c) {
+                return {
+                    id: c.id,
+                    witness: t(c.witness, lang),
+                    statement: t(c.statement, lang),
+                    isLie: !!c.isLie
+                };
+            });
+            if (!cards.length) { complete(true); return; }
+
+            var lieCount = 0;
+            for (var j = 0; j < cards.length; j++) if (cards[j].isLie) lieCount++;
+            var totalCards = cards.length;
+            var lieIds = [];
+            for (var k = 0; k < cards.length; k++) if (cards[k].isLie) lieIds.push(cards[k].id);
+            var foundLies = 0;
+            var mistakes = 0;
+            var locked = false;
+
+            var intro = document.createElement('div');
+            intro.className = 'reseau-alibis-intro';
+            intro.textContent = (lang === 'fr'
+                ? (lieCount > 1
+                    ? 'Croisez les dépositions. Cliquez sur chaque carte : Mensonge ou Vérité. Identifiez les ' + lieCount + ' menteurs.'
+                    : 'Croisez les dépositions. Une carte contredit les autres : cliquez sur le MENSONGE.')
+                : (lieCount > 1
+                    ? 'Cross-reference the testimonies. Click each card : Lie or Truth. Identify the ' + lieCount + ' liars.'
+                    : 'Cross-reference the testimonies. One card contradicts the others : click on the LIE.'));
+            body.appendChild(intro);
+
+            var counter = document.createElement('div');
+            counter.className = 'reseau-alibis-counter';
+            counter.textContent = (lang === 'fr'
+                ? 'Menteurs identifiés : 0 / ' + lieCount
+                : 'Liars found : 0 / ' + lieCount);
+            body.appendChild(counter);
+
+            var grid = document.createElement('div');
+            grid.className = 'reseau-alibis-grid';
+            body.appendChild(grid);
+
+            cards.forEach(function (c) {
+                var card = document.createElement('button');
+                card.className = 'reseau-alibis-card';
+                card.type = 'button';
+
+                var who = document.createElement('div');
+                who.className = 'reseau-alibis-who';
+                who.textContent = c.witness;
+                card.appendChild(who);
+
+                var what = document.createElement('div');
+                what.className = 'reseau-alibis-what';
+                what.textContent = c.statement;
+                card.appendChild(what);
+
+                var tag = document.createElement('div');
+                tag.className = 'reseau-alibis-tag';
+                tag.textContent = (lang === 'fr' ? 'À juger' : 'To judge');
+                card.appendChild(tag);
+
+                card.addEventListener('click', function () {
+                    if (locked || card.dataset.done) return;
+                    if (c.isLie) {
+                        card.dataset.done = '1';
+                        card.classList.add('lie-found');
+                        tag.textContent = (lang === 'fr' ? 'Mensonge' : 'Lie');
+                        tag.classList.add('tag-lie');
+                        foundLies++;
+                        counter.textContent = (lang === 'fr'
+                            ? 'Menteurs identifiés : ' + foundLies + ' / ' + lieCount
+                            : 'Liars found : ' + foundLies + ' / ' + lieCount);
+                        if (foundLies >= lieCount) {
+                            /* Toutes les cartes menteuses trouvées :
+                               on confirme les autres comme "vrai".   */
+                            locked = true;
+                            grid.querySelectorAll('.reseau-alibis-card').forEach(function (other) {
+                                if (other !== card && !other.classList.contains('lie-found')) {
+                                    other.classList.add('confirmed-true');
+                                    var t2 = other.querySelector('.reseau-alibis-tag');
+                                    if (t2) {
+                                        t2.textContent = (lang === 'fr' ? 'Vrai' : 'True');
+                                        t2.classList.add('tag-true');
+                                    }
+                                }
+                            });
+                            complete(true);
+                        }
+                    } else {
+                        mistakes++;
+                        card.classList.add('wrong');
+                        tag.textContent = (lang === 'fr' ? 'Erreur' : 'Wrong');
+                        tag.classList.add('tag-wrong');
+                        setTimeout(function () {
+                            card.classList.remove('wrong');
+                            tag.classList.remove('tag-wrong');
+                            tag.textContent = (lang === 'fr' ? 'À juger' : 'To judge');
+                        }, 700);
+                        /* Si 3 erreurs sur la même carte, on la bloque
+                           comme "vrai" pour ne pas bloquer le joueur. */
+                        if (mistakes >= 3) {
+                            card.dataset.done = '1';
+                            card.classList.add('confirmed-true');
+                            tag.textContent = (lang === 'fr' ? 'Vrai' : 'True');
+                            tag.classList.add('tag-true');
+                            if (foundLies >= lieCount) {
+                                locked = true;
+                                complete(true);
+                            }
+                        }
+                    }
+                });
+                grid.appendChild(card);
+            });
+
+            /* Hint adaptatif : à 40% du temps, illumine les cartes
+               qui contiennent un mensonge.                          */
+            registerHint(function () {
+                grid.querySelectorAll('.reseau-alibis-card').forEach(function (c) {
+                    var who = c.querySelector('.reseau-alibis-who');
+                    if (!who) return;
+                    var match = cards.filter(function (x) { return lieIds.indexOf(x.id) !== -1 && x.witness === who.textContent; })[0];
+                    if (match) c.classList.add('hint-glow');
+                });
             });
         },
 
@@ -1134,7 +1267,7 @@
             body.appendChild(wrap);
             var dial = document.createElement('div'); dial.className = 'roue-dial'; body.appendChild(dial);
             var cursors = [
-                { label: lang === 'fr' ? 'Montre (22h09)' : 'Watch (10:09pm)', target: 22.15, color: '#7fd48a' },
+                { label: lang === 'fr' ? 'Montre (heure du crime)' : 'Watch (time of death)', target: 22.15, color: '#7fd48a' },
                 { label: lang === 'fr' ? 'Horloge-mère' : 'Grandfather clock', target: 22.15, color: '#f0d890' },
                 { label: lang === 'fr' ? 'Alibi de Hale' : "Hale's alibi", target: 20.0, color: '#d8574a' }
             ];
