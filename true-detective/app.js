@@ -2613,7 +2613,6 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     }
 
     function scrRenderInlineMinigame(page) {
-        var $ = getPageElements();
         $.dialogueText.innerHTML = '';
         $.typeCursor.classList.add('hidden');
         $.choicesContainer.innerHTML = '';
