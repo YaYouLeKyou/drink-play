@@ -2370,6 +2370,7 @@ langEnBtn: document.getElementById('lang-en'),
         pageIdx: 0,
         active: false,
         awaitingChoice: false,
+        interro: null,
     };
 
     var SCENARIO_NPC_ASSETS = {
@@ -2536,6 +2537,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.choicesContainer.innerHTML = '';
         $.conversationInput.classList.add('hidden');
         $.continueBtn.classList.add('hidden');
+        $.continueBtn.disabled = false;
         $.continueBtn.onclick = null;
         $.npcName.textContent = '';
         hideNPC();
@@ -2622,7 +2624,139 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             });
             return;
         }
+        if (page.interrogation && window.TDNarration && window.TDNarration.interrogations &&
+            window.TDNarration.interrogations[page.interrogation]) {
+            scrStartInterrogation(page);
+            return;
+        }
         scrShowAdvance(page);
+    }
+
+    /* =====================================================================
+       INTERROGATOIRE — 3 phases × 3 questions (box qui se renouvelle).
+       Flow : intro → bouton « Interroger » → 3 questions → la question
+       s'efface, la réponse remplace la question dans la box → indice
+       consigné dans le journal → « Interroger » → phase suivante (les
+       3 nouvelles questions remplacent la réponse). Le bouton « Continuer »
+       reste toujours à l'écran (désactivé jusqu'à la fin).
+       ===================================================================== */
+    function itl(obj) {
+        if (!obj) return '';
+        return obj[ui.language] || obj.fr || obj.en || '';
+    }
+
+    function scrInterroRounds(data) {
+        if (data.rounds && data.rounds.length) { return data.rounds; }
+        if (data.rounds2 || data.rounds3) {
+            var rounds = [data.questions || []];
+            if (data.rounds2) rounds.push(data.rounds2);
+            if (data.rounds3) rounds.push(data.rounds3);
+            return rounds;
+        }
+        return [data.questions || []];
+    }
+
+    function scrStartInterrogation(page) {
+        scr.interro = { id: page.interrogation, round: 0, done: false };
+        // « Continuer » reste à l'écran mais reste inactif pendant l'interrogatoire
+        $.continueBtn.classList.remove('hidden');
+        $.continueBtn.disabled = true;
+        $.continueBtn.textContent = getText('continue') || 'Continuer';
+        $.continueBtn.onclick = null;
+        scrShowInterroAskButton();
+    }
+
+    function scrShowInterroAskButton() {
+        var lang = ui.language;
+        scr.awaitingChoice = true;
+        $.choicesContainer.innerHTML = '';
+        var btn = document.createElement('button');
+        btn.className = 'btn btn-choice interrogation-ask';
+        btn.textContent = lang === 'fr' ? '🔍 Interroger' : '🔍 Interrogate';
+        btn.addEventListener('click', function () {
+            if (!scr.awaitingChoice || ui.isTyping) return;
+            scr.awaitingChoice = false;
+            scrShowInterroQuestions();
+        });
+        $.choicesContainer.appendChild(btn);
+    }
+
+    function scrShowInterroQuestions() {
+        var it = scr.interro;
+        if (!it) { return; }
+        var rounds = scrInterroRounds(window.TDNarration.interrogations[it.id]);
+        var qs = rounds[Math.min(it.round, rounds.length - 1)] || [];
+        var lang = ui.language;
+        // La box se renouvelle : la réponse précédente est remplacée par la liste de questions
+        $.dialogueText.textContent = lang === 'fr'
+            ? 'Phase ' + (it.round + 1) + '/3 — Choisissez votre question :'
+            : 'Phase ' + (it.round + 1) + '/3 — Pick your question :';
+        $.typeCursor.classList.add('hidden');
+        scr.awaitingChoice = true;
+        $.choicesContainer.innerHTML = '';
+        qs.forEach(function (q) {
+            var btn = document.createElement('button');
+            btn.className = 'btn btn-choice interrogation-question';
+            btn.textContent = itl(q.label);
+            btn.addEventListener('click', function () {
+                if (!scr.awaitingChoice) return;
+                scr.awaitingChoice = false;
+                $.choicesContainer.innerHTML = '';
+                scrAskInterroQuestion(q);
+            });
+            $.choicesContainer.appendChild(btn);
+        });
+    }
+
+    function scrAskInterroQuestion(q) {
+        var response = TDScenario.t(q.response, ui.language) || '';
+        typeWriter(response, function () {
+            if (!scr.active) { return; }
+            // Indice extrait de la réponse (« [Indice X] ... » / « [X clue] ... ») → journal
+            var clue = scrClueFromInterroResponse(response);
+            if (clue) {
+                var s = scrGetState();
+                if (!s.clues) { s.clues = []; }
+                if (s.clues.indexOf(clue) === -1) { s.clues.push(clue); }
+                if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
+                    window.TDNarrativeEngine.addClue(clue);
+                    if (typeof window.TDNarrativeEngine.addStep === 'function') {
+                        window.TDNarrativeEngine.addStep('interrogation', clue);
+                    }
+                }
+                if (q.evidence && typeof TDScenario.recordEvidence === 'function') {
+                    TDScenario.recordEvidence(q.evidence);
+                }
+                showClueToast(clue);
+                updateNotebook();
+            }
+            var it = scr.interro;
+            it.round++;
+            var rounds = scrInterroRounds(window.TDNarration.interrogations[it.id]);
+            if (it.round < rounds.length && rounds[it.round] && rounds[it.round].length) {
+                scrShowInterroAskButton();
+            } else {
+                scrEndInterrogation();
+            }
+        });
+    }
+
+    function scrClueFromInterroResponse(text) {
+        if (!text) { return null; }
+        var m = text.match(/\[(?:Indice|Clue)[^\]]*\][^\n]*/g);
+        return m && m.length ? m.join(' ') : null;
+    }
+
+    function scrEndInterrogation() {
+        scr.interro.done = true;
+        scr.awaitingChoice = false;
+        $.continueBtn.disabled = false;
+        $.continueBtn.textContent = getText('continue') || 'Continuer';
+        $.continueBtn.onclick = function () {
+            if (scr.interro && !scr.interro.done) { return; }
+            scr.interro = null;
+            scrNext();
+        };
     }
 
     function scrClueFromMinigame(mg) {

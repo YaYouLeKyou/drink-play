@@ -961,6 +961,30 @@ html {
     width: 100%;
     text-align: left;
 }
+/* ===== Interrogatoire (3 phases × 3 questions) ===== */
+
+.btn-continue:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    filter: grayscale(0.6);
+}
+
+.interrogation-ask {
+    text-align: center;
+    border: 1px solid rgba(255, 0, 255, 0.5);
+}
+
+.interrogation-question {
+    border-left: 3px solid rgba(0, 255, 255, 0.5);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.interrogation-question:hover {
+    border-left-color: rgba(255, 0, 255, 0.8);
+    transform: translateX(4px);
+}
+
+
 
 /* ===== NPC Conversation ===== */
 
