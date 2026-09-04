@@ -2490,7 +2490,7 @@ langEnBtn: document.getElementById('lang-en'),
     function scrInterrogationConfig(orderIdx) {
         var s = scrGetState();
         var order = s.suspectOrdre;
-        var id = (order && order[orderIdx]) || s.prochainSuspect || 'suspect';
+        var id = s.prochainSuspect || (order && order[orderIdx]) || 'suspect';
         var decorKey = (id === 'seducteur') ? 'bar'
             : (id === 'suspect' ? 'clandestine' : 'residence');
         return { npcId: id, decor: decorKey };
@@ -2605,7 +2605,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             return;
         }
         if (page.interrogation && window.TDNarration && window.TDNarration.interrogations &&
-            window.TDNarration.interrogations[page.interrogation]) {
+            (window.TDNarration.interrogations[page.interrogation] || page.interrogation === 'dynamic')) {
             scrStartInterrogation(page);
             return;
         }
@@ -2767,7 +2767,12 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     }
 
     function scrStartInterrogation(page) {
-        scr.interro = { id: page.interrogation, round: 0, done: false };
+        var interroId = page.interrogation;
+        if (interroId === 'dynamic') {
+            var s = scrGetState();
+            interroId = s.prochainSuspect || 'suspect';
+        }
+        scr.interro = { id: interroId, round: 0, done: false };
         // « Continuer » reste à l'écran mais reste inactif pendant l'interrogatoire
         $.continueBtn.classList.remove('hidden');
         $.continueBtn.disabled = true;
@@ -2865,6 +2870,10 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.continueBtn.onclick = function () {
             if (scr.interro && !scr.interro.done) { return; }
             scr.interro = null;
+            var s = scrGetState();
+            if (s.prochainSuspect) {
+                s.prochainSuspect = null;
+            }
             scrNext();
         };
     }
@@ -2929,6 +2938,29 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 });
                 $.choicesContainer.appendChild(btn);
             });
+            if (page.choiceKey === 'finalChoice') {
+                var s = scrGetState();
+                var reinterroges = s.reinterroges || [];
+                var suspects = ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel'];
+                suspects.forEach(function (suspectId) {
+                    if (reinterroges.indexOf(suspectId) >= 0) return;
+                    var btn = document.createElement('button');
+                    btn.className = 'btn btn-choice';
+                    btn.textContent = (ui.language === 'fr' ? 'Réinterroger ' : 'Re-interrogate ') + scrChoiceLabel(suspectId);
+                    btn.addEventListener('click', function () {
+                        if (!scr.awaitingChoice) return;
+                        scr.awaitingChoice = false;
+                        s.prochainSuspect = suspectId;
+                        scr.interro = { id: suspectId, round: 0, done: false };
+                        $.continueBtn.classList.remove('hidden');
+                        $.continueBtn.disabled = true;
+                        $.continueBtn.textContent = getText('continue') || 'Continuer';
+                        $.continueBtn.onclick = null;
+                        scrShowInterroAskButton();
+                    });
+                    $.choicesContainer.appendChild(btn);
+                });
+            }
         } else {
             $.continueBtn.classList.remove('hidden');
             $.continueBtn.textContent = getText('continue') || 'Continuer';
@@ -2969,6 +3001,19 @@ function scrApplyChoice(choiceKey, choiceId) {
             var others = all.filter(function (x) { return x !== choiceId; });
             s.suspectOrdre = [choiceId].concat(others);
             scrNext();
+        } else if (choiceKey === 'reinterroger') {
+            if (!s.reinterroges) s.reinterroges = [];
+            if (s.reinterroges.indexOf(choiceId) >= 0) {
+                scrNext();
+                return;
+            }
+            s.reinterroges.push(choiceId);
+            scr.interro = { id: choiceId, round: 0, done: false };
+            $.continueBtn.classList.remove('hidden');
+            $.continueBtn.disabled = true;
+            $.continueBtn.textContent = getText('continue') || 'Continuer';
+            $.continueBtn.onclick = null;
+            scrShowInterroAskButton();
         } else if (choiceKey === 'accuser') {
             s.accused = choiceId;
             scr.phaseIdx++;

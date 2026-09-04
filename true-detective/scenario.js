@@ -44,7 +44,7 @@
         adn: { fr: 'Son ADN, mais aussi une fibre d\'étoffe rare près de la montre brisée.', en: 'His DNA, plus a thread of rare fabric near the broken watch.' },
 revel1: { fr: 'Le Major Hale, en croyant le défendre, se trahit : « Faites-lui crédit, il n\'a jamais eu les nerfs pour tromper son monde. » Puis, gêné : « J\'étais là, cette nuit-là, moi aussi. J\'ai vu Pembrooke filer vers le manoir. »', en: 'Major Hale, thinking he helps, slips: \"Give him credit, he never had the nerve to fool anyone.\" Then, embarrassed : \"I was there too that night. I saw Pembrooke slip toward the manor.\"' },
         revel2: { fr: 'Face aux preuves, il avoue avoir payé Victor Krane pour l\'acte.', en: 'Faced with the evidence, he admits paying Victor Krane for the deed.' },
-indice: { fr: 'Sa « panne » coïncidait exactement avec l\'heure du meurtre ; la durite coupée le prouve. Pourtant, nul dans la maison n\'a vu Pembrooke atteindre le manoir cette nuit-là. C\'est la main de Hale qui l\'écarte du pavillon — et la sienne seulement.', en: 'His \"breakdown\" matched the hour of the murder exactly; the cut hose proves it. Yet no one in the house saw Pembrooke reach the manor that night. Only Hale could have kept him away from the pavilion — and only Hale did.' },
+indice: { fr: 'Sa « panne » coïncidait exactement avec l\'heure du meurtre ; la durite coupée le prouve. Pourtant, nul dans la maison n\'a vu Pembrooke atteindre le manoir cette nuit-là. C\'est la main de Hale qui l\'écarte du pavillon, et la sienne seulement.', en: 'His \"breakdown\" matched the hour of the murder exactly; the cut hose proves it. Yet no one in the house saw Pembrooke reach the manor that night. Only Hale could have kept him away from the pavilion, and only Hale did.' },
         prison: { fr: 'Son charme ne sauve pas un assassin. Il baisse la tête dans le couloir de la prison.', en: 'Charm does not save a killer. He lowers his head in the prison corridor.' },
         morale: { fr: 'Le charme le plus brillant cache parfois la lame la plus froide.', en: 'The brightest charm sometimes hides the coldest blade.' },
     };
@@ -72,7 +72,7 @@ indice: { fr: 'Sa « panne » coïncidait exactement avec l\'heure du meurtre ; 
         revel2: { fr: 'Il avoue le meurtre, mais le vol l\'intéressait plus que la haine.', en: 'He confesses the murder, but the theft interested him more than hatred.' },
         indice: { fr: 'Il savait où étaient le coffre et la montre : des détails qu\'un voleur camoufle derrière son casier.', en: 'He knew where the safe and the watch were: details a thief hides behind his record.' },
         prison: { fr: 'Silas Crane ne pleure pas. Il retourne en cellule, étrangement calme : ce n\'est pas un meurtrier, seulement un homme que la misère a rendu trop familier des portes.', en: 'Silas Crane does not cry. He returns to his cell, strangely calm : he is no killer, only a man whom poverty made all too familiar with doors.' },
-        morale: { fr: 'Parfois, la fatalité pousse un homme vers un crime qu\'il n\'avait pas prémédité — et pourtant, la trace reste.', en: 'Sometimes fate pushes a man toward a crime he had not premeditated — yet the trace remains.' },
+        morale: { fr: 'Parfois, la fatalité pousse un homme vers un crime qu\'il n\'avait pas prémédité, et pourtant, la trace reste.', en: 'Sometimes fate pushes a man toward a crime he had not premeditated, yet the trace remains.' },
     };
 
     TRUTH['criminel'] = {
@@ -91,7 +91,7 @@ indice: { fr: 'Sa « panne » coïncidait exactement avec l\'heure du meurtre ; 
     /* ------------------------------------------------------------------
        2. ÉTAT DE PARTIE + API DE BASE
     ------------------------------------------------------------------ */
-    var state = { lang: 'fr', theme: 'agatha-christie', culprit: 'protecteur', prochainSuspect: null, suspectOrdre: [], phaseIdx: 0, pageIdx: 0, clues: [], miniGamesWon: 0, accused: null, score: 0, ending: null, evidence: { alibi: 0, mobile: 0, opportunity: 0, forensic: 0, witness: 0, timeline: 0 } };
+    var state = { lang: 'fr', theme: 'agatha-christie', culprit: 'protecteur', prochainSuspect: null, suspectOrdre: [], phaseIdx: 0, pageIdx: 0, clues: [], miniGamesWon: 0, accused: null, score: 0, ending: null, evidence: { alibi: 0, mobile: 0, opportunity: 0, forensic: 0, witness: 0, timeline: 0 }, reinterroges: [] };
     var SUSPECTS = ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel'];
 
     /* Le coupable est FIXE (Major Hale), plus de random */
@@ -102,6 +102,7 @@ indice: { fr: 'Sa « panne » coïncidait exactement avec l\'heure du meurtre ; 
         state.phaseIdx = 0; state.pageIdx = 0; state.clues = [];
         state.miniGamesWon = 0; state.accused = null; state.score = 0; state.ending = null;
         state.evidence = { alibi: 0, mobile: 0, opportunity: 0, forensic: 0, witness: 0, timeline: 0 };
+        state.reinterroges = [];
     }
     function truth() { return TRUTH[state.culprit] || TRUTH.protecteur; }
     function t(obj, lang) {
