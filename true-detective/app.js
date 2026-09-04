@@ -1741,7 +1741,12 @@ langEnBtn: document.getElementById('lang-en'),
         }
         ui.isTyping = false;
         if ($.typeCursor) $.typeCursor.classList.add('hidden');
-        // Appeler le callback immédiatement
+        // Clear the typeChar timeout to prevent double-callback
+        if (_typeWriterTimeout) {
+            clearTimeout(_typeWriterTimeout);
+            _typeWriterTimeout = null;
+        }
+        // Appeler le callback immédiatement pour afficher le bouton "Continuer"
         if (_typeWriterCallback) {
             var cb = _typeWriterCallback;
             _typeWriterCallback = null;
@@ -1751,6 +1756,7 @@ langEnBtn: document.getElementById('lang-en'),
 
     var _currentDialogue = '';
     var _typeWriterCallback = null;
+    var _typeWriterTimeout = null;
 
     function typeWriter(text, onComplete, speed) {
         _currentDialogue = text || '';
@@ -1771,19 +1777,14 @@ langEnBtn: document.getElementById('lang-en'),
 
         function typeChar() {
             if (ui.skipPending) {
-                // Afficher tout le texte restant
-                $.dialogueText.textContent = text;
-                ui.isTyping = false;
-                $.typeCursor.classList.add('hidden');
-                _typeWriterCallback = null;
-                if (onComplete) { onComplete(); }
+                // Already handled by skipTypeWriter — do nothing to avoid double-callback
                 return;
             }
 
             if (i < text.length) {
                 $.dialogueText.textContent += text.charAt(i);
                 i++;
-                setTimeout(typeChar, speed);
+                _typeWriterTimeout = setTimeout(typeChar, speed);
             } else {
                 ui.isTyping = false;
                 $.typeCursor.classList.add('hidden');
@@ -2363,7 +2364,7 @@ langEnBtn: document.getElementById('lang-en'),
     }
 
 /* ================================================================
-       MODE SCÉNARIO V2 — runner (consomme TDScenario + TDPhases)
+       MODE SCÉNARIO V2, runner (consomme TDScenario + TDPhases)
     ================================================================ */
     var scr = {
         phaseIdx: 0,
@@ -2600,39 +2601,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         var page = phase.pages[scr.pageIdx];
 
         if (page.minigame && window.TDMiniGames) {
-            $.continueBtn.classList.add('hidden');
-            var mgCfg = page.minigame;
-            var s0 = scrGetState();
-            if (s0 && s0.watchCode) {
-                if (mgCfg.type === 'montre_code') {
-                    mgCfg.code = s0.watchCode.slice();
-                    mgCfg.timeStr = s0.watchTimeStr;
-                }
-                if (mgCfg.type === 'coffre_code') {
-                    mgCfg.code = s0.watchCode.slice();
-                }
-            }
-            TDMiniGames.play(mgCfg, ui.language, function (res) {
-                if (res && res.won) {
-                    var s = scrGetState();
-                    s.miniGamesWon++;
-                    s.score += 10;
-                    if (!s.clues) s.clues = [];
-                    var clue = scrClueFromMinigame(page.minigame);
-                    s.clues.push(clue);
-                    if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
-                        window.TDNarrativeEngine.addClue(clue);
-                        if (typeof window.TDNarrativeEngine.addStep === 'function') {
-                            window.TDNarrativeEngine.addStep('minigame', clue);
-                        }
-                    }
-                    showClueToast(clue);
-                    if (mgCfg.type === 'montre_code' && res.notes) {
-                        s.playerNotes = res.notes;
-                    }
-                }
-                scrNext();
-            });
+            scrShowMinigameGate(page);
             return;
         }
         if (page.interrogation && window.TDNarration && window.TDNarration.interrogations &&
@@ -2643,8 +2612,60 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         scrShowAdvance(page);
     }
 
+    /* Affichage d'un mini-jeu : on laisse d'abord lire le texte, on exige
+       un appui sur « Continuer » avant de lancer le mini-jeu. */
+    function scrShowMinigameGate(page) {
+        var lang = ui.language;
+        $.continueBtn.classList.remove('hidden');
+        $.continueBtn.disabled = false;
+        $.continueBtn.textContent = getText('continue') || 'Continuer';
+        $.continueBtn.onclick = function () {
+            $.continueBtn.classList.add('hidden');
+            scrPlayMinigame(page);
+        };
+        $.conversationInput.classList.add('hidden');
+        // Petit rappel discret tant que le texte est affiché
+    }
+
+    function scrPlayMinigame(page) {
+        if (!page || !page.minigame || !scr.active) return;
+        $.continueBtn.classList.add('hidden');
+        var mgCfg = page.minigame;
+        var s0 = scrGetState();
+        if (s0 && s0.watchCode) {
+            if (mgCfg.type === 'montre_code') {
+                mgCfg.code = s0.watchCode.slice();
+                mgCfg.timeStr = s0.watchTimeStr;
+            }
+            if (mgCfg.type === 'coffre_code') {
+                mgCfg.code = s0.watchCode.slice();
+            }
+        }
+        TDMiniGames.play(mgCfg, ui.language, function (res) {
+            if (res && res.won) {
+                var s = scrGetState();
+                s.miniGamesWon++;
+                s.score += 10;
+                if (!s.clues) s.clues = [];
+                var clue = scrClueFromMinigame(page.minigame);
+                s.clues.push(clue);
+                if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
+                    window.TDNarrativeEngine.addClue(clue);
+                    if (typeof window.TDNarrativeEngine.addStep === 'function') {
+                        window.TDNarrativeEngine.addStep('minigame', clue);
+                    }
+                }
+                showClueToast(clue);
+                if (mgCfg.type === 'montre_code' && res.notes) {
+                    s.playerNotes = res.notes;
+                }
+            }
+            scrNext();
+        });
+    }
+
     /* =====================================================================
-       INTERROGATOIRE — 3 phases × 3 questions (box qui se renouvelle).
+       INTERROGATOIRE, 3 phases × 3 questions (box qui se renouvelle).
        Flow : intro → bouton « Interroger » → 3 questions → la question
        s'efface, la réponse remplace la question dans la box → indice
        consigné dans le journal → « Interroger » → phase suivante (les
@@ -2700,8 +2721,8 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         var lang = ui.language;
         // La box se renouvelle : la réponse précédente est remplacée par la liste de questions
         $.dialogueText.textContent = lang === 'fr'
-            ? 'Phase ' + (it.round + 1) + '/3 — Choisissez votre question :'
-            : 'Phase ' + (it.round + 1) + '/3 — Pick your question :';
+            ? 'Phase ' + (it.round + 1) + '/3, Choisissez votre question :'
+            : 'Phase ' + (it.round + 1) + '/3, Pick your question :';
         $.typeCursor.classList.add('hidden');
         scr.awaitingChoice = true;
         $.choicesContainer.innerHTML = '';
@@ -2776,7 +2797,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         if (mg.hotspots && mg.hotspots.length) {
             var first = mg.hotspots[0];
             var info = (first.info && (first.info[lang] || first.info.fr || first.info.en)) || first.label;
-            return (lang === 'fr' ? 'Indice relevé : ' : 'Clue found : ') + first.label + ' — ' + info;
+            return (lang === 'fr' ? 'Indice relevé : ' : 'Clue found : ') + first.label + ', ' + info;
         }
         var title = (mg.title && (mg.title[lang] || mg.title.fr || mg.title.en)) || (lang === 'fr' ? 'Indice bonus' : 'Bonus clue');
         return (lang === 'fr' ? 'Indice relevé : ' : 'Clue found : ') + title;
@@ -2921,8 +2942,8 @@ function scrApplyChoice(choiceKey, choiceId) {
             pages.push({
                 decor: 'prison', npc: null,
                 text: {
-                    fr: 'Derrière les barreaux, le coupable s\'effondre. ' + TDScenario.t(truth.prison, lang) + '\n\n[Décor : prison — Le coupable croupit en cellule, son règne est terminé.]',
-                    en: 'Behind the bars, the culprit breaks down. ' + TDScenario.t(truth.prison, lang) + '\n\n[Scene: prison — The culprit rots in a cell, his reign is over.]'
+                    fr: 'Derrière les barreaux, le coupable s\'effondre. ' + TDScenario.t(truth.prison, lang) + '\n\n[Décor : prison, Le coupable croupit en cellule, son règne est terminé.]',
+                    en: 'Behind the bars, the culprit breaks down. ' + TDScenario.t(truth.prison, lang) + '\n\n[Scene: prison, The culprit rots in a cell, his reign is over.]'
                 }
             });
             pages.push({
@@ -2944,8 +2965,8 @@ function scrApplyChoice(choiceKey, choiceId) {
             pages.push({
                 decor: 'exile', npc: null,
                 text: {
-                    fr: '[Décor : exil — Sous le soleil des tropiques, le vrai coupable sirote un cocktail au bord de la piscine d\'un palace. Il rit de vous, loin, très loin de votre juridiction.]',
-                    en: '[Scene: exile — Under the tropical sun, the real culprit sips a cocktail by the pool of a palace. He laughs at you, far, very far from your jurisdiction.]'
+                    fr: '[Décor : exil, Sous le soleil des tropiques, le vrai coupable sirote un cocktail au bord de la piscine d\'un palace. Il rit de vous, loin, très loin de votre juridiction.]',
+                    en: '[Scene: exile, Under the tropical sun, the real culprit sips a cocktail by the pool of a palace. He laughs at you, far, very far from your jurisdiction.]'
                 }
             });
             pages.push({
