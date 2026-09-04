@@ -264,7 +264,7 @@
         var body = ctx.body, lang = ctx.lang, wrap = ctx.wrap, dosWrap = ctx.dosWrap;
         var engraveEls = ctx.engraveEls, answer = ctx.answer;
         var getRevealed = ctx.getRevealed, setRevealed = ctx.setRevealed;
-        var timeStr = ctx.timeStr || '22h09';
+        var timeStr = ctx.timeStr || '??h??';
         var codeStr = answer.join('');
         var ZOOM = 2.2, LOUPE_R = 75;
 
@@ -887,8 +887,8 @@
             face.className = 'mg-item mg-montre-face';
             face.src = 'mini-games/montre/montre-du-duc-face.png';
             face.alt = lang === 'fr' ? 'Face de la montre' : 'Watch face';
-            var timeStr = cfg.timeStr || '22h09';
-            face.title = lang === 'fr' ? 'La montre figée à ' + timeStr + '…' : 'The watch frozen at ' + timeStr + '…';
+            var timeStr = cfg.timeStr || '??h??';
+            face.title = lang === 'fr' ? 'Montre de poche du Duc, brisée dans la bagarre.' : 'The Duke\'s pocket watch, broken in the struggle.';
             var dosWrap = document.createElement('div');
             dosWrap.className = 'mg-dos-wrap hidden-dos';
             var dos = document.createElement('img');
