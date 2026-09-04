@@ -1,5 +1,5 @@
 ﻿/* =====================================================================
-   TRUE DETECTIVE — MINI-JEUX OPTIONNELS (bonus d'indices + timer)
+   TRUE DETECTIVE, MINI-JEUX OPTIONNELS (bonus d'indices + timer)
    ---------------------------------------------------------------------
    Chaque mini-jeu est OPTIONNEL : le joueur peut toujours « Passer ».
    Le timer crée la pression ; un échec = perte de l'indice bonus,
@@ -11,18 +11,26 @@
     var t = function (obj, lang) { return obj[lang] || obj.fr || obj.en || ''; };
 
     /* Calcule les messages / boutons partagés */
-    function play(cfg, lang, onDone) {
+    function play(cfg, lang, onDone, target) {
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
-        var layer = document.getElementById('minigame-layer');
-        if (!layer) { if (onDone) onDone({ won: false }); return; }
-
-        layer.innerHTML = '';
-        layer.classList.add('active');
-
+        var useOverlay = !target;
+        var layer = useOverlay ? document.getElementById('minigame-layer') : null;
+        if (useOverlay && !layer) {
+            layer = document.createElement('div');
+            layer.id = 'minigame-layer';
+            layer.className = 'minigame-layer';
+            document.body.appendChild(layer);
+        }
         var content = document.createElement('div');
         content.className = 'minigame-content';
         if (cfg.wide) content.classList.add('scene-wide');
-        layer.appendChild(content);
+        if (useOverlay) {
+            if (layer) { layer.innerHTML = ''; layer.classList.add('active'); }
+            if (layer) layer.appendChild(content);
+        } else {
+            target.innerHTML = '';
+            target.appendChild(content);
+        }
 
         var title = document.createElement('div');
         title.className = 'minigame-title';
@@ -41,6 +49,7 @@
         var timerId = null;
         var resultAnnounced = false;
         var hintShown = false;
+        var useOverlay = !target;
         /* Difficulté adaptative : à 60% du temps écoulé, halo sur les bons éléments */
         function registerHint(fn) { hintFn = fn; }
         var hintFn = null;
@@ -116,8 +125,12 @@
                 ? (lang === 'fr' ? 'Consigner l\u2019indice' : 'Record the clue')
                 : (lang === 'fr' ? 'Continuer' : 'Continue');
             btn.addEventListener('click', function () {
-                layer.classList.remove('active');
-                layer.innerHTML = '';
+                if (useOverlay) {
+                    layer.classList.remove('active');
+                    layer.innerHTML = '';
+                } else {
+                    content.remove();
+                }
                 if (onDone) onDone({ won: won });
             });
             content.appendChild(btn);
@@ -177,7 +190,7 @@
     }
 
     /* ------------------------------------------------------------------
-       showMontreNoteBox — s'ouvre en bas de l'écran après la résolution
+       showMontreNoteBox, s'ouvre en bas de l'écran après la résolution
        de la montre. Permet au joueur de noter lui-même l'heure relevéee
        et le code à 4 chiffres. Ces notes seront stockées dans le journal.
     ------------------------------------------------------------------ */
@@ -257,7 +270,7 @@
     }
 
     /* ------------------------------------------------------------------
-       MONTRE_PHASE2 — cadrans + équerre draggable + question finale
+       MONTRE_PHASE2, cadrans + équerre draggable + question finale
        (utilisé par le mini-jeu 'montre_code')
     ------------------------------------------------------------------ */
     function MONTRE_PHASE2(ctx) {
@@ -391,7 +404,7 @@
             moveLoupe(e.touches[0].clientX, e.touches[0].clientY);
         });
 
-        /* Question finale : le dos a attiré l'attention — mais la face parle */
+        /* Question finale : le dos a attiré l'attention, mais la face parle */
         var questionBox = null;
         function askSincerity(playerTime) {
             questionBox = document.createElement('div');
@@ -405,7 +418,7 @@
             var yes = document.createElement('button');
             yes.className = 'btn';
             yes.textContent = lang === 'fr'
-                ? 'L\'aiguille figée à ' + timeStr + ' : voilà l\'heure probable du crime — et ' + codeStr + ' ouvrira peut-être un coffre'
+                ? 'L\'aiguille figée à ' + timeStr + ' : voilà l\'heure probable du crime, et ' + codeStr + ' ouvrira peut-être un coffre'
                 : 'The hand frozen at ' + timeStr + ' : that is the likely time of death, and ' + codeStr + ' may open a safe';
             var no = document.createElement('button');
             no.className = 'btn';
@@ -461,7 +474,7 @@
     }
 
     /* ------------------------------------------------------------------
-       BUILD_CREATORS — contient les fabriques de jeux
+       BUILD_CREATORS, contient les fabriques de jeux
     ------------------------------------------------------------------ */
     function BUILD_CREATORS(cfg, lang, complete, registerHint) {
 
@@ -553,32 +566,7 @@
             });
         },
 
-        'timeline': function (body) {
-            var order = (cfg.order || []).map(function (s) { return t(s, lang); });
-            var currentIndex = 0;
-            var stepsBox = document.createElement('div');
-            stepsBox.className = 'timeline-box';
-            body.appendChild(stepsBox);
-            var shuffled = order.slice().sort(function () { return Math.random() - 0.5; });
-            shuffled.forEach(function (label) {
-                var b = document.createElement('button');
-                b.className = 'btn timeline-step';
-                b.textContent = label;
-                b.addEventListener('click', function () {
-                    if (b.dataset.done) return;
-                    if (label === order[currentIndex]) {
-                        b.dataset.done = '1';
-                        b.classList.add('correct');
-                        currentIndex++;
-                        if (currentIndex >= order.length) complete(true);
-                    } else {
-                        b.classList.add('wrong');
-                        setTimeout(function () { b.classList.remove('wrong'); }, 400);
-                    }
-                });
-                stepsBox.appendChild(b);
-            });
-        },
+
 
         /* Le Réseau d'Alibis (Cartographie mentale)
            Le joueur dispose des dépositions des témoins. Chaque carte
@@ -713,53 +701,7 @@
             });
         },
 
-        'adn_match': function (body) {
-            var samples = (cfg.samples || []).map(function (s) { return t(s, lang); });
-            var profiles = (cfg.profiles || []).map(function (p) { return t(p, lang); });
-            var match = cfg.match;
-            var pipette = document.createElement('img');
-            pipette.className = 'mg-item mg-pipette';
-            pipette.src = 'mini-games/prescription/pipette-numerique.png';
-            pipette.alt = lang === 'fr' ? 'Pipette numérique du laboratoire' : 'Lab digital pipette';
-            body.appendChild(pipette);
-            var col = document.createElement('div');
-            col.className = 'match-col';
-            body.appendChild(col);
-            var colA = document.createElement('div');
-            colA.className = 'match-side';
-            var colB = document.createElement('div');
-            colB.className = 'match-side';
-            col.appendChild(colA); col.appendChild(colB);
-            var selSample = null;
-            samples.forEach(function (label, i) {
-                var b = document.createElement('button');
-                b.className = 'btn match-item sample';
-                b.textContent = label;
-                b.addEventListener('click', function () {
-                    colA.querySelectorAll('.sample').forEach(function (x) { x.classList.remove('selected'); });
-                    b.classList.add('selected');
-                    selSample = i;
-                });
-                colA.appendChild(b);
-            });
-            profiles.forEach(function (label, i) {
-                var b = document.createElement('button');
-                b.className = 'btn match-item profile';
-                b.textContent = label;
-                b.addEventListener('click', function () {
-                    if (selSample == null) return;
-                    if (i === match) {
-                        b.classList.add('correct');
-                        b.dataset.done = '1';
-                        complete(true);
-                    } else {
-                        b.classList.add('wrong');
-                        setTimeout(function () { b.classList.remove('wrong'); }, 400);
-                    }
-                });
-                colB.appendChild(b);
-            });
-        },
+
 
         'code_safe': function (body) {
             var answer = String(cfg.answer || '120');
@@ -843,7 +785,7 @@
             });
         },
 
-        /* V3 — MINI-JEUX AVEC ASSETS */
+        /* V3, MINI-JEUX AVEC ASSETS */
         'labo_verrou': function (body, registerHint) {
             var wrap = document.createElement('div');
             wrap.className = 'mg-scene';
@@ -906,7 +848,7 @@
             body.appendChild(status);
             body.appendChild(wrap);
 
-            /* Loupe qui couvre toute la face au début — pour repérer l'aiguille figée.
+            /* Loupe qui couvre toute la face au début, pour repérer l'aiguille figée.
                Quand on clique sur la face, on révèle le dos, où se trouve la gravure. */
             var faceLoupe = document.createElement('div');
             faceLoupe.className = 'face-loupe';
@@ -945,7 +887,7 @@
                la loupe détecte leur position (getBoundingClientRect) et les révèle. */
             dosWrap.appendChild(engravBox);
 
-            /* Bouton "Retourner la montre" — permet au joueur de passer du dos — la face */
+            /* Bouton "Retourner la montre", permet au joueur de passer du dos, la face */
             var flipBtn = document.createElement('button');
             flipBtn.className = 'btn flip-btn';
             flipBtn.textContent = lang === 'fr' ? '\u{1F504} Retourner la montre' : '\u{1F504} Flip the watch';
@@ -1010,7 +952,7 @@
             });
         },
 
-        /* Coffre-fort de l'Acte 2 — le code de la montre récompense le joueur attentif */
+        /* Coffre-fort de l'Acte 2, le code de la montre récompense le joueur attentif */
         'coffre_code': function (body) {
             var wrap = document.createElement('div');
             wrap.className = 'mg-scene mg-coffre';
@@ -1109,7 +1051,7 @@
             body.appendChild(wrap);
             var strips = [
                 { fr: 'Versement de 12 000 £ à V.K.', en: 'Payment of £12,000 to V.K.', order: 0 },
-                { fr: 'pour services rendus — contrat', en: 'for services rendered — contract', order: 1 },
+                { fr: 'pour services rendus, contrat', en: 'for services rendered, contract', order: 1 },
                 { fr: 'le 14 du mois, comme convenu', en: 'on the 14th of the month, as agreed', order: 2 },
                 { fr: 'ne pas laisser de traces', en: 'leave no traces', order: 3 }
             ];
@@ -1129,8 +1071,8 @@
             /* --- Phase 2 : empreintes digitales sur la page reconstituée --- */
             var fingerprints = [
                 { x: 30, y: 55, found: false, label: { fr: 'Empreinte sur la mention V.K.', en: 'Fingerprint on the V.K. mention' } },
-                { x: 45, y: 38, found: false, label: { fr: 'Empreinte près du 14 — la date du contrat', en: 'Fingerprint near the 14th — contract date' } },
-                { x: 62, y: 68, found: false, label: { fr: 'Empreinte sur le montant — 12 000 £', en: 'Fingerprint on the amount — £12,000' } },
+                { x: 45, y: 38, found: false, label: { fr: 'Empreinte près du 14, la date du contrat', en: 'Fingerprint near the 14th, contract date' } },
+                { x: 62, y: 68, found: false, label: { fr: 'Empreinte sur le montant, 12 000 £', en: 'Fingerprint on the amount, £12,000' } },
                 { x: 75, y: 42, found: false, label: { fr: 'Empreinte sur la signature', en: 'Fingerprint on the signature' } }
             ];
             var fpFound = 0;
@@ -1176,7 +1118,7 @@
                 wrap.addEventListener('mouseleave', carnetMouseleaveHandler);
                 var hint = document.createElement('div');
                 hint.className = 'carnet-hint';
-                hint.textContent = lang === 'fr' ? '\u{1F50D} Loupe active — relevez au moins 3 empreintes sur la page.' : '\u{1F50D} Magnifier active — find at least 3 fingerprints on the page.';
+                hint.textContent = lang === 'fr' ? '\u{1F50D} Loupe active, relevez au moins 3 empreintes sur la page.' : '\u{1F50D} Magnifier active, find at least 3 fingerprints on the page.';
                 body.appendChild(hint);
             };
             var selectedIdx = -1;

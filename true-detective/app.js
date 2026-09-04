@@ -2601,7 +2601,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         var page = phase.pages[scr.pageIdx];
 
         if (page.minigame && window.TDMiniGames) {
-            scrShowMinigameGate(page);
+            scrRenderInlineMinigame(page);
             return;
         }
         if (page.interrogation && window.TDNarration && window.TDNarration.interrogations &&
@@ -2612,15 +2612,75 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         scrShowAdvance(page);
     }
 
+    function scrRenderInlineMinigame(page) {
+        var $ = getPageElements();
+        $.dialogueText.innerHTML = '';
+        $.typeCursor.classList.add('hidden');
+        $.choicesContainer.innerHTML = '';
+        $.continueBtn.classList.add('hidden');
+        $.conversationInput.classList.add('hidden');
+
+        var container = document.createElement('div');
+        container.className = 'minigame-page';
+        $.gameScreen.appendChild(container);
+
+        var mgCfg = page.minigame;
+        var launched = false;
+        function onMinigameDone(res) {
+            if (launched) return;
+            launched = true;
+            if (res && res.won) {
+                var s = scrGetState();
+                s.miniGamesWon++;
+                s.score += 10;
+                if (!s.clues) s.clues = [];
+                var clue = scrClueFromMinigame(page.minigame);
+                s.clues.push(clue);
+                if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
+                    window.TDNarrativeEngine.addClue(clue);
+                    if (typeof window.TDNarrativeEngine.addStep === 'function') {
+                        window.TDNarrativeEngine.addStep('minigame', clue);
+                    }
+                }
+                showClueToast(clue);
+                if (mgCfg.type === 'montre_code' && res.notes) {
+                    s.playerNotes = res.notes;
+                }
+            }
+            container.remove();
+            scrNext();
+        }
+
+        try {
+            var s0 = scrGetState();
+            if (s0 && s0.watchCode) {
+                if (mgCfg.type === 'montre_code') {
+                    mgCfg.code = s0.watchCode.slice();
+                    mgCfg.timeStr = s0.watchTimeStr;
+                }
+                if (mgCfg.type === 'coffre_code') {
+                    mgCfg.code = s0.watchCode.slice();
+                }
+            }
+            TDMiniGames.play(mgCfg, ui.language, onMinigameDone, container);
+        } catch (e) {
+            console.error('[True Detective] Erreur mini-jeu inline "' + mgCfg.type + '" :', e);
+            container.remove();
+            onMinigameDone({ won: false });
+        }
+    }
+
     /* Affichage d'un mini-jeu : on laisse d'abord lire le texte, on exige
-       un appui sur « Continuer » avant de lancer le mini-jeu. */
+       un appui sur « Continuer » avant de lancer le mini-jeu. Le bouton
+       n'est masqué QUE lorsque le calque du mini-jeu est réellement actif,
+       afin qu'un échec silencieux ne bloque jamais l'aventure. */
     function scrShowMinigameGate(page) {
         var lang = ui.language;
         $.continueBtn.classList.remove('hidden');
         $.continueBtn.disabled = false;
         $.continueBtn.textContent = getText('continue') || 'Continuer';
         $.continueBtn.onclick = function () {
-            $.continueBtn.classList.add('hidden');
+            $.continueBtn.disabled = true;
             scrPlayMinigame(page);
         };
         $.conversationInput.classList.add('hidden');
@@ -2628,20 +2688,13 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     }
 
     function scrPlayMinigame(page) {
-        if (!page || !page.minigame || !scr.active) return;
-        $.continueBtn.classList.add('hidden');
+        if (!page || !page.minigame) { scrNext(); return; }
+        if (!scr.active) { scr.active = true; }
         var mgCfg = page.minigame;
-        var s0 = scrGetState();
-        if (s0 && s0.watchCode) {
-            if (mgCfg.type === 'montre_code') {
-                mgCfg.code = s0.watchCode.slice();
-                mgCfg.timeStr = s0.watchTimeStr;
-            }
-            if (mgCfg.type === 'coffre_code') {
-                mgCfg.code = s0.watchCode.slice();
-            }
-        }
-        TDMiniGames.play(mgCfg, ui.language, function (res) {
+        var launched = false;
+        function onMinigameDone(res) {
+            if (launched) return;
+            launched = true;
             if (res && res.won) {
                 var s = scrGetState();
                 s.miniGamesWon++;
@@ -2661,7 +2714,32 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 }
             }
             scrNext();
-        });
+        }
+        try {
+            var s0 = scrGetState();
+            if (s0 && s0.watchCode) {
+                if (mgCfg.type === 'montre_code') {
+                    mgCfg.code = s0.watchCode.slice();
+                    mgCfg.timeStr = s0.watchTimeStr;
+                }
+                if (mgCfg.type === 'coffre_code') {
+                    mgCfg.code = s0.watchCode.slice();
+                }
+            }
+            TDMiniGames.play(mgCfg, ui.language, onMinigameDone);
+            /* Chien de garde : si le calque du mini-jeu ne s'ouvre pas
+               (erreur silencieuse), on continue l'aventure au lieu de bloquer. */
+            setTimeout(function () {
+                var layer = document.getElementById('minigame-layer');
+                if (!launched && (!layer || !layer.classList.contains('active'))) {
+                    console.error('[True Detective] Mini-jeu "' + mgCfg.type + '" non ouvert : reprise de l\'aventure.');
+                    onMinigameDone({ won: false });
+                }
+            }, 300);
+        } catch (e) {
+            console.error('[True Detective] Erreur mini-jeu "' + mgCfg.type + '" :', e);
+            onMinigameDone({ won: false });
+        }
     }
 
     /* =====================================================================
