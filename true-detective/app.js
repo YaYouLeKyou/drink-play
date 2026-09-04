@@ -2440,6 +2440,8 @@ langEnBtn: document.getElementById('lang-en'),
         var assets = THEME_ASSETS[getThemeId()] || THEME_ASSETS['agatha-christie'];
         var map = {
             universe: assets.universe,
+            universeSherlock: ASSETS_BASE + 'univers/sherlock.jfif',
+            sherlock: ASSETS_BASE + 'univers/sherlock.jfif',
             crimeScene: assets.crimeScene,
             alley: assets.alley,
             residence: assets.residence,
@@ -2544,7 +2546,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
 
         scrMusicPlaying(phase.music);
         if ($.currentAct) $.currentAct.textContent = phase.act || '';
-        if ($.currentScene) $.currentScene.textContent = (scr.pageIdx + 1) + '/3';
+        if ($.currentScene) $.currentScene.textContent = (scr.pageIdx + 1) + '/' + phase.pages.length;
 
         var decorKey = page.decor;
         if (decorKey === 'dynamic') decorKey = scrInterrogationConfig(scr.pageIdx).decor;
@@ -2563,7 +2565,16 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
 
         if ($.pageNav) {
             var dots = $.pageNav.querySelectorAll('.page-dot');
-            for (var i = 0; i < dots.length; i++) dots[i].classList.toggle('active', i === scr.pageIdx);
+            // Nombre de pages variable selon la phase (ex : intro à 4 pages)
+            if (dots.length !== phase.pages.length) {
+                var navHtml = '';
+                for (var i = 0; i < phase.pages.length; i++) {
+                    navHtml += '<div class="page-dot' + (i === scr.pageIdx ? ' active' : '') + '" data-page="' + (i + 1) + '"></div>';
+                }
+                $.pageNav.innerHTML = navHtml;
+            } else {
+                for (var j = 0; j < dots.length; j++) dots[j].classList.toggle('active', j === scr.pageIdx);
+            }
         }
 
         hideLoading();
