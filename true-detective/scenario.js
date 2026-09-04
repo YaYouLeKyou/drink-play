@@ -1,5 +1,5 @@
-/* =====================================================================
-   TRUE DETECTIVE — SCÉNARIO V2 (data-driven + coupable randomisé)
+﻿/* =====================================================================
+   TRUE DETECTIVE, SCÉNARIO V2 (data-driven + coupable randomisé)
    ---------------------------------------------------------------------
    9 phases x 3 pages : Intro -> Recherche -> Acte1 -> Réflexion ->
    Acte2 -> Énigme -> Acte3 -> Rising Tension -> Révélation -> Outro.
@@ -42,9 +42,9 @@
         mobile: { fr: 'Endetté et jaloux, il voulait à la fois la fortune et Lady Vivienne. La mort de la victime arrangeait tout.', en: 'In debt and jealous, he wanted both the fortune and Lady Vivienne. The victim\'s death fixed everything.' },
         methode: { fr: 'Panne simulée, paiement du Criminel, alibi appuyé par le Major Hale.', en: 'Staged breakdown, paying Victor Krane, alibi backed by Major Hale.' },
         adn: { fr: 'Son ADN, mais aussi une fibre d\'étoffe rare près de la montre brisée.', en: 'His DNA, plus a thread of rare fabric near the broken watch.' },
-        revel1: { fr: 'Le Major Hale, en le croyant défendre, se trahit : « Il n\'était pas en panne, je l\'ai vu partir. »', en: 'Major Hale, thinking he helps, slips: "He wasn\'t stuck; I saw him leave."' },
+revel1: { fr: 'Le Major Hale, en croyant le défendre, se trahit : « Faites-lui crédit, il n\'a jamais eu les nerfs pour tromper son monde. » Puis, gêné : « J\'étais là, cette nuit-là, moi aussi. J\'ai vu Pembrooke filer vers le manoir. »', en: 'Major Hale, thinking he helps, slips: \"Give him credit, he never had the nerve to fool anyone.\" Then, embarrassed : \"I was there too that night. I saw Pembrooke slip toward the manor.\"' },
         revel2: { fr: 'Face aux preuves, il avoue avoir payé Victor Krane pour l\'acte.', en: 'Faced with the evidence, he admits paying Victor Krane for the deed.' },
-        indice: { fr: 'Sa « panne » coïncidait exactement avec l\'heure du meurtre ; la durite coupée le prouve.', en: 'His "breakdown" matched the hour of the murder exactly; the cut hose proves it.' },
+indice: { fr: 'Sa « panne » coïncidait exactement avec l\'heure du meurtre ; la durite coupée le prouve. Pourtant, nul dans la maison n\'a vu Pembrooke atteindre le manoir cette nuit-là. C\'est la main de Hale qui l\'écarte du pavillon — et la sienne seulement.', en: 'His \"breakdown\" matched the hour of the murder exactly; the cut hose proves it. Yet no one in the house saw Pembrooke reach the manor that night. Only Hale could have kept him away from the pavilion — and only Hale did.' },
         prison: { fr: 'Son charme ne sauve pas un assassin. Il baisse la tête dans le couloir de la prison.', en: 'Charm does not save a killer. He lowers his head in the prison corridor.' },
         morale: { fr: 'Le charme le plus brillant cache parfois la lame la plus froide.', en: 'The brightest charm sometimes hides the coldest blade.' },
     };
@@ -57,7 +57,7 @@
         adn: { fr: 'Son ADN, retrouvé bien plus profondément dans l\'appartement qu\'il ne l\'admettait.', en: 'His DNA, found deeper into the flat than he admitted.' },
         revel1: { fr: 'Silas Crane se rétracte : Rupert Blackwood l\'a payé pour mentir sur l\'heure de sortie.', en: 'Silas Crane recants: Rupert Blackwood paid him to lie about the leaving time.' },
         revel2: { fr: 'Il craque : « La dette... je ne pouvais plus payer. J\'ai dû faire venir quelqu\'un. »', en: 'He cracks: "The debt... I could not pay anymore. I had someone come."' },
-        indice: { fr: 'Il prétend être parti à 19h30, mais son ADN est sur le cadre de la porte du couloir de la mort.', en: 'He claims he left at 7:30pm, yet his DNA is on the doorframe of the death corridor.' },
+        indice: { fr: 'Il prétend être parti à 21h30, mais son ADN est sur la corbeille du bureau, près des documents de succession.', en: 'He claims he left at 9:30pm, yet his DNA is on the study wastebasket, near the succession papers.' },
         prison: { fr: 'Un homme ruiné, pris au piège de ses dettes. Il avoue, épuisé.', en: 'A ruined man, trapped by his debts. He confesses, exhausted.' },
         morale: { fr: 'L\'argent ronge l\'âme de ceux qui lui sacrifient tout.', en: 'Money eats the soul of those who sacrifice everything for it.' },
     };
@@ -71,8 +71,8 @@
         revel1: { fr: 'La pièce qu\'il conserve précieusement provient de la scène, pas de la main de la victime.', en: 'The coin he treasures comes from the scene, not from the victim\'s hand.' },
         revel2: { fr: 'Il avoue le meurtre, mais le vol l\'intéressait plus que la haine.', en: 'He confesses the murder, but the theft interested him more than hatred.' },
         indice: { fr: 'Il savait où étaient le coffre et la montre : des détails qu\'un voleur camoufle derrière son casier.', en: 'He knew where the safe and the watch were: details a thief hides behind his record.' },
-        prison: { fr: 'Silas Crane ne pleure pas. Il retourne en cellule, étrangement calme.', en: 'Silas Crane does not cry. He returns to his cell, strangely calm.' },
-        morale: { fr: 'Parfois, la fatalité pousse un homme vers un crime qu\'il n\'avait pas prémédité.', en: 'Sometimes fate pushes a man toward a crime he had not premeditated.' },
+        prison: { fr: 'Silas Crane ne pleure pas. Il retourne en cellule, étrangement calme : ce n\'est pas un meurtrier, seulement un homme que la misère a rendu trop familier des portes.', en: 'Silas Crane does not cry. He returns to his cell, strangely calm : he is no killer, only a man whom poverty made all too familiar with doors.' },
+        morale: { fr: 'Parfois, la fatalité pousse un homme vers un crime qu\'il n\'avait pas prémédité — et pourtant, la trace reste.', en: 'Sometimes fate pushes a man toward a crime he had not premeditated — yet the trace remains.' },
     };
 
     TRUTH['criminel'] = {
@@ -81,7 +81,7 @@
         mobile: { fr: 'Tueur à gages, il a exécuté un contrat. Le « pourquoi » ne l\'intéresse pas.', en: 'A hitman, he carried out a contract. The "why" does not interest him.' },
         methode: { fr: 'Exécution contractuelle, violence physique, cambriolage simulé.', en: 'Contract execution, physical violence, staged burglary.' },
         adn: { fr: 'L\'ADN inconnue est la sienne ; trop de traces pour un professionnel.', en: 'The unknown DNA is his; too many traces for a professional.' },
-        revel1: { fr: 'On découvre qu\'il connaissait la victime du bar depuis des années : ce n\'était pas un hasard.', en: 'We learn he knew the victim from the bar for years: it was no coincidence.' },
+        revel1: { fr: 'On découvre qu\'il connaissait la victime de la ruelle, pas de hasard : son nom figure déjà dans un vieux registre de la maison.', en: 'We learn he knew the victim from the alley, not by chance : his name already appears in an old house ledger.' },
         revel2: { fr: 'Il avoue le contrat, discret, sans nommer le commanditaire.', en: 'He confesses the contract, tight-lipped, without naming the client.' },
         indice: { fr: 'Son ADN inconnue était le seul à ne correspondre à personne... jusqu\'à ce qu\'on le relie au rôdeur.', en: 'His unknown DNA matched no one... until we linked him to the lurking figure.' },
         prison: { fr: 'Il ne dit rien de plus. Un métier est un métier, même pour un tueur.', en: 'He says nothing more. A job is a job, even for a killer.' },
@@ -94,7 +94,7 @@
     var state = { lang: 'fr', theme: 'agatha-christie', culprit: 'protecteur', prochainSuspect: null, suspectOrdre: [], phaseIdx: 0, pageIdx: 0, clues: [], miniGamesWon: 0, accused: null, score: 0, ending: null, evidence: { alibi: 0, mobile: 0, opportunity: 0, forensic: 0, witness: 0, timeline: 0 } };
     var SUSPECTS = ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel'];
 
-    /* Le coupable est FIXE (Major Hale) — plus de random */
+    /* Le coupable est FIXE (Major Hale), plus de random */
     function randomCulprit() { return 'protecteur'; }
     function reset() {
         state.culprit = 'protecteur';
@@ -122,19 +122,19 @@
         en: 'Julian Pembrooke turns pale. "This is a mistake… I broke down, I told you!" He\'s right: the breakdown was staged, but he was just the alibi. The real killer, the one who staged it, is still free. FAILURE.'
     };
     REACTIONS['suspect'] = {
-        fr: 'Rupert Blackwood ricane. « Accusez-moi, moi ? J\'étais parti à 21h30,Silas Crane peut le confirmer. Ce n\'est pas moi qui ai sectionné cette durite… ni payé Krane. » Il serre le poing et sort. Le vrai coupable reste en liberté. ÉCHEC.',
+        fr: 'Rupert Blackwood ricane. « Accusez-moi, moi ? J\'étais parti à 21h30, Silas Crane peut le confirmer. Ce n\'est pas moi qui ai sectionné cette durite… ni payé Krane. » Il serre le poing et sort. Le vrai coupable reste en liberté. ÉCHEC.',
         en: 'Rupert Blackwood sneers. "Accuse me? I left at 9:30pm, Silas Crane can confirm. I didn\'t cut that hose… nor pay Krane." He clenches his fist and leaves. The real killer remains free. FAILURE.'
     };
     REACTIONS['marginal'] = {
-        fr: 'Silas Crane secoue la tête. « Je ne suis qu\'un clochard, pas un meurtrier. J\'ai VU le rôdeur à 22h — suivez cette piste, trouvez qui il était. » Il disparaît dans la nuit. Sans suivre l\'indice du rôdeur, le vrai coupable vous échappe. ÉCHEC.',
-        en: 'Silas Crane shakes his head. "I\'m just a homeless man, not a killer. I SAW the prowler at 10pm — follow that lead, find out who it was." He vanishes into the night. Without following the prowler clue, the real killer escapes you. FAILURE.'
+        fr: 'Silas Crane secoue la tête. « Je ne suis qu\'un clochard, pas un meurtrier. J\'ai VU le rôdeur à 22h, suivez cette piste, trouvez qui il était. » Il disparaît dans la nuit. Sans suivre l\'indice du rôdeur, le vrai coupable vous échappe. ÉCHEC.',
+        en: 'Silas Crane shakes his head. "I\'m just a homeless man, not a killer. I SAW the prowler at 10pm, follow that lead, find out who it was." He vanishes into the night. Without following the prowler clue, the real killer escapes you. FAILURE.'
     };
     REACTIONS['criminel'] = {
-        fr: 'Victor Krane sourit lentement. « Je ne suis que le bras, inspecteur. La main qui m\'a guidé, c\'est Hale — mon employeur. Relisez les versements dans le coffre. » Il ne dira rien de plus. Le commanditaire s\'échappe. ÉCHEC.',
-        en: 'Victor Krane smiles slowly. "I am just the arm, inspector. The hand that guided me is Hale — my employer. Reread the payments in the safe." He says nothing more. The mastermind escapes. FAILURE.'
+        fr: 'Victor Krane sourit lentement. « Je ne suis que le bras, inspecteur. La main qui m\'a guidé, c\'est Hale, mon employeur. Relisez les versements dans le coffre. » Il ne dira rien de plus. Le commanditaire s\'échappe. ÉCHEC.',
+        en: 'Victor Krane smiles slowly. "I am just the arm, inspector. The hand that guided me is Hale, my employer. Reread the payments in the safe." He says nothing more. The mastermind escapes. FAILURE.'
     };
     REACTIONS['protecteur'] = {
-        fr: 'Le Major Hale s\'effondre. « Tout ça pour elle… mais elle ne m\'a jamais aimé. » La vérité éclate : amour obsessionnel, Krane payé, Pembrooke alibi, crime maîtré. JUSTICE EST FAITE.',
+        fr: 'Le Major Hale s\'effondre. « Tout ça pour elle… mais elle ne m\'a jamais aimé. » La vérité éclate : amour obsessionnel, Krane payé, Pembrooke écarté habilement… Un homme maîtrisé, jusqu\'au bout. JUSTICE EST FAITE.',
         en: 'Major Hale collapses. "All of this for her… but she never loved me." The truth bursts out: obsessive love, Krane paid, Pembrooke alibi, crime mastered. JUSTICE IS SERVED.'
     };
 
