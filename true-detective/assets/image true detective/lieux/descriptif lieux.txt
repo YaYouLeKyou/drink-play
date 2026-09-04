@@ -1,4 +1,4 @@
-1. Scène du Crime (Le Lieu Initial)
+﻿1. Scène du Crime (Le Lieu Initial)
 
 Typographie et Titrage :
 
@@ -135,7 +135,7 @@ Décors : Une salle aux hauts murs de pierre sculptée, ornée de tapisseries an
 
 Interprétation Visuelle
 L'ensemble de la composition suggère une structure multiverselle ou une fracture temporelle, où trois univers coexistants se côtoient sans jamais se toucher. L'utilisation des fractures dentelées plutôt que de bordures droites renforce l'idée d'un éclatement dramatique d'une réalité unique en trois éclats narratifs. La lumière joue un rôle crucial : douce et dorée à gauche, néon et artificielle au centre, et flamboyante à droite.
-5. Le Laboratoire / L'Atelier (Le Lieu d'Expertise) — CHRONOS NOIR
+5. Le Laboratoire / L'Atelier (Le Lieu d'Expertise), CHRONOS NOIR
 Description du Visuel :
 
 L'image s'articule autour d'un triptyque aux panneaux séparés par des fractures noires, illustrant la quête du savoir à travers trois technologies distinctes.
@@ -145,7 +145,7 @@ Le Cabinet de Chimie Victorien (À gauche) : Un espace feutré éclairé par une
 L'Atrium de Cyber-Chirurgie (Au centre) : Une pièce stérile et futuriste dominée par un bras articulé robotique suspendu. L'espace de travail présente une puce cybernétique mise à nu, entourée de scalpels laser, d'écrans de contrôle vitaux et d'interfaces holographiques diffusant un schéma bleu cyan et rose néon.
 
 Le Laboratoire d'Alchimie Fantasy (À droite) : Un atelier mystique illuminé par le feu d'un âtre en pierre et des bougies. Des chaudrons bouillonnent doucement pendant que des plantes rares séchent au plafond. Des cristaux magiques incandescents, des pilons en pierre et des grimoires gravés de pentacles couvrent la table de travail.
-6. Le Lieu Public / Le Point de Rendez-vous (L'Observation) — CHRONOS NOIR
+6. Le Lieu Public / Le Point de Rendez-vous (L'Observation), CHRONOS NOIR
 Description du Visuel :
 
 L'image est découpée en trois panneaux diagonaux séparés par des fractures sombres, illustrant des lieux de rassemblement et d'échange sous trois angles temporels.
@@ -155,7 +155,7 @@ Le Compartiment du Train de Luxe (À gauche) : Un salon intime au style victorie
 Le Bar à Ramen Cyberpunk (Au centre) : Un comptoir étroit baigné par la lueur crue de néons roses et cyan. Un androïde prépare à manger derrière la vitrine, au milieu d'enseignes synthétiques lumineuses et de conduites métalliques.
 
 La Taverne Portuaire Fantasy (À droite) : Une salle rustique aux lourdes tables en bois brut et bancs en chêne. Un grand foyer de cheminée en pierre éclaire la pièce d'une chaude lumière dorée, faisant miroiter des tasses en étain et des cartes accrochées aux murs.
-7. Le Lieu Clandestin / La Cachette (Les Révélations) — CHRONOS NOIR
+7. Le Lieu Clandestin / La Cachette (Les Révélations), CHRONOS NOIR
 Description du Visuel :
 
 L'image présente une composition en triptyque fragmenté par des éclairs de failles lumineuses, mettant en scène des lieux secrets cachés sous la surface.
@@ -164,8 +164,8 @@ Le Passage Secret Victorien (À gauche) : Un couloir dérobé dissimulé derriè
 
 Le Serveur Clandestin Cyberpunk (Au centre) : Une sous-station électrique souterraine et humide, saturée de gros câbles noirs et d'artères de données serpentant au sol. Des baies de serveurs illuminent l'ombre de lueurs néons violentes, oscillant entre le bleu cyan et le rose magenta.
 
-La Crypte Oubliée Fantasy (À droite) : Une cavité souterraine ancienne abritant des sarcophages de pierre sculptés de bas-reliefs. Une seule source de lumière — un candélabre en fer forgé aux bougies vacillantes — éclaire la poussière en suspension et les tombes gravées.
-8. Le Lieu de Confrontation (Le Climax) — CHRONOS NOIR
+La Crypte Oubliée Fantasy (À droite) : Une cavité souterraine ancienne abritant des sarcophages de pierre sculptés de bas-reliefs. Une seule source de lumière, un candélabre en fer forgé aux bougies vacillantes, éclaire la poussière en suspension et les tombes gravées.
+8. Le Lieu de Confrontation (Le Climax), CHRONOS NOIR
 Description du Visuel :
 
 L'image finale se compose d'un triptyque sous haute tension, découpé par deux failles lumineuses et zébrées d'éclairs. Les trois scènes mettent en avant des sommets exposés et dramatiques prêts pour l'affrontement final.

@@ -1,5 +1,5 @@
-/* =====================================================================
-   TRUE DETECTIVE — DEVELOPER MODE
+﻿/* =====================================================================
+   TRUE DETECTIVE, DEVELOPER MODE
    --------------------------------------------------------------------
    Bouton developer sur l'écran d'accueil qui permet de sauter
    directement à n'importe quelle phase et page du scénario.

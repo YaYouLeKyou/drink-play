@@ -1,4 +1,4 @@
-(function (global) {
+﻿(function (global) {
     'use strict';
 
     var STORAGE_KEY = 'trueDetectiveAudio';
@@ -23,7 +23,7 @@
 
     /*
     ============================================================
-    VOICE PROFILES — 8 Archetypes × 2 Languages
+    VOICE PROFILES, 8 Archetypes × 2 Languages
     ============================================================
 
     ENGLISH PERSONALITIES:
@@ -230,7 +230,7 @@
         },
         // Hercule Poirot style: measured, precise, slightly formal, calm authority
         'narrator_fr': {
-            name: 'Narrateur — Hercule Poirot (FR)',
+            name: 'Narrateur, Hercule Poirot (FR)',
             lang: 'fr-FR',
             pitch: 0.78,
             rate: 0.88,
@@ -574,7 +574,7 @@
         }
 
         // Fuzzy fallback: AI-generated NPCs may have free-text roles
-        // (e.g. "héritier fortuné", "the victim's bodyguard") — match keywords.
+        // (e.g. "héritier fortuné", "the victim's bodyguard"), match keywords.
         var combined = ((archetype || '') + ' ' + (role || '')).toLowerCase();
         if (/detect|partenaire|partner|investigat|allie|allié/.test(combined)) { return 'detective' + langSuffix; }
         if (/riche|rich|noble|heritier|héritier|suspect|arrogant|fortune/.test(combined)) { return 'suspect_rich' + langSuffix; }

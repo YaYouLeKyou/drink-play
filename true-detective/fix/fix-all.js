@@ -1,4 +1,4 @@
-/* =====================================================================
+﻿/* =====================================================================
    Script de correction globale
    - Corrige les problemes d'encodage dans les fichiers narration
    - Ajoute le bouton developer si manquant
@@ -38,7 +38,7 @@ function fixEncoding(filePath) {
         ['â€"', '"'],
         ['â€"', '"'],
         ['â€¢', '•'],
-        ['â€"', '—'],
+        ['â€"', ','],
         ['â€"', '–'],
         ['â€¦', '...'],
         ['Â«', '«'],

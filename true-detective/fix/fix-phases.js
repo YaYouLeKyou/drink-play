@@ -1,44 +1,26 @@
+// Fix corrupted apostrophes in phases.js
 const fs = require('fs');
+const path = require('path');
 
-const filePath = 'phases.js';
+const filePath = path.join(__dirname, '..', 'true-detective', 'phases.js');
 let content = fs.readFileSync(filePath, 'utf8');
 
-// Corriger les problèmes d'encodage des apostrophes
-const corrections = [
-    ["\\'mmobilier", "l'immobilier"],
-    ["a 't' retrouv'", "a été retrouvé"],
-    ["confi' \\'nqu'te", "confiée l'enquête"],
-    ["d'licate", "délicate"],
-    ["carri're", "carrière"],
-    ["sc'ne", "scène"],
-    ["s'ch'", "séché"],
-    ["b'ant", "béant"],
-    ["g't", "gît"],
-    ["bris'e", "brisée"],
-    ["\\'st 'tablie", "n'est établie"],
-    ["\\'st ' vous", "c'est à vous"],
-    ["\\'ir", "l'air"],
-    ["\\' q\\'n", "qu'un"],
-    ["\\'st lui", "c'est lui"],
-    ["d'couvert", "découvert"],
-    ["\\'ffaire", "L'affaire"],
-    ["pi'ce", "pièce"],
-    ["num'rotée", "numérotée"],
-    ["\\'t'", "été"],
-    ["s'accagé", "saccagé"],
-    ["r'digeait", "rédigeait"],
-    ["t'moigne", "témoigne"],
-    ["invit'", "invité"],
-    ["tach'", "taché"],
-    ["bascull'", "bascullé"],
-    ["chiffon'", "chiffonné"],
-    ["epicenter", "épicentre"],
-    ["accés", "accès"],
-];
+// The problem: backslash-apostrophe sequences are malformed
+// We need \' (backslash + apostrophe) inside JS strings
+// The file has \\' (double backslash + apostrophe) which breaks JS
 
-for (const [bad, good] of corrections) {
-    content = content.split(bad).join(good);
-}
+// Step 1: Replace any \\' with \'
+content = content.replace(/\\\\'/g, "\\'");
+
+// Step 2: Ensure French words with apostrophes are properly escaped
+// Patterns like l', d', qu', n', s', c', j', m', etc.
+// These should be \' inside the JS strings
+content = content.replace(/(['"])([^'"]*?)([ldncqsjmp])\\?'$/gm, "$1$2$3\\'$4");
+
+// Actually, let's be more precise. The issue is that in the raw file,
+// sequences like \\'larme should be \'larme
+// Let's just fix the remaining \\' patterns
+content = content.replace(/\\\\'/g, "\\'");
 
 fs.writeFileSync(filePath, content, 'utf8');
-console.log('Fichier phases.js corrigé !');
+console.log('Fixed apostrophes in phases.js');

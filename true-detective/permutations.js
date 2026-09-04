@@ -1,5 +1,5 @@
-/* =====================================================================
-   TRUE DETECTIVE — PERMUTATIONS (variations rejouables du scenario)
+﻿/* =====================================================================
+   TRUE DETECTIVE, PERMUTATIONS (variations rejouables du scenario)
    Chaque permutation = un coupable maitre d'oeuvre + co-complice + fausse
    piste + lame, avec textes de fouille (8 zones) et indices de mini-jeux.
    La structure des phases est IDENTIQUE (fixe). Le pont
@@ -11,7 +11,7 @@
 
     var PERMUTATIONS = {};
 
-    /* ===== DEFAUT / CANONIQUE — Major Hale ===== */
+    /* ===== DEFAUT / CANONIQUE, Major Hale ===== */
     PERMUTATIONS['protecteur'] = {
         id: 'protecteur',
         coupable: { fr: 'Le Major Hale', en: 'Major Hale' },
