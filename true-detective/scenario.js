@@ -182,19 +182,50 @@ indice: { fr: 'Sa « panne » coïncidait exactement avec l\'heure du meurtre ; 
         state.accused = suspectId;
         var correct = (suspectId === state.culprit);
         var score = getEvidenceScore();
+        var max = getEvidenceMax();
+        var ratio = score / max;
         var reaction = REACTIONS[suspectId] || REACTIONS['protecteur'];
-        var useSecondary = (score >= getEvidenceMax() * 0.6) && reaction.reaction2;
-        if (correct && score >= getEvidenceMax() * 0.6 && REACTIONS[suspectId] && REACTIONS[suspectId].reaction2) {
-            reaction = REACTIONS[suspectId].reaction2;
-        } else if (!correct && reaction.reaction2 && useSecondary) {
-            reaction = reaction.reaction2;
+        var cluesCount = state.clues ? state.clues.length : 0;
+
+        if (correct) {
+            if (ratio >= 0.6 && reaction.reaction2) {
+                reaction = reaction.reaction2;
+            }
+        } else {
+            if (reaction.reaction2 && ratio >= 0.6) {
+                reaction = reaction.reaction2;
+            }
         }
+
+        /* L'effet du faisceau d'indices : plus le joueur a d'indices,
+           plus le verdict final est influencé. Un joueur attentif peut
+           obtenir une « condamnation indirecte » même s'il a accusé
+           le mauvais suspect, car le vrai coupable est piégé par les preuves. */
+        var indirectConviction = false;
+        if (!correct && score >= max * 0.85) {
+            var culpritData = TRUTH[state.culprit] || TRUTH.protecteur;
+            var culpritSuspect = SUSPECTS.indexOf(state.culprit);
+            if (culpritSuspect >= 0) {
+                indirectConviction = true;
+                state.indirectWin = true;
+            }
+        }
+
+        /* Avantage final : le faisceau d'indices donne un multiplicateur
+           de révélation du vrai coupable. Un joueur qui a récolté tous les
+           indices (score max) obtient la pleine révélation. */
+        var revelation = Math.min(1, ratio);
+
         return {
             correct: correct,
             score: score,
-            max: getEvidenceMax(),
+            max: max,
+            ratio: ratio,
+            cluesCount: cluesCount,
+            revelation: revelation,
             reaction: t(reaction, state.lang),
             truth: truth(),
+            indirectConviction: indirectConviction,
         };
     }
 

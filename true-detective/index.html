@@ -51,7 +51,11 @@
     <section id="theme-selector-screen" class="screen">
         <div class="theme-selector-header">
             <button id="theme-back-to-hub-btn" class="btn btn-icon btn-back-to-hub theme-back-btn" title="Retour au hub">🏠</button>
-            <h1>Scénario</h1>
+            <div class="lang-toggle">
+                <button id="lang-en-theme" class="lang-btn active-lang" title="English">EN</button>
+                <button id="lang-fr-theme" class="lang-btn" title="Français">FR</button>
+            </div>
+            <h1>Universes</h1>
                 <p>Choisissez votre univers d'enquête</p>
         </div>
         <div id="theme-grid" class="theme-grid"></div>
@@ -164,6 +168,10 @@
                 <div class="solution-item solution-morale-item">
                     <span class="solution-label">Morale</span>
                     <span class="solution-value" id="solution-morale">...</span>
+                </div>
+                <div class="solution-item">
+                    <span class="solution-label">Clues Found</span>
+                    <span class="solution-value" id="solution-clues">0/18</span>
                 </div>
             </div>
             <div class="end-buttons">

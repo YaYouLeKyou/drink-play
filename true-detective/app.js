@@ -215,6 +215,8 @@ langEnBtn: document.getElementById('lang-en'),
     langFrBtn: document.getElementById('lang-fr'),
     langEnHomeBtn: document.getElementById('lang-en-home'),
     langFrHomeBtn: document.getElementById('lang-fr-home'),
+    langEnThemeBtn: document.getElementById('lang-en-theme'),
+    langFrThemeBtn: document.getElementById('lang-fr-theme'),
     restartBtn: document.getElementById('restart-btn'),
         gameBackToHubBtn: document.getElementById('game-back-to-hub-btn'),
         themeBackToHubBtn: document.getElementById('theme-back-to-hub-btn'),
@@ -425,6 +427,12 @@ langEnBtn: document.getElementById('lang-en'),
                 setLanguage('fr');
                 updateLanguageUI();
             });
+        }
+        if ($.langEnThemeBtn) {
+            $.langEnThemeBtn.addEventListener('click', function () { setLanguage('en'); });
+        }
+        if ($.langFrThemeBtn) {
+            $.langFrThemeBtn.addEventListener('click', function () { setLanguage('fr'); });
         }
 
         if ($.resumeBtn) {
@@ -668,6 +676,12 @@ langEnBtn: document.getElementById('lang-en'),
         }
         if ($.langFrHomeBtn) {
             $.langFrHomeBtn.classList.toggle('active-lang', ui.language === 'fr');
+        }
+        if ($.langEnThemeBtn) {
+            $.langEnThemeBtn.classList.toggle('active-lang', ui.language === 'en');
+        }
+        if ($.langFrThemeBtn) {
+            $.langFrThemeBtn.classList.toggle('active-lang', ui.language === 'fr');
         }
     }
 
@@ -2671,6 +2685,41 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         renderScenarioPage();
     }
 
+    var EVIDENCE_HINTS = {
+        alibi: { fr: 'Des alibis se contredisent.', en: 'Alibis contradict each other.' },
+        mobile: { fr: 'Des motivaions financières émergent.', en: 'Financial motives emerge.' },
+        opportunity: { fr: 'L\'accès au manoir est la clé.', en: 'Access to the manor is the key.' },
+        forensic: { fr: 'Les preuves matérielles parlent.', en: 'Physical evidence speaks.' },
+        witness: { fr: 'Des témoins ont vu des ombres.', en: 'Witnesses have seen shadows.' },
+        timeline: { fr: 'La chronologie aligne les heures.', en: 'The timeline aligns the hours.' },
+    };
+
+    function scrEnrichDialogue(txt, page) {
+        if (!txt || txt.indexOf('[ENRICH:clues]') === -1) {
+            return txt;
+        }
+        var s = scrGetState();
+        var ev = (s && s.evidence) || {};
+        var lang = ui.language;
+        var hints = [];
+        Object.keys(EVIDENCE_HINTS).forEach(function (k) {
+            if (ev[k] > 0) {
+                hints.push(TDScenario.t(EVIDENCE_HINTS[k], lang));
+            }
+        });
+        var evidenceCount = (ev.alibi || 0) + (ev.mobile || 0) + (ev.opportunity || 0) + (ev.forensic || 0) + (ev.witness || 0) + (ev.timeline || 0);
+        var enrichment = '';
+        if (evidenceCount > 0) {
+            var hintText = hints.join(' ');
+            if (lang === 'fr') {
+                enrichment = '\n\n« ' + hintText + ' (Score : ' + evidenceCount + '/18) »';
+            } else {
+                enrichment = '\n\n"' + hintText + ' (Score: ' + evidenceCount + '/18)"';
+            }
+        }
+        return txt.replace('[ENRICH:clues]', enrichment);
+    }
+
     function renderScenarioPage() {
         if (!scr.active) return;
         var phase = scrCurrentPhase();
@@ -2699,6 +2748,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         var npcId = page.npc;
         if (npcId === 'dynamic') npcId = scrInterrogationConfig(scr.pageIdx).npcId;
         var txt = TDScenario.t(page.text, ui.language);
+        txt = scrEnrichDialogue(txt, page);
 
         if (page.minigame) {
             npcId = null;
@@ -2939,6 +2989,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
 
     function scrAskInterroQuestion(q) {
         var response = TDScenario.t(q.response, ui.language) || '';
+        response = scrEnrichResponse(response, q);
         typeWriter(response, function () {
             if (!scr.active) { return; }
             // Indice extrait de la réponse (« [Indice X] ... » / « [X clue] ... ») → journal
@@ -2969,6 +3020,36 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 scrEndInterrogation();
             }
         });
+    }
+
+    function scrEnrichResponse(response, q) {
+        if (!TDScenario || !TDScenario.getState) { return response; }
+        var s = TDScenario.getState();
+        var ev = s.evidence || {};
+        var lang = ui.language;
+        var suspectId = scr.interro ? scr.interro.id : null;
+        var enrich = '';
+        var evidenceCount = (ev.alibi || 0) + (ev.mobile || 0) + (ev.opportunity || 0) + (ev.forensic || 0) + (ev.witness || 0) + (ev.timeline || 0);
+        if (evidenceCount >= 3 && suspectId && q.evidence) {
+            var catFilled = ev[q.evidence] > 0;
+            if (catFilled) {
+                if (lang === 'fr') {
+                    enrich = '<br><br><small class="interro-enrich">Laissez-moi vous rappeler : vous avez déjà une preuve solide dans la catégorie ' + scrEvidenceLabel(q.evidence, lang) + '. Cette réponse vous laisse tranquille... ou trahi.</small>';
+                } else {
+                    enrich = '<br><br><small class="interro-enrich">Let me remind you: you already hold solid evidence in the ' + scrEvidenceLabel(q.evidence, lang) + ' category. This answer leaves him uneasy... or trapped.</small>';
+                }
+            }
+        }
+        return response + enrich;
+    }
+
+    function scrEvidenceLabel(cat, lang) {
+        var labels = {
+            fr: { alibi: 'Alibi', mobile: 'Mobile', opportunity: 'Occasion', forensic: 'Forensique', witness: 'Témoins', timeline: 'Chronologie' },
+            en: { alibi: 'Alibi', mobile: 'Motive', opportunity: 'Opportunity', forensic: 'Forensic', witness: 'Witnesses', timeline: 'Timeline' }
+        };
+        var dict = labels[lang] || labels.en;
+        return dict[cat] || cat;
     }
 
     function scrClueFromInterroResponse(text) {
@@ -3199,6 +3280,30 @@ function scrApplyChoice(choiceKey, choiceId) {
                     en: '<div class="ending-text">Under the London sky, gas lamps draw orange halos. The case is closed. ' + morale + '</div>'
                 }
             });
+        } else if (evalResult.indirectConviction) {
+            /* Fin 2b — Accusation erronée MAIS faisceau d'indices suffisant :
+               le vrai coupable est piégé par les preuves et arrete */
+            pages.push({
+                decor: 'exile', npc: null,
+                text: {
+                    fr: '<div class="accuse-screen"><div class="accuse-result partial">⚠ ACCUSATION ERRONÉE, MAIS LES PREUVES PARLENT</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Vous accusez ' + innocentTitle + ', un innocent. Mais le faisceau d\'indices est si épais que ' + titleTxt + ' ne peut plus se cacher.</div></div><div class="ending-text">Sous le soleil des tropiques, ' + titleTxt + ' sirote un cocktail au bord de la piscine d\'un palace. Mais la pression des preuves le force à abandonner sa course. Il lâche un aveu avant de s\'envoler.</div>',
+                    en: '<div class="accuse-screen"><div class="accuse-result partial">⚠ WRONG ACCUSATION, BUT THE EVIDENCE SPEAKS</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">You accuse ' + innocentTitle + ', an innocent. But the evidence beam is so thick that ' + titleTxt + ' can no longer hide.</div></div><div class="ending-text">Under the tropical sun, ' + titleTxt + ' sips a cocktail by the pool of a palace. But the weight of the evidence forces him to abandon his flight. He breaks down before takeoff.</div>'
+                }
+            });
+            pages.push({
+                decor: 'prison', npc: null,
+                text: {
+                    fr: '<div class="ending-text">' + titleTxt + ' est finalement arrêté grâce aux preuves que vous avez collectées. La vérité a triplé en fin de compte.</div>',
+                    en: '<div class="ending-text">' + titleTxt + ' is finally arrested thanks to the evidence you collected. The truth prevails in the end.</div>'
+                }
+            });
+            pages.push({
+                decor: 'sherlock', npc: null,
+                text: {
+                    fr: '<div class="ending-text">Sous le ciel de Londres, les becs de gaz dessinent des halos orange. La vérité a émergé, même par le bas. ' + morale + '</div>',
+                    en: '<div class="ending-text">Under the London sky, gas lamps draw orange halos. The truth emerged, even if by the back door. ' + morale + '</div>'
+                }
+            });
         } else {
             /* Fin 2 — Accusation erronée : 3 pages (île paradisiaque → prison innocent → photo univers) */
             var innocentTitle = scrChoiceLabel(s.accused);
@@ -3232,19 +3337,28 @@ function scrApplyChoice(choiceKey, choiceId) {
 
     function buildEnding(s) {
         var truth = TDScenario.getTruth();
-        var good = (s.accused === s.culprit);
+        var evalResult = TDScenario.evaluateAccusation(s.accused);
+        var correct = (s.accused === s.culprit);
         var lang = s.lang || ui.language;
+        var revealed = correct;
+        if (!correct && evalResult.indirectConviction) {
+            revealed = true;
+        }
         return {
-            good: good,
+            good: correct,
             culprit: TDScenario.t(truth.title, lang) || '',
             mobile: TDScenario.t(truth.mobile, lang) || '',
             methode: TDScenario.t(truth.methode, lang) || '',
-            revealed: good
+            revealed: revealed
                 ? TDScenario.t(truth.prison, lang)
                 : (ui.language === 'fr'
                     ? 'Le vrai coupable, ' + TDScenario.t(truth.title, lang) + ', s\'est échappé.'
                     : 'The real culprit, ' + TDScenario.t(truth.title, lang) + ', has escaped.'),
             morale: TDScenario.t(truth.morale, lang) || '',
+            indirectConviction: !correct && evalResult.indirectConviction ? true : false,
+            cluesCount: evalResult.cluesCount,
+            evidenceScore: evalResult.score,
+            evidenceMax: evalResult.max,
         };
     }
 
@@ -3256,13 +3370,19 @@ function scrApplyChoice(choiceKey, choiceId) {
         $.gameScreen.classList.remove('active');
         $.gameScreen.classList.add('hidden');
         if ($.endScreen) {
-            if ($.endScreenTitle) $.endScreenTitle.textContent = ending.good ? 'Affaire classée' : 'Affaire non résolue';
+            if ($.endScreenTitle) $.endScreenTitle.textContent = ending.indirectConviction ? 'Vérité révélée' : (ending.good ? 'Affaire classée' : 'Affaire non résolue');
             if ($.solutionCulprit) $.solutionCulprit.textContent = ending.culprit;
             if ($.solutionMotive) $.solutionMotive.textContent = ending.mobile;
             if ($.solutionMethod) $.solutionMethod.textContent = ending.methode;
             if ($.solutionRevealText) $.solutionRevealText.textContent = ending.revealed + ' (Score détective : ' + (scrGetState().score || 0) + ')';
             var morale = document.getElementById('solution-morale');
             if (morale) morale.textContent = ending.morale;
+            var cluesEl = document.getElementById('solution-clues');
+            if (cluesEl) {
+                var score = ending.evidenceScore || 0;
+                var max = ending.evidenceMax || 18;
+                cluesEl.textContent = score + '/' + max;
+            }
             $.endScreen.classList.remove('hidden');
             $.endScreen.classList.add('active');
         }
