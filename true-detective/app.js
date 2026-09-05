@@ -2706,6 +2706,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 }
                 if (mgCfg.type === 'coffre_code' && s0 && s0.watchCode) {
                     mgCfg.code = s0.watchCode.slice();
+                    mgCfg.timeStr = s0.watchTimeStr;
                 }
             }
             $.minigameTitle.textContent = mgCfg.title ? (mgCfg.title[ui.language] || mgCfg.title.fr || mgCfg.title.en || 'Mini-jeu') : 'Mini-jeu';

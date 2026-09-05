@@ -1000,6 +1000,17 @@
             var answer = (cfg.code || [1, 9, 8, 1]).join('');
             var input = '';
 
+            var watchInfo = document.createElement('div');
+            watchInfo.className = 'coffre-watch-info';
+            watchInfo.textContent = (cfg.code && cfg.timeStr)
+                ? (lang === 'fr'
+                    ? 'Heure relevée: ' + cfg.timeStr + ' | Code: ' + answer
+                    : 'Time noted: ' + cfg.timeStr + ' | Code: ' + answer)
+                : (lang === 'fr'
+                    ? 'Le code de la montre s\'affiche ci-dessous.'
+                    : 'The watch code appears below.');
+            body.appendChild(watchInfo);
+
             var status = document.createElement('div');
             status.className = 'mg-coffre-status';
             status.textContent = lang === 'fr'
@@ -1010,7 +1021,7 @@
             var padBtn = document.createElement('input');
             padBtn.className = 'safe-input';
             padBtn.readOnly = true;
-            body.appendChild(pad);
+            body.appendChild(padBtn);
 
             var pad = document.createElement('div');
             pad.className = 'coffre-numpad';
