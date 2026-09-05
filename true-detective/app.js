@@ -101,9 +101,10 @@
 
     var PHASE_MUSIC_TRACKS = {
         'recherche': 'recherche.mp3',
-        'reflexion': 'recherche.mp3',
+        'reflexion': 'reflexion.mp3',
         'enigme': 'enigme.mp3',
-        'tension': 'stress.mp3',
+        'tension': 'tension.mp3',
+        'mystere': 'mystere flipant.mp3',
     };
 
     var TEXTS = {
@@ -2869,6 +2870,9 @@ langEnBtn: document.getElementById('lang-en'),
 
         overlay.classList.add('visible');
 
+        // Musique mystère sur la page d'acte
+        scrMusicPlaying('mystere');
+
         if (continueBtn) {
             continueBtn.onclick = function () {
                 overlay.classList.remove('visible');
@@ -3797,6 +3801,7 @@ function scrApplyChoice(choiceKey, choiceId) {
     window.scrShouldShowActPage = scrShouldShowActPage;
     window.THEME_ACT_TITLES = THEME_ACT_TITLES;
     window.scr = scr;
+    window.getThemeId = getThemeId;
     window.skipTypeWriter = skipTypeWriter;
     window.startScenarioGame = startScenarioGame;
     window.THEMES = THEMES;

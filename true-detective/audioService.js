@@ -250,6 +250,7 @@
         revelation: { label: 'Revelation', intensity: 'high', tempo: 120 },
         credits: { label: 'Credits', intensity: 'low', tempo: 60 },
         intro: { label: 'Intro', intensity: 'low', tempo: 60 },
+        mystere: { label: 'Mystère', intensity: 'low', tempo: 70 },
     };
 
     var MUSIC_PHASE_PROMPTS = {
