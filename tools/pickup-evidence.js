@@ -6,14 +6,8 @@ let c = fs.readFileSync(file, 'utf8');
 
 const patches = [
     ['scene_fouille', 'forensic'],
-    ['pression', 'witness'],
-    ['labo_verrou', 'alibi'],
-    ['adn_match', 'forensic'],
     ['montre_code', 'timeline'],
     ['coffre_code', 'mobile'],
-    ['chronos_roue', 'timeline'],
-    ['sabotage', 'alibi'],
-    ['cable_match', 'opportunity'],
 ];
 
 let count = 0;

@@ -54,7 +54,7 @@
         function registerHint(fn) { hintFn = fn; }
         var hintFn = null;
 
-        function finish(won) {
+        function finish(won, notes) {
             if (resultAnnounced) return;
             resultAnnounced = true;
             if (timerId) clearInterval(timerId);
@@ -131,7 +131,7 @@
                 } else {
                     content.remove();
                 }
-                if (onDone) onDone({ won: won });
+                if (onDone) onDone({ won: won, notes: notes });
             });
             content.appendChild(btn);
         }
@@ -178,13 +178,11 @@
         }
 
         /* Bouton « Passer » (optionnel) */
-        if (cfg.type !== 'code_safe') {
-            var skip = document.createElement('button');
-            skip.className = 'btn btn-skip minigame-skip';
-            skip.textContent = lang === 'fr' ? 'Passer' : 'Skip';
-            skip.addEventListener('click', function () { finish(false); });
-            content.appendChild(skip);
-        }
+        var skip = document.createElement('button');
+        skip.className = 'btn btn-skip minigame-skip';
+        skip.textContent = lang === 'fr' ? 'Passer' : 'Skip';
+        skip.addEventListener('click', function () { finish(false); });
+        content.appendChild(skip);
 
         startTimer();
     }
@@ -479,16 +477,31 @@
     function BUILD_CREATORS(cfg, lang, complete, registerHint) {
 
     return {
-'scene_fouille': function (body) {
+        'scene_fouille': function (body) {
             var spots = (cfg.hotspots || []);
             var found = 0;
             var needed = spots.length;
+            var editMode = (typeof location !== 'undefined' && location.search.indexOf('editHotspots') !== -1);
 
             var wrap = document.createElement('div');
             wrap.className = 'fouille-scene';
+            if (editMode) wrap.classList.add('fouille-edit');
             var sceneImageUrl = cfg.sceneImage || 'assets/image true detective/lieux/classic/scene de crime manoir.png';
             wrap.style.backgroundImage = 'url("' + sceneImageUrl + '")';
             body.appendChild(wrap);
+
+            if (editMode) {
+                wrap.style.maxHeight = 'none';
+                wrap.style.height = 'auto';
+                var info = document.createElement('div');
+                info.className = 'fouille-edit-info';
+                info.textContent = 'Mode édition : faites glisser les points. Cliquez "Sauvegarder" pour exporter.';
+                body.appendChild(info);
+                var saveBtn = document.createElement('button');
+                saveBtn.className = 'btn fouille-save-btn';
+                saveBtn.textContent = 'Sauvegarder les hotspots';
+                body.appendChild(saveBtn);
+            }
 
             /* Loupe : grossit la scène sous le curseur */
             var loupe = document.createElement('div');
@@ -539,6 +552,7 @@
                 }
             }
 
+            var spotButtons = [];
             spots.forEach(function (h) {
                 var spot = document.createElement('button');
                 spot.className = 'fouille-zone';
@@ -546,11 +560,16 @@
                 spot.style.top = h.y + '%';
                 spot.textContent = h.label;
                 spot.title = lang === 'fr' ? 'Examiner' : 'Examine';
+                spot.dataset.label = h.label;
+                spot.dataset.x = h.x;
+                spot.dataset.y = h.y;
+                if (editMode) spot.classList.add('fouille-zone-draggable');
                 // Ouvrir la fenêtre d'indice au survol (avec la loupe)
                 spot.addEventListener('mouseenter', function () {
-                    openZoneWin(h, spot);
+                    if (!editMode) openZoneWin(h, spot);
                 });
-                spot.addEventListener('click', function () {
+                spot.addEventListener('click', function (e) {
+                    if (editMode) { e.stopPropagation(); return; }
                     openZoneWin(h, spot);
                     if (!spot.dataset.journaled && global.TDNarrativeEngine && typeof global.TDNarrativeEngine.addClue === 'function') {
                         var clueText = lang === 'fr' ? 'Pièce ' + h.label + ' : ' + t(h.info, lang) : 'Evidence ' + h.label + ' : ' + t(h.info, lang);
@@ -563,7 +582,72 @@
                     if (found >= needed) complete(true);
                 });
                 wrap.appendChild(spot);
+                spotButtons.push(spot);
             });
+
+            /* Mode édition : drag-and-drop des hotspots */
+            if (editMode) {
+                var dragging = null;
+                function onMouseMove(e) {
+                    if (!dragging) return;
+                    var r = wrap.getBoundingClientRect();
+                    var cx = e.clientX - r.left;
+                    var cy = e.clientY - r.top;
+                    var px = (cx / r.width) * 100;
+                    var py = (cy / r.height) * 100;
+                    px = Math.max(0, Math.min(100, px));
+                    py = Math.max(0, Math.min(100, py));
+                    dragging.style.left = px + '%';
+                    dragging.style.top = py + '%';
+                    dragging.dataset.x = px.toFixed(1);
+                    dragging.dataset.y = py.toFixed(1);
+                }
+                function onMouseUp() {
+                    dragging = null;
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                }
+                function onStart(drag) {
+                    dragging = drag;
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                }
+                spotButtons.forEach(function (btn) {
+                    btn.addEventListener('mousedown', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onStart(btn);
+                    });
+                    btn.addEventListener('touchstart', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onStart(btn);
+                    }, { passive: false });
+                });
+
+                /* Bouton de sauvegarde : exporte les coordonnées */
+                if (saveBtn) {
+                    saveBtn.addEventListener('click', function () {
+                        var result = spots.map(function (h, i) {
+                            var btn = spotButtons[i];
+                            return {
+                                label: h.label,
+                                x: parseFloat(btn.dataset.x),
+                                y: parseFloat(btn.dataset.y),
+                                info: h.info
+                            };
+                        });
+                        var json = JSON.stringify(result, null, 2);
+                        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                            navigator.clipboard.writeText(json).then(function () {
+                                alert('Coordonnées copiées dans le presse-papiers !');
+                            });
+                        } else {
+                            alert(json);
+                        }
+                    });
+                }
+            }
         },
 
 
@@ -574,12 +658,32 @@
            chaque carte pour l'identifier ; il gagne quand toutes les
            cartes sont correctement étiquetées.                    */
         'reseau_alibis': function (body) {
+            var WITNESS_ASSETS = {
+                hale: 'assets/image true detective/characteres/classic/Le_Protecteur.png',
+                vivienne: 'assets/image true detective/characteres/classic/femme-fatal.png',
+                pembrooke: 'assets/image true detective/characteres/classic/le-seducteur.png',
+                blackwood: 'assets/image true detective/characteres/classic/Le-suspect.png',
+                criminel: 'assets/image true detective/characteres/classic/le-criminel.png',
+                marginal: 'assets/image true detective/characteres/classic/Le-marginal.png'
+            };
+
             var cards = (cfg.testimonies || []).map(function (c) {
+                var assetKey = c.id.toLowerCase().replace(/[^a-z]/g, '');
+                var assetPath = WITNESS_ASSETS[c.id] || WITNESS_ASSETS[assetKey];
+                if (!assetPath) {
+                    for (var k in WITNESS_ASSETS) {
+                        if (c.witness.fr && c.witness.fr.toLowerCase().indexOf(k) !== -1) {
+                            assetPath = WITNESS_ASSETS[k];
+                            break;
+                        }
+                    }
+                }
                 return {
                     id: c.id,
                     witness: t(c.witness, lang),
                     statement: t(c.statement, lang),
-                    isLie: !!c.isLie
+                    isLie: !!c.isLie,
+                    asset: assetPath
                 };
             });
             if (!cards.length) { complete(true); return; }
@@ -593,6 +697,14 @@
             var mistakes = 0;
             var locked = false;
 
+            var board = document.createElement('div');
+            board.className = 'reseau-alibis-board';
+            body.appendChild(board);
+
+            var boardBg = document.createElement('div');
+            boardBg.className = 'reseau-alibis-board-bg';
+            board.appendChild(boardBg);
+
             var intro = document.createElement('div');
             intro.className = 'reseau-alibis-intro';
             intro.textContent = (lang === 'fr'
@@ -602,23 +714,38 @@
                 : (lieCount > 1
                     ? 'Cross-reference the testimonies. Click each card : Lie or Truth. Identify the ' + lieCount + ' liars.'
                     : 'Cross-reference the testimonies. One card contradicts the others : click on the LIE.'));
-            body.appendChild(intro);
+            board.appendChild(intro);
 
             var counter = document.createElement('div');
             counter.className = 'reseau-alibis-counter';
             counter.textContent = (lang === 'fr'
                 ? 'Menteurs identifiés : 0 / ' + lieCount
                 : 'Liars found : 0 / ' + lieCount);
-            body.appendChild(counter);
+            board.appendChild(counter);
 
             var grid = document.createElement('div');
             grid.className = 'reseau-alibis-grid';
-            body.appendChild(grid);
+            board.appendChild(grid);
 
+            var cardEls = [];
             cards.forEach(function (c) {
                 var card = document.createElement('button');
                 card.className = 'reseau-alibis-card';
                 card.type = 'button';
+                card.dataset.witnessId = c.id;
+
+                var photoWrap = document.createElement('div');
+                photoWrap.className = 'reseau-alibis-photo';
+                if (c.asset) {
+                    var img = document.createElement('img');
+                    img.className = 'reseau-alibis-img';
+                    img.src = c.asset;
+                    img.alt = c.witness;
+                    photoWrap.appendChild(img);
+                } else {
+                    photoWrap.textContent = '?';
+                }
+                card.appendChild(photoWrap);
 
                 var who = document.createElement('div');
                 who.className = 'reseau-alibis-who';
@@ -647,8 +774,6 @@
                             ? 'Menteurs identifiés : ' + foundLies + ' / ' + lieCount
                             : 'Liars found : ' + foundLies + ' / ' + lieCount);
                         if (foundLies >= lieCount) {
-                            /* Toutes les cartes menteuses trouvées :
-                               on confirme les autres comme "vrai".   */
                             locked = true;
                             grid.querySelectorAll('.reseau-alibis-card').forEach(function (other) {
                                 if (other !== card && !other.classList.contains('lie-found')) {
@@ -672,8 +797,6 @@
                             tag.classList.remove('tag-wrong');
                             tag.textContent = (lang === 'fr' ? 'À juger' : 'To judge');
                         }, 700);
-                        /* Si 3 erreurs sur la même carte, on la bloque
-                           comme "vrai" pour ne pas bloquer le joueur. */
                         if (mistakes >= 3) {
                             card.dataset.done = '1';
                             card.classList.add('confirmed-true');
@@ -687,103 +810,20 @@
                     }
                 });
                 grid.appendChild(card);
+                cardEls.push(card);
             });
 
             /* Hint adaptatif : à 40% du temps, illumine les cartes
                qui contiennent un mensonge.                          */
             registerHint(function () {
-                grid.querySelectorAll('.reseau-alibis-card').forEach(function (c) {
-                    var who = c.querySelector('.reseau-alibis-who');
-                    if (!who) return;
-                    var match = cards.filter(function (x) { return lieIds.indexOf(x.id) !== -1 && x.witness === who.textContent; })[0];
-                    if (match) c.classList.add('hint-glow');
-                });
-            });
-        },
-
-
-
-        'code_safe': function (body) {
-            var answer = String(cfg.answer || '120');
-            var input = '';
-            var padBtn = document.createElement('input');
-            padBtn.className = 'safe-input';
-            padBtn.readOnly = true;
-            body.appendChild(padBtn);
-            var pad = document.createElement('div');
-            pad.className = 'num-pad';
-            body.appendChild(pad);
-            ['1','2','3','4','5','6','7','8','9'].forEach(function (k) {
-                var b = document.createElement('button');
-                b.className = 'btn num-key';
-                b.textContent = k;
-                b.addEventListener('click', function () {
-                    if (input.length >= answer.length) return;
-                    input += k;
-                    padBtn.value = input;
-                    if (input.length === answer.length) {
-                        if (input === answer) { padBtn.classList.add('correct'); complete(true); }
-                        else { padBtn.classList.add('wrong'); setTimeout(function () { padBtn.classList.remove('wrong'); padBtn.value = ''; input = ''; }, 500); }
+                cardEls.forEach(function (c, i) {
+                    if (cards[i].isLie) {
+                        c.classList.add('hint-glow');
                     }
                 });
-                pad.appendChild(b);
-            });
-            var del = document.createElement('button');
-            del.className = 'btn num-key del';
-            del.textContent = '?';
-            del.addEventListener('click', function () { input = input.slice(0, -1); padBtn.value = input; });
-            pad.appendChild(del);
-        },
-'sabotage': function (body) {
-            var parts = (cfg.parts || []).map(function (p) { return t(p, lang); });
-            var badIndex = cfg.badIndex || 0;
-            var grid = document.createElement('div');
-            grid.className = 'parts-grid';
-            body.appendChild(grid);
-            parts.forEach(function (label, i) {
-                var b = document.createElement('button');
-                b.className = 'btn part-item';
-                b.textContent = label;
-                b.addEventListener('click', function () {
-                    if (i === badIndex) { b.classList.add('correct'); complete(true); }
-                    else { b.classList.add('wrong'); setTimeout(function () { b.classList.remove('wrong'); }, 400); }
-                });
-                grid.appendChild(b);
             });
         },
 
-        'pression': function (body) {
-            /* Dossier d'interrogatoire : photo du suspect sous pression (si fournie) */
-            if (cfg.asset) {
-                var photo = document.createElement('div');
-                photo.className = 'mg-scene pression-scene';
-                photo.style.backgroundImage = "url('" + cfg.asset + "')";
-                body.appendChild(photo);
-            }
-            var order = (cfg.order || []).map(function (s) { return t(s, lang); });
-            var currentIndex = 0;
-            var box = document.createElement('div');
-            box.className = 'pression-box';
-            body.appendChild(box);
-            order.slice().sort(function () { return Math.random() - 0.5; }).forEach(function (label) {
-                var b = document.createElement('button');
-                b.className = 'btn pression-item';
-                b.textContent = label;
-                b.addEventListener('click', function () {
-                    if (b.dataset.done) return;
-                    if (label === order[currentIndex]) {
-                        b.dataset.done = '1';
-                        b.classList.add('correct');
-                        currentIndex++;
-                        if (currentIndex >= order.length) complete(true);
-                    } else {
-                        b.classList.add('wrong');
-                        setTimeout(function () { b.classList.remove('wrong'); }, 400);
-                    }
-                });
-                box.appendChild(b);
-            });
-        },
 
         /* V3, MINI-JEUX AVEC ASSETS */
         'labo_verrou': function (body, registerHint) {
@@ -981,7 +1021,6 @@
                     if (input.length === answer.length) {
                         if (input === answer) {
                             padBtn.classList.add('correct');
-                            /* animation : la porte s'ouvre */
                             img.classList.add('coffre-open');
                             setTimeout(function () { complete(true); }, 700);
                         } else {
@@ -999,6 +1038,7 @@
             pad.appendChild(del);
         },
 
+        /* V3, MINI-JEUX AVEC ASSETS */
         'chronos_roue': function (body, registerHint) {
             var wrap = document.createElement('div');
             wrap.className = 'mg-scene';
@@ -1042,106 +1082,6 @@
             registerHint(function () {
                 gearEls.forEach(function (b) { if (!b.dataset.done && b.textContent === gears[idx]) b.classList.add('hint'); });
             });
-        },
-
-        'carnet_dechire': function (body, registerHint) {
-            var wrap = document.createElement('div');
-            wrap.className = 'mg-scene carnet-scene';
-            wrap.style.backgroundImage = 'url(mini-games/prescription/prescription-eliane.png)';
-            body.appendChild(wrap);
-            var strips = [
-                { fr: 'Versement de 12 000 £ à V.K.', en: 'Payment of £12,000 to V.K.', order: 0 },
-                { fr: 'pour services rendus, contrat', en: 'for services rendered, contract', order: 1 },
-                { fr: 'le 14 du mois, comme convenu', en: 'on the 14th of the month, as agreed', order: 2 },
-                { fr: 'ne pas laisser de traces', en: 'leave no traces', order: 3 }
-            ];
-            var currentOrder = strips.slice().sort(function () { return Math.random() - 0.5; });
-            var stripEls = [];
-            var list = document.createElement('div');
-            list.className = 'carnet-strips';
-            body.appendChild(list);
-            currentOrder.forEach(function (s) {
-                var el = document.createElement('div');
-                el.className = 'carnet-strip';
-                el.textContent = t(s, lang);
-                el.dataset.origOrder = s.order;
-                list.appendChild(el);
-                stripEls.push(el);
-            });
-            /* --- Phase 2 : empreintes digitales sur la page reconstituée --- */
-            var fingerprints = [
-                { x: 30, y: 55, found: false, label: { fr: 'Empreinte sur la mention V.K.', en: 'Fingerprint on the V.K. mention' } },
-                { x: 45, y: 38, found: false, label: { fr: 'Empreinte près du 14, la date du contrat', en: 'Fingerprint near the 14th, contract date' } },
-                { x: 62, y: 68, found: false, label: { fr: 'Empreinte sur le montant, 12 000 £', en: 'Fingerprint on the amount, £12,000' } },
-                { x: 75, y: 42, found: false, label: { fr: 'Empreinte sur la signature', en: 'Fingerprint on the signature' } }
-            ];
-            var fpFound = 0;
-            var loupe = document.createElement('div');
-            loupe.className = 'carnet-loupe';
-            loupe.style.display = 'none';
-            wrap.appendChild(loupe);
-            var fpEls = [];
-            fingerprints.forEach(function (fp, i) {
-                var zone = document.createElement('div');
-                zone.className = 'carnet-fp-zone';
-                zone.style.left = fp.x + '%';
-                zone.style.top = fp.y + '%';
-                zone.dataset.idx = i;
-                wrap.appendChild(zone);
-                fpEls.push(zone);
-                zone.addEventListener('click', function () {
-                    if (fp.found) return;
-                    fp.found = true;
-                    fpFound++;
-                    zone.classList.add('found');
-                    var toast = document.createElement('div');
-                    toast.className = 'carnet-clue-toast';
-                    toast.textContent = (lang === 'fr' ? 'Empreinte relevée (' : 'Fingerprint found (') + fpFound + '/' + fingerprints.length + ') : ' + t(fp.label, lang);
-                    body.appendChild(toast);
-                    setTimeout(function () { toast.remove(); }, 2500);
-                    if (fpFound >= 3) complete(true);
-                });
-            });
-            var carnetMousemoveHandler = function (e) {
-                var rect = wrap.getBoundingClientRect();
-                var x = ((e.clientX - rect.left) / rect.width) * 100;
-                var y = ((e.clientY - rect.top) / rect.height) * 100;
-                loupe.style.display = 'block';
-                loupe.style.left = x + '%';
-                loupe.style.top = y + '%';
-            };
-            var carnetMouseleaveHandler = function () { loupe.style.display = 'none'; };
-            var activateFingerprints = function () {
-                list.classList.add('solved');
-                wrap.classList.add('loupe-active');
-                wrap.addEventListener('mousemove', carnetMousemoveHandler);
-                wrap.addEventListener('mouseleave', carnetMouseleaveHandler);
-                var hint = document.createElement('div');
-                hint.className = 'carnet-hint';
-                hint.textContent = lang === 'fr' ? '\u{1F50D} Loupe active, relevez au moins 3 empreintes sur la page.' : '\u{1F50D} Magnifier active, find at least 3 fingerprints on the page.';
-                body.appendChild(hint);
-            };
-            var selectedIdx = -1;
-            stripEls.forEach(function (el, i) {
-                el.addEventListener('click', function () {
-                    if (el.dataset.locked === '1') return;
-                    if (selectedIdx === -1) { selectedIdx = i; el.classList.add('selected'); }
-                    else {
-                        var other = stripEls[selectedIdx];
-                        other.classList.remove('selected');
-                        var tmp = other.textContent; other.textContent = el.textContent; el.textContent = tmp;
-                        var tmpO = other.dataset.origOrder; other.dataset.origOrder = el.dataset.origOrder; el.dataset.origOrder = tmpO;
-                        selectedIdx = -1; checkCarnet();
-                    }
-                });
-            });
-            function checkCarnet() {
-                if (stripEls.every(function (el, i) { return parseInt(el.dataset.origOrder, 10) === i; })) {
-                    stripEls.forEach(function (el) { el.dataset.locked = '1'; el.classList.add('locked'); });
-                    activateFingerprints();
-                }
-            }
-            registerHint(function () { stripEls.forEach(function (el, i) { if (el.dataset.locked !== '1' && parseInt(el.dataset.origOrder, 10) !== i) el.classList.add('hint'); }); });
         },
 
         'cryptogramme': function (body, registerHint) {

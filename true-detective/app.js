@@ -171,6 +171,11 @@
         themeScreen: document.getElementById('theme-selector-screen'),
         gameScreen: document.getElementById('game-screen'),
         endScreen: document.getElementById('end-screen'),
+        minigameScreen: document.getElementById('minigame-screen'),
+        minigameTitle: document.getElementById('minigame-screen-title'),
+        minigameContent: document.getElementById('minigame-screen-content'),
+        minigameBackBtn: document.getElementById('minigame-back-btn'),
+        minigameSkipBtn: document.getElementById('minigame-skip-btn'),
         themeGrid: document.getElementById('theme-grid'),
             resumeBtn: document.getElementById('resume-btn'),
             startGameBtn: document.getElementById('start-game-btn'),
@@ -222,6 +227,18 @@ langEnBtn: document.getElementById('lang-en'),
         solutionRevealText: document.getElementById('solution-revealed-text'),
         endScreenTitle: null,
     };
+
+    function showScreen(screen) {
+        if (!screen) return;
+        screen.classList.remove('hidden');
+        screen.classList.add('active');
+    }
+
+    function hideScreen(screen) {
+        if (!screen) return;
+        screen.classList.remove('active');
+        screen.classList.add('hidden');
+    }
 
     var ui = {
         language: 'en',
@@ -521,6 +538,26 @@ langEnBtn: document.getElementById('lang-en'),
                 $.homeScreen.classList.add('active');
                 hidePageNav();
                 checkSavedGame();
+            });
+        }
+
+        if ($.minigameBackBtn) {
+            $.minigameBackBtn.addEventListener('click', function () {
+                var layer = document.getElementById('minigame-layer');
+                if (layer) {
+                    layer.classList.remove('active');
+                    layer.innerHTML = '';
+                }
+                hideScreen($.minigameScreen);
+                showScreen($.gameScreen);
+            });
+        }
+
+        if ($.minigameSkipBtn) {
+            $.minigameSkipBtn.addEventListener('click', function () {
+                if (window._minigameSkipHandler) {
+                    window._minigameSkipHandler();
+                }
             });
         }
 
@@ -2487,6 +2524,11 @@ langEnBtn: document.getElementById('lang-en'),
         return map[choiceId] || choiceId;
     }
 
+    function scrChoiceLabelMulti(label, lang) {
+        if (typeof label === 'string') return label;
+        return label[lang] || label.fr || label.en || Object.values(label)[0];
+    }
+
     function scrInterrogationConfig(orderIdx) {
         var s = scrGetState();
         var order = s.suspectOrdre;
@@ -2608,7 +2650,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         var page = phase.pages[scr.pageIdx];
 
         if (page.minigame && window.TDMiniGames) {
-            scrRenderInlineMinigame(page);
+            scrShowMinigameGate(page);
             return;
         }
         if (page.interrogation && window.TDNarration && window.TDNarration.interrogations &&
@@ -2619,19 +2661,10 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         scrShowAdvance(page);
     }
 
-    function scrRenderInlineMinigame(page) {
-        $.dialogueText.innerHTML = '';
-        $.typeCursor.classList.add('hidden');
-        $.choicesContainer.innerHTML = '';
-        $.continueBtn.classList.add('hidden');
-        $.conversationInput.classList.add('hidden');
-
-        var container = document.createElement('div');
-        container.className = 'minigame-page';
-        $.gameScreen.appendChild(container);
-
+    function scrLaunchMinigame(page) {
         var mgCfg = page.minigame;
         var launched = false;
+        var currentOnDone = null;
         function onMinigameDone(res) {
             if (launched) return;
             launched = true;
@@ -2653,7 +2686,14 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                     s.playerNotes = res.notes;
                 }
             }
-            container.remove();
+            currentOnDone = null;
+            var layer = document.getElementById('minigame-layer');
+            if (layer) {
+                layer.classList.remove('active');
+                layer.innerHTML = '';
+            }
+            hideScreen($.minigameScreen);
+            showScreen($.gameScreen);
             scrNext();
         }
 
@@ -2664,14 +2704,35 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                     mgCfg.code = s0.watchCode.slice();
                     mgCfg.timeStr = s0.watchTimeStr;
                 }
-                if (mgCfg.type === 'coffre_code') {
-                    mgCfg.code = s0.watchCode.slice();
-                }
             }
-            TDMiniGames.play(mgCfg, ui.language, onMinigameDone, container);
+            $.minigameTitle.textContent = mgCfg.title ? (mgCfg.title[ui.language] || mgCfg.title.fr || mgCfg.title.en || 'Mini-jeu') : 'Mini-jeu';
+            $.minigameContent.innerHTML = '';
+            hideScreen($.gameScreen);
+            showScreen($.minigameScreen);
+            $.minigameSkipBtn.classList.remove('hidden');
+            $.minigameSkipBtn.disabled = false;
+            $.minigameSkipBtn.onclick = null;
+            TDMiniGames.play(mgCfg, ui.language, onMinigameDone);
+            currentOnDone = onMinigameDone;
+            window._minigameSkipHandler = function () {
+                if (!launched) {
+                    onMinigameDone({ won: false });
+                }
+            };
+            $.minigameSkipBtn.onclick = function () {
+                if (currentOnDone) {
+                    currentOnDone({ won: false });
+                }
+            };
         } catch (e) {
-            console.error('[True Detective] Erreur mini-jeu inline "' + mgCfg.type + '" :', e);
-            container.remove();
+            console.error('[True Detective] Erreur mini-jeu "' + mgCfg.type + '" :', e);
+            var layer = document.getElementById('minigame-layer');
+            if (layer) {
+                layer.classList.remove('active');
+                layer.innerHTML = '';
+            }
+            hideScreen($.minigameScreen);
+            showScreen($.gameScreen);
             onMinigameDone({ won: false });
         }
     }
@@ -2687,66 +2748,12 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.continueBtn.textContent = getText('continue') || 'Continuer';
         $.continueBtn.onclick = function () {
             $.continueBtn.disabled = true;
-            scrPlayMinigame(page);
+            scrLaunchMinigame(page);
         };
         $.conversationInput.classList.add('hidden');
         // Petit rappel discret tant que le texte est affiché
     }
 
-    function scrPlayMinigame(page) {
-        if (!page || !page.minigame) { scrNext(); return; }
-        if (!scr.active) { scr.active = true; }
-        var mgCfg = page.minigame;
-        var launched = false;
-        function onMinigameDone(res) {
-            if (launched) return;
-            launched = true;
-            if (res && res.won) {
-                var s = scrGetState();
-                s.miniGamesWon++;
-                s.score += 10;
-                if (!s.clues) s.clues = [];
-                var clue = scrClueFromMinigame(page.minigame);
-                s.clues.push(clue);
-                if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
-                    window.TDNarrativeEngine.addClue(clue);
-                    if (typeof window.TDNarrativeEngine.addStep === 'function') {
-                        window.TDNarrativeEngine.addStep('minigame', clue);
-                    }
-                }
-                showClueToast(clue);
-                if (mgCfg.type === 'montre_code' && res.notes) {
-                    s.playerNotes = res.notes;
-                }
-            }
-            scrNext();
-        }
-        try {
-            var s0 = scrGetState();
-            if (s0 && s0.watchCode) {
-                if (mgCfg.type === 'montre_code') {
-                    mgCfg.code = s0.watchCode.slice();
-                    mgCfg.timeStr = s0.watchTimeStr;
-                }
-                if (mgCfg.type === 'coffre_code') {
-                    mgCfg.code = s0.watchCode.slice();
-                }
-            }
-            TDMiniGames.play(mgCfg, ui.language, onMinigameDone);
-            /* Chien de garde : si le calque du mini-jeu ne s'ouvre pas
-               (erreur silencieuse), on continue l'aventure au lieu de bloquer. */
-            setTimeout(function () {
-                var layer = document.getElementById('minigame-layer');
-                if (!launched && (!layer || !layer.classList.contains('active'))) {
-                    console.error('[True Detective] Mini-jeu "' + mgCfg.type + '" non ouvert : reprise de l\'aventure.');
-                    onMinigameDone({ won: false });
-                }
-            }, 300);
-        } catch (e) {
-            console.error('[True Detective] Erreur mini-jeu "' + mgCfg.type + '" :', e);
-            onMinigameDone({ won: false });
-        }
-    }
 
     /* =====================================================================
        INTERROGATOIRE, 3 phases × 3 questions (box qui se renouvelle).
@@ -2933,10 +2940,17 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             var choices = page.choices || [];
             scr.awaitingChoice = true;
             $.choicesContainer.innerHTML = '';
-            choices.forEach(function (choiceId) {
+            choices.forEach(function (choiceItem) {
+                var choiceId, label;
+                if (typeof choiceItem === 'string') {
+                    choiceId = choiceItem;
+                } else {
+                    choiceId = choiceItem.id;
+                    label = choiceItem.label;
+                }
                 var btn = document.createElement('button');
                 btn.className = 'btn btn-choice';
-                btn.textContent = scrChoiceLabel(choiceId);
+                btn.textContent = label ? scrChoiceLabelMulti(label, ui.language) : scrChoiceLabel(choiceId);
                 btn.addEventListener('click', function () {
                     if (!scr.awaitingChoice) return;
                     scr.awaitingChoice = false;
@@ -3061,55 +3075,50 @@ function scrApplyChoice(choiceKey, choiceId) {
 
         var pages = [];
         if (good) {
+            /* Fin 1 — Accusation juste : 3 pages (prison → QG extérieur → photo univers) */
+            pages.push({
+                decor: 'prison', npc: null,
+                text: {
+                    fr: '<div class="accuse-screen"><div class="accuse-result success">✅ ACCUSATION JUSTE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">' + titleTxt + ' est coupable. ' + TDScenario.t(truth.methode, lang) + '</div></div><div class="ending-text">Derrière les barreaux, le coupable s\'effondre. ' + TDScenario.t(truth.prison, lang) + '</div>',
+                    en: '<div class="accuse-screen"><div class="accuse-result success">✅ RIGHT ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">' + titleTxt + ' is guilty. ' + TDScenario.t(truth.methode, lang) + '</div></div><div class="ending-text">Behind the bars, the culprit breaks down. ' + TDScenario.t(truth.prison, lang) + '</div>'
+                }
+            });
             pages.push({
                 decor: 'qg', npc: 'detective-partner',
                 text: {
-                    fr: '<div class="accuse-screen"><div class="accuse-result success">✅ ACCUSATION JUSTE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">' + titleTxt + ' est coupable. ' + TDScenario.t(truth.methode, lang) + '</div></div>',
-                    en: '<div class="accuse-screen"><div class="accuse-result success">✅ RIGHT ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">' + titleTxt + ' is guilty. ' + TDScenario.t(truth.methode, lang) + '</div></div>'
+                    fr: '<div class="ending-text">Devant le quartier général, votre partenaire Wexford vous félicite. « Affaire classée, inspecteur. Votre méthode a porté ses fruits. »' + '</div>',
+                    en: '<div class="ending-text">Outside headquarters, your partner Wexford congratulates you. "Case closed, inspector. Your method bore fruit."' + '</div>'
+                }
+            });
+            pages.push({
+                decor: 'sherlock', npc: null,
+                text: {
+                    fr: '<div class="ending-text">Sous le ciel de Londres, les becs de gaz dessinent des halos orange. L\'affaire est close. ' + morale + '</div>',
+                    en: '<div class="ending-text">Under the London sky, gas lamps draw orange halos. The case is closed. ' + morale + '</div>'
+                }
+            });
+        } else {
+            /* Fin 2 — Accusation erronée : 3 pages (île paradisiaque → prison innocent → photo univers) */
+            var innocentTitle = scrChoiceLabel(s.accused);
+            pages.push({
+                decor: 'exile', npc: null,
+                text: {
+                    fr: '<div class="accuse-screen"><div class="accuse-result failure">❌ ACCUSATION ERRONÉE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Vous accusez ' + innocentTitle + ', un innocent. Le vrai coupable, ' + titleTxt + ', s\'est échappé.</div></div><div class="ending-text">Sous le soleil des tropiques, le vrai coupable sirote un cocktail au bord de la piscine d\'un palace. Il rit de vous, loin, très loin de votre juridiction.</div>',
+                    en: '<div class="accuse-screen"><div class="accuse-result failure">❌ WRONG ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">You accuse ' + innocentTitle + ', an innocent. The real culprit, ' + titleTxt + ', has escaped.</div></div><div class="ending-text">Under the tropical sun, the real culprit sips a cocktail by the pool of a palace. He laughs at you, far, very far from your jurisdiction.</div>'
                 }
             });
             pages.push({
                 decor: 'prison', npc: null,
                 text: {
-                    fr: 'Derrière les barreaux, le coupable s\'effondre. ' + TDScenario.t(truth.prison, lang) + '\n\n[Décor : prison, Le coupable croupit en cellule, son règne est terminé.]',
-                    en: 'Behind the bars, the culprit breaks down. ' + TDScenario.t(truth.prison, lang) + '\n\n[Scene: prison, The culprit rots in a cell, his reign is over.]'
+                    fr: '<div class="ending-text">Derrière les barreaux, ' + innocentTitle + ' s\'effondre, innocente. La vérité finira bien par émerger, mais trop tard pour cette affaire.</div>',
+                    en: '<div class="ending-text">Behind the bars, ' + innocentTitle + ' collapses, innocent. The truth will eventually emerge, but too late for this case.</div>'
                 }
             });
             pages.push({
-                decor: 'qg', npc: 'detective-partner',
+                decor: 'sherlock', npc: null,
                 text: {
-                    fr: 'Promotion ! Vous recevez une médaille de détective supérieur. ' + morale,
-                    en: 'Promotion! You receive a top-detective medal. ' + morale
-                }
-            });
-        } else {
-            var innocentTitle = scrChoiceLabel(s.accused);
-            pages.push({
-                decor: 'qg', npc: 'detective-partner',
-                text: {
-                    fr: '<div class="accuse-screen"><div class="accuse-result failure">❌ ACCUSATION ERRONÉE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Vous accusez ' + innocentTitle + ', un innocent. Le vrai coupable, ' + titleTxt + ', s\'est échappé.</div></div>',
-                    en: '<div class="accuse-screen"><div class="accuse-result failure">❌ WRONG ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">You accuse ' + innocentTitle + ', an innocent. The real culprit, ' + titleTxt + ', has escaped.</div></div>'
-                }
-            });
-            pages.push({
-                decor: 'exile', npc: null,
-                text: {
-                    fr: '[Décor : exil, Sous le soleil des tropiques, le vrai coupable sirote un cocktail au bord de la piscine d\'un palace. Il rit de vous, loin, très loin de votre juridiction.]',
-                    en: '[Scene: exile, Under the tropical sun, the real culprit sips a cocktail by the pool of a palace. He laughs at you, far, very far from your jurisdiction.]'
-                }
-            });
-            pages.push({
-                decor: 'alley', npc: null,
-                text: {
-                    fr: 'Le vrai coupable a pris la fuite avec l\'argent et les bijoux, direction l\'étranger.',
-                    en: 'The real culprit has fled with the money and jewels toward abroad.'
-                }
-            });
-            pages.push({
-                decor: 'clandestine', npc: null,
-                text: {
-                    fr: 'Vous perdez votre badge de détective et sombrez dans la dépression. ' + morale,
-                    en: 'You lose your detective badge and fall into depression. ' + morale
+                    fr: '<div class="ending-text">Le mystère reste entier dans les ruelles de Londres. ' + morale + '</div>',
+                    en: '<div class="ending-text">The mystery remains unsolved in the London alleys. ' + morale + '</div>'
                 }
             });
         }

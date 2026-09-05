@@ -1280,6 +1280,59 @@ html {
     flex-wrap: wrap;
 }
 
+/* ===== Minigame Screen ===== */
+
+#minigame-screen {
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.minigame-screen-container {
+    width: 100%;
+    max-width: 1100px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.minigame-screen-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.minigame-screen-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.minigame-screen-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #f0d890;
+    margin: 0;
+}
+
+.minigame-screen-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+}
+
+.minigame-screen-content .minigame-content {
+    width: 100%;
+    max-width: 960px;
+}
+
+.minigame-screen-content .minigame-content.scene-wide {
+    width: min(96vw, 1080px);
+}
+
 /* ===== Loading Overlay ===== */
 
 .loading-overlay {
@@ -1492,7 +1545,8 @@ html {
   padding: 18px;
   box-sizing: border-box;
 }
-.minigame-page .minigame-content {
+.minigame-page .minigame-content,
+.minigame-layer .minigame-content {
   background: linear-gradient(160deg, #141a26, #0b0f18);
   border: 1px solid rgba(255,255,255,0.14);
   border-radius: 14px;
@@ -1503,6 +1557,13 @@ html {
   flex-direction: column;
   padding-bottom: 70px;
   box-sizing: border-box;
+}
+.minigame-page .minigame-body,
+.minigame-layer .minigame-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 .minigame-page .minigame-content.scene-wide {
   width: min(96vw, 1080px);
@@ -1718,6 +1779,8 @@ html {
   background-size: cover; background-position: center;
   cursor: none; touch-action: none;
   box-shadow: 0 0 0 1px rgba(255,255,255,0.15), 0 10px 40px rgba(0,0,0,0.6);
+  flex: 1;
+  min-height: 0;
 }
 .scene-loupe {
   position: absolute; width: 200px; height: 200px; border-radius: 50%;
@@ -1738,6 +1801,12 @@ html {
 }
 .fouille-zone:hover { background: rgba(230,70,50,0.95); box-shadow: 0 0 14px rgba(255,215,120,0.8); }
 .fouille-zone.found { background: rgba(40,110,50,0.85); border-color: #7fd48a; animation: none; }
+.fouille-edit .fouille-scene { overflow: visible; aspect-ratio: 1024 / 576; }
+.fouille-zone-draggable { cursor: grab; z-index: 10; animation: zone-pulse 2s ease-in-out infinite; pointer-events: auto; }
+.fouille-zone-draggable:active { cursor: grabbing; }
+.fouille-edit-info { text-align: center; padding: 10px; color: #f0d890; font-family: 'Special Elite', monospace; font-size: 0.9rem; }
+.fouille-save-btn { display: block; margin: 10px auto; padding: 10px 20px; font-family: 'Special Elite', monospace; font-weight: 700; }
+@keyframes zone-pulse { 0%,100% { box-shadow: 0 0 4px rgba(255,215,120,0.4), 0 0 8px rgba(255,0,255,0.8); } 50% { box-shadow: 0 0 16px rgba(255,215,120,0.9), 0 0 12px rgba(255,0,255,0.9); } }
 @keyframes zone-pulse { 0%,100% { box-shadow: 0 0 4px rgba(255,215,120,0.4); } 50% { box-shadow: 0 0 16px rgba(255,215,120,0.9); } }
 
 /* Fenêtre d'indice de zone */

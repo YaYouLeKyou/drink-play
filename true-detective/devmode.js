@@ -92,8 +92,12 @@
                         var text = page.text.fr || page.text.en || '';
                         pageText = text.substring(0, 40) + (text.length > 40 ? '...' : '');
                     }
-                    pageBtn.textContent = 'P' + (pageIdx + 1) + (pageText ? ': ' + pageText : '');
-                    pageBtn.title = page.text ? (page.text.fr || page.text.en || '') : '';
+                    var mgLabel = '';
+                    if (page.minigame) {
+                        mgLabel = ' [MG:' + page.minigame.type + ']';
+                    }
+                    pageBtn.textContent = 'P' + (pageIdx + 1) + (pageText ? ': ' + pageText : '') + mgLabel;
+                    pageBtn.title = page.text ? (page.text.fr || page.text.en || '') : (page.minigame ? ('Minigame: ' + page.minigame.type) : '');
                     pageBtn.addEventListener('click', function () {
                         jumpToPhase(phaseIdx, pageIdx);
                     });

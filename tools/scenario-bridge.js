@@ -101,20 +101,29 @@ function validate() {
         if (docLower.indexOf('face') === -1) issues.push('Le doc ne décrit pas la révélation de la FACE de la montre');
     } else issues.push('Mini-jeu montre_code absent de phases.js');
 
-    /* 4. Coffre en Acte 2, code 1981, documenté */
-    const coffre = minigames.find(function (x) { return x.type === 'coffre_code'; });
-    if (!coffre) issues.push('Mini-jeu coffre_code absent de phases.js');
-    else {
-        const actNormalized = String(coffre.act || '').toLowerCase().trim();
-        const isActe2 = /\b(acte\s*2|acte\s*ii|^2$|^ii$)/i.test(actNormalized);
-        if (!isActe2) warnings.push('coffre_code n\'est pas dans l\'Acte 2 (act=' + coffre.act + ')');
-        if ((coffre.cfg.code || []).join('') !== '1981') issues.push('Code coffre ≠ 1981');
-        if (docLower.indexOf('coffre_code') === -1) issues.push('coffre_code non documenté');
+    /* 4. Coffre-fort : narrative text instead of minigame */
+    const acte3 = phases.find(function (p) { return p.id === 'act3_1'; });
+    if (acte3) {
+        const pages = acte3.pages || [];
+        const hasCoffreMinigame = pages.some(function (pg) {
+            return pg.minigame && pg.minigame.type === 'coffre_code';
+        });
+        if (hasCoffreMinigame) {
+            issues.push('minigame coffre_code encore présent dans phases.js (devrait être narrative)');
+        }
+        const hasCoffreNarrative = pages.some(function (pg) {
+            return pg.text && (pg.text.fr || '').toLowerCase().indexOf('coffre') !== -1;
+        });
+        if (!hasCoffreNarrative) {
+            warnings.push('L acte 3 / coffre n a pas de page narrative de remplacement');
+        }
+    } else {
+        issues.push('Phase act3_1 (coffre) introuvable dans phases.js');
     }
 
-    /* 5. Chaque mini-jeu (hors code_safe) doit avoir un clue */
+    /* 5. Chaque mini-jeu doit avoir un clue */
     minigames.forEach(function (x) {
-        if (x.type !== 'code_safe' && !x.cfg.clue) {
+        if (!x.cfg.clue) {
             issues.push('Mini-jeu `' + x.type + '` (' + x.phaseId + ') sans indice de récompense (cfg.clue)');
         }
         if (x.cfg.clue && detectDocCoverage(x.cfg.clue.fr, docLower) < 0.25) {
