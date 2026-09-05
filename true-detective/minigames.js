@@ -35,18 +35,14 @@
         var titleEl = document.createElement('div');
         titleEl.className = 'minigame-title';
         titleEl.textContent = cfg.title ? t(cfg.title, lang) : 'Mini-jeu';
-        if (useOverlay) {
-            titleEl.style.display = 'none';
-        }
+        titleEl.style.display = 'none';
         content.appendChild(titleEl);
 
         if (cfg.desc) {
             var desc = document.createElement('div');
             desc.className = 'minigame-desc';
             desc.textContent = t(cfg.desc, lang);
-            if (useOverlay) {
-                desc.style.display = 'none';
-            }
+            desc.style.display = 'none';
             content.appendChild(desc);
         }
 
@@ -55,7 +51,6 @@
         var timerId = null;
         var resultAnnounced = false;
         var hintShown = false;
-        var useOverlay = !target;
         /* Difficulté adaptative : à 60% du temps écoulé, halo sur les bons éléments */
         function registerHint(fn) { hintFn = fn; }
         var hintFn = null;
