@@ -12,12 +12,14 @@
     var phaseList = null;
     var pageGrid = null;
     var themeList = null;
+    var voiceToggle = null;
 
     function init() {
         modal = document.getElementById('dev-modal');
         phaseList = document.getElementById('dev-phase-list');
         pageGrid = document.getElementById('dev-page-grid');
         themeList = document.getElementById('dev-theme-list');
+        voiceToggle = document.getElementById('dev-voice-toggle');
 
         var devBtn = document.getElementById('dev-btn');
         var closeBtn = document.getElementById('dev-close-btn');
@@ -27,6 +29,14 @@
         }
         if (closeBtn) {
             closeBtn.addEventListener('click', closeModal);
+        }
+
+        if (voiceToggle) {
+            voiceToggle.addEventListener('change', function () {
+                if (window.toggleVoiceInputEnabled) {
+                    window.toggleVoiceInputEnabled();
+                }
+            });
         }
 
         // Fermer en cliquant en dehors du modal
@@ -47,6 +57,7 @@
         renderThemeList();
         renderPhaseList();
         renderPageGrid();
+        syncVoiceToggle();
         modal.classList.add('active');
     }
 
@@ -189,4 +200,11 @@
         jumpToPhase: jumpToPhase
     };
 
+    function syncVoiceToggle() {
+        if (!voiceToggle) return;
+        var enabled = typeof window.isVoiceInputEnabled === 'function'
+            ? window.isVoiceInputEnabled()
+            : false;
+        voiceToggle.checked = enabled;
+    }
 })();

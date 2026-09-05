@@ -1070,6 +1070,11 @@ html {
     animation: pulse-glow 1s infinite;
 }
 
+.voice-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
 @keyframes pulse-glow {
     0% { box-shadow: 0 0 5px rgba(255, 0, 100, 0.3); }
     50% { box-shadow: 0 0 20px rgba(255, 0, 100, 0.6); }
@@ -1897,11 +1902,11 @@ html {
   transition: left 0.05s linear, top 0.05s linear;
 }
 .fouille-zone {
-  position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px;
+  position: absolute; width: 32px; height: 32px; margin: -16px 0 0 -16px;
   border-radius: 50%; border: 2px solid rgba(255,215,120,0.9);
   background: rgba(160,40,30,0.85); color: #ffe9a8;
   font-family: 'Special Elite', monospace; font-weight: 700; font-size: 0.75em;
-  cursor: pointer; z-index: 4; padding: 0; line-height: 14px; text-align: center;
+  cursor: pointer; z-index: 4; padding: 0; line-height: 28px; text-align: center;
   animation: zone-pulse 2s ease-in-out infinite;
   touch-action: manipulation;
 }
@@ -2250,6 +2255,17 @@ html {
   font-size: 1rem;
   margin-bottom: 12px;
 }
+.dev-voice-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dev-voice-section label {
+  font-family: 'Special Elite', monospace;
+  color: #c0c0d0;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
 .dev-phase-list {
   display: flex;
   flex-wrap: wrap;
@@ -2332,4 +2348,232 @@ html {
   background: rgba(50, 70, 100, 0.8);
   border-color: rgba(80, 120, 180, 0.6);
   color: #ffffff;
+}
+
+/* ===== Act Page Overlay ===== */
+
+.act-page-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #000000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.act-page-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.act-page-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.15;
+    z-index: -1;
+}
+
+.act-page-content {
+    text-align: center;
+    max-width: 800px;
+    width: 100%;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+.act-page-number {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.2em;
+    font-weight: 500;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: actFadeInUp 0.8s ease 0.3s forwards;
+}
+
+.act-page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 4em;
+    font-weight: 700;
+    letter-spacing: 4px;
+    line-height: 1.1;
+    opacity: 0;
+    animation: actFadeInUp 0.8s ease 0.5s forwards;
+}
+
+.act-page-subtitle {
+    font-family: 'Special Elite', monospace;
+    font-size: 1.3em;
+    font-weight: 400;
+    letter-spacing: 2px;
+    opacity: 0;
+    animation: actFadeInUp 0.8s ease 0.7s forwards;
+    max-width: 600px;
+    line-height: 1.4;
+}
+
+.act-page-divider {
+    width: 100px;
+    height: 2px;
+    opacity: 0;
+    animation: actScaleIn 0.6s ease 0.9s forwards;
+}
+
+.act-page-continue {
+    margin-top: 40px;
+    opacity: 0;
+    animation: actFadeInUp 0.8s ease 1.1s forwards;
+}
+
+.act-page-continue .btn-continue {
+    font-size: 1.2em;
+    padding: 16px 50px;
+    letter-spacing: 3px;
+}
+
+@keyframes actFadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes actScaleIn {
+    0% {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+    100% {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+}
+
+/* ===== Classic Theme ===== */
+
+.act-page-overlay.theme-agatha-christie .act-page-number,
+.act-page-overlay.theme-sherlock-holmes .act-page-number {
+    color: #c0a060;
+    text-shadow: 0 0 20px rgba(192, 160, 96, 0.5);
+}
+
+.act-page-overlay.theme-agatha-christie .act-page-title,
+.act-page-overlay.theme-sherlock-holmes .act-page-title {
+    color: #f0e0c0;
+    text-shadow: 0 0 40px rgba(192, 160, 96, 0.4), 0 2px 4px rgba(0, 0, 0, 0.8);
+    font-family: 'Playfair Display', serif;
+}
+
+.act-page-overlay.theme-agatha-christie .act-page-subtitle,
+.act-page-overlay.theme-sherlock-holmes .act-page-subtitle {
+    color: #c0a060;
+}
+
+.act-page-overlay.theme-agatha-christie .act-page-divider,
+.act-page-overlay.theme-sherlock-holmes .act-page-divider {
+    background: linear-gradient(90deg, transparent, #c0a060, transparent);
+}
+
+/* ===== Cyberpunk Theme ===== */
+
+.act-page-overlay.theme-cyberpunk {
+    background: radial-gradient(ellipse at center, #0a0020 0%, #000000 70%);
+}
+
+.act-page-overlay.theme-cyberpunk .act-page-number {
+    color: #00ffff;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.act-page-overlay.theme-cyberpunk .act-page-title {
+    color: #00ffff;
+    text-shadow: 0 0 60px rgba(0, 255, 255, 0.6), 0 0 120px rgba(0, 255, 255, 0.3);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    letter-spacing: 6px;
+}
+
+.act-page-overlay.theme-cyberpunk .act-page-subtitle {
+    color: #ff00ff;
+    text-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+}
+
+.act-page-overlay.theme-cyberpunk .act-page-divider {
+    background: linear-gradient(90deg, transparent, #00ffff, #ff00ff, transparent);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+/* ===== Film Noir Theme ===== */
+
+.act-page-overlay.theme-film-noir {
+    background: #000000;
+}
+
+.act-page-overlay.theme-film-noir .act-page-bg {
+    background: radial-gradient(ellipse at 30% 20%, rgba(40, 40, 40, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(30, 30, 30, 0.2) 0%, transparent 50%);
+    opacity: 1;
+}
+
+.act-page-overlay.theme-film-noir .act-page-number {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    font-family: 'Special Elite', monospace;
+    letter-spacing: 12px;
+}
+
+.act-page-overlay.theme-film-noir .act-page-title {
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+    font-family: 'Special Elite', monospace;
+    font-weight: 400;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+}
+
+.act-page-overlay.theme-film-noir .act-page-subtitle {
+    color: #a0a0a0;
+    font-family: 'Special Elite', monospace;
+}
+
+.act-page-overlay.theme-film-noir .act-page-divider {
+    background: linear-gradient(90deg, transparent, #ffffff, transparent);
+    height: 1px;
+}
+
+@media (max-width: 768px) {
+    .act-page-title {
+        font-size: 2.5em;
+        letter-spacing: 2px;
+    }
+    .act-page-subtitle {
+        font-size: 1em;
+    }
+    .act-page-number {
+        font-size: 0.9em;
+        letter-spacing: 4px;
+    }
 }

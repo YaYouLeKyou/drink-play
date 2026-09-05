@@ -45,6 +45,12 @@
                         <div id="dev-phase-list" class="dev-phase-list"></div>
                     </div>
                     <div class="dev-section">
+                        <h3>Voix & Reconnaissance</h3>
+                        <div id="dev-voice-section" class="dev-voice-section">
+                            <label><input type="checkbox" id="dev-voice-toggle"> Activer la reconnaissance vocale</label>
+                        </div>
+                    </div>
+                    <div class="dev-section">
                         <h3>Phases & Pages</h3>
                         <div id="dev-page-grid" class="dev-page-grid"></div>
                     </div>
@@ -120,6 +126,20 @@
             <div class="conversation-input hidden" id="conversation-input">
                 <input type="text" id="player-text" class="player-text-input" placeholder="Ask the NPC something..." maxlength="200" autocomplete="off">
                 <button id="send-btn" class="btn btn-send">Send</button>
+            </div>
+        </div>
+
+        <!-- ===== ACT PAGE OVERLAY ===== -->
+        <div id="act-page-overlay" class="act-page-overlay">
+            <div class="act-page-bg" id="act-page-bg"></div>
+            <div class="act-page-content">
+                <div class="act-page-number" id="act-page-number"></div>
+                <h1 class="act-page-title" id="act-page-title"></h1>
+                <div class="act-page-divider"></div>
+                <p class="act-page-subtitle" id="act-page-subtitle"></p>
+                <div class="act-page-continue">
+                    <button class="btn btn-continue" id="act-page-continue-btn">Continuer</button>
+                </div>
             </div>
         </div>
     </section>

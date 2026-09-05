@@ -548,6 +548,7 @@
             }
 
             var spotButtons = [];
+            var hoverTimer = null;
             spots.forEach(function (h) {
                 var spot = document.createElement('button');
                 spot.className = 'fouille-zone';
@@ -559,12 +560,18 @@
                 spot.dataset.x = h.x;
                 spot.dataset.y = h.y;
                 if (editMode) spot.classList.add('fouille-zone-draggable');
-                // Ouvrir la fenêtre d'indice au survol (avec la loupe)
                 spot.addEventListener('mouseenter', function () {
-                    if (!editMode) openZoneWin(h, spot);
+                    if (!editMode) {
+                        if (hoverTimer) clearTimeout(hoverTimer);
+                        hoverTimer = setTimeout(function () { openZoneWin(h, spot); }, 250);
+                    }
+                });
+                spot.addEventListener('mouseleave', function () {
+                    if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
                 });
                 spot.addEventListener('click', function (e) {
                     if (editMode) { e.stopPropagation(); return; }
+                    if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
                     openZoneWin(h, spot);
                     if (!spot.dataset.journaled && global.TDNarrativeEngine && typeof global.TDNarrativeEngine.addClue === 'function') {
                     var cat = h.evidence || 'forensic';

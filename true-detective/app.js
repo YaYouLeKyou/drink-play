@@ -99,6 +99,13 @@
         'film-noir': FILM_NOIR_ASSETS,
     };
 
+    var PHASE_MUSIC_TRACKS = {
+        'recherche': 'recherche.mp3',
+        'reflexion': 'recherche.mp3',
+        'enigme': 'enigme.mp3',
+        'tension': 'stress.mp3',
+    };
+
     var TEXTS = {
         en: {
             selectTheme: 'Select your investigation theme to begin',
@@ -326,6 +333,13 @@ langEnBtn: document.getElementById('lang-en'),
         narrationTimer: null,
         narrationSeconds: 30,
         narrationRemaining: 30,
+        voiceInputEnabled: (function () {
+            try {
+                var raw = localStorage.getItem('trueDetective_settings');
+                if (raw) { return JSON.parse(raw).voiceInputEnabled || false; }
+            } catch (e) { /* ignore */ }
+            return false;
+        })(),
     };
 
     function getText(key) {
@@ -342,6 +356,30 @@ langEnBtn: document.getElementById('lang-en'),
 
     function getStorageKey(key) {
         return STORAGE_PREFIX + key;
+    }
+
+    function saveSettings() {
+        try {
+            var settings = { voiceInputEnabled: ui.voiceInputEnabled };
+            localStorage.setItem('trueDetective_settings', JSON.stringify(settings));
+        } catch (e) { /* ignore */ }
+    }
+
+    function toggleVoiceInputEnabled() {
+        ui.voiceInputEnabled = !ui.voiceInputEnabled;
+        saveSettings();
+        updateVoiceButtonVisibility();
+    }
+
+    function updateVoiceButtonVisibility() {
+        if (!$.voiceBtn) return;
+        if (ui.voiceInputEnabled) {
+            $.voiceBtn.classList.remove('voice-disabled');
+            $.voiceBtn.title = 'Voice Input';
+        } else {
+            $.voiceBtn.classList.add('voice-disabled');
+            $.voiceBtn.title = 'Voice Input (disabled - enable in dev settings)';
+        }
     }
 
     function loadCachedScript(themeId, language) {
@@ -384,8 +422,9 @@ langEnBtn: document.getElementById('lang-en'),
         }
     }
 
-    function init() {
+     function init() {
         $.endScreenTitle = $.endScreen ? $.endScreen.querySelector('h1') : null;
+        updateVoiceButtonVisibility();
         renderThemeCards();
         checkSavedGame();
         setupEventListeners();
@@ -2407,7 +2446,8 @@ langEnBtn: document.getElementById('lang-en'),
 
     var _voiceActive = false;
 
-    function toggleVoiceInput() {
+     function toggleVoiceInput() {
+        if (!ui.voiceInputEnabled) { return; }
         if (!$.voiceBtn) return;
         if (_voiceActive) {
             stopVoiceInputInternal();
@@ -2754,11 +2794,12 @@ langEnBtn: document.getElementById('lang-en'),
      function scrGetState() { return TDScenario ? TDScenario.getState() : null; }
 
      function scrResetState() {
-        TDScenario.reset();
-        var s = scrGetState();
-        s.lang = ui.language;
-        s.theme = getThemeId();
-        s.watchCode = scrGenerateWatchCode();
+         TDScenario.reset();
+         window.scrThemeMusicStarted = false;
+         var s = scrGetState();
+         s.lang = ui.language;
+         s.theme = getThemeId();
+         s.watchCode = scrGenerateWatchCode();
         s.watchTime = scrGenerateWatchTime();
         s.watchCodeStr = s.watchCode.join('');
         s.watchTimeStr = s.watchTime.h + 'h' + String(s.watchTime.m).padStart(2, '0');
@@ -2845,31 +2886,38 @@ langEnBtn: document.getElementById('lang-en'),
     }
 
     function scrMusicPlaying(phaseMusic) {
-        var track;
-        if (phaseMusic === 'theme') {
-            track = (TDAudioService && TDAudioService.getThemeMusic)
-                ? TDAudioService.getThemeMusic(getThemeId())
-                : 'sherlock.mp3';
-        } else if (phaseMusic === 'credits') {
-            track = 'night ride.mp3';
-        } else {
-            var map = {
-                recherche: 'recherche.mp3',
-                reflexion: 'reflexion.mp3',
-                enigme: 'enigme.mp3',
-                rising: 'Rising Tension.mp3',
-                revelation: 'Act III Revelations.mp3',
-            };
-            track = map[phaseMusic] || 'recherche.mp3';
+        var themeTrack = (TDAudioService && TDAudioService.getThemeMusic)
+            ? TDAudioService.getThemeMusic(getThemeId())
+            : THEME_ASSETS[getThemeId()] ? THEME_ASSETS[getThemeId()].music : 'sherlock.mp3';
+        if (phaseMusic === 'theme' || phaseMusic === 'credits' || phaseMusic === 'intro') {
+            if (window.DPMusicPlayer) {
+                try { window.DPMusicPlayer.playTrack(phaseMusic === 'credits' ? 'night ride.mp3' : themeTrack); } catch (e) { /* ignore */ }
+            }
+        } else if (PHASE_MUSIC_TRACKS[phaseMusic]) {
+            if (window.DPMusicPlayer) {
+                try { window.DPMusicPlayer.playTrack(PHASE_MUSIC_TRACKS[phaseMusic]); } catch (e) { /* ignore */ }
+            }
         }
-        if (track && window.DPMusicPlayer) {
-            try { window.DPMusicPlayer.playTrack(track); } catch (e) { /* ignore */ }
+        updateMusicInfo(phaseMusic || 'investigation', getThemeId());
+    }
+
+    function scrEnsureThemeMusic() {
+        if (!window.scrThemeMusicStarted) {
+            window.scrThemeMusicStarted = true;
+            var themeId = getThemeId();
+            var themeTrack = (TDAudioService && TDAudioService.getThemeMusic)
+                ? TDAudioService.getThemeMusic(themeId)
+                : (THEME_ASSETS[themeId] ? THEME_ASSETS[themeId].music : 'sherlock.mp3');
+            if (window.DPMusicPlayer) {
+                try { window.DPMusicPlayer.playTrack(themeTrack); } catch (e) { /* ignore */ }
+            }
         }
     }
 function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
 
     function startScenarioGame() {
         scrResetState();
+        scrEnsureThemeMusic();
         $.themeScreen.classList.add('hidden');
         $.gameScreen.classList.remove('hidden');
         $.gameScreen.classList.add('active');
@@ -3054,7 +3102,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                     mgCfg.timeStr = s0.watchTimeStr;
                 }
             }
-            if (mgCfg.type === 'scene_fouille' && !mgCfg.sceneImage) {
+            if ((mgCfg.type === 'scene_fouille' || mgCfg.type === 'montre_code') && !mgCfg.sceneImage) {
                 mgCfg.sceneImage = scrDecorImage('crimeScene');
             }
             var mgThemeId = getThemeId();
@@ -3356,7 +3404,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 });
                 $.choicesContainer.appendChild(btn);
             });
-            if (page.choiceKey === 'finalChoice') {
+            if (page.choiceKey === 'accuser') {
                 var s = scrGetState();
                 var reinterroges = s.reinterroges || [];
                 var suspects = ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel'];
@@ -3622,6 +3670,9 @@ function scrApplyChoice(choiceKey, choiceId) {
     window.startScenarioGame = startScenarioGame;
     window.THEMES = THEMES;
     window.selectTheme = selectTheme;
+    window.toggleVoiceInputEnabled = toggleVoiceInputEnabled;
+    window.isVoiceInputEnabled = function () { return ui.voiceInputEnabled; };
+    window.updateVoiceButtonVisibility = updateVoiceButtonVisibility;
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
