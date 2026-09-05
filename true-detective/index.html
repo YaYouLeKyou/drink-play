@@ -122,16 +122,19 @@
             <button id="close-notebook" class="notebook-close-btn">✕</button>
         </div>
         <div class="notebook-content">
-            <div class="notebook-section">
-                <h3>Discovered Clues</h3>
-                <ul id="clues-list" class="notebook-list">
-                    <li class="notebook-empty">No clues discovered yet. Keep investigating!</li>
-                </ul>
+            <div class="notebook-tabs">
+                <button class="notebook-tab-btn active" data-tab="clues-all">All Clues</button>
+                <button class="notebook-tab-btn" data-tab="clues-forensic">Forensic</button>
+                <button class="notebook-tab-btn" data-tab="clues-witness">Witness</button>
+                <button class="notebook-tab-btn" data-tab="clues-mobile">Motive</button>
+                <button class="notebook-tab-btn" data-tab="clues-timeline">Timeline</button>
+                <button class="notebook-tab-btn" data-tab="clues-dialogue">Dialogue</button>
+                <button class="notebook-tab-btn" data-tab="clues-opportunity">Opportunity</button>
+                <button class="notebook-tab-btn" data-tab="steps">Investigation Steps</button>
             </div>
             <div class="notebook-section">
-                <h3>Investigation Steps</h3>
-                <ul id="steps-list" class="notebook-list">
-                    <li class="notebook-empty">No investigation steps recorded yet.</li>
+                <ul id="clues-list" class="notebook-list notebook-clues-grid">
+                    <li class="notebook-empty">No clues discovered yet. Keep investigating!</li>
                 </ul>
             </div>
         </div>

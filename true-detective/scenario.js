@@ -94,10 +94,12 @@ indice: { fr: 'Sa « panne » coïncidait exactement avec l\'heure du meurtre ; 
     var state = { lang: 'fr', theme: 'agatha-christie', culprit: 'protecteur', prochainSuspect: null, suspectOrdre: [], phaseIdx: 0, pageIdx: 0, clues: [], miniGamesWon: 0, accused: null, score: 0, ending: null, evidence: { alibi: 0, mobile: 0, opportunity: 0, forensic: 0, witness: 0, timeline: 0 }, reinterroges: [] };
     var SUSPECTS = ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel'];
 
-    /* Le coupable est FIXE (Major Hale), plus de random */
-    function randomCulprit() { return 'protecteur'; }
+    /* Le coupable est choisi aléatoirement parmi les 6 suspects */
+    function randomCulprit() {
+        return SUSPECTS[Math.floor(Math.random() * SUSPECTS.length)];
+    }
     function reset() {
-        state.culprit = 'protecteur';
+        state.culprit = randomCulprit();
         state.prochainSuspect = null; state.suspectOrdre = [];
         state.phaseIdx = 0; state.pageIdx = 0; state.clues = [];
         state.miniGamesWon = 0; state.accused = null; state.score = 0; state.ending = null;
@@ -138,6 +140,30 @@ indice: { fr: 'Sa « panne » coïncidait exactement avec l\'heure du meurtre ; 
         fr: 'Le Major Hale s\'effondre. « Tout ça pour elle… mais elle ne m\'a jamais aimé. » La vérité éclate : amour obsessionnel, Krane payé, Pembrooke écarté habilement… Un homme maîtrisé, jusqu\'au bout. JUSTICE EST FAITE.',
         en: 'Major Hale collapses. "All of this for her… but she never loved me." The truth bursts out: obsessive love, Krane paid, Pembrooke alibi, crime mastered. JUSTICE IS SERVED.'
     };
+    REACTIONS['protecteur'].reaction2 = {
+        fr: 'Hale relève la tête, les yeux vides. « Vous avez raison. Mais vous ne comprendrez jamais pourquoi j\'ai fait ça. Vivienne… » Il se laisse tomber. La vérité est accablante. JUSTICE EST FAITE.',
+        en: 'Hale lifts his head, eyes empty. "You\'re right. But you will never understand why I did it. Vivienne…" He collapses. The truth is overwhelming. JUSTICE IS SERVED.'
+    };
+    REACTIONS['femme-fatale'].reaction2 = {
+        fr: 'Lady Vivienne sourit, un œil seulement. « Vous m\'accusez ? Incroyable. J\'aurais attendu mieux de vous, inspecteur. » Mais un frisson parcourt sa main posée sur le coffre. Le vrai coupable l\'échappe. ÉCHEC.',
+        en: 'Lady Vivienne smiles, one eye only. "You accuse me? Incredible. I would have expected better of you, inspector." But a tremor runs through her hand resting on the safe. The real killer escapes. FAILURE.'
+    };
+    REACTIONS['seducteur'].reaction2 = {
+        fr: 'Pembrooke secoue la tête, les mains tremblantes. « Ce n\'est pas moi, inspecteur. La durite a été sectionnée de l\'intérieur. » Il désigne du doigt le Major Hale. Le vrai coupable s\'échappe. ÉCHEC.',
+        en: 'Pembrooke shakes his head, hands trembling. "Not me, inspector. The hose was cut from the inside." He points at Major Hale. The real killer escapes. FAILURE.'
+    };
+    REACTIONS['suspect'].reaction2 = {
+        fr: 'Blackwood éclate de rire. « Mon notaire ? Moi ? Regardez mieux. » Il se tourne vers le coffre. « Ce n\'est pas moi qui ai effacé les dettes… mais celui qui voulait les effacer. » Le cerveau du meurtre s\'enfuit. ÉCHEC.',
+        en: 'Blackwood laughs. "My notary? Me? Look closer." He turns to the safe. "It wasn\'t me who erased the debts… but the one who wanted them erased." The mastermind flees. FAILURE.'
+    };
+    REACTIONS['marginal'].reaction2 = {
+        fr: 'Le clochard baisse les yeux. « J\'ai trouvé la montre près du corps, pas près du coffre. Celui qui a ouvert le coffre, c\'est pas moi. » Il désigne les empreintes dans la poussière. Le vrai tueur reste libre. ÉCHEC.',
+        en: 'The vagrant lowers his eyes. "I found the watch near the body, not near the safe. The one who opened the safe wasn\'t me." He points to footprints in the dust. The real killer remains free. FAILURE.'
+    };
+    REACTIONS['criminel'].reaction2 = {
+        fr: 'Krane se frotte le menton. « Vous misez sur moi, inspecteur ? J\'ai fait mon boulot, oui. Mais le pourquoi ? Regardez les versements. Ce n\'est pas Krane qui paie, c\'est quelqu\'un qui a besoin de moi. » Le véritable commanditaire s\'enfuit. ÉCHEC.',
+        en: 'Krane rubs his chin. "You bet on me, inspector? I did my job, yes. But the why? Look at the payments. It\'s not Krane who pays, it\'s someone who needs me." The true contractor flees. FAILURE.'
+    };
 
     /* --- Système de preuves (faisceau d'indices) --- */
     function recordEvidence(category) {
@@ -157,6 +183,12 @@ indice: { fr: 'Sa « panne » coïncidait exactement avec l\'heure du meurtre ; 
         var correct = (suspectId === state.culprit);
         var score = getEvidenceScore();
         var reaction = REACTIONS[suspectId] || REACTIONS['protecteur'];
+        var useSecondary = (score >= getEvidenceMax() * 0.6) && reaction.reaction2;
+        if (correct && score >= getEvidenceMax() * 0.6 && REACTIONS[suspectId] && REACTIONS[suspectId].reaction2) {
+            reaction = REACTIONS[suspectId].reaction2;
+        } else if (!correct && reaction.reaction2 && useSecondary) {
+            reaction = reaction.reaction2;
+        }
         return {
             correct: correct,
             score: score,

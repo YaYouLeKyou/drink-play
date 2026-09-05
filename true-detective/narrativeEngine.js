@@ -233,8 +233,12 @@
 
         gameState.lastSceneData = data;
 
-        if (data.clue && data.clue !== 'null' && data.clue !== gameState.discoveredClues[gameState.discoveredClues.length - 1]) {
-            gameState.discoveredClues.push(data.clue);
+        if (data.clue && data.clue !== 'null') {
+            var lastClue = gameState.discoveredClues[gameState.discoveredClues.length - 1];
+            var lastClueText = (typeof lastClue === 'object' && lastClue) ? lastClue.text : lastClue;
+            if (data.clue !== lastClueText) {
+                gameState.discoveredClues.push({ text: data.clue, category: 'scene' });
+            }
         }
 
         if (data.event && data.event !== 'null') {
@@ -307,8 +311,19 @@
                 saveGameState();
 
                 if (data.data.revealClue && data.data.revealClue !== 'null') {
-                    if (!gameState.discoveredClues.includes(data.data.revealClue)) {
-                        gameState.discoveredClues.push(data.data.revealClue);
+                    var existingClues = gameState.discoveredClues;
+                    var alreadyHas = false;
+                    for (var i = 0; i < existingClues.length; i++) {
+                        var ex = existingClues[i];
+                        if (typeof ex === 'object' && ex.text === data.data.revealClue) {
+                            alreadyHas = true; break;
+                        }
+                        if (typeof ex === 'string' && ex === data.data.revealClue) {
+                            alreadyHas = true; break;
+                        }
+                    }
+                    if (!alreadyHas) {
+                        gameState.discoveredClues.push({ text: data.data.revealClue, category: 'dialogue' });
                         saveGameState();
                     }
                 }
@@ -323,10 +338,20 @@
         }
     }
 
-    function addClue(clue) {
+    function addClue(clue, category) {
         if (!clue || clue === 'null' || clue === '') { return false; }
-        if (gameState.discoveredClues.includes(clue)) { return false; }
-        gameState.discoveredClues.push(clue);
+        category = category || 'general';
+
+        for (var i = 0; i < gameState.discoveredClues.length; i++) {
+            var existing = gameState.discoveredClues[i];
+            if (typeof existing === 'object' && existing.text === clue) {
+                return false;
+            }
+            if (typeof existing === 'string' && existing === clue) {
+                return false;
+            }
+        }
+        gameState.discoveredClues.push({ text: clue, category: category });
         saveGameState();
         return true;
     }

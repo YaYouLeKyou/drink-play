@@ -74,6 +74,13 @@
             investigationSteps: 'Investigation Steps',
             noClues: 'No clues discovered yet. Keep investigating!',
             noSteps: 'No investigation steps recorded yet.',
+            clueCatForensic: 'Forensic',
+            clueCatWitness: 'Witness',
+            clueCatMotive: 'Motive',
+            clueCatTimeline: 'Timeline',
+            clueCatDialogue: 'Dialogue',
+            clueCatOpportunity: 'Opportunity',
+            clueCatScene: 'Scene',
             act: 'Act',
             scene: 'Scene',
             clues: 'Clues',
@@ -127,6 +134,13 @@
             investigationSteps: 'Étapes de l\'Enquête',
             noClues: 'Aucun indice découvert pour le moment.',
             noSteps: 'Aucune étape enregistrée pour le moment.',
+            clueCatForensic: 'Expertise',
+            clueCatWitness: 'Témoignage',
+            clueCatMotive: 'Mobile',
+            clueCatTimeline: 'Chronologie',
+            clueCatDialogue: 'Dialogue',
+            clueCatOpportunity: 'Occasion',
+            clueCatScene: 'Scène',
             act: 'Acte',
             scene: 'Scène',
             clues: 'Indices',
@@ -215,6 +229,8 @@ langEnBtn: document.getElementById('lang-en'),
         closeNotebookBtn: document.getElementById('close-notebook'),
         cluesList: document.getElementById('clues-list'),
         stepsList: document.getElementById('steps-list'),
+        notebookTabBtns: document.querySelectorAll('.notebook-tab-btn'),
+        notebookActiveTab: 'clues-all',
         loadingOverlay: document.getElementById('loading-overlay'),
         loadingText: document.getElementById('loading-text'),
         loadingDots: document.getElementById('loading-dots'),
@@ -456,6 +472,8 @@ langEnBtn: document.getElementById('lang-en'),
         if ($.closeNotebookBtn) {
             $.closeNotebookBtn.addEventListener('click', toggleNotebook);
         }
+
+        setupNotebookTabs();
 
         if ($.newInvestigationBtn) {
             $.newInvestigationBtn.addEventListener('click', newInvestigation);
@@ -886,12 +904,12 @@ langEnBtn: document.getElementById('lang-en'),
             gameComplete: false,
             solution: null,
         };
-
         if (sceneData.clue) {
             if (TDNarrativeEngine) {
-                TDNarrativeEngine.addClue(sceneData.clue);
+                TDNarrativeEngine.addClue(sceneData.clue, 'scene');
             }
             showClueToast(sceneData.clue);
+
         }
 
         updateObjective(sceneData.objective);
@@ -990,8 +1008,8 @@ langEnBtn: document.getElementById('lang-en'),
                     gameComplete: false,
                     solution: null,
                 };
-                if (sceneData.clue) {
-                    TDNarrativeEngine.addClue(sceneData.clue);
+                 if (sceneData.clue) {
+                    TDNarrativeEngine.addClue(sceneData.clue, 'scene');
                     showClueToast(sceneData.clue);
                 }
                 updateMusicInfo(firstScene.type, ui.theme);
@@ -1049,7 +1067,7 @@ langEnBtn: document.getElementById('lang-en'),
 
         if (sceneData.clue) {
             if (TDNarrativeEngine) {
-                TDNarrativeEngine.addClue(sceneData.clue);
+                TDNarrativeEngine.addClue(sceneData.clue, 'scene');
             }
             showClueToast(sceneData.clue);
         }
@@ -1588,7 +1606,7 @@ langEnBtn: document.getElementById('lang-en'),
 
         if (sceneData.clue) {
             if (TDNarrativeEngine) {
-                TDNarrativeEngine.addClue(sceneData.clue);
+                TDNarrativeEngine.addClue(sceneData.clue, 'scene');
             }
             showClueToast(sceneData.clue);
         }
@@ -1988,7 +2006,7 @@ langEnBtn: document.getElementById('lang-en'),
     function continueAfterTransition(data) {
         if (data.clue && data.clue !== 'null' && data.clue) {
             if (TDNarrativeEngine) {
-                TDNarrativeEngine.addClue(data.clue);
+                TDNarrativeEngine.addClue(data.clue, 'scene');
             }
             showClueToast(data.clue);
         }
@@ -2067,7 +2085,7 @@ langEnBtn: document.getElementById('lang-en'),
 
                 if (data.revealClue && data.revealClue !== 'null') {
                     if (TDNarrativeEngine) {
-                        TDNarrativeEngine.addClue(data.revealClue);
+                        TDNarrativeEngine.addClue(data.revealClue, 'dialogue');
                     }
                     showClueToast(data.revealClue);
                     updateNotebook();
@@ -2183,31 +2201,113 @@ langEnBtn: document.getElementById('lang-en'),
         if (!TDNarrativeEngine) return;
         var state = TDNarrativeEngine.getGameState();
 
-        if ($.cluesList) {
-            if (state.discoveredClues.length === 0) {
-                $.cluesList.innerHTML = '<li class="notebook-empty">' + getText('noClues') + '</li>';
+        function getClueText(clue) {
+            if (typeof clue === 'object' && clue !== null) {
+                return clue.text || '';
+            }
+            return clue || '';
+        }
+
+        function getClueCategory(clue) {
+            if (typeof clue === 'object' && clue !== null) {
+                return clue.category || 'general';
+            }
+            return 'general';
+        }
+
+        var categories = {
+            'forensic':  { label: getText('clueCatForensic') || 'Forensic', icon: '🔬' },
+            'witness':   { label: getText('clueCatWitness') || 'Witness', icon: '👁' },
+            'mobile':    { label: getText('clueCatMotive') || 'Motive', icon: '💰' },
+            'timeline':  { label: getText('clueCatTimeline') || 'Timeline', icon: '⏰' },
+            'dialogue':  { label: getText('clueCatDialogue') || 'Dialogue', icon: '💬' },
+            'opportunity': { label: getText('clueCatOpportunity') || 'Opportunity', icon: '🚪' },
+            'scene':     { label: getText('clueCatScene') || 'Scene', icon: '🔍' },
+        };
+
+        var allClues = state.discoveredClues || [];
+        var steps = state.investigationSteps || [];
+
+        if ($.stepsList) {
+            if (steps.length === 0) {
+                $.stepsList.innerHTML = '<li class="notebook-empty">' + getText('noSteps') + '</li>';
             } else {
-                $.cluesList.innerHTML = state.discoveredClues.map(function (clue) {
-                    return '<li class="clue">' + escapeHtml(clue) + '</li>';
+                $.stepsList.innerHTML = steps.map(function (step) {
+                    return '<li class="step">' + escapeHtml(step.text) + '</li>';
                 }).join('');
             }
         }
 
-        if ($.stepsList) {
-            if (state.investigationSteps.length === 0) {
-                $.stepsList.innerHTML = '<li class="notebook-empty">' + getText('noSteps') + '</li>';
+        if ($.cluesList) {
+            var activeTab = $.notebookActiveTab || 'clues-all';
+
+            if (allClues.length === 0) {
+                $.cluesList.innerHTML = '<li class="notebook-empty">' + getText('noClues') + '</li>';
             } else {
-                $.stepsList.innerHTML = state.investigationSteps.map(function (step) {
-                    return '<li class="step">' + escapeHtml(step.text) + '</li>';
-                }).join('');
+                var filtered;
+                if (activeTab === 'clues-all') {
+                    filtered = allClues;
+                } else if (activeTab === 'steps') {
+                    filtered = steps.length === 0 ? [] : steps.map(function(s) {
+                        return { text: s.text, category: 'steps', isStep: true };
+                    });
+                } else {
+                    var cat = activeTab.replace('clues-', '');
+                    filtered = allClues.filter(function(clue) {
+                        return getClueCategory(clue) === cat;
+                    });
+                }
+
+                if (filtered.length === 0) {
+                    $.cluesList.innerHTML = '<li class="notebook-empty">' + getText('noClues') + '</li>';
+                } else {
+                    $.cluesList.innerHTML = filtered.map(function (item) {
+                        if (item.isStep) {
+                            return '<li class="step-item"><span class="step-text">' + escapeHtml(item.text) + '</span></li>';
+                        }
+                        var text = getClueText(item);
+                        var cat = getClueCategory(item);
+                        var label = categories[cat] ? categories[cat].label : 'General';
+                        var icon = categories[cat] ? categories[cat].icon : '📝';
+                        return '<li class="clue-item" data-category="' + escapeHtml(cat) + '">' +
+                            '<span class="clue-cat-badge" title="' + escapeHtml(label) + '">' + icon + '</span>' +
+                            '<span class="clue-text">' + escapeHtml(text) + '</span>' +
+                            '</li>';
+                    }).join('');
+                }
             }
         }
     }
 
     function toggleNotebook() {
         if (!$.notebook) return;
+        var wasOpen = $.notebook.classList.contains('open');
         $.notebook.classList.toggle('open');
+        if (!wasOpen) {
+            resetNotebookTabs();
+        }
         updateNotebook();
+    }
+
+    function resetNotebookTabs() {
+        if (!$.notebookTabBtns || !$.notebookTabBtns.length) return;
+        $.notebookTabBtns.forEach(function(b) { b.classList.remove('active'); });
+        var allBtn = document.querySelector('.notebook-tab-btn[data-tab="clues-all"]');
+        if (allBtn) allBtn.classList.add('active');
+        $.notebookActiveTab = 'clues-all';
+    }
+
+    function setupNotebookTabs() {
+        if (!$.notebookTabBtns || !$.notebookTabBtns.length) return;
+        $.notebookTabBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var tab = this.getAttribute('data-tab');
+                $.notebookTabBtns.forEach(function(b) { b.classList.remove('active'); });
+                this.classList.add('active');
+                $.notebookActiveTab = tab;
+                updateNotebook();
+            });
+        });
     }
 
     function toggleMute() {
@@ -2674,14 +2774,16 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 s.score += 10;
                 if (!s.clues) s.clues = [];
                 var clue = scrClueFromMinigame(page.minigame);
+                var clueCategory = mgCfg.evidence || (mgCfg.type === 'scene_fouille' ? 'forensic' : (mgCfg.type === 'montre_code' ? 'timeline' : (mgCfg.type === 'coffre_code' ? 'mobile' : (mgCfg.type === 'reseau_alibis' ? 'witness' : 'scene'))));
                 s.clues.push(clue);
                 if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
-                    window.TDNarrativeEngine.addClue(clue);
+                    window.TDNarrativeEngine.addClue(clue, clueCategory);
                     if (typeof window.TDNarrativeEngine.addStep === 'function') {
-                        window.TDNarrativeEngine.addStep('minigame', clue);
+                        window.TDNarrativeEngine.addStep(mgCfg.type, clue);
                     }
                 }
                 showClueToast(clue);
+                updateNotebook();
                 if (mgCfg.type === 'montre_code' && res.notes) {
                     s.playerNotes = res.notes;
                 }
@@ -2844,9 +2946,10 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             if (clue) {
                 var s = scrGetState();
                 if (!s.clues) { s.clues = []; }
+                var clueCategory = q.evidence || 'dialogue';
                 if (s.clues.indexOf(clue) === -1) { s.clues.push(clue); }
                 if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
-                    window.TDNarrativeEngine.addClue(clue);
+                    window.TDNarrativeEngine.addClue(clue, clueCategory);
                     if (typeof window.TDNarrativeEngine.addStep === 'function') {
                         window.TDNarrativeEngine.addStep('interrogation', clue);
                     }

@@ -567,13 +567,13 @@
                     if (editMode) { e.stopPropagation(); return; }
                     openZoneWin(h, spot);
                     if (!spot.dataset.journaled && global.TDNarrativeEngine && typeof global.TDNarrativeEngine.addClue === 'function') {
-                        var clueText = lang === 'fr' ? 'Pièce ' + h.label + ' : ' + t(h.info, lang) : 'Evidence ' + h.label + ' : ' + t(h.info, lang);
-                        global.TDNarrativeEngine.addClue(clueText);
-                        if (typeof global.TDNarrativeEngine.addStep === 'function') {
-                            global.TDNarrativeEngine.addStep('fouille', clueText);
-                        }
-                        spot.dataset.journaled = '1';
+                    var clueText = lang === 'fr' ? 'Pièce ' + h.label + ' : ' + t(h.info, lang) : 'Evidence ' + h.label + ' : ' + t(h.info, lang);
+                    global.TDNarrativeEngine.addClue(clueText, 'forensic');
+                    if (typeof global.TDNarrativeEngine.addStep === 'function') {
+                        global.TDNarrativeEngine.addStep('fouille', clueText);
                     }
+                    spot.dataset.journaled = '1';
+                }
                     if (found >= needed) complete(true);
                 });
                 wrap.appendChild(spot);

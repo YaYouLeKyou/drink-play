@@ -1210,6 +1210,83 @@ html {
     padding: 20px;
 }
 
+.notebook-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 0 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.notebook-tab-btn {
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    color: rgba(224, 224, 255, 0.6);
+    font-family: 'Special Elite', monospace;
+    font-size: 0.75em;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 3px;
+}
+
+.notebook-tab-btn:hover {
+    background: rgba(0, 255, 255, 0.2);
+    color: #e0e0ff;
+}
+
+.notebook-tab-btn.active {
+    background: rgba(0, 255, 255, 0.3);
+    color: #00ffff;
+    border-color: rgba(0, 255, 255, 0.6);
+}
+
+.notebook-clues-grid {
+    list-style: none;
+}
+
+.clue-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    background: rgba(255, 215, 0, 0.05);
+    border-left: 3px solid #ffd700;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+.clue-item[data-category="forensic"] { border-left-color: #00ffff; background: rgba(0, 255, 255, 0.05); }
+.clue-item[data-category="witness"] { border-left-color: #ff6b6b; background: rgba(255, 107, 107, 0.05); }
+.clue-item[data-category="mobile"] { border-left-color: #ffd700; background: rgba(255, 215, 0, 0.05); }
+.clue-item[data-category="timeline"] { border-left-color: #ffa500; background: rgba(255, 165, 0, 0.05); }
+.clue-item[data-category="dialogue"] { border-left-color: #9d4edd; background: rgba(157, 78, 221, 0.05); }
+.clue-item[data-category="opportunity"] { border-left-color: #00ff7f; background: rgba(0, 255, 127, 0.05); }
+.clue-item[data-category="scene"] { border-left-color: #c0c0c0; background: rgba(192, 192, 192, 0.05); }
+
+.clue-cat-badge {
+    font-size: 1.1em;
+}
+
+.clue-text {
+    flex: 1;
+}
+
+.step-item {
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    border-left: 3px solid rgba(0, 255, 255, 0.5);
+    background: rgba(0, 255, 255, 0.05);
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+.step-text {
+    display: inline;
+}
+
 /* ===== End Screen ===== */
 
 .end-screen-content {
