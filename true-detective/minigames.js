@@ -183,13 +183,7 @@
             finish(true);
         }
 
-        /* Bouton « Passer » (optionnel) */
-        var skip = document.createElement('button');
-        skip.className = 'btn btn-skip minigame-skip';
-        skip.textContent = lang === 'fr' ? 'Passer' : 'Skip';
-        skip.addEventListener('click', function () { finish(false); });
-        content.appendChild(skip);
-
+        
         startTimer();
     }
 
@@ -669,8 +663,8 @@
                 vivienne: 'assets/image true detective/characteres/classic/femme-fatal.png',
                 pembrooke: 'assets/image true detective/characteres/classic/le-seducteur.png',
                 blackwood: 'assets/image true detective/characteres/classic/Le-suspect.png',
-                criminel: 'assets/image true detective/characteres/classic/le-criminel.png',
-                marginal: 'assets/image true detective/characteres/classic/Le-marginal.png'
+                silas: 'assets/image true detective/characteres/classic/Le-marginal.png',
+                krane: 'assets/image true detective/characteres/classic/le-criminel.png'
             };
 
             var cards = (cfg.testimonies || []).map(function (c) {

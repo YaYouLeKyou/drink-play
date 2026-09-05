@@ -2712,13 +2712,8 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             $.minigameSkipBtn.classList.remove('hidden');
             $.minigameSkipBtn.disabled = false;
             $.minigameSkipBtn.onclick = null;
-            TDMiniGames.play(mgCfg, ui.language, onMinigameDone);
+            TDMiniGames.play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
             currentOnDone = onMinigameDone;
-            window._minigameSkipHandler = function () {
-                if (!launched) {
-                    onMinigameDone({ won: false });
-                }
-            };
             $.minigameSkipBtn.onclick = function () {
                 if (currentOnDone) {
                     currentOnDone({ won: false });
