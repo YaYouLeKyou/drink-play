@@ -1018,7 +1018,7 @@
 
             ['1','2','3','4','5','6','7','8','9','0'].forEach(function (k) {
                 var b = document.createElement('button');
-                b.className = 'btn coffre-key';
+                b.className = 'btn coffre-key' + (k === '0' ? ' coffre-zero' : '');
                 b.textContent = k;
                 b.addEventListener('click', function () {
                     if (input.length >= answer.length) return;
