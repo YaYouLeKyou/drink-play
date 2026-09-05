@@ -988,7 +988,7 @@
         },
 
         /* Coffre-fort de l'Acte 2, le code de la montre récompense le joueur attentif */
-        'coffre_code': function (body) {
+        'coffre_code': function (body, registerHint) {
             var wrap = document.createElement('div');
             wrap.className = 'mg-scene mg-coffre';
             var img = document.createElement('img');
@@ -996,18 +996,29 @@
             img.src = 'mini-games/coffre/coffre-fort.png';
             wrap.appendChild(img);
             body.appendChild(wrap);
+
             var answer = (cfg.code || [1, 9, 8, 1]).join('');
             var input = '';
+
+            var status = document.createElement('div');
+            status.className = 'mg-coffre-status';
+            status.textContent = lang === 'fr'
+                ? 'Entrez le code à 4 chiffres de la montre pour ouvrir le coffre-fort.'
+                : 'Enter the 4-digit watch code to open the safe.';
+            body.appendChild(status);
+
             var padBtn = document.createElement('input');
             padBtn.className = 'safe-input';
             padBtn.readOnly = true;
-            body.appendChild(padBtn);
-            var pad = document.createElement('div');
-            pad.className = 'num-pad';
             body.appendChild(pad);
-            ['1','2','3','4','5','6','7','8','9'].forEach(function (k) {
+
+            var pad = document.createElement('div');
+            pad.className = 'coffre-numpad';
+            body.appendChild(pad);
+
+            ['1','2','3','4','5','6','7','8','9','0'].forEach(function (k) {
                 var b = document.createElement('button');
-                b.className = 'btn num-key';
+                b.className = 'btn coffre-key';
                 b.textContent = k;
                 b.addEventListener('click', function () {
                     if (input.length >= answer.length) return;
@@ -1017,19 +1028,36 @@
                         if (input === answer) {
                             padBtn.classList.add('correct');
                             img.classList.add('coffre-open');
+                            status.textContent = lang === 'fr'
+                                ? 'Le coffre grince et s\'ouvre !'
+                                : 'The safe creaks open!';
                             setTimeout(function () { complete(true); }, 700);
                         } else {
                             padBtn.classList.add('wrong');
-                            setTimeout(function () { padBtn.classList.remove('wrong'); padBtn.value = ''; input = ''; }, 500);
+                            status.textContent = lang === 'fr'
+                                ? 'Code incorrect. Réessayez.'
+                                : 'Wrong code. Try again.';
+                            setTimeout(function () {
+                                padBtn.classList.remove('wrong');
+                                padBtn.value = '';
+                                input = '';
+                                status.textContent = lang === 'fr'
+                                    ? 'Entrez le code à 4 chiffres de la montre pour ouvrir le coffre-fort.'
+                                    : 'Enter the 4-digit watch code to open the safe.';
+                            }, 500);
                         }
                     }
                 });
                 pad.appendChild(b);
             });
+
             var del = document.createElement('button');
-            del.className = 'btn num-key del';
-            del.textContent = '?';
-            del.addEventListener('click', function () { input = input.slice(0, -1); padBtn.value = input; });
+            del.className = 'btn coffre-key coffre-del';
+            del.textContent = '✕';
+            del.addEventListener('click', function () {
+                input = input.slice(0, -1);
+                padBtn.value = input;
+            });
             pad.appendChild(del);
         },
 
