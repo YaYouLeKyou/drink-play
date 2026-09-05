@@ -11,11 +11,13 @@
     var modal = null;
     var phaseList = null;
     var pageGrid = null;
+    var themeList = null;
 
     function init() {
         modal = document.getElementById('dev-modal');
         phaseList = document.getElementById('dev-phase-list');
         pageGrid = document.getElementById('dev-page-grid');
+        themeList = document.getElementById('dev-theme-list');
 
         var devBtn = document.getElementById('dev-btn');
         var closeBtn = document.getElementById('dev-close-btn');
@@ -42,6 +44,7 @@
 
     function openModal() {
         if (!modal) return;
+        renderThemeList();
         renderPhaseList();
         renderPageGrid();
         modal.classList.add('active');
@@ -50,6 +53,36 @@
     function closeModal() {
         if (!modal) return;
         modal.classList.remove('active');
+    }
+
+    function renderThemeList() {
+        if (!themeList || !window.THEMES) return;
+        themeList.innerHTML = '';
+
+        var visibleThemes = window.THEMES.filter(function (th) {
+            return th.id === 'agatha-christie' || th.id === 'cyberpunk' || th.id === 'film-noir';
+        });
+
+        visibleThemes.forEach(function (theme) {
+            var btn = document.createElement('button');
+            btn.className = 'dev-theme-btn';
+            btn.textContent = theme.emoji + ' ' + theme.name;
+            btn.dataset.theme = theme.id;
+            btn.addEventListener('click', function () {
+                if (window.selectTheme) {
+                    window.selectTheme(theme);
+                }
+                var homeScreen = document.getElementById('home-screen');
+                var themeScreen = document.getElementById('theme-selector-screen');
+                if (homeScreen) homeScreen.classList.remove('active');
+                if (themeScreen) {
+                    themeScreen.classList.remove('hidden');
+                    themeScreen.classList.add('active');
+                }
+                closeModal();
+            });
+            themeList.appendChild(btn);
+        });
     }
 
     function renderPhaseList() {

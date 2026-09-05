@@ -17,6 +17,7 @@
     // Images CLASSIC (nouveaux assets lieux/classic + characteres/classic)
     var CLASSIC_ASSETS = {
         universe: ASSETS_BASE + 'lieux/classic/manoir.png',
+        universeImg: ASSETS_BASE + 'univers/sherlock.jfif',
         crimeScene: ASSETS_BASE + 'lieux/classic/scene de crime manoir.png',
         detective: ASSETS_BASE + 'characteres/classic/detective-partenaire.png',
         femmeFatale: ASSETS_BASE + 'characteres/classic/femme-fatal.png',
@@ -33,28 +34,70 @@
         secretPlace: ASSETS_BASE + 'lieux/classic/appartement suspect.png',
         laboratory: ASSETS_BASE + 'lieux/classic/laboratoire.png',
         headquarters: ASSETS_BASE + 'lieux/classic/quartier general.png',
-        prison: ASSETS_BASE + 'lieux/classic/prison.png',
+        prison: ASSETS_BASE + 'lieux/classic/prison.jfif',
+        exile: ASSETS_BASE + 'lieux/classic/paradisique.png',
         music: 'sherlock.mp3',
+    };
+
+    var CYBERPUNK_ASSETS = {
+        universe: ASSETS_BASE + 'lieux/cyberpunk/exterieur-manoir.png',
+        universeImg: ASSETS_BASE + 'univers/cyberpunk.png',
+        crimeScene: ASSETS_BASE + 'lieux/cyberpunk/scene-de-crime.png',
+        detective: ASSETS_BASE + 'characteres/cyberpunk/detective-partenaire.png',
+        femmeFatale: ASSETS_BASE + 'characteres/cyberpunk/femme-fatal.png',
+        seducteur: ASSETS_BASE + 'characteres/cyberpunk/seducteur.png',
+        suspect: ASSETS_BASE + 'characteres/cyberpunk/suspect.png',
+        marginal: ASSETS_BASE + 'characteres/cyberpunk/marginal.png',
+        protecteur: ASSETS_BASE + 'characteres/cyberpunk/protecteur.png',
+        scientifique: ASSETS_BASE + 'characteres/cyberpunk/scientific.png',
+        criminel: ASSETS_BASE + 'characteres/cyberpunk/criminel.png',
+        residence: ASSETS_BASE + 'lieux/cyberpunk/interieur-manoir.png',
+        alley: ASSETS_BASE + 'lieux/cyberpunk/ruelle.png',
+        publicPlace: ASSETS_BASE + 'lieux/cyberpunk/exterieur bar.png',
+        barInterieur: ASSETS_BASE + 'lieux/cyberpunk/interieur-bar.png',
+        secretPlace: ASSETS_BASE + 'lieux/cyberpunk/appartement suspect.png',
+        laboratory: ASSETS_BASE + 'lieux/cyberpunk/laboratoire.png',
+        headquarters: ASSETS_BASE + 'lieux/cyberpunk/interieur-quartier-général.png',
+        prison: ASSETS_BASE + 'lieux/cyberpunk/prison.png',
+        exile: ASSETS_BASE + 'lieux/cyberpunk/paradisique.png',
+        music: 'cyberpunk.mp3',
+    };
+
+    var FILM_NOIR_ASSETS = {
+        universe: ASSETS_BASE + 'lieux/noire/exterieur manoir.png',
+        universeImg: ASSETS_BASE + 'univers/noire.png',
+        crimeScene: ASSETS_BASE + 'lieux/noire/scene de crime.png',
+        detective: ASSETS_BASE + 'characteres/noire/detective partenaire.png',
+        femmeFatale: ASSETS_BASE + 'characteres/noire/femme fatal.png',
+        seducteur: ASSETS_BASE + 'characteres/noire/seducteur.png',
+        suspect: ASSETS_BASE + 'characteres/noire/suspect.png',
+        marginal: ASSETS_BASE + 'characteres/noire/marginal.png',
+        protecteur: ASSETS_BASE + 'characteres/noire/protecteur.png',
+        scientifique: ASSETS_BASE + 'characteres/noire/scientific.png',
+        criminel: ASSETS_BASE + 'characteres/noire/criminel.png',
+        residence: ASSETS_BASE + 'lieux/noire/exterieur manoir.png',
+        alley: ASSETS_BASE + 'lieux/noire/ruelle.png',
+        publicPlace: ASSETS_BASE + 'lieux/noire/exterieur bar.png',
+        barInterieur: ASSETS_BASE + 'lieux/noire/interieur bar.png',
+        secretPlace: ASSETS_BASE + 'lieux/noire/appartement suspect.png',
+        laboratory: ASSETS_BASE + 'lieux/noire/laboratoire.png',
+        headquarters: ASSETS_BASE + 'lieux/noire/interieur quartier général.png',
+        prison: ASSETS_BASE + 'lieux/noire/prison.png',
+        exile: ASSETS_BASE + 'lieux/noire/paradisiaque.png',
+        music: 'noire.mp3',
     };
 
     // Un seul scénario classic : tous les thèmes pointent vers les assets classic
     var THEME_ASSETS = {
         'agatha-christie': CLASSIC_ASSETS,
         'sherlock-holmes': CLASSIC_ASSETS,
-        'cyberpunk': CLASSIC_ASSETS,
-        'heroic-fantasy': CLASSIC_ASSETS,
-        'sci-fi': CLASSIC_ASSETS,
-        'lovecraftian': CLASSIC_ASSETS,
-        'antiquite': CLASSIC_ASSETS,
-        'film-noir': CLASSIC_ASSETS,
+        'cyberpunk': CYBERPUNK_ASSETS,
+        'heroic-fantasy': Object.assign({}, CLASSIC_ASSETS),
+        'sci-fi': Object.assign({}, CLASSIC_ASSETS),
+        'lovecraftian': Object.assign({}, CLASSIC_ASSETS),
+        'antiquite': Object.assign({}, CLASSIC_ASSETS),
+        'film-noir': FILM_NOIR_ASSETS,
     };
-    THEME_ASSETS['heroic-fantasy'] = Object.assign({}, CLASSIC_ASSETS);
-    THEME_ASSETS['sci-fi'] = Object.assign({}, CLASSIC_ASSETS);
-    THEME_ASSETS['lovecraftian'] = Object.assign({}, CLASSIC_ASSETS);
-    THEME_ASSETS['antiquite'] = Object.assign({}, CLASSIC_ASSETS);
-    THEME_ASSETS['film-noir'] = Object.assign({}, CLASSIC_ASSETS);
-    THEME_ASSETS['cyberpunk'] = Object.assign({}, CLASSIC_ASSETS);
-    THEME_ASSETS['sherlock-holmes'] = Object.assign({}, CLASSIC_ASSETS);
 
     var TEXTS = {
         en: {
@@ -238,6 +281,7 @@ langEnBtn: document.getElementById('lang-en'),
         loadingDots: document.getElementById('loading-dots'),
         toast: document.getElementById('toast'),
         newInvestigationBtn: document.getElementById('new-investigation-btn'),
+        hubBtn: document.getElementById('hub-btn'),
         backToHubBtn: document.getElementById('back-to-hub-btn'),
         solutionCulprit: document.getElementById('solution-culprit'),
         solutionMotive: document.getElementById('solution-motive'),
@@ -379,7 +423,9 @@ langEnBtn: document.getElementById('lang-en'),
     function renderThemeCards() {
         $.themeGrid.innerHTML = '';
         // Un seul scénario classic visible dans la config
-        var visibleThemes = THEMES.filter(function (th) { return th.id === 'agatha-christie'; });
+        var visibleThemes = THEMES.filter(function (th) {
+            return th.id === 'agatha-christie' || th.id === 'cyberpunk' || th.id === 'film-noir';
+        });
         visibleThemes.forEach(function (theme) {
             var card = document.createElement('div');
             card.className = 'theme-card';
@@ -499,6 +545,21 @@ langEnBtn: document.getElementById('lang-en'),
                     TDAudioService.stopSpeaking();
                 }
                 window.location.href = '../index.html';
+            });
+        }
+
+        if ($.hubBtn) {
+            $.hubBtn.addEventListener('click', function () {
+                if (TDNarrativeEngine) {
+                    TDNarrativeEngine.resetGame();
+                }
+                if (TDImageService) {
+                    TDImageService.clearCache();
+                }
+                if (TDAudioService) {
+                    TDAudioService.stopSpeaking();
+                }
+                window.location.reload();
             });
         }
 
@@ -2527,13 +2588,13 @@ langEnBtn: document.getElementById('lang-en'),
 
     var SCENARIO_NPC_ASSETS = {
         'detective-partner': 'detective',
-        'protecteur': null,
+        'protecteur': 'protecteur',
         'femme-fatale': 'femmeFatale',
         'seducteur': 'seducteur',
         'suspect': 'suspect',
         'marginal': 'marginal',
-        'scientifique': null,
-        'criminel': null,
+        'scientifique': 'scientifique',
+        'criminel': 'criminel',
     };
 
     var SCENARIO_NPC_NAMES = {
@@ -2547,16 +2608,152 @@ langEnBtn: document.getElementById('lang-en'),
         'criminel': { fr: 'Victor Krane', en: 'Victor Krane' },
     };
 
-    // personnages non présents dans THEME_ASSETS générique -> fichiers dédiés (assets classic)
-    var EXTRA_NPC_IMAGES = {
-        'protecteur': ASSETS_BASE + 'characteres/classic/Le_Protecteur.png',
-        'scientifique': ASSETS_BASE + 'characteres/classic/le-scientific.png',
-        'criminel': ASSETS_BASE + 'characteres/classic/le-criminel.png',
+    var THEME_NPC_NAMES = {
+        'agatha-christie': SCENARIO_NPC_NAMES,
+        'sherlock-holmes': SCENARIO_NPC_NAMES,
+        'cyberpunk': {
+            'detective-partner': { fr: 'Inspecteur Vega', en: 'Inspector Vega' },
+            'protecteur': { fr: 'Cipher-7', en: 'Cipher-7' },
+            'femme-fatale': { fr: 'Lyra Noir', en: 'Lyra Noir' },
+            'seducteur': { fr: 'Dex Rook', en: 'Dex Rook' },
+            'suspect': { fr: 'Ledger-9', en: 'Ledger-9' },
+            'marginal': { fr: 'Ghost', en: 'Ghost' },
+            'scientifique': { fr: 'Dr. Synapse', en: 'Dr. Synapse' },
+            'criminel': { fr: 'Razor', en: 'Razor' },
+        },
+        'film-noir': {
+            'detective-partner': { fr: 'Détective Reeves', en: 'Detective Reeves' },
+            'protecteur': { fr: 'Mike Malone', en: 'Mike Malone' },
+            'femme-fatale': { fr: 'Vivian Noir', en: 'Vivian Noir' },
+            'seducteur': { fr: 'Johnny Lorraine', en: 'Johnny Lorraine' },
+            'suspect': { fr: 'Vincent Crowe', en: 'Vincent Crowe' },
+            'marginal': { fr: 'Eddie', en: 'Eddie' },
+            'scientifique': { fr: 'Dr. Coroner', en: 'Dr. Coroner' },
+            'criminel': { fr: 'Louie the Blade', en: 'Louie the Blade' },
+        },
     };
 
-    function scrGetState() { return TDScenario.getState(); }
+    var THEME_NAME_OVERRIDES = {
+        'cyberpunk': {
+            'Major Hale': 'Cipher-7',
+            'Hale': 'Cipher-7',
+            'Lady Vivienne': 'Lyra Noir',
+            'Vivienne': 'Lyra Noir',
+            'Julian Pembrooke': 'Dex Rook',
+            'Pembrooke': 'Dex Rook',
+            'Rupert Blackwood': 'Ledger-9',
+            'Blackwood': 'Ledger-9',
+            'Silas Crane': 'Ghost',
+            'Victor Krane': 'Razor',
+            'Krane': 'Razor',
+            'Dr Whitmore': 'Dr. Synapse',
+            'Whitmore': 'Synapse',
+            'Wexford': 'Detective Vega',
+        },
+        'film-noir': {
+            'Major Hale': 'Mike Malone',
+            'Hale': 'Mike Malone',
+            'Lady Vivienne': 'Vivian Noir',
+            'Vivienne': 'Vivian Noir',
+            'Julian Pembrooke': 'Johnny Lorraine',
+            'Pembrooke': 'Johnny Lorraine',
+            'Rupert Blackwood': 'Vincent Crowe',
+            'Blackwood': 'Vincent Crowe',
+            'Silas Crane': 'Eddie',
+            'Victor Krane': 'Louie the Blade',
+            'Krane': 'Louie',
+            'Dr Whitmore': 'Dr. Coroner',
+            'Whitmore': 'Coroner',
+            'Wexford': 'Detective Reeves',
+        },
+    };
 
-    function scrResetState() {
+    function scrSubstituteNames(text, themeId) {
+        if (!text) return text;
+        if (themeId === 'agatha-christie' || themeId === 'sherlock-holmes') return text;
+        var overrides = THEME_NAME_OVERRIDES[themeId];
+        if (!overrides) return text;
+        var keys = Object.keys(overrides).sort(function (a, b) { return b.length - a.length; });
+        for (var i = 0; i < keys.length; i++) {
+            text = text.split(keys[i]).join(overrides[keys[i]]);
+        }
+        return text;
+    }
+
+    var THEME_TRUTH_TITLES = {
+        'agatha-christie': null,
+        'sherlock-holmes': null,
+        'cyberpunk': {
+            protecteur: { fr: 'Cipher-7', en: 'Cipher-7' },
+            'femme-fatale': { fr: 'Lyra Noir', en: 'Lyra Noir' },
+            seducteur: { fr: 'Dex Rook', en: 'Dex Rook' },
+            suspect: { fr: 'Ledger-9', en: 'Ledger-9' },
+            marginal: { fr: 'Ghost', en: 'Ghost' },
+            criminel: { fr: 'Razor', en: 'Razor' },
+        },
+        'film-noir': {
+            protecteur: { fr: 'Mike Malone', en: 'Mike Malone' },
+            'femme-fatale': { fr: 'Vivian Noir', en: 'Vivian Noir' },
+            seducteur: { fr: 'Johnny Lorraine', en: 'Johnny Lorraine' },
+            suspect: { fr: 'Vincent Crowe', en: 'Vincent Crowe' },
+            marginal: { fr: 'Eddie', en: 'Eddie' },
+            criminel: { fr: 'Louie the Blade', en: 'Louie the Blade' },
+        },
+    };
+
+    var THEME_OUTRO_TEXT = {
+        'agatha-christie': {
+            win_fr: 'Sous le ciel de Londres, les becs de gaz dessinent des halos orange. L\'affaire est close.',
+            win_en: 'Under the London sky, gas lamps draw orange halos. The case is closed.',
+            indirect_fr: 'Sous le ciel de Londres, les becs de gaz dessinent des halos orange. La vérité a émergé, même par le bas.',
+            indirect_en: 'Under the London sky, gas lamps draw orange halos. The truth emerged, even if by the back door.',
+            fail_fr: 'Le mystère reste entier dans les ruelles de Londres.',
+            fail_en: 'The mystery remains unsolved in the London alleys.',
+            exile_fr: 'Sous le soleil des tropiques, le vrai coupable sirote un cocktail au bord de la piscine d\'un palace.',
+            exile_en: 'Under the tropical sun, the real culprit sips a cocktail by the pool of a palace.',
+        },
+        'cyberpunk': {
+            win_fr: 'Sous les néons de la mégapole, la pluie digitale caresse les façades. L\'affaire est close.',
+            win_en: 'Under the neon megacity, digital rain washes the facades. The case is closed.',
+            indirect_fr: 'Sous les néons de la mégapole, la pluie digitale caresse les façades. La vérité a émergé, même par le bas.',
+            indirect_en: 'Under the neon megacity, digital rain washes the facades. The truth emerged, even if by the back door.',
+            fail_fr: 'Le mystère reste en suspens dans les ruelles numériques de la mégapole.',
+            fail_en: 'The mystery remains unsolved in the digital alleys of the megacity.',
+            exile_fr: 'Dans les néons clignotants de la mégapole, le vrai coupable se fait discret parmi la foule cybernétique.',
+            exile_en: 'Among the flashing neon of the megacity, the real culprit melts into the cybernetic crowd.',
+        },
+        'film-noir': {
+            win_fr: 'Sous le ciel pluvieux de Chicago, les réverbères dessinent des halos rouges. L\'affaire est close.',
+            win_en: 'Under the rainy Chicago sky, streetlamps cast red halos. The case is closed.',
+            indirect_fr: 'Sous le ciel pluvieux de Chicago, les réverbères dessinent des halos rouges. La vérité a émergé, même par le bas.',
+            indirect_en: 'Under the rainy Chicago sky, streetlamps cast red halos. The truth emerged, even if by the back door.',
+            fail_fr: 'Le mystère reste insoluble dans les ruelles sombres de Chicago.',
+            fail_en: 'The mystery remains unsolved in the dark alleys of Chicago.',
+            exile_fr: 'Dans les ruelles sombres de Chicago, le vrai coupable s\'enfuit dans la nuit au gré des ombres.',
+            exile_en: 'In the dark alleys of Chicago, the real culprit flees into the night through shifting shadows.',
+        },
+    };
+
+    function scrThemedTitle(culpritId, lang) {
+        var themeId = getThemeId();
+        var themedTitles = THEME_TRUTH_TITLES[themeId];
+        if (themedTitles && themedTitles[culpritId]) {
+            var entry = themedTitles[culpritId];
+            return entry[lang] || entry.fr || entry.en || '';
+        }
+        var truth = TDScenario.getTruth();
+        return truth.title ? TDScenario.t(truth.title, lang) : (truth.culprit || '');
+    }
+
+    function scrGetOutroText(key, lang) {
+        var themeId = getThemeId();
+        var txt = THEME_OUTRO_TEXT[themeId] || THEME_OUTRO_TEXT['agatha-christie'];
+        return txt ? (txt[key + '_' + lang] || txt[key + '_fr']) : '';
+    }
+
+     function scrGetState() { return TDScenario ? TDScenario.getState() : null; }
+
+     function scrResetState() {
         TDScenario.reset();
         var s = scrGetState();
         s.lang = ui.language;
@@ -2592,8 +2789,8 @@ langEnBtn: document.getElementById('lang-en'),
         var assets = THEME_ASSETS[getThemeId()] || THEME_ASSETS['agatha-christie'];
         var map = {
             universe: assets.universe,
-            universeSherlock: ASSETS_BASE + 'univers/sherlock.jfif',
-            sherlock: ASSETS_BASE + 'univers/sherlock.jfif',
+            universeSherlock: assets.universeImg,
+            sherlock: assets.universeImg,
             crimeScene: assets.crimeScene,
             alley: assets.alley,
             residence: assets.residence,
@@ -2614,28 +2811,23 @@ langEnBtn: document.getElementById('lang-en'),
     }
 
     function scrNpcImage(npcId) {
-        if (EXTRA_NPC_IMAGES[npcId]) return EXTRA_NPC_IMAGES[npcId];
         var assets = THEME_ASSETS[getThemeId()] || THEME_ASSETS['agatha-christie'];
         var key = SCENARIO_NPC_ASSETS[npcId];
         return key ? (assets[key] || null) : null;
     }
 
     function scrNpcName(npcId) {
-        var n = SCENARIO_NPC_NAMES[npcId];
+        var names = THEME_NPC_NAMES[getThemeId()] || SCENARIO_NPC_NAMES;
+        var n = names[npcId];
         if (!n) return '';
         return n[ui.language] || n.fr;
     }
 
     function scrChoiceLabel(choiceId) {
-        var map = {
-            'femme-fatale': ui.language === 'fr' ? 'Lady Vivienne' : 'Lady Vivienne',
-            'seducteur': ui.language === 'fr' ? 'Julian Pembrooke' : 'Julian Pembrooke',
-            'suspect': ui.language === 'fr' ? 'Rupert Blackwood' : 'Rupert Blackwood',
-            'protecteur': ui.language === 'fr' ? 'Le Major Hale' : 'Major Hale',
-            'marginal': ui.language === 'fr' ? 'Silas Crane' : 'Silas Crane',
-            'criminel': ui.language === 'fr' ? 'Victor Krane' : 'Victor Krane',
-        };
-        return map[choiceId] || choiceId;
+        var names = THEME_NPC_NAMES[getThemeId()] || SCENARIO_NPC_NAMES;
+        var n = names[choiceId];
+        if (n) return n[ui.language] || n.fr || '';
+        return choiceId;
     }
 
     function scrChoiceLabelMulti(label, lang) {
@@ -2749,6 +2941,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         if (npcId === 'dynamic') npcId = scrInterrogationConfig(scr.pageIdx).npcId;
         var txt = TDScenario.t(page.text, ui.language);
         txt = scrEnrichDialogue(txt, page);
+        txt = scrSubstituteNames(txt, getThemeId());
 
         if (page.minigame) {
             npcId = null;
@@ -2859,6 +3052,27 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 if (mgCfg.type === 'coffre_code' && s0 && s0.watchCode) {
                     mgCfg.code = s0.watchCode.slice();
                     mgCfg.timeStr = s0.watchTimeStr;
+                }
+            }
+            if (mgCfg.type === 'scene_fouille' && !mgCfg.sceneImage) {
+                mgCfg.sceneImage = scrDecorImage('crimeScene');
+            }
+            var mgThemeId = getThemeId();
+            if (mgCfg.clue) {
+                if (mgCfg.clue.fr) mgCfg.clue.fr = scrSubstituteNames(mgCfg.clue.fr, mgThemeId);
+                if (mgCfg.clue.en) mgCfg.clue.en = scrSubstituteNames(mgCfg.clue.en, mgThemeId);
+            }
+            if (mgCfg.testimonies) {
+                for (var ti = 0; ti < mgCfg.testimonies.length; ti++) {
+                    var tm = mgCfg.testimonies[ti];
+                    if (tm.witness) {
+                        if (tm.witness.fr) tm.witness.fr = scrSubstituteNames(tm.witness.fr, mgThemeId);
+                        if (tm.witness.en) tm.witness.en = scrSubstituteNames(tm.witness.en, mgThemeId);
+                    }
+                    if (tm.statement) {
+                        if (tm.statement.fr) tm.statement.fr = scrSubstituteNames(tm.statement.fr, mgThemeId);
+                        if (tm.statement.en) tm.statement.en = scrSubstituteNames(tm.statement.en, mgThemeId);
+                    }
                 }
             }
             $.minigameTitle.textContent = mgCfg.title ? (mgCfg.title[ui.language] || mgCfg.title.fr || mgCfg.title.en || 'Mini-jeu') : 'Mini-jeu';
@@ -2976,7 +3190,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         qs.forEach(function (q) {
             var btn = document.createElement('button');
             btn.className = 'btn btn-choice interrogation-question';
-            btn.textContent = itl(q.label);
+            btn.textContent = scrSubstituteNames(itl(q.label), getThemeId());
             btn.addEventListener('click', function () {
                 if (!scr.awaitingChoice) return;
                 scr.awaitingChoice = false;
@@ -2990,6 +3204,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     function scrAskInterroQuestion(q) {
         var response = TDScenario.t(q.response, ui.language) || '';
         response = scrEnrichResponse(response, q);
+        response = scrSubstituteNames(response, getThemeId());
         typeWriter(response, function () {
             if (!scr.active) { return; }
             // Indice extrait de la réponse (« [Indice X] ... » / « [X clue] ... ») → journal
@@ -3054,7 +3269,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
 
     function scrClueFromInterroResponse(text) {
         if (!text) { return null; }
-        var m = text.match(/\[(?:Indice|Clue)[^\]]*\][^\n]*/g);
+        var m = text.match(/\[(?:[^\]]*(?:Indice|clue)[^\]]*)\][^\n]*/gi);
         return m && m.length ? m.join(' ') : null;
     }
 
@@ -3070,7 +3285,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             if (s.prochainSuspect) {
                 s.prochainSuspect = null;
             }
-            scrNext();
+            renderScenarioPage();
         };
     }
 
@@ -3133,11 +3348,11 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 }
                 var btn = document.createElement('button');
                 btn.className = 'btn btn-choice';
-                btn.textContent = label ? scrChoiceLabelMulti(label, ui.language) : scrChoiceLabel(choiceId);
+                btn.textContent = scrSubstituteNames(label ? scrChoiceLabelMulti(label, ui.language) : scrChoiceLabel(choiceId), getThemeId());
                 btn.addEventListener('click', function () {
                     if (!scr.awaitingChoice) return;
                     scr.awaitingChoice = false;
-                    scrApplyChoice(page.choiceKey, choiceId);
+                    scrApplyChoice(choiceItem.choiceKey || page.choiceKey, choiceId);
                 });
                 $.choicesContainer.appendChild(btn);
             });
@@ -3235,14 +3450,16 @@ function scrApplyChoice(choiceKey, choiceId) {
 
     function buildOutroPages(s) {
         var truth = TDScenario.getTruth();
+        var themeId = getThemeId();
         var lang = ui.language;
         var evalResult = TDScenario.evaluateAccusation(s.accused);
         var good = evalResult.correct;
-        var titleTxt = truth.title ? TDScenario.t(truth.title, lang) : (truth.culprit || '');
-        var morale = truth.morale ? TDScenario.t(truth.morale, lang) : '';
+        var titleTxt = scrThemedTitle(truth.culprit, lang);
+        var innocentTitle = scrSubstituteNames(scrChoiceLabel(s.accused), themeId);
+        var morale = scrSubstituteNames(truth.morale ? TDScenario.t(truth.morale, lang) : '', themeId);
         var score = evalResult.score;
         var maxScore = evalResult.max;
-        var reaction = evalResult.reaction;
+        var reaction = scrSubstituteNames(evalResult.reaction, themeId);
 
         var beamHtml = '<div class="evidence-beam"><div class="evidence-beam-title">📋 FAISCEAU DE PREUVES (' + score + '/' + maxScore + ')</div>';
         var cats = state().evidence;
@@ -3256,28 +3473,35 @@ function scrApplyChoice(choiceKey, choiceId) {
         }
         beamHtml += '</div>';
 
+        var winTxt = scrGetOutroText('win', lang);
+        var indirectTxt = scrGetOutroText('indirect', lang);
+        var failTxt = scrGetOutroText('fail', lang);
+        var exileTxt = scrGetOutroText('exile', lang);
+        var methodeTxt = scrSubstituteNames(TDScenario.t(truth.methode, lang), themeId);
+        var prisonTxt = scrSubstituteNames(TDScenario.t(truth.prison, lang), themeId);
+
         var pages = [];
         if (good) {
             /* Fin 1 — Accusation juste : 3 pages (prison → QG extérieur → photo univers) */
             pages.push({
                 decor: 'prison', npc: null,
                 text: {
-                    fr: '<div class="accuse-screen"><div class="accuse-result success">✅ ACCUSATION JUSTE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">' + titleTxt + ' est coupable. ' + TDScenario.t(truth.methode, lang) + '</div></div><div class="ending-text">Derrière les barreaux, le coupable s\'effondre. ' + TDScenario.t(truth.prison, lang) + '</div>',
-                    en: '<div class="accuse-screen"><div class="accuse-result success">✅ RIGHT ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">' + titleTxt + ' is guilty. ' + TDScenario.t(truth.methode, lang) + '</div></div><div class="ending-text">Behind the bars, the culprit breaks down. ' + TDScenario.t(truth.prison, lang) + '</div>'
+                    fr: '<div class="accuse-screen"><div class="accuse-result success">✅ ACCUSATION JUSTE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">' + titleTxt + ' est coupable. ' + methodeTxt + '</div></div><div class="ending-text">Derrière les barreaux, le coupable s\'effondre. ' + prisonTxt + '</div>',
+                    en: '<div class="accuse-screen"><div class="accuse-result success">✅ RIGHT ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">' + titleTxt + ' is guilty. ' + methodeTxt + '</div></div><div class="ending-text">Behind the bars, the culprit breaks down. ' + prisonTxt + '</div>'
                 }
             });
             pages.push({
                 decor: 'qg', npc: 'detective-partner',
                 text: {
-                    fr: '<div class="ending-text">Devant le quartier général, votre partenaire Wexford vous félicite. « Affaire classée, inspecteur. Votre méthode a porté ses fruits. »' + '</div>',
-                    en: '<div class="ending-text">Outside headquarters, your partner Wexford congratulates you. "Case closed, inspector. Your method bore fruit."' + '</div>'
+                    fr: '<div class="ending-text">' + scrSubstituteNames('Devant le quartier général, votre partenaire Wexford vous félicite. « Affaire classée, inspecteur. Votre méthode a porté ses fruits. »', themeId) + '</div>',
+                    en: '<div class="ending-text">' + scrSubstituteNames('Outside headquarters, your partner Wexford congratulates you. "Case closed, inspector. Your method bore fruit."', themeId) + '</div>'
                 }
             });
             pages.push({
                 decor: 'sherlock', npc: null,
                 text: {
-                    fr: '<div class="ending-text">Sous le ciel de Londres, les becs de gaz dessinent des halos orange. L\'affaire est close. ' + morale + '</div>',
-                    en: '<div class="ending-text">Under the London sky, gas lamps draw orange halos. The case is closed. ' + morale + '</div>'
+                    fr: '<div class="ending-text">' + winTxt + ' ' + morale + '</div>',
+                    en: '<div class="ending-text">' + winTxt + ' ' + morale + '</div>'
                 }
             });
         } else if (evalResult.indirectConviction) {
@@ -3286,8 +3510,8 @@ function scrApplyChoice(choiceKey, choiceId) {
             pages.push({
                 decor: 'exile', npc: null,
                 text: {
-                    fr: '<div class="accuse-screen"><div class="accuse-result partial">⚠ ACCUSATION ERRONÉE, MAIS LES PREUVES PARLENT</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Vous accusez ' + innocentTitle + ', un innocent. Mais le faisceau d\'indices est si épais que ' + titleTxt + ' ne peut plus se cacher.</div></div><div class="ending-text">Sous le soleil des tropiques, ' + titleTxt + ' sirote un cocktail au bord de la piscine d\'un palace. Mais la pression des preuves le force à abandonner sa course. Il lâche un aveu avant de s\'envoler.</div>',
-                    en: '<div class="accuse-screen"><div class="accuse-result partial">⚠ WRONG ACCUSATION, BUT THE EVIDENCE SPEAKS</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">You accuse ' + innocentTitle + ', an innocent. But the evidence beam is so thick that ' + titleTxt + ' can no longer hide.</div></div><div class="ending-text">Under the tropical sun, ' + titleTxt + ' sips a cocktail by the pool of a palace. But the weight of the evidence forces him to abandon his flight. He breaks down before takeoff.</div>'
+                    fr: '<div class="accuse-screen"><div class="accuse-result partial">⚠ ACCUSATION ERRONÉE, MAIS LES PREUVES PARLENT</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Vous accusez ' + innocentTitle + ', un innocent. Mais le faisceau d\'indices est si épais que ' + titleTxt + ' ne peut plus se cacher.</div></div><div class="ending-text">' + exileTxt + ' Mais la pression des preuves le force à abandonner sa course. Il lâche un aveu avant de s\'envoler.</div>',
+                    en: '<div class="accuse-screen"><div class="accuse-result partial">⚠ WRONG ACCUSATION, BUT THE EVIDENCE SPEAKS</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">You accuse ' + innocentTitle + ', an innocent. But the evidence beam is so thick that ' + titleTxt + ' can no longer hide.</div></div><div class="ending-text">' + exileTxt + ' But the weight of the evidence forces him to abandon his flight. He breaks down before takeoff.</div>'
                 }
             });
             pages.push({
@@ -3300,18 +3524,17 @@ function scrApplyChoice(choiceKey, choiceId) {
             pages.push({
                 decor: 'sherlock', npc: null,
                 text: {
-                    fr: '<div class="ending-text">Sous le ciel de Londres, les becs de gaz dessinent des halos orange. La vérité a émergé, même par le bas. ' + morale + '</div>',
-                    en: '<div class="ending-text">Under the London sky, gas lamps draw orange halos. The truth emerged, even if by the back door. ' + morale + '</div>'
+                    fr: '<div class="ending-text">' + indirectTxt + ' ' + morale + '</div>',
+                    en: '<div class="ending-text">' + indirectTxt + ' ' + morale + '</div>'
                 }
             });
         } else {
             /* Fin 2 — Accusation erronée : 3 pages (île paradisiaque → prison innocent → photo univers) */
-            var innocentTitle = scrChoiceLabel(s.accused);
             pages.push({
                 decor: 'exile', npc: null,
                 text: {
-                    fr: '<div class="accuse-screen"><div class="accuse-result failure">❌ ACCUSATION ERRONÉE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Vous accusez ' + innocentTitle + ', un innocent. Le vrai coupable, ' + titleTxt + ', s\'est échappé.</div></div><div class="ending-text">Sous le soleil des tropiques, le vrai coupable sirote un cocktail au bord de la piscine d\'un palace. Il rit de vous, loin, très loin de votre juridiction.</div>',
-                    en: '<div class="accuse-screen"><div class="accuse-result failure">❌ WRONG ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">You accuse ' + innocentTitle + ', an innocent. The real culprit, ' + titleTxt + ', has escaped.</div></div><div class="ending-text">Under the tropical sun, the real culprit sips a cocktail by the pool of a palace. He laughs at you, far, very far from your jurisdiction.</div>'
+                    fr: '<div class="accuse-screen"><div class="accuse-result failure">❌ ACCUSATION ERRONÉE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Vous accusez ' + innocentTitle + ', un innocent. Le vrai coupable, ' + titleTxt + ', s\'est échappé.</div></div><div class="ending-text">' + exileTxt + ' Il rit de vous, loin, très loin de votre juridiction.</div>',
+                    en: '<div class="accuse-screen"><div class="accuse-result failure">❌ WRONG ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">You accuse ' + innocentTitle + ', an innocent. The real culprit, ' + titleTxt + ', has escaped.</div></div><div class="ending-text">' + exileTxt + ' He laughs at you, far, very far from your jurisdiction.</div>'
                 }
             });
             pages.push({
@@ -3324,8 +3547,8 @@ function scrApplyChoice(choiceKey, choiceId) {
             pages.push({
                 decor: 'sherlock', npc: null,
                 text: {
-                    fr: '<div class="ending-text">Le mystère reste entier dans les ruelles de Londres. ' + morale + '</div>',
-                    en: '<div class="ending-text">The mystery remains unsolved in the London alleys. ' + morale + '</div>'
+                    fr: '<div class="ending-text">' + failTxt + ' ' + morale + '</div>',
+                    en: '<div class="ending-text">' + failTxt + ' ' + morale + '</div>'
                 }
             });
         }
@@ -3340,21 +3563,23 @@ function scrApplyChoice(choiceKey, choiceId) {
         var evalResult = TDScenario.evaluateAccusation(s.accused);
         var correct = (s.accused === s.culprit);
         var lang = s.lang || ui.language;
+        var themeId = getThemeId();
         var revealed = correct;
         if (!correct && evalResult.indirectConviction) {
             revealed = true;
         }
+        var themedTitle = scrThemedTitle(truth.culprit, lang);
         return {
             good: correct,
-            culprit: TDScenario.t(truth.title, lang) || '',
-            mobile: TDScenario.t(truth.mobile, lang) || '',
-            methode: TDScenario.t(truth.methode, lang) || '',
+            culprit: themedTitle,
+            mobile: scrSubstituteNames(TDScenario.t(truth.mobile, lang), themeId) || '',
+            methode: scrSubstituteNames(TDScenario.t(truth.methode, lang), themeId) || '',
             revealed: revealed
-                ? TDScenario.t(truth.prison, lang)
+                ? scrSubstituteNames(TDScenario.t(truth.prison, lang), themeId)
                 : (ui.language === 'fr'
-                    ? 'Le vrai coupable, ' + TDScenario.t(truth.title, lang) + ', s\'est échappé.'
-                    : 'The real culprit, ' + TDScenario.t(truth.title, lang) + ', has escaped.'),
-            morale: TDScenario.t(truth.morale, lang) || '',
+                    ? 'Le vrai coupable, ' + themedTitle + ', s\'est échappé.'
+                    : 'The real culprit, ' + themedTitle + ', has escaped.'),
+            morale: scrSubstituteNames(TDScenario.t(truth.morale, lang), themeId) || '',
             indirectConviction: !correct && evalResult.indirectConviction ? true : false,
             cluesCount: evalResult.cluesCount,
             evidenceScore: evalResult.score,
@@ -3395,6 +3620,8 @@ function scrApplyChoice(choiceKey, choiceId) {
     window.scr = scr;
     window.skipTypeWriter = skipTypeWriter;
     window.startScenarioGame = startScenarioGame;
+    window.THEMES = THEMES;
+    window.selectTheme = selectTheme;
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);

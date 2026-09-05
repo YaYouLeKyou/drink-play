@@ -308,7 +308,8 @@ html {
 
     .theme-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(180px, 200px));
+        justify-content: center;
         gap: 16px;
         max-width: 1000px;
         width: 100%;
@@ -322,14 +323,16 @@ html {
 
 @media (max-width: 768px) {
     .theme-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(140px, 180px));
+        justify-content: center;
         gap: 12px;
     }
 }
 
 @media (max-width: 480px) {
     .theme-grid {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(120px, 160px));
+        justify-content: center;
         gap: 10px;
     }
 }
@@ -1594,7 +1597,8 @@ html {
     }
     
     .theme-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 160px));
+        justify-content: center;
         gap: 10px;
     }
     
@@ -2156,9 +2160,30 @@ html {
 }
 
 /* ===== DEVELOPER MODE ===== */
-.btn-dev {
+.btn-hub {
   position: fixed;
   top: 20px;
+  left: 20px;
+  background: rgba(40, 40, 60, 0.95);
+  border: 2px solid rgba(0, 255, 255, 0.7);
+  color: #00ffff;
+  font-size: 0.85rem;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 99999;
+  transition: all 0.3s ease;
+  font-family: 'Special Elite', monospace;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+.btn-hub:hover {
+  background: rgba(60, 60, 80, 1);
+  border-color: rgba(0, 255, 255, 1);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+.btn-dev {
+  position: fixed;
+  top: 60px;
   left: 20px;
   background: rgba(40, 40, 60, 0.95);
   border: 2px solid rgba(255, 200, 100, 0.7);
@@ -2229,6 +2254,26 @@ html {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+.dev-theme-list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.dev-theme-btn {
+  background: rgba(40, 60, 90, 0.6);
+  border: 1px solid rgba(100, 150, 200, 0.4);
+  color: #e0e0ff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+.dev-theme-btn:hover {
+  background: rgba(60, 90, 130, 0.8);
+  border-color: rgba(100, 150, 200, 0.7);
 }
 .dev-phase-btn {
   background: rgba(40, 60, 90, 0.6);
