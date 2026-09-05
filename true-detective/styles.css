@@ -1617,25 +1617,29 @@ html {
 .mg-timeline .slot.filled { border-style: solid; border-color: rgba(240,216,144,0.6); color: #f0d890; }
 .mg-timeline .slot.correct { border-color: #7fd48a; color: #c9f2d2; }
 
-/* Réseau d'Alibis (Cartographie mentale) */
-.reseau-alibis-intro { font-size: 0.95rem; color: #f0d890; margin: 0 0 8px 0; font-style: italic; }
-.reseau-alibis-counter { font-size: 0.85rem; color: #d8c8a0; margin: 0 0 12px 0; padding: 6px 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(240,216,144,0.3); border-radius: 6px; display: inline-block; }
-.reseau-alibis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
-.reseau-alibis-card { position: relative; padding: 16px 14px 14px 14px; background: linear-gradient(180deg, rgba(40,32,22,0.95) 0%, rgba(28,22,16,0.95) 100%); border: 1px solid rgba(240,216,144,0.35); border-radius: 10px; color: #e8dcc4; font-family: inherit; font-size: 0.9rem; line-height: 1.45; text-align: left; cursor: pointer; transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
-.reseau-alibis-card:hover { transform: translateY(-2px); border-color: rgba(240,216,144,0.7); box-shadow: 0 4px 14px rgba(0,0,0,0.5); }
-.reseau-alibis-who { font-weight: 700; color: #f0d890; font-size: 1.0rem; margin-bottom: 8px; letter-spacing: 0.02em; }
-.reseau-alibis-what { color: #d8c8a0; font-size: 0.88rem; margin-bottom: 10px; }
-.reseau-alibis-tag { position: absolute; top: 8px; right: 10px; font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; background: rgba(240,216,144,0.15); color: #f0d890; border: 1px solid rgba(240,216,144,0.4); }
+/* Réseau d'Alibis (Crime Investigation Board) */
+.reseau-alibis-board { position: relative; width: 100%; max-width: 800px; margin: 0 auto; }
+.reseau-alibis-board-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('assets/image true detective/mini-games/noire/corkboard.jpg') center/cover; opacity: 0.12; border: 2px solid rgba(240,216,144,0.15); border-radius: 12px; pointer-events: none; }
+.reseau-alibis-intro { position: relative; font-size: 0.95rem; color: #f0d890; margin: 0 0 8px 0; font-style: italic; text-align: center; z-index: 1; }
+.reseau-alibis-counter { position: relative; font-size: 0.85rem; color: #d8c8a0; margin: 0 0 16px 0; padding: 6px 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(240,216,144,0.3); border-radius: 6px; display: inline-block; z-index: 1; }
+.reseau-alibis-grid { position: relative; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 16px; z-index: 1; }
+.reseau-alibis-card { position: relative; padding: 16px 14px 20px 14px; background: linear-gradient(180deg, rgba(40,32,22,0.9) 0%, rgba(28,22,16,0.9) 100%); border: 2px solid rgba(240,216,144,0.3); border-radius: 12px; color: #e8dcc4; font-family: inherit; font-size: 0.88rem; line-height: 1.4; text-align: left; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+.reseau-alibis-card:hover { transform: translateY(-3px); border-color: rgba(240,216,144,0.8); box-shadow: 0 6px 20px rgba(0,0,0,0.6); }
+.reseau-alibis-photo { width: 100%; height: 90px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(240,216,144,0.2); border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.3); flex-shrink: 0; }
+.reseau-alibis-img { max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; image-rendering: pixelated; }
+.reseau-alibis-who { font-weight: 700; color: #f0d890; font-size: 1.0rem; margin-bottom: 6px; letter-spacing: 0.02em; }
+.reseau-alibis-what { color: #d8c8a0; font-size: 0.82rem; margin-bottom: 8px; }
+.reseau-alibis-tag { position: absolute; top: 8px; right: 10px; font-size: 0.65rem; padding: 2px 8px; border-radius: 999px; background: rgba(240,216,144,0.15); color: #f0d890; border: 1px solid rgba(240,216,144,0.4); }
 .reseau-alibis-card.wrong { border-color: #d8574a; animation: mg-shake 0.4s; }
 .reseau-alibis-card .tag-wrong { background: rgba(216,87,74,0.25); color: #f2c1ba; border-color: #d8574a; }
-.reseau-alibis-card.lie-found { border-color: #d8574a; background: linear-gradient(180deg, rgba(70,20,20,0.9) 0%, rgba(40,16,16,0.9) 100%); box-shadow: 0 0 18px rgba(216,87,74,0.5); }
+.reseau-alibis-card.lie-found { border-color: #d8574a; background: linear-gradient(180deg, rgba(70,20,20,0.85) 0%, rgba(40,16,16,0.85) 100%); box-shadow: 0 0 20px rgba(216,87,74,0.6); }
 .reseau-alibis-card.lie-found .reseau-alibis-tag { background: rgba(216,87,74,0.4); color: #fff; border-color: #d8574a; }
 .reseau-alibis-card.lie-found .tag-lie { background: rgba(216,87,74,0.5); color: #fff; border-color: #d8574a; }
 .reseau-alibis-card.confirmed-true { border-color: rgba(127,212,138,0.6); opacity: 0.85; }
 .reseau-alibis-card.confirmed-true .reseau-alibis-tag { background: rgba(127,212,138,0.3); color: #c9f2d2; }
 .reseau-alibis-card.confirmed-true .tag-true { background: rgba(127,212,138,0.4); color: #fff; border-color: #7fd48a; }
-.reseau-alibis-card.hint-glow { box-shadow: 0 0 18px rgba(240,216,144,0.6); border-color: rgba(240,216,144,0.8); animation: hint-pulse 1.2s ease-in-out infinite; }
-@keyframes hint-pulse { 0%,100% { box-shadow: 0 0 12px rgba(240,216,144,0.4); } 50% { box-shadow: 0 0 24px rgba(240,216,144,0.9); } }
+.reseau-alibis-card.hint-glow { box-shadow: 0 0 20px rgba(240,216,144,0.7); border-color: rgba(240,216,144,0.9); animation: hint-pulse 1.2s ease-in-out infinite; }
+@keyframes hint-pulse { 0%,100% { box-shadow: 0 0 14px rgba(240,216,144,0.5); } 50% { box-shadow: 0 0 26px rgba(240,216,144,1); } }
 
 /* Pavé numérique (coffre) */
 .mg-safe-input { width: 100%; text-align: center; font-size: 1.8rem; letter-spacing: 0.5em; padding: 8px; margin-bottom: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #f0d890; }
