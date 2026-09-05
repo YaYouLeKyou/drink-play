@@ -2774,6 +2774,124 @@ langEnBtn: document.getElementById('lang-en'),
         },
     };
 
+    var THEME_ACT_TITLES = {
+        'agatha-christie': {
+            'Acte 1': {
+                number: { fr: 'Acte Premier', en: 'Act One' },
+                title: { fr: 'L\'Ombre du Crime', en: 'The Shadow of Crime' },
+                subtitle: { fr: 'Un magnat est retrouvé mort dans son manoir. L\'enquête commence dans le brouillard de Londres.', en: 'A tycoon is found dead in his manor. The investigation begins in the London fog.' }
+            },
+            'Acte 2': {
+                number: { fr: 'Acte Deuxième', en: 'Act Two' },
+                title: { fr: 'Fils et Faux-Semblants', en: 'Threads and Deceptions' },
+                subtitle: { fr: 'Les témoignages se contredisent, les alibis se fissurent. La vérité se cache derrière les masques.', en: 'Testimonies contradict each other, alibis crack. The truth hides behind the masks.' }
+            },
+            'Acte 3': {
+                number: { fr: 'Acte Troisième', en: 'Act Three' },
+                title: { fr: 'La Vérité Nue', en: 'The Naked Truth' },
+                subtitle: { fr: 'Le coffre-fort livre ses secrets. Le coupable doit être démasqué avant qu\'il ne soit trop tard.', en: 'The safe yields its secrets. The culprit must be unmasked before it is too late.' }
+            },
+        },
+        'sherlock-holmes': {
+            'Acte 1': {
+                number: { fr: 'Acte Premier', en: 'Act One' },
+                title: { fr: 'Le Mystère du Manoir', en: 'The Manor Mystery' },
+                subtitle: { fr: 'Un magnat est retrouvé mort dans son manoir. L\'enquête commence dans le brouillard victorien.', en: 'A tycoon is found dead in his manor. The investigation begins in the Victorian fog.' }
+            },
+            'Acte 2': {
+                number: { fr: 'Acte Deuxième', en: 'Act Two' },
+                title: { fr: 'Labyrinthe de Mensonges', en: 'Labyrinth of Lies' },
+                subtitle: { fr: 'Les témoignages se contredisent, les alibis se fissurent. La vérité se cache derrière les masques.', en: 'Testimonies contradict each other, alibis crack. The truth hides behind the masks.' }
+            },
+            'Acte 3': {
+                number: { fr: 'Acte Troisième', en: 'Act Three' },
+                title: { fr: 'Révélation Finale', en: 'Final Revelation' },
+                subtitle: { fr: 'Le coffre-fort livre ses secrets. Le coupable doit être démasqué avant qu\'il ne soit trop tard.', en: 'The safe yields its secrets. The culprit must be unmasked before it is too late.' }
+            },
+        },
+        'cyberpunk': {
+            'Acte 1': {
+                number: { fr: 'ACTE 01', en: 'ACT 01' },
+                title: { fr: 'Protocole Initial', en: 'Initial Protocol' },
+                subtitle: { fr: 'Un corpo retrouvé dans le secteur 7-Lambda. L\'investigation démarre sous les néons.', en: 'A corpo found in Sector 7-Lambda. The investigation begins under the neon lights.' }
+            },
+            'Acte 2': {
+                number: { fr: 'ACTE 02', en: 'ACT 02' },
+                title: { fr: 'Faisceau de Données', en: 'Data Beam' },
+                subtitle: { fr: 'Les flux témoignages se contredisent, les firewalls sautent. La vérité est encryptée.', en: 'Testimony streams contradict each other, firewalls collapse. The truth is encrypted.' }
+            },
+            'Acte 3': {
+                number: { fr: 'ACTE 03', en: 'ACT 03' },
+                title: { fr: 'Root Access', en: 'Root Access' },
+                subtitle: { fr: 'Le coffre crypté s\'ouvre. Le coupable doit être flushé avant la purge système.', en: 'The encrypted vault opens. The culprit must be flushed before the system purge.' }
+            },
+        },
+        'film-noir': {
+            'Acte 1': {
+                number: { fr: 'Premier Acte', en: 'First Act' },
+                title: { fr: 'Une Nuit Mortelle', en: 'One Deadly Night' },
+                subtitle: { fr: 'Un homme riche retrouvé raide dans son bureau. Chicago n\'oublie jamais.', en: 'A rich man found stiff in his office. Chicago never forgets.' }
+            },
+            'Acte 2': {
+                number: { fr: 'Deuxième Acte', en: 'Second Act' },
+                title: { fr: 'Dames et Démons', en: 'Dames and Devils' },
+                subtitle: { fr: 'Les alibis se vendent, les témoins se trompent. Dans cette ville, tout le monde a quelque chose à cacher.', en: 'Alibis are bought, witnesses are fooled. In this town, everyone has something to hide.' }
+            },
+            'Acte 3': {
+                number: { fr: 'Troisième Acte', en: 'Third Act' },
+                title: { fr: 'Le Dernier Verre', en: 'The Last Drink' },
+                subtitle: { fr: 'Le coffre fort grince. Le coupable doit tomber avant l\'aube, sinon c\'est vous qui trinquez.', en: 'The safe creaks open. The culprit must fall before dawn, or it\'s you who buys the drink.' }
+            },
+        },
+    };
+
+    function scrShowActPage(act, onContinue) {
+        var themeId = getThemeId();
+        var titles = THEME_ACT_TITLES[themeId] || THEME_ACT_TITLES['agatha-christie'];
+        var data = titles[act];
+        if (!data) { onContinue(); return; }
+
+        var lang = ui.language || 'fr';
+        var overlay = document.getElementById('act-page-overlay');
+        if (!overlay) { onContinue(); return; }
+
+        overlay.className = 'act-page-overlay theme-' + themeId;
+
+        var numberEl = document.getElementById('act-page-number');
+        var titleEl = document.getElementById('act-page-title');
+        var subtitleEl = document.getElementById('act-page-subtitle');
+        var continueBtn = document.getElementById('act-page-continue-btn');
+
+        if (numberEl) numberEl.textContent = data.number[lang] || data.number.fr || '';
+        if (titleEl) titleEl.textContent = data.title[lang] || data.title.fr || '';
+        if (subtitleEl) subtitleEl.textContent = data.subtitle[lang] || data.subtitle.fr || '';
+        if (continueBtn) continueBtn.textContent = getText('continue') || 'Continuer';
+
+        overlay.classList.add('visible');
+
+        if (continueBtn) {
+            continueBtn.onclick = function () {
+                overlay.classList.remove('visible');
+                setTimeout(function () {
+                    if (typeof onContinue === 'function') onContinue();
+                }, 600);
+            };
+        }
+    }
+
+    function scrShouldShowActPage(act) {
+        if (!act) return false;
+        if (act === 'Intro' || act === 'Outro') return false;
+        var themeId = getThemeId();
+        var titles = THEME_ACT_TITLES[themeId] || THEME_ACT_TITLES['agatha-christie'];
+        return titles && titles.hasOwnProperty(act);
+    }
+
+    function scrGetPreviousPhase() {
+        if (!window.TDPhases || scr.phaseIdx <= 0) return null;
+        return window.TDPhases[scr.phaseIdx - 1] || null;
+    }
+
     function scrThemedTitle(culpritId, lang) {
         var themeId = getThemeId();
         var themedTitles = THEME_TRUTH_TITLES[themeId];
@@ -3446,10 +3564,20 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     }
 
     function nextScenarioPhase() {
+        var prevPhase = scrCurrentPhase();
+        var prevAct = prevPhase ? prevPhase.act : null;
         scr.phaseIdx++;
         scr.pageIdx = 0;
         if (!scrCurrentPhase()) { finishScenario(); return; }
-        renderScenarioPage();
+        var nextPhase = scrCurrentPhase();
+        var nextAct = nextPhase ? nextPhase.act : null;
+        if (nextAct && nextAct !== prevAct && scrShouldShowActPage(nextAct)) {
+            scrShowActPage(nextAct, function () {
+                renderScenarioPage();
+            });
+        } else {
+            renderScenarioPage();
+        }
     }
 
     function finishScenario() {
@@ -3665,6 +3793,9 @@ function scrApplyChoice(choiceKey, choiceId) {
     window.scrResetState = scrResetState;
     window.renderScenarioPage = renderScenarioPage;
     window.scrCurrentPhase = scrCurrentPhase;
+    window.scrShowActPage = scrShowActPage;
+    window.scrShouldShowActPage = scrShouldShowActPage;
+    window.THEME_ACT_TITLES = THEME_ACT_TITLES;
     window.scr = scr;
     window.skipTypeWriter = skipTypeWriter;
     window.startScenarioGame = startScenarioGame;
