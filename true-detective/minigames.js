@@ -32,15 +32,21 @@
             target.appendChild(content);
         }
 
-        var title = document.createElement('div');
-        title.className = 'minigame-title';
-        title.textContent = cfg.title ? t(cfg.title, lang) : 'Mini-jeu';
-        content.appendChild(title);
+        var titleEl = document.createElement('div');
+        titleEl.className = 'minigame-title';
+        titleEl.textContent = cfg.title ? t(cfg.title, lang) : 'Mini-jeu';
+        if (useOverlay) {
+            titleEl.style.display = 'none';
+        }
+        content.appendChild(titleEl);
 
         if (cfg.desc) {
             var desc = document.createElement('div');
             desc.className = 'minigame-desc';
             desc.textContent = t(cfg.desc, lang);
+            if (useOverlay) {
+                desc.style.display = 'none';
+            }
             content.appendChild(desc);
         }
 
