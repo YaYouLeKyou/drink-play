@@ -3770,7 +3770,11 @@ function scrApplyChoice(choiceKey, choiceId) {
     function showScenarioEnding(ending) {
         scr.active = false;
         if (window.DPMusicPlayer) {
-            try { window.DPMusicPlayer.playTrack('night ride.mp3'); } catch (e) {}
+            // Garder la musique du thème pour la fin (sherlock/cyberpunk/noire selon l'univers)
+            var themeTrack = (TDAudioService && TDAudioService.getThemeMusic)
+                ? TDAudioService.getThemeMusic(getThemeId())
+                : (THEME_ASSETS[getThemeId()] ? THEME_ASSETS[getThemeId()].music : 'sherlock.mp3');
+            try { window.DPMusicPlayer.playTrack(themeTrack); } catch (e) {}
         }
         $.gameScreen.classList.remove('active');
         $.gameScreen.classList.add('hidden');
