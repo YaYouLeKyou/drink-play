@@ -795,7 +795,7 @@ langEnBtn: document.getElementById('lang-en'),
         }
     }
 
-    function updateMusicInfo(phase, themeId) {
+    function updateMusicInfo(phase, themeId, skipAudio) {
         if (!$.musicInfo || !TDAudioService) { return; }
         var phaseLabel = TDAudioService.MUSIC_PHASES && TDAudioService.MUSIC_PHASES[phase]
             ? TDAudioService.MUSIC_PHASES[phase].label
@@ -808,7 +808,9 @@ langEnBtn: document.getElementById('lang-en'),
         $.musicInfo.textContent = icon + ' ' + phaseLabel;
         $.musicInfo.className = 'music-info phase-' + phase;
         ui.currentMusicPhase = phase;
-        if (TDAudioService.setMusicPhase) {
+        // En mode scénario, la piste est déjà jouée par scrMusicPlaying() :
+        // on ne laisse PAS setMusicPhase écraser le thème par une phase générique.
+        if (!skipAudio && TDAudioService.setMusicPhase && TDAudioService.MUSIC_PHASE_TRACKS && TDAudioService.MUSIC_PHASE_TRACKS[phase]) {
             TDAudioService.setMusicPhase(phase);
         }
     }
@@ -3020,7 +3022,7 @@ langEnBtn: document.getElementById('lang-en'),
                 try { window.DPMusicPlayer.playTrack(PHASE_MUSIC_TRACKS[phaseMusic]); } catch (e) { /* ignore */ }
             }
         }
-        updateMusicInfo(phaseMusic || 'investigation', getThemeId());
+        updateMusicInfo(phaseMusic || 'investigation', getThemeId(), true);
     }
 
     function scrEnsureThemeMusic() {
