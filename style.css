@@ -220,6 +220,13 @@ h1 {
     }
 }
 
+@media screen and (max-width: 480px) {
+    h1 {
+        font-size: 2.5rem;
+        margin: 1rem 0 2rem 0;
+    }
+}
+
 .td-front .inner p {
     color: #00ffff;
     text-shadow: 0 0 12px rgba(0, 255, 255, 0.6);

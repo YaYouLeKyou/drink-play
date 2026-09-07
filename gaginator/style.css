@@ -1,4 +1,4 @@
-body {
+﻿body {
     font-family: 'Georgia', serif;
     display: flex;
     justify-content: center;
@@ -9,6 +9,7 @@ body {
     background-size: contain;
     background-position: center;
     color: #d0d0d0;
+    overflow-x: hidden;
     /* Slightly muted text for classic feel */
 }
 

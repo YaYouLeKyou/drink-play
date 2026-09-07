@@ -108,6 +108,61 @@ html {
     transform: translateY(0);
 }
 
+/* ===== Home Screen Mobile ===== */
+@media (max-width: 768px) {
+    .home-content {
+        justify-content: flex-start;
+        padding-top: 60px;
+        height: auto;
+        min-height: 100%;
+    }
+
+    .cover-image {
+        width: 200px;
+        height: 200px;
+        margin-bottom: 10px;
+    }
+
+    .home-title h1 {
+        font-size: 2.2em;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+    }
+
+    .home-subtitle {
+        font-size: 0.9em;
+        margin-bottom: 20px;
+        max-width: 100%;
+    }
+
+    .start-btn {
+        font-size: 0.95em;
+        padding: 14px 30px;
+        width: calc(100vw - 40px);
+        max-width: 320px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cover-image {
+        width: 150px;
+        height: 150px;
+    }
+
+    .home-title h1 {
+        font-size: 1.8em;
+    }
+
+    .home-subtitle {
+        font-size: 0.8em;
+    }
+
+    .start-btn {
+        font-size: 0.85em;
+        padding: 12px 24px;
+    }
+}
+
 .btn-restart {
     width: 42px;
     height: 42px;
@@ -708,7 +763,7 @@ html {
     cursor: pointer;
     transition: box-shadow 0.2s ease;
     position: fixed;
-    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     left: 50%;
     transform: translateX(-50%);
     z-index: 300;
@@ -1612,7 +1667,7 @@ html {
     }
     
     .btn-continue {
-        bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
         padding: 12px 24px;
         font-size: 0.9em;
     }
@@ -2654,17 +2709,27 @@ html {
 
 /* =====================================================================
    RESPONSIVE MOBILE — anti-chevauchement boutons & bouton Continuer
-   toujours accessible (au-dessus du lecteur musique #dp-music-player)
+   Lecteur musique (#dp-music-player) maintenant en HAUT de l'écran
 ==================================================================== */
 @media (max-width: 768px) {
+    /* Espace en haut pour le lecteur musique (#dp-music-player) */
+    .screen {
+        padding-top: 60px;
+    }
+
+    /* Lang-toggle remonté pour ne pas chevaucher le lecteur */
+    .lang-toggle {
+        top: 55px;
+    }
+
     /* Zones tactiles confortables, aucun bouton trop petit */
     .btn {
         min-height: 44px;
     }
 
-    /* Bouton Continuer : pleine largeur maîtrisée, jamais sous le lecteur */
+    /* Bouton Continuer : pleine largeur maîtrisée */
     .btn-continue {
-        bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(20px + env(safe-area-inset-bottom, 0px));
         left: 50%;
         width: min(100vw - 24px, 420px);
         min-width: 0;
@@ -2675,12 +2740,12 @@ html {
 
     /* Le contenu du dialogue ne passe plus sous le bouton Continuer */
     .dialogue-container {
-        bottom: calc(146px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(90px + env(safe-area-inset-bottom, 0px));
     }
 
     /* Toast remonté au-dessus du bouton Continuer */
     .toast {
-        bottom: calc(146px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(90px + env(safe-area-inset-bottom, 0px));
         padding: 12px 18px;
         font-size: 0.9em;
     }
@@ -2707,29 +2772,29 @@ html {
         flex-grow: 1;
     }
 
-    /* --- Espace réservé au lecteur musique (#dp-music-player, ~58px en bas à droite) ---
-       Aucun contenu du jeu ne doit passer sous / derrière le lecteur sur mobile. */
+    /* --- Lecteur musique (#dp-music-player) est maintenant en HAUT ---
+       On supprime les marges basses qui n'étaient que pour le lecteur */
     .montre-note-box {
-        bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
     }
 
-    /* Carnet : remonté pour ne pas être recouvert par le lecteur */
+    /* Carnet : marge basse standard */
     .notebook {
-        bottom: calc(58px + env(safe-area-inset-bottom, 0px));
-        max-height: calc(60vh - 58px);
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        max-height: calc(60vh - 16px);
     }
 
-    /* Mini-jeux : marge basse pour que les actions restent au-dessus du lecteur */
+    /* Mini-jeux : marge basse standard */
     .minigame-screen .minigame-content,
     .minigame-page .minigame-content,
     .minigame-layer .minigame-content,
     .minigame-box {
-        padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+        padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     }
 
-    /* Pages d'acte : contenu décalé au-dessus du lecteur */
+    /* Pages d'acte : marge basse standard */
     .act-page-content {
-        padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+        padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
     }
 
     /* En-tête mini-jeu : titre et bouton Passer se replient proprement */
@@ -2754,8 +2819,13 @@ html {
 }
 
 @media (max-width: 480px) {
+    /* Espace en haut pour le lecteur musique */
+    .screen {
+        padding-top: 50px;
+    }
+
     .btn-continue {
-        bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
         width: calc(100vw - 20px);
         padding: 12px 14px;
         font-size: 0.9em;
@@ -2763,7 +2833,7 @@ html {
     }
 
     .dialogue-container {
-        bottom: calc(134px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(80px + env(safe-area-inset-bottom, 0px));
         padding: 8px;
     }
 
@@ -2776,13 +2846,13 @@ html {
     .minigame-page .minigame-content,
     .minigame-layer .minigame-content,
     .minigame-box {
-        padding: 16px 14px calc(110px + env(safe-area-inset-bottom, 0px)) 14px;
-        max-height: calc(100vh - 20px);
+        padding: 16px 14px calc(20px + env(safe-area-inset-bottom, 0px)) 14px;
+        max-height: calc(100vh - 80px);
     }
 
-    /* Box de notes : reste au-dessus du lecteur musique */
+    /* Box de notes : marge basse standard */
     .montre-note-box {
-        bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
         width: calc(100vw - 20px);
     }
     .mg-actions {
