@@ -838,6 +838,17 @@ html {
     cursor: not-allowed;
     transform: translateX(-50%) !important;
     box-shadow: none;
+    animation: none;
+}
+
+/* Animation "s'allume" - le bouton pulse quand il est cliquable */
+@keyframes btn-glow-pulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(255, 0, 255, 0.4), 0 0 16px rgba(0, 255, 255, 0.2); }
+    50% { box-shadow: 0 0 20px rgba(255, 0, 255, 0.8), 0 0 40px rgba(0, 255, 255, 0.5); }
+}
+
+.btn-continue:not(:disabled) {
+    animation: btn-glow-pulse 2s ease-in-out infinite;
 }
 
 .dialogue-container {
@@ -2974,6 +2985,15 @@ html {
         transform: none !important;
     }
 
+    /* Glow pulse sur mobile - bouton cliquable */
+    @keyframes btn-glow-pulse-mobile {
+        0%, 100% { box-shadow: 0 -4px 15px rgba(255, 0, 255, 0.4), 0 0 15px rgba(0, 255, 255, 0.3); }
+        50% { box-shadow: 0 -4px 30px rgba(255, 0, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.6); }
+    }
+    #game-screen .btn-continue:not(:disabled) {
+        animation: btn-glow-pulse-mobile 2s ease-in-out infinite;
+    }
+
     /* Toast remonté au-dessus du bouton Continuer */
     .toast {
         bottom: calc(90px + env(safe-area-inset-bottom, 0px));
@@ -3182,6 +3202,15 @@ html {
     #game-screen .btn-continue:hover,
     #game-screen .btn-continue:active {
         transform: none !important;
+    }
+
+    /* Glow pulse sur mobile 480px - bouton cliquable */
+    @keyframes btn-glow-pulse-mobile-sm {
+        0%, 100% { box-shadow: 0 -4px 12px rgba(255, 0, 255, 0.4), 0 0 12px rgba(0, 255, 255, 0.3); }
+        50% { box-shadow: 0 -4px 25px rgba(255, 0, 255, 0.8), 0 0 25px rgba(0, 255, 255, 0.6); }
+    }
+    #game-screen .btn-continue:not(:disabled) {
+        animation: btn-glow-pulse-mobile-sm 2s ease-in-out infinite;
     }
 
     /* Mini-jeux : plus d'espace utile, actions empilées verticalement */
