@@ -262,6 +262,7 @@
         voiceBtn: document.getElementById('voice-btn'),
         muteBtn: document.getElementById('mute-btn'),
         volumeBtn: document.getElementById('volume-btn'),
+        typingBtn: document.getElementById('typing-btn'),
 langEnBtn: document.getElementById('lang-en'),
     langFrBtn: document.getElementById('lang-fr'),
     langEnHomeBtn: document.getElementById('lang-en-home'),
@@ -431,6 +432,7 @@ langEnBtn: document.getElementById('lang-en'),
         setupEventListeners();
         updateMuteButton();
         updateVolumeButton();
+        updateTypingSoundButton();
         updateLanguageUI();
         updateLanguageButtons();
 
@@ -555,6 +557,10 @@ langEnBtn: document.getElementById('lang-en'),
             });
         }
 
+        if ($.typingBtn) {
+            $.typingBtn.addEventListener('click', toggleTypingSound);
+        }
+
         if ($.voiceBtn) {
             $.voiceBtn.addEventListener('click', toggleVoiceInput);
         }
@@ -599,7 +605,7 @@ langEnBtn: document.getElementById('lang-en'),
                 if (TDAudioService) {
                     TDAudioService.stopSpeaking();
                 }
-                window.location.reload();
+                window.location.href = '../index.html';
             });
         }
 
@@ -864,8 +870,10 @@ langEnBtn: document.getElementById('lang-en'),
 
         if (TDAudioService) {
             TDAudioService.playThemeMusic(ui.theme.id);
+            TDAudioService.setCurrentTheme(ui.theme.id);
         }
         updateMusicInfo('investigation', ui.theme.id);
+        updateTypingSoundButton();
         showLoading(getText('generatingInvestigation'));
 
         var themeId = ui.theme.id;
@@ -1956,6 +1964,9 @@ langEnBtn: document.getElementById('lang-en'),
             if (i < text.length) {
                 $.dialogueText.textContent += text.charAt(i);
                 i++;
+                if (TDAudioService && typeof TDAudioService.playTypingSound === 'function' && TDAudioService.typingSound) {
+                    TDAudioService.playTypingSound();
+                }
                 _typeWriterTimeout = setTimeout(typeChar, speed);
             } else {
                 ui.isTyping = false;
@@ -2447,6 +2458,28 @@ langEnBtn: document.getElementById('lang-en'),
         $.volumeBtn.title = 'Voice volume: ' + pct + '%. Click to change.';
     }
 
+    function toggleTypingSound() {
+        if (!TDAudioService) return;
+        TDAudioService.toggleTypingSound();
+        updateTypingSoundButton();
+    }
+
+    function updateTypingSoundButton() {
+        if (!$.typingBtn || !TDAudioService) {
+            if ($.typingBtn) $.typingBtn.classList.add('hidden');
+            return;
+        }
+        var enabled = TDAudioService.typingSound;
+        $.typingBtn.textContent = enabled ? '⌨️' : '🔇';
+        var themeId = getThemeId();
+        if (themeId === 'cyberpunk' || themeId === 'sci-fi') {
+            $.typingBtn.title = enabled ? 'Computer typing sound (on)' : 'Computer typing sound (off)';
+        } else {
+            $.typingBtn.title = enabled ? 'Typewriter sound (on)' : 'Typewriter sound (off)';
+        }
+        $.typingBtn.classList.remove('hidden');
+    }
+
     var _voiceActive = false;
 
      function toggleVoiceInput() {
@@ -2877,6 +2910,12 @@ langEnBtn: document.getElementById('lang-en'),
 
         if (continueBtn) {
             continueBtn.onclick = function () {
+                // Clear previous page content immediately so it doesn't ghost
+                // through the fading overlay
+                if ($.dialogueText) $.dialogueText.textContent = '';
+                if ($.npcName) $.npcName.textContent = '';
+                hideNPC();
+                if ($.bgLayer) $.bgLayer.style.opacity = '0';
                 overlay.classList.remove('visible');
                 setTimeout(function () {
                     if (typeof onContinue === 'function') onContinue();
@@ -3029,12 +3068,16 @@ langEnBtn: document.getElementById('lang-en'),
         if (!window.scrThemeMusicStarted) {
             window.scrThemeMusicStarted = true;
             var themeId = getThemeId();
+            if (TDAudioService && typeof TDAudioService.setCurrentTheme === 'function') {
+                TDAudioService.setCurrentTheme(themeId);
+            }
             var themeTrack = (TDAudioService && TDAudioService.getThemeMusic)
                 ? TDAudioService.getThemeMusic(themeId)
                 : (THEME_ASSETS[themeId] ? THEME_ASSETS[themeId].music : 'sherlock.mp3');
             if (window.DPMusicPlayer) {
                 try { window.DPMusicPlayer.playTrack(themeTrack); } catch (e) { /* ignore */ }
             }
+            updateTypingSoundButton();
         }
     }
 function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }

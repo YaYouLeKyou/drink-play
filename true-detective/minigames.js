@@ -539,7 +539,22 @@
                 close.textContent = lang === 'fr' ? 'Poursuivre l\u2019examen' : 'Keep examining';
                 close.addEventListener('click', function () { win.remove(); win = null; });
                 win.appendChild(head); win.appendChild(txt); win.appendChild(close);
-                body.appendChild(win);
+                wrap.appendChild(win);
+                // Position near the spot, clamped to the scene bounds
+                var sw = spot.getBoundingClientRect();
+                var rw = wrap.getBoundingClientRect();
+                var relX = ((sw.left + sw.right) / 2 - rw.left) / rw.width * 100;
+                var relY = ((sw.top + sw.bottom) / 2 - rw.top) / rw.height * 100;
+                var winW = 88, winH = 50;
+                if (relX < winW) relX = Math.min(relX + winW, 100 - winW / 2);
+                if (relX > 100 - winW) relX = Math.max(100 - winW, winW / 2);
+                if (relY > 100 - winH) relY = Math.max(0, relY - winH);
+                win.style.left = relX + '%';
+                win.style.top = relY + '%';
+                win.style.transform = 'translate(-50%, 0)';
+                win.style.maxWidth = 'none';
+                win.style.width = '44%';
+                win.style.maxHeight = 'none';
                 if (!spot.dataset.done) {
                     spot.dataset.done = '1';
                     spot.classList.add('found');
@@ -552,8 +567,8 @@
             spots.forEach(function (h) {
                 var spot = document.createElement('button');
                 spot.className = 'fouille-zone';
-                spot.style.left = h.x + '%';
-                spot.style.top = h.y + '%';
+                spot.style.left = (h.x != null ? h.x : 50) + '%';
+                spot.style.top = (h.y != null ? h.y : 50) + '%';
                 spot.textContent = h.label;
                 spot.title = lang === 'fr' ? 'Examiner' : 'Examine';
                 spot.dataset.label = h.label;

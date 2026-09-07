@@ -134,6 +134,9 @@
                 phase.pages.forEach(function (page, pageIdx) {
                     var pageBtn = document.createElement('button');
                     pageBtn.className = 'dev-page-btn';
+                    if (page.minigame) {
+                        pageBtn.classList.add('dev-page-btn-mg');
+                    }
                     var pageText = '';
                     if (page.text) {
                         var text = page.text.fr || page.text.en || '';

@@ -9,6 +9,10 @@
     var recognition = null;
     var isListening = false;
     var isSpeaking = false;
+    var typingSoundEnabled = true;
+    var currentTheme = null;
+    var typingCtx = null;
+    var typingPool = [];
 
     var THEME_MUSIC = {
         'agatha-christie': 'sherlock.mp3',
@@ -293,7 +297,11 @@
 
     function saveSettings() {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({ volume: volume, muted: muted }));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                volume: volume,
+                muted: muted,
+                typingSound: typingSoundEnabled
+            }));
         } catch (e) {
             console.warn('[AudioService] Failed to save settings:', e.message);
         }
@@ -306,6 +314,7 @@
             var data = JSON.parse(raw);
             if (typeof data.volume === 'number') { volume = data.volume; }
             if (typeof data.muted === 'boolean') { muted = data.muted; }
+            if (typeof data.typingSound === 'boolean') { typingSoundEnabled = data.typingSound; }
         } catch (e) {
             console.warn('[AudioService] Failed to load settings:', e.message);
         }
@@ -522,11 +531,139 @@
     }
 
     function playThemeMusic(themeId) {
+        currentTheme = themeId;
         var track = THEME_MUSIC[themeId] || MUSIC_PHASE_TRACKS.investigation;
         if (typeof window !== 'undefined' && window.DPMusicPlayer) {
             window.DPMusicPlayer.playTrack(track);
         }
         return track;
+    }
+
+    function setCurrentTheme(themeId) {
+        currentTheme = themeId;
+    }
+
+    function isCyberpunkTheme() {
+        var id = (currentTheme || '').toLowerCase();
+        return id === 'cyberpunk' || id === 'sci-fi' || id === 'sf';
+    }
+
+    function ensureTypingCtx() {
+        if (!typingCtx) {
+            try {
+                typingCtx = new (global.AudioContext || global.webkitAudioContext)();
+            } catch (e) {
+                console.warn('[AudioService] Web Audio API not supported for typewriter sound');
+                return null;
+            }
+        }
+        if (typingCtx.state === 'suspended') {
+            typingCtx.resume();
+        }
+        return typingCtx;
+    }
+
+    // Eagerly create + unlock the AudioContext on first user gesture so that
+    // short typewriter sounds play reliably (browsers block autoplay on a
+    // context that was never resumed by a user interaction).
+    function initTypingSound() {
+        if (typingCtx) return;
+        var ctx = ensureTypingCtx();
+        if (!ctx) return;
+        var unlock = function () {
+            if (typingCtx && typingCtx.state === 'suspended') {
+                typingCtx.resume();
+            }
+            document.removeEventListener('click', unlock);
+            document.removeEventListener('keydown', unlock);
+            document.removeEventListener('touchstart', unlock);
+        };
+        document.addEventListener('click', unlock);
+        document.addEventListener('keydown', unlock);
+        document.addEventListener('touchstart', unlock);
+    }
+    initTypingSound();
+
+    function playTypingSound() {
+        if (!typingSoundEnabled || muted) return;
+        var ctx = ensureTypingCtx();
+        if (!ctx || ctx.state !== 'running') return;
+
+        var cyber = isCyberpunkTheme();
+        var now = ctx.currentTime;
+        var masterVol = volume * 0.35;
+
+        if (cyber) {
+            // Futuristic computer "blip" : short descending oscillator with
+            // subtle noise crackle and a tiny reverb tail
+            var osc = ctx.createOscillator();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(900 + Math.random() * 200, now);
+            osc.frequency.exponentialRampToValueAtTime(220 + Math.random() * 100, now + 0.06);
+
+            var gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.linearRampToValueAtTime(masterVol, now + 0.005);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+
+            // Noise crackle for texture
+            var noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.03, ctx.sampleRate);
+            var d = noiseBuf.getChannelData(0);
+            for (var i = 0; i < d.length; i++) {
+                d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 4);
+            }
+            var noiseSrc = ctx.createBufferSource();
+            noiseSrc.buffer = noiseBuf;
+            var noiseGain = ctx.createGain();
+            noiseGain.gain.setValueAtTime(0.001, now);
+            noiseGain.gain.linearRampToValueAtTime(masterVol * 0.3, now + 0.005);
+            noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            noiseSrc.connect(noiseGain);
+            noiseGain.connect(ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + 0.08);
+            noiseSrc.start(now);
+            noiseSrc.stop(now + 0.03);
+        } else {
+            // Classic typewriter "click" : short filtered noise burst
+            var bufLen = Math.floor(ctx.sampleRate * 0.025);
+            var buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+            var data = buf.getChannelData(0);
+            for (var j = 0; j < bufLen; j++) {
+                data[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / bufLen, 3) * (0.4 + Math.random() * 0.2);
+            }
+            var src = ctx.createBufferSource();
+            src.buffer = buf;
+
+            var filter = ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(1600 + Math.random() * 400, now);
+
+            var g = ctx.createGain();
+            g.gain.setValueAtTime(masterVol, now);
+            g.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
+
+            src.connect(filter);
+            filter.connect(g);
+            g.connect(ctx.destination);
+
+            src.start(now);
+            src.stop(now + 0.025);
+        }
+    }
+
+    function toggleTypingSound() {
+        typingSoundEnabled = !typingSoundEnabled;
+        saveSettings();
+        return typingSoundEnabled;
+    }
+
+    function stopTypingSound() {
+        // No persistent sound to stop (all events are short), but keep API
     }
 
     function getMusicForPhase(themeId, musicPhase) {
@@ -653,7 +790,11 @@
         setMusicPhase: setMusicPhase,
         getMusicForPhase: getMusicForPhase,
         getCurrentMusicPhase: getCurrentMusicPhase,
-        playThemeMusic: playThemeMusic,
+         playThemeMusic: playThemeMusic,
+        setCurrentTheme: setCurrentTheme,
+        playTypingSound: playTypingSound,
+        toggleTypingSound: toggleTypingSound,
+        stopTypingSound: stopTypingSound,
         setVolume: setVolume,
         toggleMute: toggleMute,
         cycleVolume: cycleVolume,
@@ -667,5 +808,6 @@
         get isListening() { return isListening; },
         get volume() { return volume; },
         get muted() { return muted; },
+        get typingSound() { return typingSoundEnabled; },
     };
 })(typeof window !== 'undefined' ? window : global);

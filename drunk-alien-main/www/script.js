@@ -999,6 +999,7 @@ function update() {
                     if (playerState.weaponLevel > 0) {
                         playerState.weaponLevel = 0;
                         showMessageWithDuration("Basic Shot!", "", "orange", 90)
+                        if (window.DA_Audio) window.DA_Audio.sfx.vomit();
                     }
                 } else if (item.type === "beer") {
                     gameState.beerScore++;

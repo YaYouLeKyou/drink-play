@@ -439,7 +439,7 @@
         var buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
         var data = buffer.getChannelData(0);
         for (var i = 0; i < bufferSize; i++) {
-            data[i] = (Math.random() * 2 - 1) * (0.6 + 0.4 * Math.random());
+            data[i] = (Math.random() * 2 - 1) * (0.3 + 0.15 * Math.random());
         }
 
         var source = ctx.createBufferSource();
@@ -447,12 +447,11 @@
         source.loop = true;
 
         var filter = ctx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.value = 400;
-        filter.Q.value = 0.8;
+        filter.type = 'lowpass';
+        filter.frequency.value = 500;
 
         var gain = ctx.createGain();
-        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.setValueAtTime(0.1, now);
 
         source.connect(filter);
         filter.connect(gain);
@@ -460,10 +459,10 @@
         source.start(now);
 
         var crackOsc = ctx.createOscillator();
-        crackOsc.type = 'sawtooth';
-        crackOsc.frequency.setValueAtTime(180, now);
+        crackOsc.type = 'triangle';
+        crackOsc.frequency.setValueAtTime(120, now);
         var crackGain = ctx.createGain();
-        crackGain.gain.setValueAtTime(0.08, now);
+        crackGain.gain.setValueAtTime(0.03, now);
         crackOsc.connect(crackGain);
         crackGain.connect(dest);
         crackOsc.start(now);
@@ -503,9 +502,22 @@
     }
 
     function sfxBomb() {
-        playNoise(0.7, 0.4, 400);
-        playSweep(300, 20, 0.6, 'sawtooth', 0.3);
-        playSweep(150, 40, 0.5, 'square', 0.25);
+        playNoise(0.9, 0.8, 300);
+        playSweep(400, 20, 1.2, 'sawtooth', 0.5);
+        playSweep(200, 60, 0.8, 'square', 0.35);
+        setTimeout(function () {
+            playNoise(0.4, 0.3, 150);
+            playSweep(120, 300, 0.5, 'sine', 0.2);
+        }, 500);
+    }
+
+    function sfxVomit() {
+        playSweep(400, 120, 0.4, 'sawtooth', 0.2);
+        playNoise(0.3, 0.3, 200);
+        playSequence([
+            { freq: 220, dur: 0.2 },
+            { freq: 196, dur: 0.3 }
+        ], 100, 'square', 0.15);
     }
 
     function sfxExplosion() {
@@ -543,10 +555,13 @@
     }
 
     function sfxItem() {
+        playSweep(440, 1760, 0.25, 'triangle', 0.18);
         playSequence([
-            { freq: 880, dur: 0.06 },
-            { freq: 1320, dur: 0.1 }
-        ], 60, 'triangle', 0.12);
+            { freq: 523, dur: 0.06 },
+            { freq: 659, dur: 0.06 },
+            { freq: 784, dur: 0.08 },
+            { freq: 1046, dur: 0.1 }
+        ], 50, 'triangle', 0.15);
     }
 
     function sfxBossEntry() {
@@ -572,7 +587,14 @@
     }
 
     function sfxShield() {
-        playSweep(300, 900, 0.2, 'triangle', 0.12);
+        playSweep(200, 1200, 0.3, 'sine', 0.18);
+        playSequence([
+            { freq: 330, dur: 0.08 },
+            { freq: 440, dur: 0.08 },
+            { freq: 660, dur: 0.08 },
+            { freq: 880, dur: 0.08 },
+            { freq: 1320, dur: 0.2 }
+        ], 45, 'sine', 0.15);
     }
 
     /* ============================================================
@@ -614,7 +636,8 @@
             onFire: sfxOnFire,
             onFireStart: sfxOnFireStart,
             onFireStop: stopFireSound,
-            speedBoost: sfxSpeedBoost
+            speedBoost: sfxSpeedBoost,
+            vomit: sfxVomit
         },
         muteSfx: function () {
             userSfxMuted = true;
