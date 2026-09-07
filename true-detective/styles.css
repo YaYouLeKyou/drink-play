@@ -2651,7 +2651,7 @@ html {
 }
 .btn-dev {
   position: fixed;
-  top: 60px;
+    top: 116px;
   left: 20px;
   background: rgba(40, 40, 60, 0.95);
   border: 2px solid rgba(255, 200, 100, 0.7);
@@ -2664,6 +2664,12 @@ html {
   transition: all 0.3s ease;
   font-family: 'Special Elite', monospace;
   box-shadow: 0 0 10px rgba(255, 200, 100, 0.3);
+}
+
+@media (min-width: 769px) {
+    .btn-dev {
+        top: 76px;
+    }
 }
 .btn-dev:hover {
   background: rgba(60, 60, 80, 1);

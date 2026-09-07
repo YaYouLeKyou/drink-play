@@ -79,6 +79,12 @@ let questionTimerRemaining = 0;
 let questionPressureLevel = 0;
 let gameStarted = false;
 
+const APRIL_VOICE_PROFILE = {
+    rate: 1.08,
+    pitch: 1.18,
+    volume: 1.0,
+};
+
 function preloadVoices() {
     if (!window.speechSynthesis) return;
     const load = () => {
@@ -815,9 +821,9 @@ function speak(text, options = {}) {
     const isQuestion = options.question || false;
     const isAction = options.action || false;
     const isQuestionText = options.questionText || false;
-    utterance.rate = isWelcome ? 1.1 : isQuestionText ? 0.95 : isQuestion ? 1.0 : isAction ? 1.05 : 1.0;
-    utterance.pitch = isWelcome ? 1.3 : isQuestionText ? 1.1 : isQuestion ? 1.2 : isAction ? 1.15 : 1.1;
-    utterance.volume = hostVolume;
+    utterance.rate = isWelcome ? 1.12 : isQuestionText ? 0.98 : isQuestion ? 1.04 : isAction ? 1.1 : APRIL_VOICE_PROFILE.rate;
+    utterance.pitch = isWelcome ? 1.24 : isQuestionText ? 1.12 : isQuestion ? 1.18 : isAction ? 1.2 : APRIL_VOICE_PROFILE.pitch;
+    utterance.volume = hostVolume * APRIL_VOICE_PROFILE.volume;
     isSpeaking = true;
     utterance.onend = () => { isSpeaking = false; };
     utterance.onerror = () => { isSpeaking = false; };

@@ -458,7 +458,12 @@
             return v.lang.startsWith(profile.lang.split('-')[0]);
         });
         var pool = sameLang.length ? sameLang : voices;
-        return pool.find(function (v) { return hintRegex.test(v.name); }) || pool[0] || null;
+        var genderRegex = profile.gender === 'female'
+            ? /female|woman|girl|samantha|victoria|karen|moira|fiona|tessa|alice|emma|sophie|audrey/i
+            : /male|man|david|alex|daniel|mark|james|paul|george|francois|pascal|cyprien/i;
+        var genderPool = pool.filter(function (v) { return genderRegex.test(v.name); });
+        var preferredPool = genderPool.length ? genderPool : pool;
+        return preferredPool.find(function (v) { return hintRegex.test(v.name); }) || preferredPool[0] || null;
     }
 
     function startListening(onResult, onError) {
@@ -547,6 +552,13 @@
     function isCyberpunkTheme() {
         var id = (currentTheme || '').toLowerCase();
         return id === 'cyberpunk' || id === 'sci-fi' || id === 'sf';
+    }
+
+    function getTypingSoundProfile() {
+        var id = (currentTheme || '').toLowerCase();
+        if (isCyberpunkTheme()) return 'cyberpunk';
+        if (id === 'film-noir' || id === 'noir') return 'film-noir';
+        return 'classic';
     }
 
     /* ---- Fallback typewriter : clic WAV généré à la volée (data URI),
@@ -654,7 +666,8 @@
         }
         typingSilentCalls = 0;
 
-        var cyber = isCyberpunkTheme();
+        var profile = getTypingSoundProfile();
+        var cyber = profile === 'cyberpunk';
         var now = ctx.currentTime;
         var masterVol = volume * 0.5;
 
@@ -694,7 +707,7 @@
             noiseSrc.start(now);
             noiseSrc.stop(now + 0.03);
         } else {
-            // Classic typewriter "click" : short filtered noise burst
+            // Mechanical profiles: classic is crisp, film noir is lower and softer.
             // + a low tonal "thock" (striking key / carriage) for realism
             var bufLen = Math.floor(ctx.sampleRate * 0.025);
             var buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
@@ -707,11 +720,12 @@
 
             var filter = ctx.createBiquadFilter();
             filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(1600 + Math.random() * 400, now);
+            var noir = profile === 'film-noir';
+            filter.frequency.setValueAtTime(noir ? 950 + Math.random() * 250 : 1600 + Math.random() * 400, now);
 
             var g = ctx.createGain();
-            g.gain.setValueAtTime(masterVol, now);
-            g.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
+            g.gain.setValueAtTime(masterVol * (noir ? 0.72 : 1), now);
+            g.gain.exponentialRampToValueAtTime(0.0001, now + (noir ? 0.035 : 0.025));
 
             src.connect(filter);
             filter.connect(g);
@@ -724,14 +738,14 @@
                frappe pour un rendu mécanique naturel */
             var thock = ctx.createOscillator();
             thock.type = 'triangle';
-            var thockFreq = 140 + Math.random() * 70;
+            var thockFreq = noir ? 95 + Math.random() * 40 : 140 + Math.random() * 70;
             thock.frequency.setValueAtTime(thockFreq, now);
-            thock.frequency.exponentialRampToValueAtTime(thockFreq * 0.55, now + 0.05);
+            thock.frequency.exponentialRampToValueAtTime(thockFreq * 0.55, now + (noir ? 0.07 : 0.05));
 
             var thockGain = ctx.createGain();
             thockGain.gain.setValueAtTime(0.001, now);
-            thockGain.gain.linearRampToValueAtTime(masterVol * 0.5, now + 0.004);
-            thockGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+            thockGain.gain.linearRampToValueAtTime(masterVol * (noir ? 0.38 : 0.5), now + 0.004);
+            thockGain.gain.exponentialRampToValueAtTime(0.0001, now + (noir ? 0.09 : 0.06));
 
             thock.connect(thockGain);
             thockGain.connect(ctx.destination);

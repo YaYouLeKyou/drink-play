@@ -939,13 +939,18 @@ function pickCowboyVoice() {
 
     const sameLang = voices.filter(v => v.lang.startsWith(targetLang.split('-')[0]));
     const pool = sameLang.length ? sameLang : voices;
+    const genderPattern = profile && profile.gender === 'female'
+        ? /female|woman|girl|samantha|victoria|karen|moira|fiona|tessa|alice|emma|sophie/i
+        : /male|man|david|alex|daniel|mark|james|paul|george/i;
+    const genderPool = pool.filter(v => genderPattern.test(v.name));
+    const preferredPool = genderPool.length ? genderPool : pool;
 
-    const preferred = pool.find(v => new RegExp(hint, 'i').test(v.name));
+    const preferred = preferredPool.find(v => new RegExp(hint, 'i').test(v.name));
     if (preferred) return preferred;
 
-    return pool.find(v => v.lang === targetLang) ||
-           pool.find(v => /en-US|en-GB|en-AU|fr-FR|es-ES|it-IT/i.test(v.lang)) ||
-           pool[0] || null;
+    return preferredPool.find(v => v.lang === targetLang) ||
+           preferredPool.find(v => /en-US|en-GB|en-AU|fr-FR|es-ES|it-IT/i.test(v.lang)) ||
+           preferredPool[0] || null;
 }
 
 function speakCowboy(text) {
