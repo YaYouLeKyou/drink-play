@@ -318,6 +318,7 @@
         } catch (e) {
             console.warn('[AudioService] Failed to load settings:', e.message);
         }
+        console.info('[AudioService] Typewriter sound:', typingSoundEnabled ? 'activé' : 'DÉSACTIVÉ (bouton ⌨️ de la barre du haut)', '| muted:', muted);
     }
 
     function loadVoices() {
@@ -548,8 +549,46 @@
         return id === 'cyberpunk' || id === 'sci-fi' || id === 'sf';
     }
 
-    function ensureTypingCtx() {
-        if (!typingCtx) {
+    /* ---- Fallback typewriter : clic WAV généré à la volée (data URI),
+       joué via <audio> si le Web Audio API reste bloqué par le navigateur */
+    var typingFallbackMode = false;
+    var typingSilentCalls = 0;
+    var typingFallbackUri = null;
+
+    function buildClickWavUri() {
+        var sampleRate = 8000;
+        var n = Math.floor(sampleRate * 0.04); /* 40 ms */
+        var bytes = new Uint8Array(44 + n * 2);
+        function wstr(o, s) { for (var i = 0; i < s.length; i++) bytes[o + i] = s.charCodeAt(i); }
+        function w32(o, v) { bytes[o] = v & 255; bytes[o + 1] = (v >> 8) & 255; bytes[o + 2] = (v >> 16) & 255; bytes[o + 3] = (v >>> 24) & 255; }
+        function w16(o, v) { bytes[o] = v & 255; bytes[o + 1] = (v >> 8) & 255; }
+        wstr(0, 'RIFF'); w32(4, 36 + n * 2); wstr(8, 'WAVE');
+        wstr(12, 'fmt '); w32(16, 16); w16(20, 1); w16(22, 1);
+        w32(24, sampleRate); w32(28, sampleRate * 2); w16(32, 2); w16(34, 16);
+        wstr(36, 'data'); w32(40, n * 2);
+        for (var i = 0; i < n; i++) {
+            var t = i / n;
+            var env = Math.pow(1 - t, 3);
+            var noise = Math.random() * 2 - 1;
+            var tone = Math.sin(2 * Math.PI * 170 * (i / sampleRate)) * 0.6;
+            var v = Math.max(-1, Math.min(1, (noise * 0.7 + tone) * env * 0.9));
+            w16(44 + i * 2, Math.round(v * 32767));
+        }
+        var bin = '';
+        for (var b = 0; b < bytes.length; b++) bin += String.fromCharCode(bytes[b]);
+        return 'data:audio/wav;base64,' + btoa(bin);
+    }
+
+    function playTypingFallback() {
+        try {
+            if (!typingFallbackUri) typingFallbackUri = buildClickWavUri();
+            var a = new Audio(typingFallbackUri);
+            a.volume = Math.max(0.05, Math.min(1, volume * 0.45));
+            a.play().catch(function () { /* gestes requis — ignoré */ });
+        } catch (e) { /* ignore */ }
+    }
+
+    function ensureTypingCtx() {        if (!typingCtx) {
             try {
                 typingCtx = new (global.AudioContext || global.webkitAudioContext)();
             } catch (e) {
@@ -594,11 +633,26 @@
 
     function playTypingSound() {
         if (!typingSoundEnabled || muted) return;
+
+        /* Fallback HTMLAudio : si le Web Audio reste bloqué (autoplay policy,
+           navigateur capricieux), on joue un clic WAV généré via <audio>,
+           autorisé dès que l'utilisateur a interagi avec la page. */
+        if (typingFallbackMode) {
+            playTypingFallback();
+            return;
+        }
+
         var ctx = ensureTypingCtx();
-        if (!ctx) return;
-        // Un contexte suspendu (autoplay policy) ne produit aucun son :
-        // on tente une reprise, et on réessaie au caractère suivant.
-        if (ctx.state !== 'running') { return; }
+        if (!ctx || ctx.state !== 'running') {
+            typingSilentCalls++;
+            if (typingSilentCalls >= 10) {
+                typingFallbackMode = true;
+                console.info('[AudioService] Typewriter: Web Audio bloqué, bascule sur le fallback HTMLAudio');
+                playTypingFallback();
+            }
+            return;
+        }
+        typingSilentCalls = 0;
 
         var cyber = isCyberpunkTheme();
         var now = ctx.currentTime;
