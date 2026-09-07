@@ -3807,3 +3807,87 @@ html {
     opacity: 0.7;
     display: block;
 }
+
+/* Final mobile overrides: keep touch targets and evidence dialogs usable. */
+@media (max-width: 480px) {
+    .minigame-screen {
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 56px 8px 8px;
+    }
+
+    .minigame-screen-container,
+    .minigame-screen-content,
+    .minigame-layer .minigame-content,
+    .minigame-page .minigame-content {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+
+    .minigame-screen-content,
+    .minigame-layer .minigame-content,
+    .minigame-page .minigame-content {
+        max-height: calc(100vh - 72px);
+        overflow-y: auto;
+        padding: 12px 10px calc(24px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .minigame-content.scene-wide {
+        width: 100%;
+    }
+
+    .fouille-zone,
+    .fouille-spot.thermo {
+        width: 44px;
+        height: 44px;
+        margin: -22px 0 0 -22px;
+        line-height: 40px;
+    }
+
+    .zone-window {
+        left: 50% !important;
+        top: 8% !important;
+        width: 88% !important;
+        max-width: 88% !important;
+        max-height: 80%;
+        overflow-y: auto;
+        box-sizing: border-box;
+        padding: 14px;
+    }
+
+    .reseau-alibis-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .coffre-numpad {
+        width: min(100%, 260px);
+        gap: 8px;
+    }
+
+    .coffre-key {
+        min-height: 52px;
+        padding: 12px 0;
+    }
+
+    .note-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 5px;
+    }
+
+    .note-row label {
+        min-width: 0;
+    }
+
+    .note-btn-row {
+        flex-direction: column;
+    }
+
+    .note-btn-row .btn {
+        width: 100%;
+        margin: 0;
+    }
+}
