@@ -583,7 +583,7 @@
             var env = Math.pow(1 - t, 3);
             var noise = Math.random() * 2 - 1;
             var tone = Math.sin(2 * Math.PI * 170 * (i / sampleRate)) * 0.6;
-            var v = Math.max(-1, Math.min(1, (noise * 0.7 + tone) * env * 0.9));
+            var v = Math.max(-1, Math.min(1, (noise * 0.35 + tone * 0.35) * env * 0.55));
             w16(44 + i * 2, Math.round(v * 32767));
         }
         var bin = '';
@@ -595,7 +595,7 @@
         try {
             if (!typingFallbackUri) typingFallbackUri = buildClickWavUri();
             var a = new Audio(typingFallbackUri);
-            a.volume = Math.max(0.05, Math.min(1, volume * 0.45));
+            a.volume = Math.max(0.02, Math.min(1, volume * 0.2));
             a.play().catch(function () { /* gestes requis — ignoré */ });
         } catch (e) { /* ignore */ }
     }
@@ -669,33 +669,32 @@
         var profile = getTypingSoundProfile();
         var cyber = profile === 'cyberpunk';
         var now = ctx.currentTime;
-        var masterVol = volume * 0.5;
+        var masterVol = volume * 0.24;
 
         if (cyber) {
-            // Futuristic computer "blip" : short descending oscillator with
-            // subtle noise crackle and a tiny reverb tail
+            // Soft futuristic key tone: rounded rather than a sharp alert.
             var osc = ctx.createOscillator();
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(900 + Math.random() * 200, now);
-            osc.frequency.exponentialRampToValueAtTime(220 + Math.random() * 100, now + 0.06);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(620 + Math.random() * 120, now);
+            osc.frequency.exponentialRampToValueAtTime(260 + Math.random() * 70, now + 0.1);
 
             var gain = ctx.createGain();
             gain.gain.setValueAtTime(0.001, now);
-            gain.gain.linearRampToValueAtTime(masterVol, now + 0.005);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+            gain.gain.linearRampToValueAtTime(masterVol * 0.8, now + 0.018);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
 
             // Noise crackle for texture
-            var noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.03, ctx.sampleRate);
+            var noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.04, ctx.sampleRate);
             var d = noiseBuf.getChannelData(0);
             for (var i = 0; i < d.length; i++) {
-                d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 4);
+                d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 5) * 0.25;
             }
             var noiseSrc = ctx.createBufferSource();
             noiseSrc.buffer = noiseBuf;
             var noiseGain = ctx.createGain();
             noiseGain.gain.setValueAtTime(0.001, now);
-            noiseGain.gain.linearRampToValueAtTime(masterVol * 0.3, now + 0.005);
-            noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
+            noiseGain.gain.linearRampToValueAtTime(masterVol * 0.12, now + 0.018);
+            noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
 
             osc.connect(gain);
             gain.connect(ctx.destination);
@@ -703,9 +702,9 @@
             noiseGain.connect(ctx.destination);
 
             osc.start(now);
-            osc.stop(now + 0.08);
+            osc.stop(now + 0.13);
             noiseSrc.start(now);
-            noiseSrc.stop(now + 0.03);
+            noiseSrc.stop(now + 0.04);
         } else {
             // Mechanical profiles: classic is crisp, film noir is lower and softer.
             // + a low tonal "thock" (striking key / carriage) for realism
@@ -713,7 +712,7 @@
             var buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
             var data = buf.getChannelData(0);
             for (var j = 0; j < bufLen; j++) {
-                data[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / bufLen, 3) * (0.4 + Math.random() * 0.2);
+                data[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / bufLen, 3) * (0.16 + Math.random() * 0.08);
             }
             var src = ctx.createBufferSource();
             src.buffer = buf;
@@ -724,8 +723,8 @@
             filter.frequency.setValueAtTime(noir ? 950 + Math.random() * 250 : 1600 + Math.random() * 400, now);
 
             var g = ctx.createGain();
-            g.gain.setValueAtTime(masterVol * (noir ? 0.72 : 1), now);
-            g.gain.exponentialRampToValueAtTime(0.0001, now + (noir ? 0.035 : 0.025));
+            g.gain.setValueAtTime(masterVol * (noir ? 0.52 : 0.68), now);
+            g.gain.exponentialRampToValueAtTime(0.0001, now + (noir ? 0.05 : 0.04));
 
             src.connect(filter);
             filter.connect(g);
@@ -744,8 +743,8 @@
 
             var thockGain = ctx.createGain();
             thockGain.gain.setValueAtTime(0.001, now);
-            thockGain.gain.linearRampToValueAtTime(masterVol * (noir ? 0.38 : 0.5), now + 0.004);
-            thockGain.gain.exponentialRampToValueAtTime(0.0001, now + (noir ? 0.09 : 0.06));
+            thockGain.gain.linearRampToValueAtTime(masterVol * (noir ? 0.22 : 0.3), now + 0.012);
+            thockGain.gain.exponentialRampToValueAtTime(0.0001, now + (noir ? 0.11 : 0.08));
 
             thock.connect(thockGain);
             thockGain.connect(ctx.destination);
