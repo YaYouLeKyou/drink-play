@@ -479,8 +479,8 @@ input:hover {
 
 .dev-contact-btn {
     position: fixed;
-    bottom: 16px;
-    right: 16px;
+    top: 16px;
+    left: 16px;
     font-size: 1.4rem;
     text-decoration: none;
     opacity: 0.5;
