@@ -1718,7 +1718,10 @@ langEnBtn: document.getElementById('lang-en'),
 
         $.choicesContainer.innerHTML = '';
         $.conversationInput.classList.add('hidden');
-        $.continueBtn.classList.add('hidden');
+        if (!isMobile()) {
+            $.continueBtn.classList.add('hidden');
+        }
+        $.continueBtn.disabled = false;
         $.continueBtn.onclick = null;
         $.npcName.textContent = '';
         hideNPC();
@@ -1773,7 +1776,9 @@ langEnBtn: document.getElementById('lang-en'),
         }
 
         ui.isWaiting = true;
-        $.continueBtn.classList.add('hidden');
+        if (!isMobile()) {
+            $.continueBtn.classList.add('hidden');
+        }
 
         if (TDAudioService) {
             TDAudioService.stopSpeaking();
@@ -3153,7 +3158,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         scr.awaitingChoice = false;
         $.choicesContainer.innerHTML = '';
         $.conversationInput.classList.add('hidden');
-        $.continueBtn.classList.add('hidden');
+        if (!isMobile()) {
+            $.continueBtn.classList.add('hidden');
+        }
         $.continueBtn.disabled = false;
         $.continueBtn.onclick = null;
         $.npcName.textContent = '';
@@ -3384,9 +3391,11 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         scr.interro = { id: interroId, round: 0, done: false };
         // « Continuer » reste à l'écran mais reste inactif pendant l'interrogatoire
         $.continueBtn.classList.remove('hidden');
-        $.continueBtn.disabled = true;
+        $.continueBtn.disabled = !isMobile();
         $.continueBtn.textContent = getText('continue') || 'Continuer';
-        $.continueBtn.onclick = null;
+        if (!isMobile()) {
+            $.continueBtn.onclick = null;
+        }
         scrShowInterroAskButton();
     }
 
@@ -3602,9 +3611,11 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                         s.prochainSuspect = suspectId;
                         scr.interro = { id: suspectId, round: 0, done: false };
                         $.continueBtn.classList.remove('hidden');
-                        $.continueBtn.disabled = true;
+                        $.continueBtn.disabled = !isMobile();
                         $.continueBtn.textContent = getText('continue') || 'Continuer';
-                        $.continueBtn.onclick = null;
+                        if (!isMobile()) {
+                            $.continueBtn.onclick = null;
+                        }
                         scrShowInterroAskButton();
                     });
                     $.choicesContainer.appendChild(btn);
@@ -3669,9 +3680,11 @@ function scrApplyChoice(choiceKey, choiceId) {
             s.reinterroges.push(choiceId);
             scr.interro = { id: choiceId, round: 0, done: false };
             $.continueBtn.classList.remove('hidden');
-            $.continueBtn.disabled = true;
+            $.continueBtn.disabled = !isMobile();
             $.continueBtn.textContent = getText('continue') || 'Continuer';
-            $.continueBtn.onclick = null;
+            if (!isMobile()) {
+                $.continueBtn.onclick = null;
+            }
             scrShowInterroAskButton();
         } else if (choiceKey === 'accuser') {
             s.accused = choiceId;
