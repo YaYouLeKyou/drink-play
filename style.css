@@ -476,3 +476,19 @@ input:hover {
         opacity: 1;
     }
 }
+
+.dev-contact-btn {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    font-size: 1.4rem;
+    text-decoration: none;
+    opacity: 0.5;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 999;
+    line-height: 1;
+}
+.dev-contact-btn:hover {
+    opacity: 1;
+    transform: scale(1.15);
+}
