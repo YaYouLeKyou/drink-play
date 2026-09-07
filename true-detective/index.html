@@ -12,19 +12,21 @@
     <body>
         <!-- ===== HOME / SPLASH SCREEN ===== -->
         <section id="home-screen" class="screen active">
+            <header class="mobile-header">
+                <button id="hub-btn" class="btn btn-icon btn-back-to-hub" title="Retour au hub">🏠</button>
+                <div class="lang-toggle">
+                    <button id="lang-en-home" class="lang-btn active-lang" title="English">EN</button>
+                    <button id="lang-fr-home" class="lang-btn" title="Français">FR</button>
+                </div>
+            </header>
             <div class="home-content">
                 <img id="cover-image" class="cover-image" src="assets/true-detective.png" alt="True Detective">
                 <div class="home-title">
                     <h1>True Detective</h1>
                 </div>
                 <p class="home-subtitle">Enquête détective interactive avec IA. 8 univers, PNJ dynamiques et narration vocale.</p>
-                <div class="lang-toggle">
-                    <button id="lang-en-home" class="lang-btn active-lang" title="English">EN</button>
-                    <button id="lang-fr-home" class="lang-btn" title="Français">FR</button>
-                </div>
                 <button id="start-btn" class="start-btn">Commencer l'enquête</button>
             </div>
-            <button id="hub-btn" class="btn btn-hub">🏠 Hub Central</button>
             <button id="dev-btn" class="btn btn-dev">🛠️ Dev</button>
         </section>
 
@@ -84,7 +86,7 @@
             <div class="top-bar-left">
                 <span class="act-indicator">Act <span id="current-act">1</span> / 3</span>
                 <span class="scene-indicator">Scene <span id="current-scene">1</span></span>
-                <span class="clue-indicator" id="clue-indicator" style="display:none;">🕵︝ Clues: <span id="clues-count">0</span></span>
+                <span class="clue-indicator" id="clue-indicator" style="display:none;">🕵️ Clues: <span id="clues-count">0</span></span>
             </div>
             <div class="top-bar-right">
                 <div class="lang-selector" id="lang-selector">
@@ -103,36 +105,42 @@
             </div>
         </div>
 
-        <div class="bg-layer" id="bg-layer"></div>
-        <div class="bg-overlay"></div>
+        <div class="game-mobile-layout">
+            <div class="dialogue-container">
+                <div class="objective-display" id="objective-display">
+                    <span class="objective-icon" id="objective-icon">🎯</span>
+                    <span class="objective-text" id="objective-text"></span>
+                </div>
+                <div class="npc-name-display" id="npc-name"></div>
+                <div class="dialogue-box">
+                    <span id="dialogue-text" class="dialogue-text"></span>
+                    <span class="typewriter-cursor" id="type-cursor">|</span>
+                </div>
+                <div class="page-nav" id="page-nav">
+                    <div class="page-dot active" data-page="1"></div>
+                    <div class="page-dot" data-page="2"></div>
+                    <div class="page-dot" data-page="3"></div>
+                </div>
+                <div class="dialogue-history" id="dialogue-history"></div>
+                <div class="choices-container" id="choices-container"></div>
+                <button class="btn btn-continue always-active" id="continue-btn">Continue</button>
+                <div class="conversation-input hidden" id="conversation-input">
+                    <input type="text" id="player-text" class="player-text-input" placeholder="Ask the NPC something..." maxlength="200" autocomplete="off">
+                    <button id="send-btn" class="btn btn-send">Send</button>
+                </div>
+            </div>
 
-        <div class="character-layer" id="character-layer">
-            <img id="npc-image" class="npc-image" src="" alt="NPC Character">
+            <div class="game-visuals">
+                <div class="bg-layer" id="bg-layer"></div>
+                <div class="bg-overlay"></div>
+                <div class="character-layer" id="character-layer">
+                    <img id="npc-image" class="npc-image" src="" alt="NPC Character">
+                </div>
+            </div>
         </div>
 
-        <div class="dialogue-container">
-            <div class="objective-display" id="objective-display">
-                <span class="objective-icon" id="objective-icon">🎯</span>
-                <span class="objective-text" id="objective-text"></span>
-            </div>
-            <div class="npc-name-display" id="npc-name"></div>
-            <div class="dialogue-box">
-                <span id="dialogue-text" class="dialogue-text"></span>
-                <span class="typewriter-cursor" id="type-cursor">|</span>
-            </div>
-            <div class="page-nav" id="page-nav">
-                <div class="page-dot active" data-page="1"></div>
-                <div class="page-dot" data-page="2"></div>
-                <div class="page-dot" data-page="3"></div>
-            </div>
-            <div class="dialogue-history" id="dialogue-history"></div>
-            <div class="choices-container" id="choices-container"></div>
-            <button class="btn btn-continue hidden" id="continue-btn">Continue</button>
-            <div class="conversation-input hidden" id="conversation-input">
-                <input type="text" id="player-text" class="player-text-input" placeholder="Ask the NPC something..." maxlength="200" autocomplete="off">
-                <button id="send-btn" class="btn btn-send">Send</button>
-            </div>
-        </div>
+        <button class="btn btn-continue always-active mobile-continue-btn" id="mobile-continue-btn">Continue</button>
+    </section>
 
         <!-- ===== ACT PAGE OVERLAY ===== -->
         <div id="act-page-overlay" class="act-page-overlay">

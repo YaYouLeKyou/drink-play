@@ -1,6 +1,10 @@
 ﻿(function () {
     'use strict';
 
+    function isMobile() {
+        return window.innerWidth <= 768;
+    }
+
     var THEMES = [
         { id: 'agatha-christie', name: 'Classic', emoji: '🏚️', desc: 'Scénario complet', category: 'classic' },
         { id: 'sherlock-holmes', name: 'Sherlock Holmes', emoji: '🔍', desc: 'Londres 19e siècle', category: 'classic' },
@@ -1462,7 +1466,7 @@ langEnBtn: document.getElementById('lang-en'),
     function renderPageContent(pageData, pageNumber, sceneData) {
         $.choicesContainer.innerHTML = '';
         $.conversationInput.classList.add('hidden');
-        $.continueBtn.classList.add('hidden');
+        $.continueBtn.classList.remove('hidden');
         $.npcName.textContent = '';
 
         updatePageDots();
@@ -1471,7 +1475,17 @@ langEnBtn: document.getElementById('lang-en'),
             $.continueBtn.classList.remove('hidden');
             $.continueBtn.textContent = getText('nextPage') || 'Next';
         } else {
-            $.continueBtn.classList.add('hidden');
+            if (!isMobile()) {
+                $.continueBtn.classList.add('hidden');
+            }
+            $.continueBtn.textContent = getText('continue') || 'Continue';
+        }
+
+        $.continueBtn.disabled = pageNumber >= ui.totalPages && !isMobile();
+        if (!isMobile()) {
+            $.continueBtn.onclick = pageNumber < ui.totalPages ? handleContinue : null;
+        } else {
+            $.continueBtn.onclick = handleContinue;
         }
 
         var themeId = getThemeId();
@@ -1647,7 +1661,9 @@ langEnBtn: document.getElementById('lang-en'),
         $.npcName.textContent = '';
         hideNPC();
         clearDialogueHistory();
-        $.continueBtn.classList.add('hidden');
+        if (!isMobile()) {
+            $.continueBtn.classList.add('hidden');
+        }
         $.continueBtn.onclick = null;
 
         updatePageDots();
