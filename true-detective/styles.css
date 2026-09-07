@@ -917,6 +917,11 @@ html {
     opacity: 0.45;
 }
 
+.btn-continue {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
 /* Animation "s'allume" - le bouton pulse quand il est cliquable */
 @keyframes btn-glow-pulse {
     0%, 100% { box-shadow: 0 0 8px rgba(0, 255, 0, 0.4), 0 0 16px rgba(0, 255, 0, 0.2); }
@@ -3063,6 +3068,17 @@ html {
         padding-top: 60px;
     }
 
+    /* Positionnement du lecteur musique (#dp-music-player) */
+    #dp-music-player {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        width: 100%;
+        height: 50px;
+        background: linear-gradient(to bottom, rgba(0, 0, 10, 0.9) 0%, transparent 100%);
+    }
+
     /* Lang-toggle remonté pour ne pas chevaucher le lecteur */
     .lang-toggle {
         top: 55px;
@@ -3078,7 +3094,7 @@ html {
         display: flex;
         flex-direction: column;
         position: fixed;
-        top: 0;
+        top: 60px;
         left: 0;
         width: 100%;
         height: 100%;
