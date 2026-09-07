@@ -339,6 +339,18 @@ html {
     box-sizing: border-box;
 }
 
+.screen {
+    padding-top: 56px;
+}
+
+.mobile-header {
+    top: 56px;
+}
+
+.top-bar {
+    top: 56px;
+}
+
 .screen.active {
     opacity: 1;
     visibility: visible;
@@ -1022,9 +1034,33 @@ html {
     width: 42px;
     height: 42px;
     padding: 0;
-    font-size: 1.1em;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.15em;
+    font-weight: 600;
+    line-height: 1;
     border-radius: 50%;
     justify-content: center;
+}
+
+.top-bar-right .btn-icon {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    color: #d9fbff;
+    background: rgba(6, 25, 40, 0.72);
+}
+
+.top-bar-right .btn-icon:hover,
+.top-bar-right .btn-icon:focus-visible {
+    color: #ffffff;
+    background: rgba(0, 202, 210, 0.28);
+}
+
+.top-bar-right .btn-icon.voice-recording {
+    color: #ffb4b4;
+    border-color: rgba(255, 100, 100, 0.75);
+    background: rgba(125, 20, 30, 0.4);
 }
 
 .btn-icon-small {

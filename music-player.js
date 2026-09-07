@@ -175,16 +175,19 @@
     var prevBtn = document.createElement('button');
     prevBtn.className = 'dp-music-btn';
     prevBtn.title = 'Previous track';
+    prevBtn.setAttribute('aria-label', 'Previous track');
     prevBtn.textContent = '⏮';
 
     var playBtn = document.createElement('button');
     playBtn.className = 'dp-music-btn dp-music-play';
     playBtn.title = 'Play / Pause';
+    playBtn.setAttribute('aria-label', 'Play or pause music');
     playBtn.textContent = '▶';
 
     var nextBtn = document.createElement('button');
     nextBtn.className = 'dp-music-btn';
     nextBtn.title = 'Next track';
+    nextBtn.setAttribute('aria-label', 'Next track');
     nextBtn.textContent = '⏭';
 
     var volumeEl = document.createElement('input');
@@ -205,22 +208,27 @@
     style.textContent = [
         '#dp-music-player {',
         '    position: fixed;',
-        '    bottom: 16px;',
-        '    right: 16px;',
-        '    z-index: 9999;',
+        '    top: 0;',
+        '    left: 0;',
+        '    width: 100%;',
+        '    min-height: 56px;',
+        '    box-sizing: border-box;',
+        '    justify-content: center;',
+        '    transform: none;',
+        '    z-index: 11000;',
         '    display: flex;',
         '    align-items: center;',
         '    gap: 6px;',
         '    padding: 8px 12px;',
         '    background: rgba(15, 15, 25, 0.82);',
         '    border: 1px solid rgba(255, 255, 255, 0.18);',
-        '    border-radius: 999px;',
+        '    border-radius: 0;',
         '    backdrop-filter: blur(8px);',
         '    -webkit-backdrop-filter: blur(8px);',
         '    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);',
         '    color: #fff;',
         '    font-family: inherit;',
-        '    max-width: min(92vw, 420px);',
+        '    max-width: none;',
         '}',
         '#dp-music-player .dp-music-title {',
         '    font-size: 13px;',
@@ -250,17 +258,16 @@
         '}',
         '#dp-music-player .dp-music-volume {',
         '    width: 70px;',
+        '    height: 20px;',
+        '    flex: 0 0 auto;',
         '    accent-color: #7ec8ff;',
         '    cursor: pointer;',
         '}',
         '@media (max-width: 768px) {',
         '    #dp-music-player {',
-        '        bottom: auto;',
-        '        top: 8px;',
-        '        right: auto;',
-        '        left: 50%;',
-        '        transform: translateX(-50%);',
-        '        max-width: calc(100vw - 24px);',
+        '        top: 0;',
+        '        min-height: 56px;',
+        '        max-width: none;',
         '        padding: 6px 10px;',
         '    }',
         '    #dp-music-player .dp-music-title { max-width: 90px; }',
@@ -270,7 +277,7 @@
     document.head.appendChild(style);
 
     function updateTitle() {
-        titleEl.textContent = '🎵 ' + trackLabel(PLAYLIST[currentIndex]);
+        titleEl.textContent = '♪ ' + trackLabel(PLAYLIST[currentIndex]);
     }
 
     function updatePlayButton() {

@@ -282,6 +282,7 @@ langEnBtn: document.getElementById('lang-en'),
         objectiveText: document.getElementById('objective-text'),
         dialogueHistory: document.getElementById('dialogue-history'),
         continueBtn: document.getElementById('continue-btn'),
+        mobileContinueBtn: document.getElementById('mobile-continue-btn'),
         pageNav: document.getElementById('page-nav'),
         notebook: document.getElementById('notebook'),
         closeNotebookBtn: document.getElementById('close-notebook'),
@@ -348,6 +349,10 @@ langEnBtn: document.getElementById('lang-en'),
         })(),
     };
 
+    var _typeWriterTimeout = null;
+    var _typeWriterCallback = null;
+    var _currentDialogue = '';
+
     function getText(key) {
         var langTexts = TEXTS[ui.language] || TEXTS.en;
         return langTexts[key] || key;
@@ -381,10 +386,12 @@ langEnBtn: document.getElementById('lang-en'),
         if (!$.voiceBtn) return;
         if (ui.voiceInputEnabled) {
             $.voiceBtn.classList.remove('voice-disabled');
-            $.voiceBtn.title = 'Voice Input';
+            $.voiceBtn.title = 'Saisie vocale';
+            $.voiceBtn.setAttribute('aria-label', 'Activer la saisie vocale');
         } else {
             $.voiceBtn.classList.add('voice-disabled');
-            $.voiceBtn.title = 'Voice Input (disabled - enable in dev settings)';
+            $.voiceBtn.title = 'Saisie vocale désactivée : activez-la dans les réglages développeur';
+            $.voiceBtn.setAttribute('aria-label', 'Saisie vocale désactivée');
         }
     }
 
@@ -533,6 +540,10 @@ langEnBtn: document.getElementById('lang-en'),
 
         if ($.startGameBtn) {
             $.startGameBtn.addEventListener('click', startGameFromConfig);
+        }
+
+        if ($.mobileContinueBtn) {
+            $.mobileContinueBtn.addEventListener('click', handleContinue);
         }
 
         if ($.sendBtn) {
@@ -1467,6 +1478,9 @@ langEnBtn: document.getElementById('lang-en'),
         $.choicesContainer.innerHTML = '';
         $.conversationInput.classList.add('hidden');
         $.continueBtn.classList.remove('hidden');
+        if ($.mobileContinueBtn) {
+            $.mobileContinueBtn.classList.remove('hidden');
+        }
         $.npcName.textContent = '';
 
         updatePageDots();
@@ -1479,6 +1493,10 @@ langEnBtn: document.getElementById('lang-en'),
                 $.continueBtn.classList.add('hidden');
             }
             $.continueBtn.textContent = getText('continue') || 'Continue';
+        }
+
+        if ($.mobileContinueBtn) {
+            $.mobileContinueBtn.textContent = $.continueBtn.textContent;
         }
 
         $.continueBtn.disabled = pageNumber >= ui.totalPages && !isMobile();
@@ -1601,88 +1619,236 @@ langEnBtn: document.getElementById('lang-en'),
         });
     }
 
-    function onPageComplete(pageNumber, sceneData) {
+    function handleContinue() {
         stopNarrationTimer();
-        ui.isTyping = false;
-        ui.skipPending = false;
-        ui.isWaiting = false;
+        if (ui.isWaiting) return;
 
-        var isNarration = sceneData.type === 'narration';
-
-        if (pageNumber < ui.totalPages) {
-            $.continueBtn.classList.remove('hidden');
-            $.continueBtn.textContent = getText('nextPage') || 'Next';
-            $.continueBtn.onclick = handleContinue;
-        } else {
-            if (isNarration) {
-                $.continueBtn.classList.remove('hidden');
-                $.continueBtn.textContent = getText('continue') || 'Continue';
-                $.continueBtn.onclick = function () {
-                    hidePageNav();
-                    if (ui._narrationCallback) {
-                        var cb = ui._narrationCallback;
-                        ui._narrationCallback = null;
-                        cb();
-                    }
-                };
-            } else if (sceneData.type === 'revelation') {
-                $.continueBtn.classList.remove('hidden');
-                $.continueBtn.textContent = getText('continue') || 'Continue';
-                $.continueBtn.onclick = handleContinue;
-            } else if (sceneData.type === 'credits') {
-                $.continueBtn.classList.remove('hidden');
-                $.continueBtn.textContent = getText('credits') || 'Credits';
-                $.continueBtn.onclick = handleContinue;
-            } else if (sceneData.type === 'puzzle' && sceneData.puzzle) {
-                renderPuzzle(sceneData.puzzle);
-            } else if (sceneData.choices && sceneData.choices.length) {
-                _currentChoices = sceneData.choices;
-                showChoices();
-            } else {
-                $.continueBtn.classList.remove('hidden');
-                $.continueBtn.textContent = getText('continue') || 'Continue';
-                $.continueBtn.onclick = handleContinue;
-            }
+        // IMMEDIATELY skip typing if active - button should always be clickable
+        if (ui.isTyping) {
+            skipTypeWriter();
         }
+
+        if (ui.currentPage < ui.totalPages) {
+            nextPage();
+            return;
+        }
+
+        ui.isWaiting = true;
+
+        if (TDAudioService) {
+            TDAudioService.stopSpeaking();
+        }
+
+        if (ui.currentSceneData && ui.currentSceneData.type === 'credits') {
+            hideLoading();
+            if (TDNarrativeEngine) {
+                var state = TDNarrativeEngine.getGameState();
+                if (state.solution) {
+                    showEndScreen(state.solution);
+                }
+            }
+            return;
+        }
+
+        advanceGameState(null)
+                .then(function (data) {
+                    ui.isWaiting = false;
+
+                    if (data.gameComplete) {
+                        showEndScreen(data.solution);
+                        return;
+                    }
+
+                    if (data.nextActTransition && data.nextActTransition !== 'null') {
+                        showTransitionToast(data.nextActTransition);
+                        setTimeout(function () {
+                            continueAfterTransition(data);
+                        }, 2000);
+                    } else {
+                        continueAfterTransition(data);
+                    }
+                })
+                .catch(function (err) {
+                    ui.isWaiting = false;
+                    showToast('Failed to continue investigation: ' + (err.message || 'Unknown error'), true);
+                });
     }
 
-    function showNarrationSequence(pages, onCompleted, musicPhase) {
-        ui.currentPage = 0;
-        ui.totalPages = pages.length;
-        ui.currentSceneData = { type: 'narration', pages: pages };
-        ui.currentSceneType = 'narration';
-        ui.isWaiting = false;
-        ui.isTyping = false;
+    function typeWriter(text, onComplete, speed) {
+        _currentDialogue = text || '';
+        _typeWriterCallback = onComplete;
+        speed = speed || ui.typingSpeed;
         ui.skipPending = false;
-        ui.puzzleData = null;
 
-        $.choicesContainer.innerHTML = '';
-        $.conversationInput.classList.add('hidden');
-        $.npcName.textContent = '';
-        hideNPC();
-        clearDialogueHistory();
-        if (!isMobile()) {
-            $.continueBtn.classList.add('hidden');
+        if (!$.dialogueText || !$.typeCursor) {
+            if (onComplete) { onComplete(); }
+            return;
         }
-        $.continueBtn.onclick = null;
 
-        updatePageDots();
-        showPageNav();
-        
-        if (musicPhase && musicPhase !== 'intro') {
-            updateMusicInfo(musicPhase, getThemeId());
-        } else if (musicPhase === 'intro') {
-            var themeObj = THEMES.find(function (t) { return t.id === getThemeId(); }) || {};
-            if ($.musicInfo) {
-                $.musicInfo.textContent = '🎵 ' + (themeObj.name || 'Intro');
+        // Effet machine à écrire avec skip au clic
+        $.dialogueText.textContent = '';
+        $.typeCursor.classList.remove('hidden');
+        ui.isTyping = true;
+        var i = 0;
+
+        function typeChar() {
+            if (ui.skipPending) {
+                // Already handled by skipTypeWriter — do nothing to avoid double-callback
+                return;
             }
-        } else {
-            updateMusicInfo('investigation', getThemeId());
+
+            if (i < text.length) {
+                $.dialogueText.textContent += text.charAt(i);
+                i++;
+                if (TDAudioService && typeof TDAudioService.playTypingSound === 'function' && TDAudioService.typingSound) {
+                    TDAudioService.playTypingSound();
+                }
+                _typeWriterTimeout = setTimeout(typeChar, speed);
+            } else {
+                ui.isTyping = false;
+                $.typeCursor.classList.add('hidden');
+                _typeWriterCallback = null;
+                if (onComplete) { onComplete(); }
+            }
         }
 
-        goToPage(1);
+        typeChar();
+    }
 
-        ui._narrationCallback = onCompleted;
+    function getCurrentSceneText() {
+        return _currentDialogue || ($.dialogueText ? $.dialogueText.textContent : '');
+    }
+
+    function showChoices() {
+        $.choicesContainer.innerHTML = '';
+
+        var choices = getCurrentChoices() || [];
+        if (!choices || choices.length === 0) {
+            choices = [getText('skip') || 'Continue'];
+        }
+
+        choices.forEach(function (choice) {
+            var btn = document.createElement('button');
+            btn.className = 'btn btn-choice';
+            btn.textContent = choice;
+            btn.addEventListener('click', function () {
+                handleChoice(choice);
+            });
+            $.choicesContainer.appendChild(btn);
+        });
+    }
+
+    var _currentChoices = [];
+
+    function getCurrentChoices() {
+        return _currentChoices;
+    }
+
+    function handleChoice(choice) {
+        if (ui.isWaiting || ui.isTyping) return;
+        ui.isWaiting = true;
+        ui.isTyping = false;
+        stopNarrationTimer();
+        clearTypeWriter();
+
+        if (TDAudioService) {
+            TDAudioService.stopSpeaking();
+        }
+
+        advanceGameState(choice)
+                .then(function (data) {
+                    ui.isWaiting = false;
+
+                    if (data.gameComplete) {
+                        showEndScreen(data.solution);
+                        return;
+                    }
+
+                    if (data.nextActTransition && data.nextActTransition !== 'null') {
+                        showTransitionToast(data.nextActTransition);
+                    }
+                    continueAfterTransition(data);
+                })
+                .catch(function (err) {
+                    ui.isWaiting = false;
+                    showToast('Failed to continue investigation: ' + (err.message || 'Unknown error'), true);
+                    setTimeout(function () { ui.isWaiting = false; }, 1000);
+                });
+    }
+
+    function advanceFallbackGameState(playerChoice) {
+        if (!ui.fallbackScript || !ui.fallbackScript.acts) {
+            return Promise.reject(new Error('No fallback script'));
+        }
+
+        var acts = ui.fallbackScript.acts;
+        var currentAct = ui.fallbackCurrentAct;
+        var currentScene = ui.fallbackCurrentScene + 1;
+        var nextActTransition = null;
+
+        if (currentScene >= acts[currentAct].scenes.length) {
+            currentScene = 0;
+            if (currentAct + 1 < acts.length) {
+                currentAct++;
+                nextActTransition = acts[currentAct].setting || 'A new act begins.';
+            } else {
+                ui.fallbackCurrentAct = currentAct;
+                ui.fallbackCurrentScene = currentScene;
+                return Promise.resolve({
+                    gameComplete: true,
+                    solution: ui.fallbackScript.solution,
+                    clue: null,
+                    event: null,
+                    npcId: null,
+                    dialogue: '',
+                    location: '',
+                    type: 'credits',
+                    objective: '',
+                    choices: [],
+                    musicPhase: 'credits',
+                    nextActTransition: null,
+                    gameComplete: true,
+                    solution: ui.fallbackScript.solution,
+                });
+            }
+        }
+
+        // Update state
+        ui.fallbackCurrentAct = currentAct;
+        ui.fallbackCurrentScene = currentScene;
+
+        var scene = acts[currentAct].scenes[currentScene];
+        var sceneData = {
+            dialogue: scene.dialogue || '',
+            location: scene.location || '',
+            npcId: scene.npcId || null,
+            type: scene.type || 'investigation',
+            objective: scene.objective || getDefaultObjective(scene.type || 'investigation'),
+            choices: scene.choices || [],
+            clue: scene.clue || null,
+            event: null,
+            puzzle: scene.puzzle || null,
+            musicPhase: scene.musicPhase || scene.type || 'investigation',
+            nextActTransition: nextActTransition,
+            gameComplete: false,
+            solution: null,
+        };
+
+        return Promise.resolve({
+            dialogue: sceneData.dialogue,
+            location: sceneData.location,
+            npcId: sceneData.npcId,
+            type: sceneData.type,
+            objective: sceneData.objective,
+            choices: sceneData.choices,
+            clue: sceneData.clue,
+            event: sceneData.event,
+            puzzle: sceneData.puzzle,
+            musicPhase: sceneData.musicPhase,
+            nextActTransition: sceneData.nextActTransition,
+            gameComplete: sceneData.gameComplete,
+            solution: sceneData.solution,
+        });
     }
 
     function addDialogueHistory(role, text, npcName) {
@@ -1770,6 +1936,12 @@ langEnBtn: document.getElementById('lang-en'),
         stopNarrationTimer();
         if (ui.isWaiting) return;
 
+        // Check if narrative is completed before allowing navigation
+        if (ui.isTyping) {
+            skipTypeWriter();
+            return;
+        }
+
         if (ui.currentPage < ui.totalPages) {
             nextPage();
             return;
@@ -1819,146 +1991,6 @@ langEnBtn: document.getElementById('lang-en'),
                 });
     }
 
-    function renderPuzzle(puzzle) {
-        if (!puzzle) return;
-
-        $.choicesContainer.innerHTML = '';
-
-        if (puzzle.type === 'multiple_choice') {
-            var options = puzzle.options || [];
-            options.forEach(function (option) {
-                var btn = document.createElement('button');
-                btn.className = 'btn btn-choice';
-                btn.textContent = option;
-                btn.addEventListener('click', function () {
-                    checkPuzzleAnswer(option, puzzle);
-                });
-                $.choicesContainer.appendChild(btn);
-            });
-        } else if (puzzle.type === 'text_input') {
-            var input = document.createElement('input');
-            input.type = 'text';
-            input.className = 'player-text-input';
-            input.placeholder = getText('puzzlePlaceholder') || 'Enter your answer...';
-            input.maxLength = 200;
-            input.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    checkPuzzleAnswer(input.value.trim(), puzzle);
-                }
-            });
-
-            var submitBtn = document.createElement('button');
-            submitBtn.className = 'btn btn-send';
-            submitBtn.textContent = getText('submit') || 'Submit';
-            submitBtn.addEventListener('click', function () {
-                checkPuzzleAnswer(input.value.trim(), puzzle);
-            });
-
-            var formWrapper = document.createElement('div');
-            formWrapper.className = 'conversation-input';
-            formWrapper.appendChild(input);
-            formWrapper.appendChild(submitBtn);
-            $.choicesContainer.appendChild(formWrapper);
-        }
-    }
-
-    function checkPuzzleAnswer(answer, puzzle) {
-        var isCorrect = false;
-        if (puzzle.correctAnswer) {
-            isCorrect = String(answer).toLowerCase() === String(puzzle.correctAnswer).toLowerCase();
-        } else if (puzzle.acceptableAnswers && Array.isArray(puzzle.acceptableAnswers)) {
-            isCorrect = puzzle.acceptableAnswers.some(function (a) {
-                return String(answer).toLowerCase() === String(a).toLowerCase();
-            });
-        }
-
-        if (isCorrect) {
-            ui.isWaiting = true;
-            if (TDAudioService) {
-                TDAudioService.stopSpeaking();
-            }
-            TDAudioService.speak(getText('puzzleSolved') || 'Correct! The puzzle is solved.', 'narrator');
-            setTimeout(function () {
-                advanceGameState(getText('puzzleCorrect') || 'Correct answer')
-                        .then(function (data) {
-                            ui.isWaiting = false;
-                            if (data.gameComplete) {
-                                showEndScreen(data.solution);
-                                return;
-                            }
-                            continueAfterTransition(data);
-                        })
-                        .catch(function (err) {
-                            ui.isWaiting = false;
-                            showToast('Failed to continue investigation: ' + (err.message || 'Unknown error'), true);
-                        });
-            }, 1500);
-        } else {
-            showToast(getText('puzzleWrong') || 'That doesn\'t seem right. Try again.', true);
-        }
-    }
-
-     function startNarrationTimer(onExpire) {
-        stopNarrationTimer();
-        ui.narrationRemaining = ui.narrationSeconds;
-
-        if ($.narrationTimer) {
-            $.narrationTimer.classList.remove('hidden');
-            $.narrationTimer.textContent = '⏱ ' + ui.narrationRemaining + 's';
-        }
-
-        ui.narrationTimer = setInterval(function () {
-            ui.narrationRemaining--;
-            if (ui.narrationRemaining <= 0) {
-                stopNarrationTimer();
-                if (onExpire) { onExpire(); }
-            } else {
-                if ($.narrationTimer) {
-                    $.narrationTimer.textContent = '⏱ ' + ui.narrationRemaining + 's';
-                }
-            }
-        }, 1000);
-    }
-
-    function stopNarrationTimer() {
-        if (ui.narrationTimer) {
-            clearInterval(ui.narrationTimer);
-            ui.narrationTimer = null;
-        }
-        if ($.narrationTimer) {
-            $.narrationTimer.classList.add('hidden');
-        }
-    }
-
-     function skipTypeWriter() {
-        stopNarrationTimer();
-        ui.skipPending = true;
-        if (TDAudioService && typeof TDAudioService.stopSpeaking === 'function') {
-            TDAudioService.stopSpeaking();
-        }
-        if ($.dialogueText && _currentDialogue) {
-            $.dialogueText.textContent = _currentDialogue;
-        }
-        ui.isTyping = false;
-        if ($.typeCursor) $.typeCursor.classList.add('hidden');
-        // Clear the typeChar timeout to prevent double-callback
-        if (_typeWriterTimeout) {
-            clearTimeout(_typeWriterTimeout);
-            _typeWriterTimeout = null;
-        }
-        // Appeler le callback immédiatement pour afficher le bouton "Continuer"
-        if (_typeWriterCallback) {
-            var cb = _typeWriterCallback;
-            _typeWriterCallback = null;
-            cb();
-        }
-     }
-
-    var _currentDialogue = '';
-    var _typeWriterCallback = null;
-    var _typeWriterTimeout = null;
-
     function typeWriter(text, onComplete, speed) {
         _currentDialogue = text || '';
         _typeWriterCallback = onComplete;
@@ -1998,6 +2030,142 @@ langEnBtn: document.getElementById('lang-en'),
         }
 
         typeChar();
+    }
+
+    function getCurrentSceneText() {
+        return _currentDialogue || ($.dialogueText ? $.dialogueText.textContent : '');
+    }
+
+    function showChoices() {
+        $.choicesContainer.innerHTML = '';
+
+        var choices = getCurrentChoices() || [];
+        if (!choices || choices.length === 0) {
+            choices = [getText('skip') || 'Continue'];
+        }
+
+        choices.forEach(function (choice) {
+            var btn = document.createElement('button');
+            btn.className = 'btn btn-choice';
+            btn.textContent = choice;
+            btn.addEventListener('click', function () {
+                handleChoice(choice);
+            });
+            $.choicesContainer.appendChild(btn);
+        });
+    }
+
+    var _currentChoices = [];
+
+    function getCurrentChoices() {
+        return _currentChoices;
+    }
+
+    function handleChoice(choice) {
+        if (ui.isWaiting || ui.isTyping) return;
+        ui.isWaiting = true;
+        ui.isTyping = false;
+        stopNarrationTimer();
+        clearTypeWriter();
+
+        if (TDAudioService) {
+            TDAudioService.stopSpeaking();
+        }
+
+        advanceGameState(choice)
+                .then(function (data) {
+                    ui.isWaiting = false;
+
+                    if (data.gameComplete) {
+                        showEndScreen(data.solution);
+                        return;
+                    }
+
+                    if (data.nextActTransition && data.nextActTransition !== 'null') {
+                        showTransitionToast(data.nextActTransition);
+                    }
+                    continueAfterTransition(data);
+                })
+                .catch(function (err) {
+                    ui.isWaiting = false;
+                    showToast('Failed to continue investigation: ' + (err.message || 'Unknown error'), true);
+                    setTimeout(function () { ui.isWaiting = false; }, 1000);
+                });
+    }
+
+    function advanceFallbackGameState(playerChoice) {
+        if (!ui.fallbackScript || !ui.fallbackScript.acts) {
+            return Promise.reject(new Error('No fallback script'));
+        }
+
+        var acts = ui.fallbackScript.acts;
+        var currentAct = ui.fallbackCurrentAct;
+        var currentScene = ui.fallbackCurrentScene + 1;
+        var nextActTransition = null;
+
+        if (currentScene >= acts[currentAct].scenes.length) {
+            currentScene = 0;
+            if (currentAct + 1 < acts.length) {
+                currentAct++;
+                nextActTransition = acts[currentAct].setting || 'A new act begins.';
+            } else {
+                ui.fallbackCurrentAct = currentAct;
+                ui.fallbackCurrentScene = currentScene;
+                return Promise.resolve({
+                    gameComplete: true,
+                    solution: ui.fallbackScript.solution,
+                    clue: null,
+                    event: null,
+                    npcId: null,
+                    dialogue: '',
+                    location: '',
+                    type: 'credits',
+                    objective: '',
+                    choices: [],
+                    musicPhase: 'credits',
+                    nextActTransition: null,
+                    gameComplete: true,
+                    solution: ui.fallbackScript.solution,
+                });
+            }
+        }
+
+        // Update state
+        ui.fallbackCurrentAct = currentAct;
+        ui.fallbackCurrentScene = currentScene;
+
+        var scene = acts[currentAct].scenes[currentScene];
+        var sceneData = {
+            dialogue: scene.dialogue || '',
+            location: scene.location || '',
+            npcId: scene.npcId || null,
+            type: scene.type || 'investigation',
+            objective: scene.objective || getDefaultObjective(scene.type || 'investigation'),
+            choices: scene.choices || [],
+            clue: scene.clue || null,
+            event: null,
+            puzzle: scene.puzzle || null,
+            musicPhase: scene.musicPhase || scene.type || 'investigation',
+            nextActTransition: nextActTransition,
+            gameComplete: false,
+            solution: null,
+        };
+
+        return Promise.resolve({
+            dialogue: sceneData.dialogue,
+            location: sceneData.location,
+            npcId: sceneData.npcId,
+            type: sceneData.type,
+            objective: sceneData.objective,
+            choices: sceneData.choices,
+            clue: sceneData.clue,
+            event: sceneData.event,
+            puzzle: sceneData.puzzle,
+            musicPhase: sceneData.musicPhase,
+            nextActTransition: sceneData.nextActTransition,
+            gameComplete: sceneData.gameComplete,
+            solution: sceneData.solution,
+        });
     }
 
     function getCurrentSceneText() {
@@ -2265,10 +2433,60 @@ langEnBtn: document.getElementById('lang-en'),
     }
 
     function clearTypeWriter() {
+        clearTimeout(_typeWriterTimeout);
+        _typeWriterTimeout = null;
         $.dialogueText.textContent = '';
         if ($.typeCursor) {
             $.typeCursor.classList.add('hidden');
         }
+    }
+
+    function startNarrationTimer(onComplete) {
+        stopNarrationTimer();
+        ui.narrationRemaining = ui.narrationSeconds;
+        if ($.narrationTimer) {
+            $.narrationTimer.classList.remove('hidden');
+            $.narrationTimer.textContent = '❱ ' + ui.narrationRemaining + 's';
+        }
+        ui.narrationTimer = setInterval(function () {
+            ui.narrationRemaining -= 1;
+            if ($.narrationTimer) {
+                $.narrationTimer.textContent = '❱ ' + Math.max(0, ui.narrationRemaining) + 's';
+            }
+            if (ui.narrationRemaining <= 0) {
+                stopNarrationTimer();
+                if (onComplete) onComplete();
+            }
+        }, 1000);
+    }
+
+    function stopNarrationTimer() {
+        if (ui.narrationTimer) {
+            clearInterval(ui.narrationTimer);
+            ui.narrationTimer = null;
+        }
+        if ($.narrationTimer) {
+            $.narrationTimer.classList.add('hidden');
+        }
+    }
+
+    function skipTypeWriter() {
+        if (!ui.isTyping) return;
+
+        clearTimeout(_typeWriterTimeout);
+        _typeWriterTimeout = null;
+        ui.skipPending = true;
+        ui.isTyping = false;
+        if ($.dialogueText) {
+            $.dialogueText.textContent = _currentDialogue || '';
+        }
+        if ($.typeCursor) {
+            $.typeCursor.classList.add('hidden');
+        }
+
+        var callback = _typeWriterCallback;
+        _typeWriterCallback = null;
+        if (callback) callback();
     }
 
     function encodeURI(url) {
@@ -2467,16 +2685,18 @@ langEnBtn: document.getElementById('lang-en'),
 
     function updateMuteButton() {
         if (!$.muteBtn || !TDAudioService) return;
-        $.muteBtn.textContent = TDAudioService.muted ? '🔇' : '🔊';
-        $.muteBtn.title = TDAudioService.muted ? 'Unmute narration' : 'Mute narration';
+        $.muteBtn.textContent = TDAudioService.muted ? '◌' : '◒';
+        $.muteBtn.title = TDAudioService.muted ? 'Activer la narration' : 'Couper la narration';
+        $.muteBtn.setAttribute('aria-label', $.muteBtn.title);
     }
 
     function updateVolumeButton() {
         if (!$.volumeBtn || !TDAudioService) return;
         var pct = Math.round(TDAudioService.volume * 100);
-        var icon = TDAudioService.volume <= 0.5 ? '🔉' : '🔊';
+        var icon = TDAudioService.volume <= 0.5 ? '◑' : '◐';
         $.volumeBtn.textContent = icon + pct + '%';
-        $.volumeBtn.title = 'Voice volume: ' + pct + '%. Click to change.';
+        $.volumeBtn.title = 'Volume de la narration : ' + pct + ' %. Cliquer pour modifier.';
+        $.volumeBtn.setAttribute('aria-label', $.volumeBtn.title);
     }
 
     function toggleTypingSound() {
@@ -2491,13 +2711,14 @@ langEnBtn: document.getElementById('lang-en'),
             return;
         }
         var enabled = TDAudioService.typingSound;
-        $.typingBtn.textContent = enabled ? '⌨️' : '🔇';
+        $.typingBtn.textContent = enabled ? '⌨' : '⌧';
         var themeId = getThemeId();
         if (themeId === 'cyberpunk' || themeId === 'sci-fi') {
-            $.typingBtn.title = enabled ? 'Computer typing sound (on)' : 'Computer typing sound (off)';
+            $.typingBtn.title = enabled ? 'Son de clavier activé' : 'Son de clavier désactivé';
         } else {
-            $.typingBtn.title = enabled ? 'Typewriter sound (on)' : 'Typewriter sound (off)';
+            $.typingBtn.title = enabled ? 'Son de machine à écrire activé' : 'Son de machine à écrire désactivé';
         }
+        $.typingBtn.setAttribute('aria-label', $.typingBtn.title);
         $.typingBtn.classList.remove('hidden');
     }
 
@@ -2516,8 +2737,9 @@ langEnBtn: document.getElementById('lang-en'),
     function startVoiceInput() {
         _voiceActive = true;
         if ($.voiceBtn) {
-            $.voiceBtn.textContent = '🔴';
-            $.voiceBtn.title = 'Listening...';
+            $.voiceBtn.textContent = '●';
+            $.voiceBtn.title = 'Écoute en cours';
+            $.voiceBtn.setAttribute('aria-label', $.voiceBtn.title);
             $.voiceBtn.classList.add('voice-recording');
         }
 
@@ -2547,8 +2769,9 @@ langEnBtn: document.getElementById('lang-en'),
     function stopVoiceInputInternal() {
         _voiceActive = false;
         if ($.voiceBtn) {
-            $.voiceBtn.textContent = '🎤';
-            $.voiceBtn.title = 'Voice Input';
+            $.voiceBtn.textContent = '◉';
+            $.voiceBtn.title = 'Saisie vocale';
+            $.voiceBtn.setAttribute('aria-label', $.voiceBtn.title);
             $.voiceBtn.classList.remove('voice-recording');
         }
         if (TDAudioService && TDAudioService.stopListening) {

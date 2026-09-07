@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>True Detective, Interactive Investigation</title>
+    <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Special+Elite&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -13,7 +14,7 @@
         <!-- ===== HOME / SPLASH SCREEN ===== -->
         <section id="home-screen" class="screen active">
             <header class="mobile-header">
-                <button id="hub-btn" class="btn btn-icon btn-back-to-hub" title="Retour au hub">🏠</button>
+                <button id="hub-btn" class="btn btn-icon btn-back-to-hub" title="Retour au hub" aria-label="Retour au hub">⌂</button>
                 <div class="lang-toggle">
                     <button id="lang-en-home" class="lang-btn active-lang" title="English">EN</button>
                     <button id="lang-fr-home" class="lang-btn" title="Français">FR</button>
@@ -27,7 +28,7 @@
                 <p class="home-subtitle">Enquête détective interactive avec IA. 8 univers, PNJ dynamiques et narration vocale.</p>
                 <button id="start-btn" class="start-btn">Commencer l'enquête</button>
             </div>
-            <button id="dev-btn" class="btn btn-dev">🛠️ Dev</button>
+            <button id="dev-btn" class="btn btn-dev">⚙ Dev</button>
         </section>
 
         <!-- ===== DEVELOPER MODAL ===== -->
@@ -67,7 +68,7 @@
     <!-- ===== THEME SELECTOR SCREEN ===== -->
     <section id="theme-selector-screen" class="screen">
         <div class="theme-selector-header">
-            <button id="theme-back-to-hub-btn" class="btn btn-icon btn-back-to-hub theme-back-btn" title="Retour au hub">🏠</button>
+            <button id="theme-back-to-hub-btn" class="btn btn-icon btn-back-to-hub theme-back-btn" title="Retour au hub" aria-label="Retour au hub">⌂</button>
             <div class="lang-toggle">
                 <button id="lang-en-theme" class="lang-btn active-lang" title="English">EN</button>
                 <button id="lang-fr-theme" class="lang-btn" title="Français">FR</button>
@@ -93,13 +94,13 @@
                     <button id="lang-en" class="lang-btn active-lang" title="English">EN</button>
                     <button id="lang-fr" class="lang-btn" title="Français">FR</button>
                 </div>
-                <button id="restart-btn" class="btn btn-icon btn-restart" title="Recommencer une histoire">🔄</button>
-                <button id="game-back-to-hub-btn" class="btn btn-icon btn-back-to-hub" title="Retour au hub">🏠</button>
-                <button id="notebook-btn" class="btn btn-icon" title="Investigation Notebook">📓</button>
-                <button id="voice-btn" class="btn btn-icon" title="Voice Input">🎤</button>
-                <button id="mute-btn" class="btn btn-icon" title="Mute narration">🔊</button>
-                <button id="volume-btn" class="btn btn-icon" title="Voice volume">🔊100%</button>
-                <button id="typing-btn" class="btn btn-icon" title="Typewriter sound">⌨️</button>
+                <button id="restart-btn" class="btn btn-icon btn-restart" title="Recommencer une histoire" aria-label="Recommencer une histoire">↻</button>
+                <button id="game-back-to-hub-btn" class="btn btn-icon btn-back-to-hub" title="Retour au hub" aria-label="Retour au hub">⌂</button>
+                <button id="notebook-btn" class="btn btn-icon" title="Carnet d'enquête" aria-label="Ouvrir le carnet d'enquête">▤</button>
+                <button id="voice-btn" class="btn btn-icon" title="Saisie vocale" aria-label="Activer la saisie vocale">◉</button>
+                <button id="mute-btn" class="btn btn-icon" title="Couper la narration" aria-label="Couper la narration">◒</button>
+                <button id="volume-btn" class="btn btn-icon" title="Volume de la narration" aria-label="Modifier le volume de la narration">◐100%</button>
+                <button id="typing-btn" class="btn btn-icon" title="Son de machine à écrire" aria-label="Activer le son de machine à écrire">⌨</button>
                 <span class="music-info" id="music-info">🎵 Investigation</span>
                 <span class="narration-timer hidden" id="narration-timer">❱ 30s</span>
             </div>

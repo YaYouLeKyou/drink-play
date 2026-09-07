@@ -10,6 +10,8 @@
     background-position: center;
     color: #d0d0d0;
     overflow-x: hidden;
+    padding-top: 56px;
+    box-sizing: border-box;
     /* Slightly muted text for classic feel */
 }
 
@@ -123,7 +125,7 @@ h1 {
 /* ---------- Back to Hub button ---------- */
 .back-to-hub-btn {
     position: absolute;
-    top: 20px;
+    top: 76px;
     left: 20px;
     z-index: 100;
     background: linear-gradient(135deg, #404040 0%, #606060 100%);
@@ -147,7 +149,7 @@ h1 {
 /* ===== Language Dropdown (top-right, below Echo Donjon) ===== */
 .lang-dropdown-wrapper {
     position: absolute;
-    top: 68px;
+    top: 124px;
     right: 20px;
     z-index: 101;
 }
@@ -220,7 +222,7 @@ h1 {
 
 .echo-donjon-btn {
     position: absolute;
-    top: 20px;
+    top: 76px;
     right: 20px;
     z-index: 101;
     background: linear-gradient(135deg, #4a235a 0%, #7b4284 100%);
@@ -311,7 +313,7 @@ h1 {
 /* ===== Language Change Button ===== */
 .lang-dropdown-wrapper {
     position: absolute;
-    top: 68px;
+    top: 124px;
     right: 20px;
     z-index: 101;
 }

@@ -13,6 +13,8 @@ body {
     background-attachment: fixed;
     min-height: 100vh;
     overflow-x: hidden;
+    padding-top: 56px;
+    box-sizing: border-box;
 }
 
 h1 {
