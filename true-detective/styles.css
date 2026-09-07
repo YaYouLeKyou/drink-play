@@ -2707,6 +2707,31 @@ html {
         flex-grow: 1;
     }
 
+    /* --- Espace réservé au lecteur musique (#dp-music-player, ~58px en bas à droite) ---
+       Aucun contenu du jeu ne doit passer sous / derrière le lecteur sur mobile. */
+    .montre-note-box {
+        bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Carnet : remonté pour ne pas être recouvert par le lecteur */
+    .notebook {
+        bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+        max-height: calc(60vh - 58px);
+    }
+
+    /* Mini-jeux : marge basse pour que les actions restent au-dessus du lecteur */
+    .minigame-screen .minigame-content,
+    .minigame-page .minigame-content,
+    .minigame-layer .minigame-content,
+    .minigame-box {
+        padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* Pages d'acte : contenu décalé au-dessus du lecteur */
+    .act-page-content {
+        padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    }
+
     /* En-tête mini-jeu : titre et bouton Passer se replient proprement */
     .minigame-screen-header {
         flex-wrap: wrap;
@@ -2751,8 +2776,14 @@ html {
     .minigame-page .minigame-content,
     .minigame-layer .minigame-content,
     .minigame-box {
-        padding: 16px 14px 66px 14px;
+        padding: 16px 14px calc(110px + env(safe-area-inset-bottom, 0px)) 14px;
         max-height: calc(100vh - 20px);
+    }
+
+    /* Box de notes : reste au-dessus du lecteur musique */
+    .montre-note-box {
+        bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+        width: calc(100vw - 20px);
     }
     .mg-actions {
         flex-direction: column;
