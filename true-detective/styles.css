@@ -113,15 +113,15 @@ html {
 @media (max-width: 768px) {
     .home-content {
         justify-content: flex-start;
-        padding-top: 60px;
+        padding-top: 55px;
         height: auto;
         min-height: 100%;
     }
 
     .cover-image {
-        width: 200px;
-        height: 200px;
-        margin-bottom: 10px;
+        width: min(70vw, 280px);
+        height: min(70vw, 280px);
+        margin-bottom: 12px;
     }
 
     .home-title h1 {
@@ -146,8 +146,8 @@ html {
 
 @media (max-width: 480px) {
     .cover-image {
-        width: 150px;
-        height: 150px;
+        width: min(65vw, 220px);
+        height: min(65vw, 220px);
     }
 
     .home-title h1 {
@@ -383,6 +383,40 @@ html {
         justify-content: center;
         gap: 12px;
     }
+
+    #theme-selector-screen .theme-selector-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding-top: 56px;
+        text-align: center;
+    }
+
+    #theme-selector-screen .theme-selector-header .theme-back-btn {
+        position: static;
+        transform: none;
+        margin-right: auto;
+    }
+
+    #theme-selector-screen .theme-selector-header .lang-toggle {
+        position: static;
+        left: auto;
+        right: auto;
+        transform: none;
+        margin-left: auto;
+    }
+
+    #theme-selector-screen .theme-selector-header h1 {
+        width: 100%;
+        font-size: 2em;
+    }
+
+    #theme-selector-screen .theme-selector-header p {
+        width: 100%;
+        font-size: 0.95em;
+    }
 }
 
 @media (max-width: 480px) {
@@ -390,6 +424,19 @@ html {
         grid-template-columns: repeat(auto-fit, minmax(120px, 160px));
         justify-content: center;
         gap: 10px;
+    }
+
+    #theme-selector-screen .theme-selector-header {
+        padding-top: 52px;
+        gap: 8px;
+    }
+
+    #theme-selector-screen .theme-selector-header h1 {
+        font-size: 1.6em;
+    }
+
+    #theme-selector-screen .theme-selector-header p {
+        font-size: 0.85em;
     }
 }
 
@@ -768,8 +815,8 @@ html {
     left: 50%;
     transform: translateX(-50%);
     z-index: 300;
-    min-width: 200px;
-    max-width: calc(100vw - 40px);
+    width: calc(100vw - 24px);
+    max-width: 500px;
     text-align: center;
     box-sizing: border-box;
     margin: 0;
@@ -1579,6 +1626,41 @@ html {
     padding: 14px 36px;
 }
 
+/* Theme selector: prevent layout shift when start button appears */
+#theme-selector-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#theme-selector-screen .theme-selector-header {
+    flex-shrink: 0;
+}
+
+#theme-selector-screen .theme-grid {
+    flex: 1;
+    min-height: 0;
+}
+
+#theme-selector-screen .resume-btn {
+    flex-shrink: 0;
+}
+
+#theme-selector-screen .start-game-btn {
+    flex-shrink: 0;
+    position: fixed;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(100vw - 24px, 420px);
+    z-index: 100;
+    margin-top: 0;
+}
+
+#theme-selector-screen .start-game-btn.hidden {
+    display: none !important;
+}
+
 /* ===== Responsive ===== */
 
 @media (max-width: 1024px) {
@@ -1653,9 +1735,16 @@ html {
     }
     
     .npc-image {
-        max-width: 100%;
-        max-height: 50vh;
+        max-width: 90%;
+        max-height: 55vh;
         bottom: 70px;
+    }
+
+    /* Decor image: fit entirely on mobile */
+    .bg-layer {
+        background-size: contain;
+        background-position: center top;
+        background-color: #000;
     }
     
     .theme-grid {
@@ -1976,6 +2065,30 @@ html {
   pointer-events: none; display: none; z-index: 5;
   transform: translate(-50%, -50%);
   transition: left 0.05s linear, top 0.05s linear;
+}
+
+@media (max-width: 768px) {
+  .scene-loupe {
+    width: 160px;
+    height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .scene-loupe {
+    width: 140px;
+    height: 140px;
+  }
+
+  .face-loupe {
+    width: 140px;
+    height: 140px;
+  }
+
+  .loupe {
+    width: 120px;
+    height: 120px;
+  }
 }
 .fouille-zone {
   position: absolute; width: 32px; height: 32px; margin: -16px 0 0 -16px;
@@ -2729,11 +2842,12 @@ html {
         min-height: 44px;
     }
 
-    /* Bouton Continuer : pleine largeur maîtrisée */
+    /* Bouton Continuer : pleine largeur sur mobile */
     .btn-continue {
         bottom: calc(20px + env(safe-area-inset-bottom, 0px));
         left: 50%;
-        width: min(100vw - 24px, 420px);
+        width: calc(100vw - 24px);
+        max-width: 500px;
         min-width: 0;
         padding: 13px 18px;
         font-size: 0.95em;

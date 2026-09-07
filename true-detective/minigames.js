@@ -1,4 +1,4 @@
-﻿/* =====================================================================
+/* =====================================================================
    TRUE DETECTIVE, MINI-JEUX OPTIONNELS (bonus d'indices + timer)
    ---------------------------------------------------------------------
    Chaque mini-jeu est OPTIONNEL : le joueur peut toujours « Passer ».
@@ -498,7 +498,7 @@
                 body.appendChild(saveBtn);
             }
 
-            /* Loupe : grossit la scène sous le curseur */
+            /* Loupe : grossit la scène, toujours visible et déplaçable au doigt */
             var loupe = document.createElement('div');
             loupe.className = 'scene-loupe';
             var ZOOM = 2, LR = 95;
@@ -508,19 +508,59 @@
             function moveLoupe(clientX, clientY) {
                 var r = wrap.getBoundingClientRect();
                 var cx = clientX - r.left, cy = clientY - r.top;
-                if (cx < 0 || cy < 0 || cx > r.width || cy > r.height) { loupe.style.display = 'none'; return; }
+                if (cx < 0 || cy < 0 || cx > r.width || cy > r.height) { return; }
+                loupe.style.display = 'block';
+                loupe.style.left = cx + 'px';
+                loupe.style.top = cy + 'px';
+                loupe.style.backgroundSize = (r.width * ZOOM) + 'px ' + (r.height * ZOOM) + 'px';
+                loupe.style.backgroundPosition = (LR - cx * ZOOM) + 'px ' + (LR - cy * ZOOM) + 'px';
+                checkLoupeOverSpot(cx, cy, r);
+            }
+            function centerLoupe() {
+                var r = wrap.getBoundingClientRect();
+                var cx = r.width / 2, cy = r.height / 2;
                 loupe.style.display = 'block';
                 loupe.style.left = cx + 'px';
                 loupe.style.top = cy + 'px';
                 loupe.style.backgroundSize = (r.width * ZOOM) + 'px ' + (r.height * ZOOM) + 'px';
                 loupe.style.backgroundPosition = (LR - cx * ZOOM) + 'px ' + (LR - cy * ZOOM) + 'px';
             }
-            wrap.addEventListener('mousemove', function (e) { moveLoupe(e.clientX, e.clientY); });
-            wrap.addEventListener('mouseleave', function () { loupe.style.display = 'none'; });
-            wrap.addEventListener('touchmove', function (e) {
-                e.preventDefault(); moveLoupe(e.touches[0].clientX, e.touches[0].clientY);
-            }, { passive: false });
-            wrap.addEventListener('touchstart', function (e) { moveLoupe(e.touches[0].clientX, e.touches[0].clientY); });
+            centerLoupe();
+            var isDragging = false;
+            function startDrag(e) {
+                isDragging = true;
+                var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                moveLoupe(clientX, clientY);
+            }
+            function drag(e) {
+                if (!isDragging) return;
+                e.preventDefault();
+                var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                moveLoupe(clientX, clientY);
+            }
+            function endDrag() { isDragging = false; }
+            wrap.addEventListener('mousedown', startDrag);
+            wrap.addEventListener('mousemove', function (e) { if (isDragging) drag(e); });
+            wrap.addEventListener('mouseup', endDrag);
+            wrap.addEventListener('mouseleave', endDrag);
+            wrap.addEventListener('touchstart', startDrag, { passive: false });
+            wrap.addEventListener('touchmove', drag, { passive: false });
+            wrap.addEventListener('touchend', endDrag);
+            wrap.addEventListener('touchcancel', endDrag);
+            function checkLoupeOverSpot(cx, cy, rect) {
+                spotButtons.forEach(function (spot) {
+                    if (spot.dataset.done) return;
+                    var spotX = (parseFloat(spot.dataset.x) / 100) * rect.width;
+                    var spotY = (parseFloat(spot.dataset.y) / 100) * rect.height;
+                    var dist = Math.sqrt(Math.pow(cx - spotX, 2) + Math.pow(cy - spotY, 2));
+                    if (dist < 50) {
+                        var h = spots.find(function (s) { return s.label === spot.dataset.label; });
+                        if (h) { openZoneWin(h, spot); }
+                    }
+                });
+            }
 
             /* Fenêtre d'indice de zone */
             var win = null;
@@ -990,6 +1030,13 @@
             }
             face.addEventListener('mousemove', function (e) { moveFaceLoupe(e.clientX, e.clientY); });
             face.addEventListener('mouseleave', function () { faceLoupe.style.display = 'none'; });
+            face.addEventListener('touchmove', function (e) {
+                e.preventDefault();
+                moveFaceLoupe(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: false });
+            face.addEventListener('touchstart', function (e) {
+                moveFaceLoupe(e.touches[0].clientX, e.touches[0].clientY);
+            });
 
             /* Quand le joueur clique sur la face après avoir bien observé l'aiguille figée,
                on lui pose la question et on ouvre la voie vers le dos */
