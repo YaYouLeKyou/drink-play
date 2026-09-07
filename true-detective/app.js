@@ -103,8 +103,8 @@
         'recherche': 'recherche.mp3',
         'reflexion': 'reflexion.mp3',
         'enigme': 'enigme.mp3',
-        'tension': 'tension.mp3',
-        'mystere': 'mystere flipant.mp3',
+        'tension': 'stress.mp3',
+        'mystere': 'Midnight Ticking.mp3',
     };
 
     var TEXTS = {

@@ -269,10 +269,10 @@
 
     var MUSIC_PHASE_TRACKS = {
         investigation: 'recherche.mp3',
-        interrogation: 'mystere flipant.mp3',
+        interrogation: 'Midnight Ticking.mp3',
         puzzle: 'enigme.mp3',
-        tension: 'tension.mp3',
-        revelation: 'Act III Revelations.mp3',
+        tension: 'stress.mp3',
+        revelation: 'Rising Tension.mp3',
         credits: 'generique.mp3',
         intro: 'generique.mp3',
     };
