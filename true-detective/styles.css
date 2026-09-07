@@ -192,9 +192,9 @@ html {
         margin-bottom: 0;
     }
 
-    #hub-btn {
-        display: none;
-    }
+#hub-btn {
+    display: block;
+}
 }
 
 @media (max-width: 480px) {
@@ -3073,21 +3073,33 @@ html {
         min-height: 44px;
     }
 
-    /* ===== GAME SCREEN: Layout vertical en colonne ===== */
+    /* ===== GAME SCREEN: Layout vertical fixe, pas d'overflow ===== */
     #game-screen {
         display: flex;
         flex-direction: column;
-        min-height: calc(100vh - 60px);
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 60px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        padding: 0;
     }
 
-    /* Header: fixe en haut */
+    /* Wrapper: on neutralise le flex pour que les enfants fixés soient indépendants */
+    #game-screen .game-mobile-layout {
+        display: block;
+        min-height: auto;
+        padding: 0;
+    }
+
+    /* Header: fixe en dessous du lecteur musique (~40px) */
     #game-screen .top-bar {
-        position: sticky;
-        top: 0;
-        z-index: 100;
+        position: fixed;
+        top: 40px;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
         flex-shrink: 0;
         background: linear-gradient(to bottom, rgba(0, 0, 10, 0.95) 0%, rgba(0, 0, 10, 0.8) 100%);
         backdrop-filter: blur(8px);
@@ -3095,24 +3107,25 @@ html {
         order: 1;
     }
 
-    /* Dialogue container: dans le flux, après le header */
+    /* Dialogue container: fixe entre le header et les décos, scroll interne */
     #game-screen .dialogue-container {
-        position: relative;
-        top: auto;
-        bottom: auto;
-        left: auto;
-        right: auto;
+        position: fixed;
+        top: 84px;
+        left: 0;
+        right: 0;
+        bottom: 60px;
         width: 100%;
         max-width: 100%;
         margin: 0;
         padding: 16px;
-        flex-shrink: 0;
-        overflow: visible;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         z-index: 10;
+        background: transparent;
         order: 2;
     }
 
-    /* Choix: dans le flux, après le texte */
+    /* Choix: dans le flux du dialogue, après le texte */
     #game-screen .choices-container {
         position: relative;
         top: auto;
@@ -3120,28 +3133,45 @@ html {
         left: auto;
         right: auto;
         width: 100%;
-        padding: 0 16px 16px;
+        padding: 0 0 16px;
         flex-shrink: 0;
         z-index: 10;
+        gap: 8px;
         order: 3;
     }
 
-    #game-screen .choices-container {
-        gap: 8px;
-    }
     #game-screen .btn-choice {
         max-width: 100%;
     }
 
-    /* Décor et personnage: dans le flux, après les questions */
-    #game-screen .bg-layer {
-        position: relative;
-        top: auto;
-        left: auto;
+    /* ===== Décor et personnage: fixe dans la moitié basse de l'écran =====
+       Occupent la moitié basse, au-dessus du bouton Continuer.
+       Ils ne bougent jamais, même si le texte s'agrandit. */
+    #game-screen .game-visuals {
+        position: fixed;
+        bottom: 60px;
+        left: 0;
         width: 100%;
-        height: 350px;
-        flex-shrink: 0;
-        background-size: contain;
+        height: 50vh;
+        min-height: 0;
+        margin-top: 0;
+        padding: 0;
+        z-index: 5;
+        pointer-events: none;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        overflow: visible;
+        order: 4;
+    }
+
+    #game-screen .bg-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         background-color: #000;
@@ -3163,46 +3193,71 @@ html {
         bottom: auto;
         left: auto;
         width: 100%;
-        height: 0;
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
         z-index: 3;
         pointer-events: none;
+        padding: 0;
+        box-sizing: border-box;
         order: 4;
     }
 
+    /* Grand personnage devant son décor */
     #game-screen .npc-image {
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
+        position: relative;
+        bottom: auto;
+        left: auto;
+        transform: none;
         max-width: 90%;
-        max-height: 320px;
+        max-height: 95%;
         width: auto;
         height: auto;
         object-fit: contain;
+        margin: 0 auto;
+        display: block;
     }
 
-    /* Bouton Continuer: fixe en bas, pleine largeur, toujours accessible */
+    /* Bouton Continuer: fixe en bas avec marge de sécurité */
     #game-screen .btn-continue {
         position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        transform: none;
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        border-radius: 0;
-        padding: 16px;
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100vw - 24px);
+        max-width: 500px;
+        border-radius: 50px;
+        padding: 14px;
         font-size: 1em;
         z-index: 500;
-        flex-shrink: 0;
         box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
         order: 6;
     }
 
     #game-screen .btn-continue:hover,
     #game-screen .btn-continue:active {
-        transform: none !important;
+        transform: translateX(-50%) !important;
+    }
+
+    /* Bouton mobile-continue-btn aligné avec le .btn-continue */
+    #game-screen .mobile-continue-btn {
+        display: flex;
+        position: fixed;
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100vw - 24px);
+        max-width: 500px;
+        z-index: 300;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50px;
+        padding: 14px;
+    }
+
+    #game-screen .btn-continue.hidden {
+        display: flex !important;
     }
 
     /* Glow pulse sur mobile - bouton cliquable */
@@ -3212,6 +3267,51 @@ html {
     }
     #game-screen .btn-continue:not(:disabled) {
         animation: btn-glow-pulse-mobile 2s ease-in-out infinite;
+    }
+
+    /* ===== Boîtes de texte transparentes avec flou (mobile) ===== */
+    #game-screen .dialogue-box {
+        background: rgba(10, 12, 20, 0.55);
+        border: 1px solid rgba(0, 255, 255, 0.4);
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    #game-screen .dialogue-box::before {
+        opacity: 0.7;
+    }
+
+    #game-screen .objective-display {
+        background: rgba(0, 0, 15, 0.5);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 12px;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+    }
+
+    #game-screen .dialogue-history {
+        background: rgba(0, 0, 15, 0.35);
+        border: 1px solid rgba(0, 255, 255, 0.1);
+        border-radius: 8px;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+    }
+
+    #game-screen .btn-choice {
+        background: rgba(0, 10, 26, 0.6);
+        border: 1px solid rgba(0, 255, 255, 0.4);
+        border-radius: 12px;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+    }
+
+    #game-screen .conversation-input .player-text-input {
+        background: rgba(0, 0, 15, 0.5);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 12px;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
     }
 
     /* Toast remonté au-dessus du bouton Continuer */
@@ -3305,41 +3405,52 @@ html {
         padding-top: 50px;
     }
 
-    /* ===== GAME SCREEN: Layout vertical en colonne (480px) ===== */
+    /* ===== GAME SCREEN: Layout vertical fixe, pas d'overflow (480px) ===== */
     #game-screen {
         display: flex;
         flex-direction: column;
-        min-height: calc(100vh - 50px);
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 56px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        padding: 0;
     }
 
+    #game-screen .game-mobile-layout {
+        display: block;
+        min-height: auto;
+        padding: 0;
+    }
+
+    /* Header: fixe en dessous du lecteur musique (~40px) */
     #game-screen .top-bar {
-        position: sticky;
-        top: 0;
-        z-index: 100;
+        position: fixed;
+        top: 40px;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
         flex-shrink: 0;
         background: linear-gradient(to bottom, rgba(0, 0, 10, 0.95) 0%, rgba(0, 0, 10, 0.8) 100%);
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
-        order: 1;
     }
 
     #game-screen .dialogue-container {
-        position: relative;
-        top: auto;
-        bottom: auto;
-        left: auto;
-        right: auto;
+        position: fixed;
+        top: 84px;
+        left: 0;
+        right: 0;
+        bottom: 60px;
         width: 100%;
         max-width: 100%;
         margin: 0;
         padding: 12px;
-        flex-shrink: 0;
-        overflow: visible;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         z-index: 10;
-        order: 2;
+        background: transparent;
     }
 
     #game-screen .choices-container {
@@ -3362,19 +3473,35 @@ html {
         max-width: 100%;
     }
 
-    #game-screen .bg-layer {
-        position: relative;
-        top: auto;
-        left: auto;
+    /* ===== Décor et personnage: fixe dans la moitié basse de l'écran ===== */
+    #game-screen .game-visuals {
+        position: fixed;
+        bottom: 60px;
+        left: 0;
         width: 100%;
-        height: 280px;
-        flex-shrink: 0;
-        background-size: contain;
+        height: 50vh;
+        min-height: 0;
+        margin-top: 0;
+        padding: 0;
+        z-index: 5;
+        pointer-events: none;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        overflow: visible;
+    }
+
+    #game-screen .bg-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         background-color: #000;
         z-index: 1;
-        order: 4;
     }
 
     #game-screen .character-layer {
@@ -3382,46 +3509,70 @@ html {
         bottom: auto;
         left: auto;
         width: 100%;
-        height: 0;
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
         z-index: 3;
         pointer-events: none;
-        order: 4;
+        padding: 0;
+        box-sizing: border-box;
     }
 
+    /* Grand personnage devant son décor */
     #game-screen .npc-image {
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
+        position: relative;
+        bottom: auto;
+        left: auto;
+        transform: none;
         max-width: 95%;
-        max-height: 260px;
+        max-height: 95%;
         width: auto;
         height: auto;
         object-fit: contain;
+        margin: 0 auto;
+        display: block;
     }
 
+    /* Bouton Continuer: fixe en bas avec marge de sécurité */
     #game-screen .btn-continue {
         position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        transform: none;
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-        border-radius: 0;
-        padding: 14px;
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100vw - 20px);
+        max-width: 420px;
+        border-radius: 50px;
+        padding: 12px;
         font-size: 0.95em;
         letter-spacing: 1px;
         z-index: 500;
-        flex-shrink: 0;
         box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
-        order: 6;
     }
 
     #game-screen .btn-continue:hover,
     #game-screen .btn-continue:active {
-        transform: none !important;
+        transform: translateX(-50%) !important;
+    }
+
+    /* Bouton mobile-continue-btn aligné avec le .btn-continue */
+    #game-screen .mobile-continue-btn {
+        display: flex;
+        position: fixed;
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100vw - 20px);
+        max-width: 420px;
+        z-index: 300;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50px;
+        padding: 12px;
+    }
+
+    #game-screen .btn-continue.hidden {
+        display: flex !important;
     }
 
     /* Glow pulse sur mobile 480px - bouton cliquable */
@@ -3431,6 +3582,47 @@ html {
     }
     #game-screen .btn-continue:not(:disabled) {
         animation: btn-glow-pulse-mobile-sm 2s ease-in-out infinite;
+    }
+
+    /* ===== Boîtes de texte transparentes avec flou (mobile 480px) ===== */
+    #game-screen .dialogue-box {
+        background: rgba(10, 12, 20, 0.55);
+        border: 1px solid rgba(0, 255, 255, 0.4);
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    #game-screen .objective-display {
+        background: rgba(0, 0, 15, 0.5);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 12px;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+    }
+
+    #game-screen .dialogue-history {
+        background: rgba(0, 0, 15, 0.35);
+        border: 1px solid rgba(0, 255, 255, 0.1);
+        border-radius: 8px;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+    }
+
+    #game-screen .btn-choice {
+        background: rgba(0, 10, 26, 0.6);
+        border: 1px solid rgba(0, 255, 255, 0.4);
+        border-radius: 12px;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+    }
+
+    #game-screen .conversation-input .player-text-input {
+        background: rgba(0, 0, 15, 0.5);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 12px;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
     }
 
     /* Mini-jeux : plus d'espace utile, actions empilées verticalement */
@@ -3450,18 +3642,17 @@ html {
         max-height: 45vh;
     }
 
-    /* Decor image: fit entirely on mobile 480px */
-    .bg-layer {
-        background-size: contain;
-        background-position: center top;
+    /* Decor image: fit entirely on mobile */
+    #game-screen .bg-layer {
+        background-size: cover;
+        background-position: center center;
         background-color: #000;
     }
 
-    /* NPC image: bigger on mobile 480px */
-    .npc-image {
+    /* NPC image: grand personnage devant son décor */
+    #game-screen .npc-image {
         max-width: 95%;
-        max-height: 65vh;
-        bottom: 60px;
+        max-height: 95%;
     }
 
     .carnet-scene {
