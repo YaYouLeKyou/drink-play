@@ -146,36 +146,50 @@ html {
         gap: 6px;
     }
 
+    /* Accueil mobile : titre au-dessus, grande image centrée, actions dessous */
     .home-content {
-        justify-content: flex-start;
-        padding-top: 68px;
-        height: auto;
-        min-height: 100%;
+        justify-content: center;
+        height: 100dvh;
+        min-height: 100dvh;
+        padding: 112px 16px 24px;
+        gap: 0;
+        overflow: hidden;
+    }
+
+    .home-title {
+        order: 1;
+        flex-shrink: 0;
     }
 
     .cover-image {
-        width: min(70vw, 280px);
-        height: min(70vw, 280px);
-        margin-bottom: 10px;
+        order: 2;
+        width: min(78vw, 340px, calc(100vh - 285px));
+        height: min(78vw, 340px, calc(100vh - 285px));
+        margin: 12px 0 14px;
+        flex-shrink: 1;
+    }
+
+    .home-subtitle {
+        order: 3;
+        font-size: 0.85em;
+        margin: 0 0 16px;
+        max-width: 340px;
+        flex-shrink: 0;
+    }
+
+    .start-btn {
+        order: 4;
+        font-size: 0.9em;
+        padding: 12px 28px;
+        width: calc(100vw - 40px);
+        max-width: 300px;
+        flex-shrink: 0;
     }
 
     .home-title h1 {
         font-size: 2em;
         letter-spacing: 1px;
-        margin-bottom: 8px;
-    }
-
-    .home-subtitle {
-        font-size: 0.85em;
-        margin-bottom: 16px;
-        max-width: 100%;
-    }
-
-    .start-btn {
-        font-size: 0.9em;
-        padding: 12px 28px;
-        width: calc(100vw - 40px);
-        max-width: 300px;
+        margin-bottom: 0;
     }
 
     #hub-btn {
@@ -189,17 +203,25 @@ html {
         padding: 0 12px;
     }
 
+    /* Image agrandie, centrée et limitée par la hauteur disponible */
+    .home-content {
+        padding: 96px 12px 20px;
+    }
+
     .cover-image {
-        width: min(65vw, 220px);
-        height: min(65vw, 220px);
+        width: min(82vw, 360px, calc(100dvh - 265px));
+        height: min(82vw, 360px, calc(100dvh - 265px));
+        margin-top: 10px;
+        margin-bottom: 12px;
     }
 
     .home-title h1 {
-        font-size: 1.6em;
+        font-size: 1.8em;
     }
 
     .home-subtitle {
         font-size: 0.78em;
+        max-width: 330px;
     }
 
     .start-btn {
