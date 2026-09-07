@@ -558,35 +558,33 @@
             }
         }
         if (typingCtx.state === 'suspended') {
-            typingCtx.resume();
+            try { typingCtx.resume(); } catch (e) { /* ignore */ }
         }
         return typingCtx;
     }
 
-    // Eagerly create + unlock the AudioContext on first user gesture so that
+    // Lazily create + unlock the AudioContext on the first user gesture so that
     // short typewriter sounds play reliably (browsers block autoplay on a
-    // context that was never resumed by a user interaction).
+    // context that was never created/resumed by a user interaction).
+    // NOTE: le contexte n'est plus créé au chargement de la page (il restait
+    // alors « suspended » à jamais dans certains navigateurs) : il est créé
+    // DANS le handler du premier geste utilisateur.
     function initTypingSound() {
-        if (typingCtx) return;
-        var ctx = ensureTypingCtx();
-        if (!ctx) return;
         var unlock = function () {
-            if (typingCtx) {
-                if (typingCtx.state === 'suspended') {
-                    typingCtx.resume();
-                }
+            var ctx = ensureTypingCtx();
+            if (ctx && ctx.state === 'running') {
                 // Play a silent buffer to force-unlock the audio context
                 try {
-                    var buf = typingCtx.createBuffer(1, 1, 22050);
-                    var src = typingCtx.createBufferSource();
+                    var buf = ctx.createBuffer(1, 1, 22050);
+                    var src = ctx.createBufferSource();
                     src.buffer = buf;
-                    src.connect(typingCtx.destination);
+                    src.connect(ctx.destination);
                     src.start(0);
                 } catch (e) { /* ignore */ }
+                document.removeEventListener('click', unlock);
+                document.removeEventListener('keydown', unlock);
+                document.removeEventListener('touchstart', unlock);
             }
-            document.removeEventListener('click', unlock);
-            document.removeEventListener('keydown', unlock);
-            document.removeEventListener('touchstart', unlock);
         };
         document.addEventListener('click', unlock);
         document.addEventListener('keydown', unlock);
@@ -598,7 +596,9 @@
         if (!typingSoundEnabled || muted) return;
         var ctx = ensureTypingCtx();
         if (!ctx) return;
-        if (ctx.state !== 'running') return;
+        // Un contexte suspendu (autoplay policy) ne produit aucun son :
+        // on tente une reprise, et on réessaie au caractère suivant.
+        if (ctx.state !== 'running') { return; }
 
         var cyber = isCyberpunkTheme();
         var now = ctx.currentTime;
@@ -641,6 +641,7 @@
             noiseSrc.stop(now + 0.03);
         } else {
             // Classic typewriter "click" : short filtered noise burst
+            // + a low tonal "thock" (striking key / carriage) for realism
             var bufLen = Math.floor(ctx.sampleRate * 0.025);
             var buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
             var data = buf.getChannelData(0);
@@ -664,6 +665,25 @@
 
             src.start(now);
             src.stop(now + 0.025);
+
+            /* Composante tonale grave ("thock") : varie légèrement à chaque
+               frappe pour un rendu mécanique naturel */
+            var thock = ctx.createOscillator();
+            thock.type = 'triangle';
+            var thockFreq = 140 + Math.random() * 70;
+            thock.frequency.setValueAtTime(thockFreq, now);
+            thock.frequency.exponentialRampToValueAtTime(thockFreq * 0.55, now + 0.05);
+
+            var thockGain = ctx.createGain();
+            thockGain.gain.setValueAtTime(0.001, now);
+            thockGain.gain.linearRampToValueAtTime(masterVol * 0.5, now + 0.004);
+            thockGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+
+            thock.connect(thockGain);
+            thockGain.connect(ctx.destination);
+
+            thock.start(now);
+            thock.stop(now + 0.07);
         }
     }
 
