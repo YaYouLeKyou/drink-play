@@ -15,6 +15,7 @@ body {
     height: 100vh;
     width: 100vw;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
 }
 
 body::before {
@@ -1653,7 +1654,8 @@ html {
     
     .npc-image {
         max-width: 100%;
-        max-height: 60vh;
+        max-height: 50vh;
+        bottom: 70px;
     }
     
     .theme-grid {
@@ -2833,7 +2835,7 @@ html {
     }
 
     .dialogue-container {
-        bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(134px + env(safe-area-inset-bottom, 0px));
         padding: 8px;
     }
 
@@ -2848,6 +2850,32 @@ html {
     .minigame-box {
         padding: 16px 14px calc(20px + env(safe-area-inset-bottom, 0px)) 14px;
         max-height: calc(100vh - 80px);
+    }
+
+    .mg-scene {
+        height: 160px;
+    }
+
+    .fouille-scene {
+        aspect-ratio: 16 / 9;
+        max-height: 35vh;
+    }
+
+    .carnet-scene {
+        height: 220px;
+    }
+
+    .mg-montre {
+        height: 200px;
+    }
+
+    .mg-coffre {
+        height: 180px;
+    }
+
+    .minigame-screen-content {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     /* Box de notes : marge basse standard */
