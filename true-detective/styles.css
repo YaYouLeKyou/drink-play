@@ -872,7 +872,7 @@ html {
     border: none;
     font-family: 'Special Elite', monospace;
     font-size: 1em;
-    padding: 14px 32px;
+    padding: 18px 32px;
     border-radius: 50px;
     cursor: pointer;
     transition: box-shadow 0.2s ease, opacity 0.2s ease;
@@ -885,7 +885,7 @@ html {
     max-width: 500px;
     text-align: center;
     box-sizing: border-box;
-    margin: 0;
+    margin: 0 0 20px 0;
     flex-shrink: 0;
 }
 
@@ -1974,8 +1974,9 @@ html {
     
     .btn-continue {
         bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-        padding: 12px 24px;
+        padding: 16px 24px;
         font-size: 0.9em;
+        margin: 0 0 15px 0;
     }
 
     .game-mobile-layout {
@@ -3112,7 +3113,7 @@ html {
     /* Header: fixe en dessous du lecteur musique (~40px) */
     #game-screen .top-bar {
         position: fixed;
-        top: 40px;
+        top: 60px;
         left: 0;
         width: 100%;
         z-index: 1000;
@@ -3426,7 +3427,7 @@ html {
         display: flex;
         flex-direction: column;
         position: fixed;
-        top: 0;
+        top: 60px;
         left: 0;
         width: 100%;
         height: 100%;
@@ -3443,7 +3444,7 @@ html {
     /* Header: fixe en dessous du lecteur musique (~40px) */
     #game-screen .top-bar {
         position: fixed;
-        top: 40px;
+        top: 60px;
         left: 0;
         width: 100%;
         z-index: 1000;
