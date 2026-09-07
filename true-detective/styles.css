@@ -3891,3 +3891,32 @@ html {
         margin: 0;
     }
 }
+
+/* Shared mobile rhythm: the music player is always a 56px header. */
+@media (max-width: 768px) {
+    .screen {
+        padding-top: 56px;
+    }
+
+    .mobile-header,
+    .top-bar,
+    #game-screen .top-bar {
+        top: 56px;
+    }
+
+    #game-screen {
+        top: 56px;
+    }
+
+    #game-screen .game-mobile-layout {
+        padding-top: 100px;
+    }
+
+    #game-screen .dialogue-container {
+        top: 104px;
+    }
+
+    #minigame-screen {
+        padding: 56px 8px 8px;
+    }
+}
