@@ -2714,10 +2714,13 @@ langEnBtn: document.getElementById('lang-en'),
         $.typingBtn.textContent = enabled ? '⌨' : '⌧';
         var themeId = getThemeId();
         if (themeId === 'cyberpunk' || themeId === 'sci-fi') {
-            $.typingBtn.title = enabled ? 'Son de clavier activé' : 'Son de clavier désactivé';
+            $.typingBtn.title = enabled ? 'Son de clavier cyberpunk activé' : 'Son de clavier cyberpunk désactivé';
+        } else if (themeId === 'film-noir') {
+            $.typingBtn.title = enabled ? 'Bruit de machine à écrire noir activé' : 'Bruit de machine à écrire noir désactivé';
         } else {
-            $.typingBtn.title = enabled ? 'Son de machine à écrire activé' : 'Son de machine à écrire désactivé';
+            $.typingBtn.title = enabled ? 'Bruit de machine à écrire activé' : 'Bruit de machine à écrire désactivé';
         }
+        $.typingBtn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
         $.typingBtn.setAttribute('aria-label', $.typingBtn.title);
         $.typingBtn.classList.remove('hidden');
     }

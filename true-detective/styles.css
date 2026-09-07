@@ -1120,6 +1120,44 @@ html {
     cursor: not-allowed;
 }
 
+/* Keep text actions readable when translations or generated labels are longer. */
+.btn:not(.btn-icon) {
+    min-height: 42px;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    justify-content: center;
+    text-align: center;
+}
+
+.btn-choice {
+    min-height: 48px;
+}
+
+.btn-icon {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .screen {
+        padding-top: 56px;
+    }
+
+    .top-bar,
+    #game-screen .top-bar {
+        top: 56px;
+    }
+
+    #game-screen .game-mobile-layout {
+        padding-top: 100px;
+    }
+
+    .top-bar-right .btn-icon {
+        min-width: 36px;
+    }
+}
+
 /* ===== Dialogue ===== */
 
 .dialogue-container {
