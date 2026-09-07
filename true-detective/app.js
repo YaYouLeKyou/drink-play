@@ -267,6 +267,8 @@
         muteBtn: document.getElementById('mute-btn'),
         volumeBtn: document.getElementById('volume-btn'),
         typingBtn: document.getElementById('typing-btn'),
+        settingsToggle: document.getElementById('mobile-settings-toggle'),
+        settingsPanel: document.getElementById('settings-menu-panel'),
 langEnBtn: document.getElementById('lang-en'),
     langFrBtn: document.getElementById('lang-fr'),
     langEnHomeBtn: document.getElementById('lang-en-home'),
@@ -546,6 +548,21 @@ langEnBtn: document.getElementById('lang-en'),
             $.mobileContinueBtn.addEventListener('click', handleContinue);
         }
 
+        if ($.settingsToggle && $.settingsPanel) {
+            $.settingsToggle.addEventListener('click', function (event) {
+                event.stopPropagation();
+                var open = $.settingsPanel.classList.toggle('open');
+                $.settingsToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+            $.settingsPanel.addEventListener('click', function (event) {
+                event.stopPropagation();
+            });
+            document.addEventListener('click', closeSettingsMenu);
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') closeSettingsMenu();
+            });
+        }
+
         if ($.sendBtn) {
             $.sendBtn.addEventListener('click', function () {
                 sendPlayerText();
@@ -744,6 +761,11 @@ langEnBtn: document.getElementById('lang-en'),
                 skipTypeWriter();
             }
         });
+    }
+
+    function closeSettingsMenu() {
+        if ($.settingsPanel) $.settingsPanel.classList.remove('open');
+        if ($.settingsToggle) $.settingsToggle.setAttribute('aria-expanded', 'false');
     }
 
     function updateLanguageUI() {

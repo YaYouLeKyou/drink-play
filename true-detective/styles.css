@@ -693,6 +693,14 @@ html {
     align-items: center;
 }
 
+.mobile-settings-toggle {
+    display: none;
+}
+
+.settings-menu-panel {
+    position: relative;
+}
+
 .lang-toggle {
     position: absolute;
     top: 20px;
@@ -3316,6 +3324,16 @@ html {
         display: block;
     }
 
+    #game-screen .npc-image.npc-full,
+    #game-screen .npc-image.npc-closeup {
+        width: auto;
+        height: auto;
+        max-width: min(92vw, 360px);
+        max-height: calc(100% - 8px);
+        object-fit: contain;
+        object-position: bottom center;
+    }
+
     /* Bouton Continuer: fixe en bas avec marge de sécurité */
     #game-screen .btn-continue {
         position: fixed;
@@ -3631,6 +3649,12 @@ html {
         display: block;
     }
 
+    #game-screen .npc-image.npc-full,
+    #game-screen .npc-image.npc-closeup {
+        max-width: min(92vw, 320px);
+        max-height: calc(100% - 6px);
+    }
+
     /* Bouton Continuer: fixe en bas avec marge de sécurité */
     #game-screen .btn-continue {
         position: fixed;
@@ -3918,5 +3942,72 @@ html {
 
     #minigame-screen {
         padding: 56px 8px 8px;
+    }
+
+    .top-bar-left {
+        width: calc(100% - 52px);
+        min-width: 0;
+        padding-right: 4px;
+    }
+
+    .mobile-settings-toggle {
+        display: flex;
+        position: absolute;
+        top: 4px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        border-radius: 9px;
+        z-index: 1101;
+    }
+
+    .top-bar-right.settings-menu-panel {
+        display: none;
+        position: absolute;
+        top: 44px;
+        right: 8px;
+        width: min(240px, calc(100vw - 16px));
+        max-height: calc(100vh - 130px);
+        padding: 8px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        overflow-y: auto;
+        background: rgba(8, 18, 30, 0.97);
+        border: 1px solid rgba(0, 255, 255, 0.35);
+        border-radius: 12px;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55);
+        z-index: 1100;
+    }
+
+    .top-bar-right.settings-menu-panel.open {
+        display: flex;
+    }
+
+    .settings-menu-panel .lang-selector {
+        display: flex;
+        gap: 6px;
+    }
+
+    .settings-menu-panel .lang-btn,
+    .settings-menu-panel .btn-icon {
+        min-height: 40px;
+    }
+
+    .settings-menu-panel .btn-icon {
+        width: 100%;
+        height: 40px;
+        flex: 0 0 auto;
+        justify-content: flex-start;
+        padding: 0 12px;
+        border-radius: 8px;
+    }
+
+    .settings-menu-panel .music-info,
+    .settings-menu-panel .narration-timer {
+        padding: 5px 8px;
+        white-space: normal;
+        text-align: left;
     }
 }
