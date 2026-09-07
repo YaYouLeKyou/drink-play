@@ -571,8 +571,18 @@
         var ctx = ensureTypingCtx();
         if (!ctx) return;
         var unlock = function () {
-            if (typingCtx && typingCtx.state === 'suspended') {
-                typingCtx.resume();
+            if (typingCtx) {
+                if (typingCtx.state === 'suspended') {
+                    typingCtx.resume();
+                }
+                // Play a silent buffer to force-unlock the audio context
+                try {
+                    var buf = typingCtx.createBuffer(1, 1, 22050);
+                    var src = typingCtx.createBufferSource();
+                    src.buffer = buf;
+                    src.connect(typingCtx.destination);
+                    src.start(0);
+                } catch (e) { /* ignore */ }
             }
             document.removeEventListener('click', unlock);
             document.removeEventListener('keydown', unlock);
@@ -587,11 +597,12 @@
     function playTypingSound() {
         if (!typingSoundEnabled || muted) return;
         var ctx = ensureTypingCtx();
-        if (!ctx || ctx.state !== 'running') return;
+        if (!ctx) return;
+        if (ctx.state !== 'running') return;
 
         var cyber = isCyberpunkTheme();
         var now = ctx.currentTime;
-        var masterVol = volume * 0.35;
+        var masterVol = volume * 0.5;
 
         if (cyber) {
             // Futuristic computer "blip" : short descending oscillator with

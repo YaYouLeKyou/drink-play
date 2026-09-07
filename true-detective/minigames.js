@@ -545,10 +545,11 @@
                 var rw = wrap.getBoundingClientRect();
                 var relX = ((sw.left + sw.right) / 2 - rw.left) / rw.width * 100;
                 var relY = ((sw.top + sw.bottom) / 2 - rw.top) / rw.height * 100;
-                var winW = 88, winH = 50;
-                if (relX < winW) relX = Math.min(relX + winW, 100 - winW / 2);
-                if (relX > 100 - winW) relX = Math.max(100 - winW, winW / 2);
-                if (relY > 100 - winH) relY = Math.max(0, relY - winH);
+                var winHalfW = 22; // half of 44% window width
+                var winH = 55; // approximate window height in %
+                // Clamp so the window stays fully inside the scene
+                relX = Math.max(winHalfW, Math.min(100 - winHalfW, relX));
+                relY = Math.max(0, Math.min(100 - winH, relY + 4));
                 win.style.left = relX + '%';
                 win.style.top = relY + '%';
                 win.style.transform = 'translate(-50%, 0)';
