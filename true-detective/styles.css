@@ -3944,6 +3944,23 @@ html {
         padding: 56px 8px 8px;
     }
 
+    #game-screen .game-visuals {
+        height: min(52vh, 390px);
+    }
+
+    #game-screen .bg-layer {
+        background-size: contain;
+        background-position: center bottom;
+        background-repeat: no-repeat;
+    }
+
+    #game-screen .npc-image,
+    #game-screen .npc-image.npc-full,
+    #game-screen .npc-image.npc-closeup {
+        max-width: min(96vw, 380px);
+        max-height: calc(100% - 4px);
+    }
+
     .top-bar-left {
         width: calc(100% - 52px);
         min-width: 0;
