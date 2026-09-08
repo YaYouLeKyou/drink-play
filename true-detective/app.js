@@ -545,7 +545,21 @@ langEnBtn: document.getElementById('lang-en'),
         }
 
         if ($.mobileContinueBtn) {
-            $.mobileContinueBtn.addEventListener('click', handleContinue);
+            $.mobileContinueBtn.addEventListener('click', function () {
+                // Le mode scénario configure le bouton desktop selon l'étape
+                // courante : page suivante, mini-jeu, choix ou interrogation.
+                if (typeof scr !== 'undefined' && scr && scr.active) {
+                    if (ui.isTyping) {
+                        skipTypeWriter();
+                        return;
+                    }
+                    if ($.continueBtn && typeof $.continueBtn.onclick === 'function') {
+                        $.continueBtn.onclick();
+                    }
+                    return;
+                }
+                handleContinue();
+            });
         }
 
         if ($.settingsToggle && $.settingsPanel) {
