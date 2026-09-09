@@ -3606,7 +3606,17 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         }
         if (page.interrogation && window.TDNarration && window.TDNarration.interrogations &&
             (window.TDNarration.interrogations[page.interrogation] || page.interrogation === 'dynamic')) {
-            scrStartInterrogation(page);
+            var interroId = page.interrogation;
+            if (interroId === 'dynamic') {
+                var s2 = scrGetState();
+                interroId = s2.prochainSuspect || 'suspect';
+            }
+            var alreadyDone = scr.interro && scr.interro.done && scr.interro.id === interroId;
+            if (!alreadyDone) {
+                scrStartInterrogation(page);
+            } else {
+                scrShowAdvance(page);
+            }
             return;
         }
         scrShowAdvance(page);
@@ -3742,14 +3752,21 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     }
 
     function scrInterroRounds(data) {
+        if (!data) { return []; }
         if (data.rounds && data.rounds.length) { return data.rounds; }
-        if (data.rounds2 || data.rounds3) {
-            var rounds = [data.questions || []];
-            if (data.rounds2) rounds.push(data.rounds2);
-            if (data.rounds3) rounds.push(data.rounds3);
-            return rounds;
-        }
-        return [data.questions || []];
+        var rounds = [];
+        var addRound = function (item) {
+            if (!item) { return; }
+            if (Array.isArray(item)) {
+                rounds.push(item.length ? item : []);
+            } else {
+                rounds.push([item]);
+            }
+        };
+        addRound(data.questions);
+        addRound(data.rounds2);
+        addRound(data.rounds3);
+        return rounds.length ? rounds : [[]];
     }
 
     function scrStartInterrogation(page) {
@@ -3900,7 +3917,6 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.continueBtn.textContent = getText('continue') || 'Continuer';
         $.continueBtn.onclick = function () {
             if (scr.interro && !scr.interro.done) { return; }
-            scr.interro = null;
             var s = scrGetState();
             if (s.prochainSuspect) {
                 s.prochainSuspect = null;
