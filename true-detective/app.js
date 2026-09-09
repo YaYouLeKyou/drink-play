@@ -280,8 +280,11 @@ langEnBtn: document.getElementById('lang-en'),
     themeBackToHubBtn: document.getElementById('theme-back-to-hub-btn'),
     homeSettingsToggle: document.getElementById('home-mobile-settings-toggle'),
     homeSettingsPanel: document.getElementById('home-settings-panel'),
-    musicInfo: document.getElementById('music-info'),
-    narrationTimer: document.getElementById('narration-timer'),
+        musicInfo: document.getElementById('music-info'),
+        narrationTimer: document.getElementById('narration-timer'),
+        musicToggleBtn: document.getElementById('music-toggle-btn'),
+        themeSettingsToggle: document.getElementById('theme-settings-toggle'),
+        themeSettingsPanel: document.getElementById('theme-settings-panel'),
         objectiveDisplay: document.getElementById('objective-display'),
         objectiveText: document.getElementById('objective-text'),
         dialogueHistory: document.getElementById('dialogue-history'),
@@ -610,6 +613,31 @@ function saveSettings() {
                 if (event.key === 'Escape') closeHomeSettingsMenu();
             });
         }
+
+        if ($.themeSettingsToggle && $.themeSettingsPanel) {
+            $.themeSettingsToggle.addEventListener('click', function (event) {
+                event.stopPropagation();
+                var open = $.themeSettingsPanel.classList.toggle('open');
+                $.themeSettingsToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+            $.themeSettingsPanel.addEventListener('click', function (event) {
+                event.stopPropagation();
+            });
+            document.addEventListener('click', closeThemeSettingsMenu);
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') closeThemeSettingsMenu();
+            });
+        }
+
+        if ($.musicToggleBtn) {
+            $.musicToggleBtn.addEventListener('click', function () {
+                var player = document.getElementById('dp-music-player');
+                if (!player) return;
+                var hidden = player.classList.toggle('music-hidden');
+                $.musicToggleBtn.querySelector('.btn-text-label').textContent = hidden ? 'Show Music' : 'Music';
+                $.musicToggleBtn.querySelector('.btn-icon-label').textContent = hidden ? '🔇' : '🎵';
+            });
+        }
         
         // Add orientation toggle handler
         if ($.orientationToggle) {
@@ -855,6 +883,11 @@ function saveSettings() {
     function closeHomeSettingsMenu() {
         if ($.homeSettingsPanel) $.homeSettingsPanel.classList.remove('open');
         if ($.homeSettingsToggle) $.homeSettingsToggle.setAttribute('aria-expanded', 'false');
+    }
+
+    function closeThemeSettingsMenu() {
+        if ($.themeSettingsPanel) $.themeSettingsPanel.classList.remove('open');
+        if ($.themeSettingsToggle) $.themeSettingsToggle.setAttribute('aria-expanded', 'false');
     }
 
     function updateLanguageUI() {
@@ -3784,7 +3817,6 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     response = scrSubstituteNames(response, getThemeId());
     typeWriter(response, function () {
         if (!scr.active) { return; }
-        // Indice extrait de la réponse (« [Indice X] ... » / « [X clue] ... ») → journal
         var clue = scrClueFromInterroResponse(response);
         if (clue) {
             var s = scrGetState();
@@ -3804,20 +3836,20 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             updateNotebook();
         }
         var it = scr.interro;
-        it.round++;
+        if (!it.answeredQuestions) { it.answeredQuestions = []; }
+        it.answeredQuestions.push(q.id || q.label);
         var rounds = scrInterroRounds(window.TDNarration.interrogations[it.id]);
-        // Check if all questions in current round have been answered
         var currentRoundQuestions = rounds[it.round] || [];
-        var answeredQuestions = it.answeredQuestions || [];
-        if (currentRoundQuestions.length > 0) {
-            // If there are still unanswered questions in this round, stay in this round
-            if (currentRoundQuestions.length > currentRoundQuestions.filter(q => q.done).length) {
-                // Still questions to answer in this round
-                return;
-            }
+        var remainingInRound = currentRoundQuestions.filter(function (rq) {
+            var rid = rq.id || rq.label;
+            return it.answeredQuestions.indexOf(rid) === -1;
+        });
+        if (remainingInRound.length > 0) {
+            scrShowInterroQuestions();
+            return;
         }
-        // All questions in current round answered, move to next round or end interrogation
-        if (it.round < rounds.length && rounds[it.round] && rounds[it.round].length) {
+        if (it.round + 1 < rounds.length && rounds[it.round + 1] && rounds[it.round + 1].length) {
+            it.round++;
             scrShowInterroAskButton();
         } else {
             scrEndInterrogation();

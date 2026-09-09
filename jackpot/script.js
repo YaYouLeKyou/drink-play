@@ -56,93 +56,93 @@ const profileBases = [
         emoji: '🤠',
         group: 'en',
         lang: 'en-US',
-        rate: 0.88,
-        malePitch: 0.55,
+        rate: 1.2,
+        malePitch: 0.75,
         femalePitch: 0.92,
         maleVoiceHint: 'david|alex|daniel|mark|james|en-US',
         femaleVoiceHint: 'karen|samantha|victoria|moira|en-US',
         ready: [
-            "Howdy, folks! Let's get this wheel spinning!",
-            "Yee-haw! The Jackpot is loaded and ready!",
-            "Grab your hats, we're fixin' to spin!",
-            "Whoa there! Get ready for a ripper of a time!",
-            "Welcome to the rowdiest saloon this side of the Pecos!",
-            "Saddle up, partners! Fortune favors the bold and the thirsty!",
-            "The reels are hotter than a branding iron tonight!",
-            "Step right up! Every spin's a brand new adventure under the big Texas sky!",
-            "Yeeeehaw! Let's make memories and empty some glasses!",
-            "The gold rush ain't got nothing on this jackpot, I reckon!",
-            "Giddy up! Luck loves a brave Texan!",
-            "Tonight we spin like there's no tomorrow, y'all!"
+            "YEEHAW, partner! Let's rip this wheel apart!",
+            "Hot dang! The Jackpot is BLAZING and ready!",
+            "Saddle up, cowboy! We're about to make some NOISE!",
+            "Whoa there, hold onto your hats — this ride's gonna be WILD!",
+            "Welcome to the rowdiest, loudest, FUNNEST saloon in the whole dang West!",
+            "Giddy up! Fortune favors the bold, the thirsty, and the absolutely CRAZY!",
+            "The reels are hotter than a branding iron on a summer afternoon!",
+            "Step right up! Every spin's a brand new disaster waiting to happen!",
+            "YEEEEEHAW! Let's turn this party upside down!",
+            "The gold rush ain't got NOTHING on this jackpot, partner!",
+            "Lock and load! Luck loves a fast-talking, fast-spinning cowboy!",
+            "Tonight we spin like there's no tomorrow and drink like fish! Let's GO!"
         ],
         spinning: [
-            'Spinning...',
-            "Hold on tight, y'all!",
-            "You ain't seen nothin' yet!",
-            'Round and round she goes!',
-            'My spurs are tingling!',
-            'Here we go, hold your horses!'
+            'HERE WE GO!',
+            "Hang on tight, partner!",
+            "YOU AIN'T SEEN NOTHIN' YET!",
+            'Round and round she goes — faster than a jackrabbit on a hot date!',
+            'My spurs are tingling and my hat is flyin\'!',
+            'Hold onto your drinks, folks!'
         ],
         win: [
-            'Jackpot! You hit the motherlode!',
-            "Hot diggity dog, that's a hit!",
-            'Look at that luck, partner!',
-            "Yeehaw! That's how we do it in Texas!",
-            'You knocked it out of the park!',
-            'Praise the golden horseshoe!',
-            'The saloon goes wild! Drink up, partner!',
-            "Sweet mother of tumbleweeds, what a spin!",
-            "I ain't seen luck like that since the gold rush!",
-            'That deserves a drink as big as Texas!',
-            'Ride that lucky streak, cowboy!'
+            'JACKPOT! You hit the motherlode, you absolute MADMAN!',
+            "Hot diggity dog, that's a HIT! I can't believe my eyes!",
+            "Look at that luck, partner! You're on FIRE!",
+            "YEEHAW! That's how we do it in Texas, baby!",
+            'You knocked it out of the park and into next week!',
+            'Praise the golden horseshoe — that was BEAUTIFUL!',
+            "The whole dang saloon goes wild! DRINK UP, partner!",
+            "Sweet mother of tumbleweeds, what a SPIN!",
+            "I ain't seen luck like that since the Great Gold Rush of '49!",
+            "That deserves a drink as big as TEXAS!",
+            'Ride that lucky streak all the way to the bank, cowboy!'
         ],
         lose: [
-            'Next time, partner!',
-            "Keep tryin', y'all!",
-            'Better luck next spin!',
-            'Not today, but tomorrow\'s another day!',
-            'Dust yourself off and try again!',
-            'Aw shucks, so close!',
-            "The wheel's shy tonight...",
-            'Even the best Texans miss the bullseye!',
-            "Don't cry in your beer, partner — spin again!"
+            'Next time, partner — don\'t you quit now!',
+            "Keep tryin', y'all — even a blind squirrel finds a nut!",
+            'Better luck next spin! This ol\' wheel\'s just teasin\' ya!',
+            'Not today, but tomorrow\'s another shot at glory!',
+            'Dust yourself off and spin again, cowboy!',
+            "Aw shucks, so close I can taste it!",
+            "The wheel's shy tonight... but it won't be for long!",
+            "Even the best Texans miss the bullseye sometimes!",
+            "Don't cry in your beer, partner — spin again and show 'em who's boss!"
         ],
         idle: [
-            "This wheel ain't gonna spin itself, partner!",
-            'A Texan never waits — he rides!',
-            'The Jackpot is getting impatient!',
-            'My horse spins more than you do!',
-            'In all my years on the prairie, I never saw a jackpot win itself!',
-            'Hey! The drinks are getting warm over here!',
-            'Even my cactus is more animated than this!',
-            'The tumbleweeds are bored, partner!',
-            'Fortune knocks softly... but the wheel needs a push!'
+            "This wheel ain't gonna spin itself, lazybones! Get movin'!",
+            'A Texan never waits — he RIDES! What are you waiting for?!',
+            'The Jackpot is gettin\' impatient and so am I!',
+            "My horse spins more than you do — and he's DEAD!",
+            'In all my years on the prairie, I never saw a jackpot win itself! Get to it!',
+            'Hey! The drinks are gettin\' warm and my patience is runnin\' thin!',
+            "Even my cactus is more animated than this! C'mon, PEOPLE!",
+            "The tumbleweeds are bored, partner! Do something!",
+            "Fortune knocks softly... but I'm about to kick the door down! Spin it!"
         ],
-        spinCommand: ['Spin!', 'GO!', "Let's do this!", 'Show me what you got!', 'Yeehaw!'],
+        spinCommand: ['SPIN!', 'GO!', "Let's DO this!", 'Show me what you got!', 'YEEHAW!'],
         start: [
-            'Let the good times roll, partner!',
-            'Another round, another chance at glory!',
-            'Time to get this party started!',
-            'Round two, here we come!',
-            'Ready for another wild ride?'
+            "Let the good times ROLL, partner!",
+            "Another round, another chance at glory!",
+            "Time to get this party STARTED!",
+            "Round two, here we come! Let's get CRAZY!",
+            "Ready for another wild ride? Buckle up, buttercup!"
         ],
         winChallenge: [
-            "You drew the lucky straw! Your challenge is: {{challenge}} — Drink up and have fun with it!",
-            "Jackpot! The spirits of the saloon decree: {{challenge}} Make it count, partner!",
-            "Hot damn! The cards have spoken: {{challenge}} Show 'em how it's done!",
-            "Ain't that a beaut! Your dare is: {{challenge}} Living dangerously, I like it!",
-            "The jackpot gods are smiling: {{challenge}} Take this drink like a true Texan!",
-            "Sweet mother of tumbleweeds! Your mission: {{challenge}} Ride that storm, partner!",
-            "The wheel of fortune spins in your favor! {{challenge}} — No backing down now!",
-            "That's a big win! The challenge: {{challenge}} Make it as legendary as this spin!"
+            "You drew the lucky straw, you mad genius! Your challenge: {{challenge}} — Drink up and OWN it!",
+            "Jackpot! The spirits of the saloon decree: {{challenge}} Make it legendary, partner!",
+            "Hot dang! The cards have spoken: {{challenge}} Show 'em how it's DONE!",
+            "Ain't that a BEAUT! Your dare is: {{challenge}} — Live dangerously, I love it!",
+            "The jackpot gods are smiling: {{challenge}} — Take this drink like a TRUE Texan!",
+            "Sweet mother of tumbleweeds! Your mission: {{challenge}} — Ride that storm, partner!",
+            "The wheel of fortune spins in your favor! {{challenge}} — No backing down now, coward!",
+            "That's a BIG win! The challenge: {{challenge}} — Make it as legendary as this spin!"
         ],
         loseReaction: [
-            "No match this time, but the drinks keep flowing! Try again!",
+            "No match this time, but the drinks keep flowin'! Try again, don't be a quitter!",
             "A miss is as good as a mile, but this ain't no time for sad faces! Spin again!",
-            "The wheel says not today, but fortune is fickle — don't give up!",
+            "The wheel says not today, but fortune is fickle — don't you DARE give up!",
             "Close only counts in horseshoes and hand grenades! Give it another whirl!",
-            "The reels are shy tonight… or are they? Let's find out with another spin!",
-            "Not the jackpot, but the night is still young! Spin that wheel!"
+            "The reels are shy tonight… or are they? Let's find out with ANOTHER spin!",
+            "Not the jackpot, but the night is still young! Spin that wheel, cowboy!"
         ]
     },
     {
@@ -962,8 +962,8 @@ function speakCowboy(text) {
         const utterance = new SpeechSynthesisUtterance(String(text));
         utterance.lang = profile ? profile.lang : 'en-US';
         if (cowboyVoice) utterance.voice = cowboyVoice;
-        utterance.rate = profile ? profile.rate : 0.88;
-        utterance.pitch = profile ? profile.pitch : 0.55;
+        utterance.rate = profile ? profile.rate : 1.2;
+        utterance.pitch = profile ? profile.pitch : 0.75;
         utterance.volume = cowboyVolume;
         utterance.onstart = () => { cowboyHasSpoken = true; };
         window.speechSynthesis.speak(utterance);

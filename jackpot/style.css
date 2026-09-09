@@ -1,10 +1,11 @@
 html,
 body {
-    overflow: hidden;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
 }
 
 body {
@@ -13,6 +14,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    min-height: 100dvh;
     margin: 0;
     background-color: #222;
     color: #eee;
@@ -23,6 +25,8 @@ body {
     background-attachment: fixed;
     padding-top: 56px;
     box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -395,7 +399,8 @@ body {
     text-align: center;
     width: 90%;
     max-width: 500px;
-    max-height: calc(100vh - 24px);
+    max-height: calc(100vh - 80px);
+    max-height: calc(100dvh - 80px);
     overflow-y: auto;
 }
 
@@ -802,6 +807,9 @@ setup-section {
 
 /* Responsive */
 @media (max-width: 768px) {
+    body {
+        background-attachment: scroll;
+    }
     .slot {
         font-size: 3em;
         width: 70px;
