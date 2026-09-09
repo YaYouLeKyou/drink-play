@@ -41,6 +41,42 @@ html {
 
 /* ===== Home / Splash Screen ===== */
 
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Special Elite', 'Courier New', monospace;
+    background: radial-gradient(ellipse at bottom, #0a0a1a 0%, #000000 70%);
+    color: #e0e0ff;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 20% 80%, rgba(0, 255, 200, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 0, 200, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+html {
+    font-size: 16px;
+}
+
+@media (max-width: 480px) {
+    html { font-size: 14px; }
+}
+
+/* ===== Home / Splash Screen ===== */
+
 .home-content {
     text-align: center;
     z-index: 10;
@@ -192,9 +228,9 @@ html {
         margin-bottom: 0;
     }
 
-#hub-btn {
-    display: block;
-}
+    #hub-btn {
+        display: block;
+    }
 }
 
 @media (max-width: 480px) {
@@ -901,7 +937,7 @@ html {
     left: 50%;
     transform: translateX(-50%);
     z-index: 300;
-    width: calc(100vw - 24px);
+    width: auto;
     max-width: 500px;
     text-align: center;
     box-sizing: border-box;
@@ -2033,8 +2069,8 @@ html {
     }
     
     .npc-image {
-        max-width: 95%;
-        max-height: 60vh;
+        max-width: 96%;
+        max-height: 65vh;
     }
 
     /* Decor image: fill the space on mobile */
@@ -3250,14 +3286,15 @@ html {
     }
 
     /* ===== Décor et personnage: fixe dans la moitié basse de l'écran =====
-       Occupent la moitié basse, au-dessus du bouton Continuer.
+       Occupent la moitié basse (~50-55%), au-dessus du bouton Continuer.
+       Le décor peut déborder (image plus grande que le conteneur).
        Ils ne bougent jamais, même si le texte s'agrandit. */
     #game-screen .game-visuals {
         position: fixed;
         bottom: 60px;
         left: 0;
         width: 100%;
-        height: 50vh;
+        height: 55vh;
         min-height: 0;
         margin-top: 0;
         padding: 0;
@@ -3315,7 +3352,7 @@ html {
         bottom: auto;
         left: auto;
         transform: none;
-        max-width: 90%;
+        max-width: 95%;
         max-height: 95%;
         width: auto;
         height: auto;
@@ -3328,7 +3365,7 @@ html {
     #game-screen .npc-image.npc-closeup {
         width: auto;
         height: auto;
-        max-width: min(92vw, 360px);
+        max-width: min(96vw, 420px);
         max-height: calc(100% - 8px);
         object-fit: contain;
         object-position: bottom center;
@@ -3945,7 +3982,8 @@ html {
     }
 
     #game-screen .game-visuals {
-        height: min(52vh, 390px);
+        height: 100vh;
+        min-height: 560px;
     }
 
     #game-screen .bg-layer {
@@ -4002,6 +4040,29 @@ html {
         display: flex;
     }
 
+    .mobile-header .settings-menu-panel {
+        display: none;
+        position: absolute;
+        top: 44px;
+        right: 8px;
+        width: min(240px, calc(100vw - 16px));
+        max-height: calc(100vh - 130px);
+        padding: 8px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        overflow-y: auto;
+        background: rgba(8, 18, 30, 0.97);
+        border: 1px solid rgba(0, 255, 255, 0.35);
+        border-radius: 12px;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55);
+        z-index: 1100;
+    }
+
+    .mobile-header .settings-menu-panel.open {
+        display: flex;
+    }
+
     .settings-menu-panel .lang-selector {
         display: flex;
         gap: 6px;
@@ -4026,5 +4087,11 @@ html {
         padding: 5px 8px;
         white-space: normal;
         text-align: left;
+    }
+
+    /* Main scene only: keep the full decorative image behind the character. */
+    #game-screen .game-visuals {
+        height: 100vh !important;
+        min-height: 560px;
     }
 }

@@ -14,10 +14,13 @@
         <!-- ===== HOME / SPLASH SCREEN ===== -->
         <section id="home-screen" class="screen active">
             <header class="mobile-header">
-                <button id="hub-btn" class="btn btn-icon btn-back-to-hub" title="Retour au hub" aria-label="Retour au hub">⌂</button>
-                <div class="lang-toggle">
-                    <button id="lang-en-home" class="lang-btn active-lang" title="English">EN</button>
-                    <button id="lang-fr-home" class="lang-btn" title="Français">FR</button>
+                <button id="home-mobile-settings-toggle" class="btn btn-icon mobile-settings-toggle" type="button" aria-label="Ouvrir les réglages" aria-expanded="false">☰</button>
+                <div class="top-bar-right settings-menu-panel" id="home-settings-panel">
+                    <div class="lang-selector">
+                        <button id="lang-en-home" class="lang-btn active-lang" title="English">🌍 English</button>
+                        <button id="lang-fr-home" class="lang-btn" title="Français">🌍 Français</button>
+                    </div>
+                    <button id="hub-btn" class="btn btn-icon btn-back-to-hub" title="Retour au hub" aria-label="Retour au hub">⌂ Retour au hub</button>
                 </div>
             </header>
             <div class="home-content">

@@ -675,25 +675,25 @@
             // Soft futuristic key tone: rounded rather than a sharp alert.
             var osc = ctx.createOscillator();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(620 + Math.random() * 120, now);
-            osc.frequency.exponentialRampToValueAtTime(260 + Math.random() * 70, now + 0.1);
+            osc.frequency.setValueAtTime(420 + Math.random() * 80, now);
+            osc.frequency.exponentialRampToValueAtTime(180 + Math.random() * 50, now + 0.1);
 
             var gain = ctx.createGain();
             gain.gain.setValueAtTime(0.001, now);
-            gain.gain.linearRampToValueAtTime(masterVol * 0.8, now + 0.018);
+            gain.gain.linearRampToValueAtTime(masterVol * 0.5, now + 0.018);
             gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
 
-            // Noise crackle for texture
-            var noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.04, ctx.sampleRate);
+            // Minimal noise for texture - subtle, not harsh
+            var noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.02, ctx.sampleRate);
             var d = noiseBuf.getChannelData(0);
             for (var i = 0; i < d.length; i++) {
-                d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 5) * 0.25;
+                d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3) * 0.08;
             }
             var noiseSrc = ctx.createBufferSource();
             noiseSrc.buffer = noiseBuf;
             var noiseGain = ctx.createGain();
             noiseGain.gain.setValueAtTime(0.001, now);
-            noiseGain.gain.linearRampToValueAtTime(masterVol * 0.12, now + 0.018);
+            noiseGain.gain.linearRampToValueAtTime(masterVol * 0.06, now + 0.018);
             noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
 
             osc.connect(gain);

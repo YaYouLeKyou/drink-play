@@ -23,14 +23,28 @@
         }
         var content = document.createElement('div');
         content.className = 'minigame-content';
-        if (cfg.wide) content.classList.add('scene-wide');
-        if (useOverlay) {
-            if (layer) { layer.innerHTML = ''; layer.classList.add('active'); }
-            if (layer) layer.appendChild(content);
-        } else {
-            target.innerHTML = '';
-            target.appendChild(content);
-        }
+            if (cfg.wide) content.classList.add('scene-wide');
+            
+            /* Handle mobile screen orientation for watch and crime scene games */
+            if (cfg.type === 'scene_fouille' || cfg.type === 'montre_code') {
+                if (window.innerWidth <= 768 && window.innerHeight > window.innerWidth) {
+                    /* Landscape mode on mobile - add full-screen class */
+                    content.classList.add('landscape-mode');
+                }
+                
+                /* Ensure full-size background for mini games */
+                if (content && content.classList.contains('minigame-content')) {
+                    content.classList.add('full-background');
+                }
+            }
+            
+            if (useOverlay) {
+                if (layer) { layer.innerHTML = ''; layer.classList.add('active'); }
+                if (layer) layer.appendChild(content);
+            } else {
+                target.innerHTML = '';
+                target.appendChild(content);
+            }
 
         var titleEl = document.createElement('div');
         titleEl.className = 'minigame-title';
@@ -541,10 +555,8 @@
                 moveLoupe(clientX, clientY);
             }
             function endDrag() { isDragging = false; }
-            wrap.addEventListener('mousedown', startDrag);
-            wrap.addEventListener('mousemove', function (e) { if (isDragging) drag(e); });
-            wrap.addEventListener('mouseup', endDrag);
-            wrap.addEventListener('mouseleave', endDrag);
+            wrap.addEventListener('mousemove', function (e) { moveLoupe(e.clientX, e.clientY); });
+            wrap.addEventListener('mouseleave', function () { loupe.style.display = 'none'; });
             wrap.addEventListener('touchstart', startDrag, { passive: false });
             wrap.addEventListener('touchmove', drag, { passive: false });
             wrap.addEventListener('touchend', endDrag);
@@ -580,22 +592,14 @@
                 close.addEventListener('click', function () { win.remove(); win = null; });
                 win.appendChild(head); win.appendChild(txt); win.appendChild(close);
                 wrap.appendChild(win);
-                // Position near the spot, clamped to the scene bounds
-                var sw = spot.getBoundingClientRect();
-                var rw = wrap.getBoundingClientRect();
-                var relX = ((sw.left + sw.right) / 2 - rw.left) / rw.width * 100;
-                var relY = ((sw.top + sw.bottom) / 2 - rw.top) / rw.height * 100;
-                var winHalfW = 22; // half of 44% window width
-                var winH = 55; // approximate window height in %
-                // Clamp so the window stays fully inside the scene
-                relX = Math.max(winHalfW, Math.min(100 - winHalfW, relX));
-                relY = Math.max(0, Math.min(100 - winH, relY + 4));
-                win.style.left = relX + '%';
-                win.style.top = relY + '%';
+                win.style.left = '50%';
+                win.style.top = 'auto';
+                win.style.bottom = '12px';
                 win.style.transform = 'translate(-50%, 0)';
-                win.style.maxWidth = 'none';
-                win.style.width = '44%';
+                win.style.width = 'min(92%, 520px)';
+                win.style.maxWidth = '520px';
                 win.style.maxHeight = 'none';
+                win.style.zIndex = '2000';
                 if (!spot.dataset.done) {
                     spot.dataset.done = '1';
                     spot.classList.add('found');

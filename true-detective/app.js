@@ -276,10 +276,12 @@ langEnBtn: document.getElementById('lang-en'),
     langEnThemeBtn: document.getElementById('lang-en-theme'),
     langFrThemeBtn: document.getElementById('lang-fr-theme'),
     restartBtn: document.getElementById('restart-btn'),
-        gameBackToHubBtn: document.getElementById('game-back-to-hub-btn'),
-        themeBackToHubBtn: document.getElementById('theme-back-to-hub-btn'),
-        musicInfo: document.getElementById('music-info'),
-        narrationTimer: document.getElementById('narration-timer'),
+    gameBackToHubBtn: document.getElementById('game-back-to-hub-btn'),
+    themeBackToHubBtn: document.getElementById('theme-back-to-hub-btn'),
+    homeSettingsToggle: document.getElementById('home-mobile-settings-toggle'),
+    homeSettingsPanel: document.getElementById('home-settings-panel'),
+    musicInfo: document.getElementById('music-info'),
+    narrationTimer: document.getElementById('narration-timer'),
         objectiveDisplay: document.getElementById('objective-display'),
         objectiveText: document.getElementById('objective-text'),
         dialogueHistory: document.getElementById('dialogue-history'),
@@ -371,12 +373,12 @@ langEnBtn: document.getElementById('lang-en'),
         return STORAGE_PREFIX + key;
     }
 
-    function saveSettings() {
-        try {
-            var settings = { voiceInputEnabled: ui.voiceInputEnabled };
-            localStorage.setItem('trueDetective_settings', JSON.stringify(settings));
-        } catch (e) { /* ignore */ }
-    }
+function saveSettings() {
+    try {
+        var settings = { voiceInputEnabled: ui.voiceInputEnabled, orientation: $.orientationToggle ? $.orientationToggle.getAttribute('aria-pressed') : 'vertical' };
+        localStorage.setItem('trueDetective_settings', JSON.stringify(settings));
+    } catch (e) { /* ignore */ }
+}
 
     function toggleVoiceInputEnabled() {
         ui.voiceInputEnabled = !ui.voiceInputEnabled;
@@ -443,9 +445,26 @@ langEnBtn: document.getElementById('lang-en'),
         renderThemeCards();
         checkSavedGame();
         setupEventListeners();
-        updateMuteButton();
         updateVolumeButton();
         updateTypingSoundButton();
+        // Initialize orientation from saved settings
+        var savedSettings = { };
+        try {
+            var saved = localStorage.getItem('trueDetective_settings');
+            if (raw) { return JSON.parse(raw).voiceInputEnabled || false; }
+            savedSettings = JSON.parse(raw);
+        } catch (e) { /* ignore */ }
+        if (savedSettings.orientation === 'horizontal') {
+            $.gameScreen.classList.add('orientation-horizontal');
+            $.orientationToggle.classList.add('active');
+            $.orientationToggle.setAttribute('aria-pressed', 'true');
+            document.getElementById('orientation-icon').textContent = '→';
+        } else {
+            $.gameScreen.classList.add('orientation-vertical');
+            $.orientationToggle.classList.remove('active');
+            $.orientationToggle.setAttribute('aria-pressed', 'false');
+            document.getElementById('orientation-icon').textContent = '↻';
+        }
         updateLanguageUI();
         updateLanguageButtons();
 
@@ -574,6 +593,57 @@ langEnBtn: document.getElementById('lang-en'),
             document.addEventListener('click', closeSettingsMenu);
             document.addEventListener('keydown', function (event) {
                 if (event.key === 'Escape') closeSettingsMenu();
+            });
+        }
+
+        if ($.homeSettingsToggle && $.homeSettingsPanel) {
+            $.homeSettingsToggle.addEventListener('click', function (event) {
+                event.stopPropagation();
+                var open = $.homeSettingsPanel.classList.toggle('open');
+                $.homeSettingsToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            });
+            $.homeSettingsPanel.addEventListener('click', function (event) {
+                event.stopPropagation();
+            });
+            document.addEventListener('click', closeHomeSettingsMenu);
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') closeHomeSettingsMenu();
+            });
+        }
+        
+        // Add orientation toggle handler
+        if ($.orientationToggle) {
+            $.orientationToggle.addEventListener('click', function (event) {
+                event.stopPropagation();
+                var htmlElement = document.documentElement;
+                var isCurrentlyHorizontal = htmlElement.classList.contains('orientation-horizontal');
+                var newOrientation = isCurrentlyHorizontal ? 'vertical' : 'horizontal';
+                
+                // Toggle the class on the game-screen element
+                if (isCurrentlyHorizontal) {
+                    $.gameScreen.classList.remove('orientation-horizontal');
+                    $.gameScreen.classList.add('orientation-vertical');
+                } else {
+                    $.gameScreen.classList.remove('orientation-vertical');
+                    $.gameScreen.classList.add('orientation-horizontal');
+                }
+                
+                // Update the button's aria-pressed attribute
+                $.orientationToggle.setAttribute('aria-pressed', newOrientation === 'horizontal');
+                
+                // Update the button icon
+                const iconEl = document.getElementById('orientation-icon');
+                if (iconEl) {
+                    if (newOrientation === 'horizontal') {
+                        iconEl.textContent = '→';
+                    } else {
+                        iconEl.textContent = '↻';
+                    }
+                }
+                
+                // Update localStorage to persist orientation
+                var settings = { orientation: newOrientation };
+                localStorage.setItem('trueDetective_settings', JSON.stringify(settings));
             });
         }
 
@@ -780,6 +850,11 @@ langEnBtn: document.getElementById('lang-en'),
     function closeSettingsMenu() {
         if ($.settingsPanel) $.settingsPanel.classList.remove('open');
         if ($.settingsToggle) $.settingsToggle.setAttribute('aria-expanded', 'false');
+    }
+
+    function closeHomeSettingsMenu() {
+        if ($.homeSettingsPanel) $.homeSettingsPanel.classList.remove('open');
+        if ($.homeSettingsToggle) $.homeSettingsToggle.setAttribute('aria-expanded', 'false');
     }
 
     function updateLanguageUI() {
@@ -3680,7 +3755,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         var it = scr.interro;
         if (!it) { return; }
         var rounds = scrInterroRounds(window.TDNarration.interrogations[it.id]);
-        var qs = rounds[Math.min(it.round, rounds.length - 1)] || [];
+        var qs = rounds[it.round] || [];  // Get all questions for current round
         var lang = ui.language;
         // La box se renouvelle : la réponse précédente est remplacée par la liste de questions
         $.dialogueText.textContent = lang === 'fr'
@@ -3704,39 +3779,50 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     }
 
     function scrAskInterroQuestion(q) {
-        var response = TDScenario.t(q.response, ui.language) || '';
-        response = scrEnrichResponse(response, q);
-        response = scrSubstituteNames(response, getThemeId());
-        typeWriter(response, function () {
-            if (!scr.active) { return; }
-            // Indice extrait de la réponse (« [Indice X] ... » / « [X clue] ... ») → journal
-            var clue = scrClueFromInterroResponse(response);
-            if (clue) {
-                var s = scrGetState();
-                if (!s.clues) { s.clues = []; }
-                var clueCategory = q.evidence || 'dialogue';
-                if (s.clues.indexOf(clue) === -1) { s.clues.push(clue); }
-                if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
-                    window.TDNarrativeEngine.addClue(clue, clueCategory);
-                    if (typeof window.TDNarrativeEngine.addStep === 'function') {
-                        window.TDNarrativeEngine.addStep('interrogation', clue);
-                    }
+    var response = TDScenario.t(q.response, ui.language) || '';
+    response = scrEnrichResponse(response, q);
+    response = scrSubstituteNames(response, getThemeId());
+    typeWriter(response, function () {
+        if (!scr.active) { return; }
+        // Indice extrait de la réponse (« [Indice X] ... » / « [X clue] ... ») → journal
+        var clue = scrClueFromInterroResponse(response);
+        if (clue) {
+            var s = scrGetState();
+            if (!s.clues) { s.clues = []; }
+            var clueCategory = q.evidence || 'dialogue';
+            if (s.clues.indexOf(clue) === -1) { s.clues.push(clue); }
+            if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
+                window.TDNarrativeEngine.addClue(clue, clueCategory);
+                if (typeof window.TDNarrativeEngine.addStep === 'function') {
+                    window.TDNarrativeEngine.addStep('interrogation', clue);
                 }
-                if (q.evidence && typeof TDScenario.recordEvidence === 'function') {
-                    TDScenario.recordEvidence(q.evidence);
-                }
-                showClueToast(clue);
-                updateNotebook();
             }
-            var it = scr.interro;
-            it.round++;
-            var rounds = scrInterroRounds(window.TDNarration.interrogations[it.id]);
-            if (it.round < rounds.length && rounds[it.round] && rounds[it.round].length) {
-                scrShowInterroAskButton();
-            } else {
-                scrEndInterrogation();
+            if (q.evidence && typeof TDScenario.recordEvidence === 'function') {
+                TDScenario.recordEvidence(q.evidence);
             }
-        });
+            showClueToast(clue);
+            updateNotebook();
+        }
+        var it = scr.interro;
+        it.round++;
+        var rounds = scrInterroRounds(window.TDNarration.interrogations[it.id]);
+        // Check if all questions in current round have been answered
+        var currentRoundQuestions = rounds[it.round] || [];
+        var answeredQuestions = it.answeredQuestions || [];
+        if (currentRoundQuestions.length > 0) {
+            // If there are still unanswered questions in this round, stay in this round
+            if (currentRoundQuestions.length > currentRoundQuestions.filter(q => q.done).length) {
+                // Still questions to answer in this round
+                return;
+            }
+        }
+        // All questions in current round answered, move to next round or end interrogation
+        if (it.round < rounds.length && rounds[it.round] && rounds[it.round].length) {
+            scrShowInterroAskButton();
+        } else {
+            scrEndInterrogation();
+        }
+    });
     }
 
     function scrEnrichResponse(response, q) {

@@ -15,6 +15,32 @@ body {
     overflow-x: hidden;
     padding-top: 56px;
     box-sizing: border-box;
+    /* Make background brighter - remove dark overlay */
+    background-color: transparent;
+}
+
+/* Mobile landscape mode: background at 50% height */
+@media (max-height: 800px) and (orientation: landscape) {
+    body {
+        background-size: 50% auto;
+        background-position: top center;
+    }
+}
+
+/* Mobile vertical mode: full background */
+@media (orientation: portrait) {
+    body {
+        background-size: cover;
+        background-position: center;
+    }
+}
+
+/* Landscape mode on larger screens */
+@media (min-height: 800px) and (orientation: landscape) {
+    body {
+        background-size: 50% auto;
+        background-position: top center;
+    }
 }
 
 h1 {
