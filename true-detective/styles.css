@@ -1,4 +1,4 @@
-﻿* {
+* {
     margin: 0;
     padding: 0;
     -webkit-box-sizing: border-box;
@@ -2139,67 +2139,67 @@ html {
     transition: all 0.35s ease;
 }
 .minigame-category.matched {
-    background: linear-gradient(160deg, rgba(0, 255, 255, 0.08), rgba(255, 0, 255,  ​0.04));
-    border:  ​1px solid rgba(0, 212, 255, ​0.25);
-    box-shadow:  ​0 0 30px rgba(0, 212, 255,​ 0.08);
+    background: linear-gradient(160deg, rgba(0, 255, 255, 0.08), rgba(255, 0, 255,  0.04));
+    border:  1px solid rgba(0, 212, 255, 0.25);
+    box-shadow:  0 0 30px rgba(0, 212, 255, 0.08);
 }
 .minigame-category.matched .minigame-category-title {
     color: #ffffff;
-    text-shadow:​ 0 0 14px rgba(0, 212, 255,​ 0.7);
+    text-shadow: 0 0 14px rgba(0, 212, 255, 0.7);
 }
 .minigame-category.minimer {
-    opacity:​ 0.78;
+    opacity: 0.78;
 }
 .minigame-category-marker {
     display: inline-block;
-    font-size:​ 0.72em;
+    font-size: 0.72em;
     font-family: 'Montserrat', sans-serif;
-    letter-spacing:​ 0.08em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    background: rgba(0, 255, 255,​ 0.12);
-    border:​ 1px solid rgba(0, 212, 255,​ 0.35);
+    background: rgba(0, 255, 255, 0.12);
+    border: 1px solid rgba(0, 212, 255, 0.35);
     color: #aef6ff;
-    padding:​ 2px 10px;
-    border-radius:​ 999px;
-    margin-left:​ 8px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    margin-left: 8px;
     vertical-align: middle;
 }
 /* ===== Intro dialog d'un mini-jeu (intégration narration/univers) ===== */
 .minigame-intro-overlay {
     position: fixed;
-    top:​ 0; left:​ 0;
-    width:​ 100%; height:​ 100%;
-    background: rgba(4, 7, 12,​ 0.86);
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(4, 7, 12, 0.86);
     backdrop-filter: blur(6px);
     display: none;
     align-items: center; justify-content: center;
-    z-index:​ 10010;
-    padding:​ 24px;
+    z-index: 10010;
+    padding: 24px;
     box-sizing: border-box;
 }
 .minigame-intro-overlay.active { display: flex; }
 .minigame-intro-box {
-    background: rgba(10, 16, 28,​ 0.97);
-    border:​ 1px solid rgba(0, 212, 255,​ 0.35);
-    border-radius:​ 18px;
-    max-width:​ 560px;
-    width:​ 100%;
-    padding:​ 28px 26px;
-    box-shadow:​ 0 0 60px rgba(0, 212, 255,​ 0.15);
-    text-align:​ center;
+    background: rgba(10, 16, 28, 0.97);
+    border: 1px solid rgba(0, 212, 255, 0.35);
+    border-radius: 18px;
+    max-width: 560px;
+    width: 100%;
+    padding: 28px 26px;
+    box-shadow: 0 0 60px rgba(0, 212, 255, 0.15);
+    text-align: center;
     position: relative;
-    animation: introPop​ 0.3s ease;
+    animation: introPop 0.3s ease;
 }
 @keyframes introPop {
-    from { transform: scale(0.96); opacity:​ 0; }
-    to { transform: scale(1); opacity:​ 1; }
+    from { transform: scale(0.96); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
-.minigame-intro-chap { font-size:​ 0.85em; color: #8be4ff; letter-spacing:​ 0.06em; text-transform: uppercase; font-family: 'Montserrat', sans-serif; }
-.minigame-intro-name { font-family: 'Playfair Display', serif; font-size:​ 1.5em; color: #ffffff; margin:​ 4px 0 6px 0; }
-.minigame-intro-passion { font-size:​ 0.92em; color: #ffd27a; font-style: italic; margin:​ 0 0 12px 0; font-family: 'Montserrat', sans-serif; }
-.minigame-intro-body { font-size:​ 0.98em; color: rgba(235, 235, 255,​ 0.92); line-height:​ 1.5; margin-bottom:​ 22px; font-family: 'Montserrat', sans-serif; }
-.minigame-intro-actions { display: flex; gap:​ 12px; justify-content: center; flex-wrap: wrap; }
-.minigame-intro-actions .btn { min-width:​ 140px; }
+.minigame-intro-chap { font-size: 0.85em; color: #8be4ff; letter-spacing: 0.06em; text-transform: uppercase; font-family: 'Montserrat', sans-serif; }
+.minigame-intro-name { font-family: 'Playfair Display', serif; font-size: 1.5em; color: #ffffff; margin: 4px 0 6px 0; }
+.minigame-intro-passion { font-size: 0.92em; color: #ffd27a; font-style: italic; margin: 0 0 12px 0; font-family: 'Montserrat', sans-serif; }
+.minigame-intro-body { font-size: 0.98em; color: rgba(235, 235, 255, 0.92); line-height: 1.5; margin-bottom: 22px; font-family: 'Montserrat', sans-serif; }
+.minigame-intro-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.minigame-intro-actions .btn { min-width: 140px; }
 
 .retro-wrap {
     display: flex;
