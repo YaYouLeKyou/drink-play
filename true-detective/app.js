@@ -7,12 +7,7 @@
 
     var THEMES = [
         { id: 'agatha-christie', name: 'Classic', emoji: '🏚️', desc: 'Scénario complet', category: 'classic' },
-        { id: 'sherlock-holmes', name: 'Sherlock Holmes', emoji: '🔍', desc: 'Londres 19e siècle', category: 'classic' },
         { id: 'cyberpunk', name: 'Cyberpunk', emoji: '🌃', desc: 'Dystopie néon', category: 'scifi' },
-        { id: 'heroic-fantasy', name: 'Heroic Fantasy', emoji: '⚔️', desc: 'Donjons & Magie', category: 'scifi' },
-        { id: 'sci-fi', name: 'Sci-Fi', emoji: '👽', desc: 'Space Opera', category: 'scifi' },
-        { id: 'lovecraftian', name: 'Horreur Lovecraftienne', emoji: '🐙', desc: 'Paranormal', category: 'horror' },
-        { id: 'antiquite', name: 'Antiquité', emoji: '🏛️', desc: 'Péplum', category: 'horror' },
         { id: 'film-noir', name: 'Film Noir', emoji: '🎩', desc: 'Noir des années 40', category: 'classic' },
     ];
 
@@ -94,12 +89,7 @@
     // Un seul scénario classic : tous les thèmes pointent vers les assets classic
     var THEME_ASSETS = {
         'agatha-christie': CLASSIC_ASSETS,
-        'sherlock-holmes': CLASSIC_ASSETS,
         'cyberpunk': CYBERPUNK_ASSETS,
-        'heroic-fantasy': Object.assign({}, CLASSIC_ASSETS),
-        'sci-fi': Object.assign({}, CLASSIC_ASSETS),
-        'lovecraftian': Object.assign({}, CLASSIC_ASSETS),
-        'antiquite': Object.assign({}, CLASSIC_ASSETS),
         'film-noir': FILM_NOIR_ASSETS,
     };
 
@@ -240,11 +230,21 @@
         themeScreen: document.getElementById('theme-selector-screen'),
         gameScreen: document.getElementById('game-screen'),
         endScreen: document.getElementById('end-screen'),
+        orientationToggle: document.getElementById('orientation-toggle'),
+        orientationIcon: document.getElementById('orientation-icon'),
         minigameScreen: document.getElementById('minigame-screen'),
+        gameModeScreen: document.getElementById('game-mode-screen'),
+        gameModeBackBtn: document.getElementById('game-mode-back-btn'),
+        minigameSelectScreen: document.getElementById('minigame-select-screen'),
         minigameTitle: document.getElementById('minigame-screen-title'),
         minigameContent: document.getElementById('minigame-screen-content'),
         minigameBackBtn: document.getElementById('minigame-back-btn'),
         minigameSkipBtn: document.getElementById('minigame-skip-btn'),
+        minigameOverlay: document.getElementById('minigame-overlay'),
+        minigameBgLayer: document.getElementById('minigame-bg-layer'),
+        minigameNpcImage: document.getElementById('minigame-npc-image'),
+        minigameDialogueText: document.getElementById('minigame-dialogue-text'),
+        minigameSettingsToggle: document.getElementById('minigame-settings-toggle'),
         themeGrid: document.getElementById('theme-grid'),
             resumeBtn: document.getElementById('resume-btn'),
             startGameBtn: document.getElementById('start-game-btn'),
@@ -277,9 +277,12 @@ langEnBtn: document.getElementById('lang-en'),
     langFrThemeBtn: document.getElementById('lang-fr-theme'),
     restartBtn: document.getElementById('restart-btn'),
     gameBackToHubBtn: document.getElementById('game-back-to-hub-btn'),
-    themeBackToHubBtn: document.getElementById('theme-back-to-hub-btn'),
-    homeSettingsToggle: document.getElementById('home-mobile-settings-toggle'),
-    homeSettingsPanel: document.getElementById('home-settings-panel'),
+        themeBackToHubBtn: document.getElementById('theme-back-to-hub-btn'),
+        homeSettingsToggle: document.getElementById('home-mobile-settings-toggle'),
+        homeSettingsPanel: document.getElementById('home-settings-panel'),
+        soloGameBtn: document.getElementById('solo-game-btn'),
+        minigameSelectBtn: document.getElementById('minigame-select-btn'),
+        minigameSelectBackBtn: document.getElementById('minigame-select-back-btn'),
         musicInfo: document.getElementById('music-info'),
         narrationTimer: document.getElementById('narration-timer'),
         musicToggleBtn: document.getElementById('music-toggle-btn'),
@@ -454,19 +457,20 @@ function saveSettings() {
         var savedSettings = { };
         try {
             var saved = localStorage.getItem('trueDetective_settings');
-            if (raw) { return JSON.parse(raw).voiceInputEnabled || false; }
-            savedSettings = JSON.parse(raw);
+            if (saved) { savedSettings = JSON.parse(saved); }
         } catch (e) { /* ignore */ }
-        if (savedSettings.orientation === 'horizontal') {
+        if (savedSettings.orientation === 'horizontal' && $.orientationToggle) {
             $.gameScreen.classList.add('orientation-horizontal');
             $.orientationToggle.classList.add('active');
             $.orientationToggle.setAttribute('aria-pressed', 'true');
-            document.getElementById('orientation-icon').textContent = '→';
+            if (document.getElementById('orientation-icon')) document.getElementById('orientation-icon').textContent = '→';
         } else {
             $.gameScreen.classList.add('orientation-vertical');
-            $.orientationToggle.classList.remove('active');
-            $.orientationToggle.setAttribute('aria-pressed', 'false');
-            document.getElementById('orientation-icon').textContent = '↻';
+            if ($.orientationToggle) {
+                $.orientationToggle.classList.remove('active');
+                $.orientationToggle.setAttribute('aria-pressed', 'false');
+            }
+            if (document.getElementById('orientation-icon')) document.getElementById('orientation-icon').textContent = '↻';
         }
         updateLanguageUI();
         updateLanguageButtons();
@@ -499,7 +503,6 @@ function saveSettings() {
 
     function renderThemeCards() {
         $.themeGrid.innerHTML = '';
-        // Un seul scénario classic visible dans la config
         var visibleThemes = THEMES.filter(function (th) {
             return th.id === 'agatha-christie' || th.id === 'cyberpunk' || th.id === 'film-noir';
         });
@@ -507,6 +510,13 @@ function saveSettings() {
             var card = document.createElement('div');
             card.className = 'theme-card';
             card.dataset.theme = theme.id;
+            var assets = THEME_ASSETS[theme.id] || {};
+            var bgImage = assets.universeImg || assets.universe || '';
+            if (bgImage) {
+                card.style.backgroundImage = 'url(' + bgImage + ')';
+                card.style.backgroundSize = 'cover';
+                card.style.backgroundPosition = 'center';
+            }
             card.innerHTML =
                 '<div class="theme-card-inner">' +
                 '<div class="theme-emoji">' + theme.emoji + '</div>' +
@@ -565,6 +575,54 @@ function saveSettings() {
         if ($.startGameBtn) {
             $.startGameBtn.addEventListener('click', startGameFromConfig);
         }
+
+        if ($.soloGameBtn) {
+            $.soloGameBtn.addEventListener('click', function () {
+                $.gameModeScreen.classList.remove('active');
+                $.gameModeScreen.classList.add('hidden');
+                startSoloGame();
+            });
+        }
+
+        if ($.minigameSelectBtn) {
+            $.minigameSelectBtn.addEventListener('click', function () {
+                $.gameModeScreen.classList.remove('active');
+                $.gameModeScreen.classList.add('hidden');
+                $.minigameSelectScreen.classList.remove('hidden');
+                $.minigameSelectScreen.classList.add('active');
+            });
+        }
+
+        if ($.minigameSelectBackBtn) {
+            $.minigameSelectBackBtn.addEventListener('click', function () {
+                $.minigameSelectScreen.classList.remove('active');
+                $.minigameSelectScreen.classList.add('hidden');
+                $.gameModeScreen.classList.remove('hidden');
+                $.gameModeScreen.classList.add('active');
+            });
+        }
+
+        if ($.gameModeBackBtn) {
+            $.gameModeBackBtn.addEventListener('click', function () {
+                $.gameModeScreen.classList.remove('active');
+                $.gameModeScreen.classList.add('hidden');
+                $.homeScreen.classList.remove('hidden');
+                $.homeScreen.classList.add('active');
+                hidePageNav();
+                checkSavedGame();
+            });
+        }
+
+        // Minigame selection cards
+        var minigameCards = document.querySelectorAll('.minigame-select-card');
+        minigameCards.forEach(function (card) {
+            card.addEventListener('click', function () {
+                var minigameType = card.dataset.minigame;
+                if (minigameType) {
+                    launchMinigameFromSelection(minigameType);
+                }
+            });
+        });
 
         if ($.mobileContinueBtn) {
             $.mobileContinueBtn.addEventListener('click', function () {
@@ -820,20 +878,38 @@ function saveSettings() {
 
         if ($.minigameBackBtn) {
             $.minigameBackBtn.addEventListener('click', function () {
-                var layer = document.getElementById('minigame-layer');
-                if (layer) {
-                    layer.classList.remove('active');
-                    layer.innerHTML = '';
+                var overlay = document.getElementById('minigame-overlay');
+                if (overlay) {
+                    overlay.classList.add('hidden');
+                    overlay.querySelector('#minigame-screen-content').innerHTML = '';
                 }
-                hideScreen($.minigameScreen);
-                showScreen($.gameScreen);
+                if (window._minigameSkipHandler) {
+                    window._minigameSkipHandler({ won: false });
+                    window._minigameSkipHandler = null;
+                }
             });
         }
 
         if ($.minigameSkipBtn) {
             $.minigameSkipBtn.addEventListener('click', function () {
                 if (window._minigameSkipHandler) {
-                    window._minigameSkipHandler();
+                    window._minigameSkipHandler({ won: false });
+                    window._minigameSkipHandler = null;
+                }
+            });
+        }
+
+        var minigameSettingsToggle = document.getElementById('minigame-settings-toggle');
+        var minigameSettingsPanel = document.getElementById('minigame-settings-panel');
+        if (minigameSettingsToggle && minigameSettingsPanel) {
+            minigameSettingsToggle.addEventListener('click', function () {
+                var isOpen = minigameSettingsPanel.classList.toggle('open');
+                minigameSettingsToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
+            document.addEventListener('click', function (e) {
+                if (!minigameSettingsPanel.contains(e.target) && e.target !== minigameSettingsToggle) {
+                    minigameSettingsPanel.classList.remove('open');
+                    minigameSettingsToggle.setAttribute('aria-expanded', 'false');
                 }
             });
         }
@@ -1006,9 +1082,20 @@ function saveSettings() {
         }
 
         if ($.startGameBtn) {
-            $.startGameBtn.classList.remove('hidden');
-            $.startGameBtn.textContent = getText('startGame') || 'Start Investigation';
+            $.startGameBtn.classList.add('hidden');
         }
+
+        // Auto-advance to game mode selection
+        setTimeout(function () {
+            if ($.themeScreen) {
+                $.themeScreen.classList.add('hidden');
+                $.themeScreen.classList.remove('active');
+            }
+            if ($.gameModeScreen) {
+                $.gameModeScreen.classList.remove('hidden');
+                $.gameModeScreen.classList.add('active');
+            }
+        }, 300);
     }
 
     function startGameFromConfig() {
@@ -1018,6 +1105,17 @@ function saveSettings() {
         }
 
         ui.theme = { id: ui.theme.id, name: ui.theme.name, emoji: ui.theme.emoji, desc: ui.theme.desc, category: ui.theme.category };
+
+        // Show game mode selection screen
+        $.themeScreen.classList.add('hidden');
+        $.gameModeScreen.classList.remove('hidden');
+        $.gameModeScreen.classList.add('active');
+    }
+
+    function startSoloGame() {
+        $.gameModeScreen.classList.remove('active');
+        $.gameModeScreen.classList.add('hidden');
+        $.minigameSelectScreen.classList.add('hidden');
 
         // MODE SCÉNARIO V2 : si les phases + scénario sont chargés, on utilise le
         // fil conducteur complet (au lieu de la génération IA libre).
@@ -2076,360 +2174,6 @@ function saveSettings() {
         renderCurrentPage();
     }
 
-    function handleContinue() {
-        stopNarrationTimer();
-        if (ui.isWaiting) return;
-
-        // Check if narrative is completed before allowing navigation
-        if (ui.isTyping) {
-            skipTypeWriter();
-            return;
-        }
-
-        if (ui.currentPage < ui.totalPages) {
-            nextPage();
-            return;
-        }
-
-        ui.isWaiting = true;
-        if (!isMobile()) {
-            $.continueBtn.classList.add('hidden');
-        }
-
-        if (TDAudioService) {
-            TDAudioService.stopSpeaking();
-        }
-
-        if (ui.currentSceneData && ui.currentSceneData.type === 'credits') {
-            hideLoading();
-            if (TDNarrativeEngine) {
-                var state = TDNarrativeEngine.getGameState();
-                if (state.solution) {
-                    showEndScreen(state.solution);
-                }
-            }
-            return;
-        }
-
-        advanceGameState(null)
-                .then(function (data) {
-                    ui.isWaiting = false;
-
-                    if (data.gameComplete) {
-                        showEndScreen(data.solution);
-                        return;
-                    }
-
-                    if (data.nextActTransition && data.nextActTransition !== 'null') {
-                        showTransitionToast(data.nextActTransition);
-                        setTimeout(function () {
-                            continueAfterTransition(data);
-                        }, 2000);
-                    } else {
-                        continueAfterTransition(data);
-                    }
-                })
-                .catch(function (err) {
-                    ui.isWaiting = false;
-                    showToast('Failed to continue investigation: ' + (err.message || 'Unknown error'), true);
-                });
-    }
-
-    function typeWriter(text, onComplete, speed) {
-        _currentDialogue = text || '';
-        _typeWriterCallback = onComplete;
-        speed = speed || ui.typingSpeed;
-        ui.skipPending = false;
-
-        if (!$.dialogueText || !$.typeCursor) {
-            if (onComplete) { onComplete(); }
-            return;
-        }
-
-        // Effet machine à écrire avec skip au clic
-        $.dialogueText.textContent = '';
-        $.typeCursor.classList.remove('hidden');
-        ui.isTyping = true;
-        var i = 0;
-
-        function typeChar() {
-            if (ui.skipPending) {
-                // Already handled by skipTypeWriter — do nothing to avoid double-callback
-                return;
-            }
-
-            if (i < text.length) {
-                $.dialogueText.textContent += text.charAt(i);
-                i++;
-                if (TDAudioService && typeof TDAudioService.playTypingSound === 'function' && TDAudioService.typingSound) {
-                    TDAudioService.playTypingSound();
-                }
-                _typeWriterTimeout = setTimeout(typeChar, speed);
-            } else {
-                ui.isTyping = false;
-                $.typeCursor.classList.add('hidden');
-                _typeWriterCallback = null;
-                if (onComplete) { onComplete(); }
-            }
-        }
-
-        typeChar();
-    }
-
-    function getCurrentSceneText() {
-        return _currentDialogue || ($.dialogueText ? $.dialogueText.textContent : '');
-    }
-
-    function showChoices() {
-        $.choicesContainer.innerHTML = '';
-
-        var choices = getCurrentChoices() || [];
-        if (!choices || choices.length === 0) {
-            choices = [getText('skip') || 'Continue'];
-        }
-
-        choices.forEach(function (choice) {
-            var btn = document.createElement('button');
-            btn.className = 'btn btn-choice';
-            btn.textContent = choice;
-            btn.addEventListener('click', function () {
-                handleChoice(choice);
-            });
-            $.choicesContainer.appendChild(btn);
-        });
-    }
-
-    var _currentChoices = [];
-
-    function getCurrentChoices() {
-        return _currentChoices;
-    }
-
-    function handleChoice(choice) {
-        if (ui.isWaiting || ui.isTyping) return;
-        ui.isWaiting = true;
-        ui.isTyping = false;
-        stopNarrationTimer();
-        clearTypeWriter();
-
-        if (TDAudioService) {
-            TDAudioService.stopSpeaking();
-        }
-
-        advanceGameState(choice)
-                .then(function (data) {
-                    ui.isWaiting = false;
-
-                    if (data.gameComplete) {
-                        showEndScreen(data.solution);
-                        return;
-                    }
-
-                    if (data.nextActTransition && data.nextActTransition !== 'null') {
-                        showTransitionToast(data.nextActTransition);
-                    }
-                    continueAfterTransition(data);
-                })
-                .catch(function (err) {
-                    ui.isWaiting = false;
-                    showToast('Failed to continue investigation: ' + (err.message || 'Unknown error'), true);
-                    setTimeout(function () { ui.isWaiting = false; }, 1000);
-                });
-    }
-
-    function advanceFallbackGameState(playerChoice) {
-        if (!ui.fallbackScript || !ui.fallbackScript.acts) {
-            return Promise.reject(new Error('No fallback script'));
-        }
-
-        var acts = ui.fallbackScript.acts;
-        var currentAct = ui.fallbackCurrentAct;
-        var currentScene = ui.fallbackCurrentScene + 1;
-        var nextActTransition = null;
-
-        if (currentScene >= acts[currentAct].scenes.length) {
-            currentScene = 0;
-            if (currentAct + 1 < acts.length) {
-                currentAct++;
-                nextActTransition = acts[currentAct].setting || 'A new act begins.';
-            } else {
-                ui.fallbackCurrentAct = currentAct;
-                ui.fallbackCurrentScene = currentScene;
-                return Promise.resolve({
-                    gameComplete: true,
-                    solution: ui.fallbackScript.solution,
-                    clue: null,
-                    event: null,
-                    npcId: null,
-                    dialogue: '',
-                    location: '',
-                    type: 'credits',
-                    objective: '',
-                    choices: [],
-                    musicPhase: 'credits',
-                    nextActTransition: null,
-                    gameComplete: true,
-                    solution: ui.fallbackScript.solution,
-                });
-            }
-        }
-
-        // Update state
-        ui.fallbackCurrentAct = currentAct;
-        ui.fallbackCurrentScene = currentScene;
-
-        var scene = acts[currentAct].scenes[currentScene];
-        var sceneData = {
-            dialogue: scene.dialogue || '',
-            location: scene.location || '',
-            npcId: scene.npcId || null,
-            type: scene.type || 'investigation',
-            objective: scene.objective || getDefaultObjective(scene.type || 'investigation'),
-            choices: scene.choices || [],
-            clue: scene.clue || null,
-            event: null,
-            puzzle: scene.puzzle || null,
-            musicPhase: scene.musicPhase || scene.type || 'investigation',
-            nextActTransition: nextActTransition,
-            gameComplete: false,
-            solution: null,
-        };
-
-        return Promise.resolve({
-            dialogue: sceneData.dialogue,
-            location: sceneData.location,
-            npcId: sceneData.npcId,
-            type: sceneData.type,
-            objective: sceneData.objective,
-            choices: sceneData.choices,
-            clue: sceneData.clue,
-            event: sceneData.event,
-            puzzle: sceneData.puzzle,
-            musicPhase: sceneData.musicPhase,
-            nextActTransition: sceneData.nextActTransition,
-            gameComplete: sceneData.gameComplete,
-            solution: sceneData.solution,
-        });
-    }
-
-    function getCurrentSceneText() {
-        return _currentDialogue || ($.dialogueText ? $.dialogueText.textContent : '');
-    }
-
-    function showChoices() {
-        $.choicesContainer.innerHTML = '';
-
-        var choices = getCurrentChoices() || [];
-        if (!choices || choices.length === 0) {
-            choices = [getText('skip') || 'Continue'];
-        }
-
-        choices.forEach(function (choice) {
-            var btn = document.createElement('button');
-            btn.className = 'btn btn-choice';
-            btn.textContent = choice;
-            btn.addEventListener('click', function () {
-                handleChoice(choice);
-            });
-            $.choicesContainer.appendChild(btn);
-        });
-    }
-
-    var _currentChoices = [];
-
-    function getCurrentChoices() {
-        return _currentChoices;
-    }
-
-    function handleChoice(choice) {
-        if (ui.isWaiting || ui.isTyping) return;
-        ui.isWaiting = true;
-        ui.isTyping = false;
-        stopNarrationTimer();
-        clearTypeWriter();
-
-        if (TDAudioService) {
-            TDAudioService.stopSpeaking();
-        }
-
-        advanceGameState(choice)
-                .then(function (data) {
-                    ui.isWaiting = false;
-
-                    if (data.gameComplete) {
-                        showEndScreen(data.solution);
-                        return;
-                    }
-
-                     if (data.nextActTransition && data.nextActTransition !== 'null') {
-                        showTransitionToast(data.nextActTransition);
-                    }
-                    continueAfterTransition(data);
-                })
-                .catch(function (err) {
-                    ui.isWaiting = false;
-                    showToast('Failed to continue investigation: ' + (err.message || 'Unknown error'), true);
-                    setTimeout(function () { ui.isWaiting = false; }, 1000);
-                });
-    }
-
-    function advanceFallbackGameState(playerChoice) {
-        if (!ui.fallbackScript || !ui.fallbackScript.acts) {
-            return Promise.reject(new Error('No fallback script'));
-        }
-
-        var acts = ui.fallbackScript.acts;
-        var currentAct = ui.fallbackCurrentAct;
-        var currentScene = ui.fallbackCurrentScene + 1;
-        var nextActTransition = null;
-
-        if (currentScene >= acts[currentAct].scenes.length) {
-            currentScene = 0;
-            if (currentAct + 1 < acts.length) {
-                currentAct++;
-                nextActTransition = acts[currentAct].setting || 'A new act begins.';
-            } else {
-                ui.fallbackCurrentAct = currentAct;
-                ui.fallbackCurrentScene = currentScene;
-                return Promise.resolve({
-                    gameComplete: true,
-                    solution: ui.fallbackScript.solution,
-                    clue: null,
-                    event: null,
-                    npcId: null,
-                    dialogue: '',
-                    location: '',
-                    type: 'credits',
-                    objective: '',
-                    choices: [],
-                    musicPhase: 'credits',
-                    nextActTransition: null,
-                });
-            }
-        }
-
-        ui.fallbackCurrentAct = currentAct;
-        ui.fallbackCurrentScene = currentScene;
-
-        var scenes = acts[currentAct].scenes;
-        var scene = scenes[Math.min(currentScene, scenes.length - 1)];
-
-        return Promise.resolve({
-            gameComplete: false,
-            nextActTransition: nextActTransition,
-            clue: null,
-            event: null,
-            npcId: scene.npcId || null,
-            dialogue: scene.dialogue || '',
-            location: scene.location || '',
-            type: scene.type || 'investigation',
-            objective: scene.objective || '',
-            choices: scene.choices || [],
-            musicPhase: scene.musicPhase || 'investigation',
-            puzzle: scene.puzzle || null,
-        });
-    }
-
     function advanceGameState(choice) {
         if (ui.usingFallback) {
             return advanceFallbackGameState(choice);
@@ -3077,7 +2821,6 @@ function saveSettings() {
 
     var THEME_NPC_NAMES = {
         'agatha-christie': SCENARIO_NPC_NAMES,
-        'sherlock-holmes': SCENARIO_NPC_NAMES,
         'cyberpunk': {
             'detective-partner': { fr: 'Inspecteur Vega', en: 'Inspector Vega' },
             'protecteur': { fr: 'Cipher-7', en: 'Cipher-7' },
@@ -3137,7 +2880,7 @@ function saveSettings() {
 
     function scrSubstituteNames(text, themeId) {
         if (!text) return text;
-        if (themeId === 'agatha-christie' || themeId === 'sherlock-holmes') return text;
+        if (themeId === 'agatha-christie') return text;
         var overrides = THEME_NAME_OVERRIDES[themeId];
         if (!overrides) return text;
         var keys = Object.keys(overrides).sort(function (a, b) { return b.length - a.length; });
@@ -3149,7 +2892,6 @@ function saveSettings() {
 
     var THEME_TRUTH_TITLES = {
         'agatha-christie': null,
-        'sherlock-holmes': null,
         'cyberpunk': {
             protecteur: { fr: 'Cipher-7', en: 'Cipher-7' },
             'femme-fatale': { fr: 'Lyra Noir', en: 'Lyra Noir' },
@@ -3216,23 +2958,6 @@ function saveSettings() {
             'Acte 3': {
                 number: { fr: 'Acte Troisième', en: 'Act Three' },
                 title: { fr: 'La Vérité Nue', en: 'The Naked Truth' },
-                subtitle: { fr: 'Le coffre-fort livre ses secrets. Le coupable doit être démasqué avant qu\'il ne soit trop tard.', en: 'The safe yields its secrets. The culprit must be unmasked before it is too late.' }
-            },
-        },
-        'sherlock-holmes': {
-            'Acte 1': {
-                number: { fr: 'Acte Premier', en: 'Act One' },
-                title: { fr: 'Le Mystère du Manoir', en: 'The Manor Mystery' },
-                subtitle: { fr: 'Un magnat est retrouvé mort dans son manoir. L\'enquête commence dans le brouillard victorien.', en: 'A tycoon is found dead in his manor. The investigation begins in the Victorian fog.' }
-            },
-            'Acte 2': {
-                number: { fr: 'Acte Deuxième', en: 'Act Two' },
-                title: { fr: 'Labyrinthe de Mensonges', en: 'Labyrinth of Lies' },
-                subtitle: { fr: 'Les témoignages se contredisent, les alibis se fissurent. La vérité se cache derrière les masques.', en: 'Testimonies contradict each other, alibis crack. The truth hides behind the masks.' }
-            },
-            'Acte 3': {
-                number: { fr: 'Acte Troisième', en: 'Act Three' },
-                title: { fr: 'Révélation Finale', en: 'Final Revelation' },
                 subtitle: { fr: 'Le coffre-fort livre ses secrets. Le coupable doit être démasqué avant qu\'il ne soit trop tard.', en: 'The safe yields its secrets. The culprit must be unmasked before it is too late.' }
             },
         },
@@ -3434,8 +3159,11 @@ function saveSettings() {
         var s = scrGetState();
         var order = s.suspectOrdre;
         var id = s.prochainSuspect || (order && order[orderIdx]) || 'suspect';
-        var decorKey = (id === 'seducteur') ? 'bar'
-            : (id === 'suspect' ? 'clandestine' : 'residence');
+        var decorKey = (id === 'seducteur') ? 'barInterieur'
+            : (id === 'suspect' ? 'secretPlace'
+            : (id === 'marginal' ? 'alley'
+            : (id === 'criminel' ? 'publicPlace'
+            : 'residence')));
         return { npcId: id, decor: decorKey };
     }
 
@@ -3655,7 +3383,11 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 layer.classList.remove('active');
                 layer.innerHTML = '';
             }
-            hideScreen($.minigameScreen);
+            var overlay = document.getElementById('minigame-overlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+                overlay.querySelector('#minigame-screen-content').innerHTML = '';
+            }
             showScreen($.gameScreen);
             scrNext();
         }
@@ -3695,11 +3427,17 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             }
             $.minigameTitle.textContent = mgCfg.title ? (mgCfg.title[ui.language] || mgCfg.title.fr || mgCfg.title.en || 'Mini-jeu') : 'Mini-jeu';
             $.minigameContent.innerHTML = '';
-            hideScreen($.gameScreen);
-            showScreen($.minigameScreen);
-            $.minigameSkipBtn.classList.remove('hidden');
-            $.minigameSkipBtn.disabled = false;
+
+            var overlay = document.getElementById('minigame-overlay');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+            }
+            populateMinigameOverlayChrome(scr.interro ? scr.interro.id : null, mgCfg.title ? (mgCfg.title[ui.language] || mgCfg.title.fr || mgCfg.title.en || 'Mini-jeu') : 'Mini-jeu');
+$.minigameSkipBtn.classList.remove('hidden');
+        $.minigameSkipBtn.disabled = false;
+        $.minigameSkipBtn.textContent = ui.language === 'fr' ? 'Passer' : 'Skip';
             $.minigameSkipBtn.onclick = null;
+
             TDMiniGames.play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
             currentOnDone = onMinigameDone;
             $.minigameSkipBtn.onclick = function () {
@@ -3709,13 +3447,11 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             };
         } catch (e) {
             console.error('[True Detective] Erreur mini-jeu "' + mgCfg.type + '" :', e);
-            var layer = document.getElementById('minigame-layer');
-            if (layer) {
-                layer.classList.remove('active');
-                layer.innerHTML = '';
+            var overlay = document.getElementById('minigame-overlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+                overlay.querySelector('#minigame-screen-content').innerHTML = '';
             }
-            hideScreen($.minigameScreen);
-            showScreen($.gameScreen);
             onMinigameDone({ won: false });
         }
     }
@@ -3775,7 +3511,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             var s = scrGetState();
             interroId = s.prochainSuspect || 'suspect';
         }
-        scr.interro = { id: interroId, round: 0, done: false };
+        scr.interro = { id: interroId, questionRound: 0, minigameRound: 0, done: false, questionsDone: false };
         // « Continuer » reste à l'écran mais reste inactif pendant l'interrogatoire
         $.continueBtn.classList.remove('hidden');
         $.continueBtn.disabled = !isMobile();
@@ -3788,29 +3524,81 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
 
     function scrShowInterroAskButton() {
         var lang = ui.language;
-        scr.awaitingChoice = true;
-        $.choicesContainer.innerHTML = '';
-        var btn = document.createElement('button');
-        btn.className = 'btn btn-choice interrogation-ask';
-        btn.textContent = lang === 'fr' ? '🔍 Interroger' : '🔍 Interrogate';
-        btn.addEventListener('click', function () {
-            if (!scr.awaitingChoice || ui.isTyping) return;
-            scr.awaitingChoice = false;
-            scrShowInterroQuestions();
-        });
-        $.choicesContainer.appendChild(btn);
+        var it = scr.interro;
+        if (!it) return;
+
+        var interroData = window.TDNarration && window.TDNarration.interrogations ? window.TDNarration.interrogations[it.id] : null;
+        var rounds = interroData ? scrInterroRounds(interroData) : [];
+        var hasMoreQuestions = !it.questionsDone && (it.questionRound + 1 < rounds.length) && rounds[it.questionRound + 1] && rounds[it.questionRound + 1].length;
+
+        if (hasMoreQuestions) {
+            scr.awaitingChoice = true;
+            $.choicesContainer.innerHTML = '';
+            var askBtn = document.createElement('button');
+            askBtn.className = 'btn btn-choice interrogation-ask';
+            askBtn.textContent = lang === 'fr' ? '🔍 Interroger' : '🔍 Interrogate';
+            askBtn.addEventListener('click', function () {
+                if (!scr.awaitingChoice || ui.isTyping) return;
+                scr.awaitingChoice = false;
+                $.choicesContainer.innerHTML = '';
+                scrShowInterroQuestions();
+            });
+            $.choicesContainer.appendChild(askBtn);
+            $.continueBtn.classList.remove('hidden');
+            $.continueBtn.disabled = !isMobile();
+            $.continueBtn.textContent = getText('continue') || 'Continuer';
+            if (!isMobile()) {
+                $.continueBtn.onclick = null;
+            }
+            return;
+        }
+
+        if (!it.questionsDone) {
+            it.questionsDone = true;
+        }
+
+        var minigameCfg = interroData && interroData.minigame ? scrGetMinigameRoundConfig(it.id, it.minigameRound) : null;
+
+        if (minigameCfg) {
+            scr.awaitingChoice = true;
+            $.choicesContainer.innerHTML = '';
+            var mgLabel = minigameCfg.title
+                ? (minigameCfg.title[lang] || minigameCfg.title.fr || minigameCfg.title.en || '')
+                : '';
+            var btnText = mgLabel
+                ? (lang === 'fr' ? '🎮 ' + mgLabel : '🎮 ' + mgLabel)
+                : (lang === 'fr' ? '🎮 Lancer le défi (' + (it.minigameRound + 1) + '/3)' : '🎮 Launch challenge (' + (it.minigameRound + 1) + '/3)');
+            var btn = document.createElement('button');
+            btn.className = 'btn btn-choice interrogation-ask';
+            btn.textContent = btnText;
+            btn.addEventListener('click', function () {
+                if (!scr.awaitingChoice || ui.isTyping) return;
+                scr.awaitingChoice = false;
+                $.choicesContainer.innerHTML = '';
+                scrShowMinigameRound(it.minigameRound);
+            });
+            $.choicesContainer.appendChild(btn);
+            $.continueBtn.classList.remove('hidden');
+            $.continueBtn.disabled = !isMobile();
+            $.continueBtn.textContent = getText('continue') || 'Continuer';
+            if (!isMobile()) {
+                $.continueBtn.onclick = null;
+            }
+            return;
+        }
+
+        scrEndInterrogation();
     }
 
     function scrShowInterroQuestions() {
         var it = scr.interro;
         if (!it) { return; }
         var rounds = scrInterroRounds(window.TDNarration.interrogations[it.id]);
-        var qs = rounds[it.round] || [];  // Get all questions for current round
+        var qs = rounds[it.questionRound] || [];
         var lang = ui.language;
-        // La box se renouvelle : la réponse précédente est remplacée par la liste de questions
         $.dialogueText.textContent = lang === 'fr'
-            ? 'Phase ' + (it.round + 1) + '/3, Choisissez votre question :'
-            : 'Phase ' + (it.round + 1) + '/3, Pick your question :';
+            ? 'Phase ' + (it.questionRound + 1) + '/3, Choisissez votre question :'
+            : 'Phase ' + (it.questionRound + 1) + '/3, Pick your question :';
         $.typeCursor.classList.add('hidden');
         scr.awaitingChoice = true;
         $.choicesContainer.innerHTML = '';
@@ -3826,6 +3614,17 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             });
             $.choicesContainer.appendChild(btn);
         });
+        var skipToMinigameBtn = document.createElement('button');
+        skipToMinigameBtn.className = 'btn btn-choice interrogation-skip';
+        skipToMinigameBtn.textContent = lang === 'fr' ? '⏭ Passer au défi' : '⏭ Skip to challenge';
+        skipToMinigameBtn.addEventListener('click', function () {
+            if (!scr.awaitingChoice) return;
+            scr.awaitingChoice = false;
+            $.choicesContainer.innerHTML = '';
+            it.questionsDone = true;
+            scrShowInterroAskButton();
+        });
+        $.choicesContainer.appendChild(skipToMinigameBtn);
     }
 
     function scrAskInterroQuestion(q) {
@@ -3856,20 +3655,12 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         if (!it.answeredQuestions) { it.answeredQuestions = []; }
         it.answeredQuestions.push(q.id || q.label);
         var rounds = scrInterroRounds(window.TDNarration.interrogations[it.id]);
-        var currentRoundQuestions = rounds[it.round] || [];
-        var remainingInRound = currentRoundQuestions.filter(function (rq) {
-            var rid = rq.id || rq.label;
-            return it.answeredQuestions.indexOf(rid) === -1;
-        });
-        if (remainingInRound.length > 0) {
-            scrShowInterroQuestions();
-            return;
-        }
-        if (it.round + 1 < rounds.length && rounds[it.round + 1] && rounds[it.round + 1].length) {
-            it.round++;
+        if (it.questionRound + 1 < rounds.length && rounds[it.questionRound + 1] && rounds[it.questionRound + 1].length) {
+            it.questionRound++;
             scrShowInterroAskButton();
         } else {
-            scrEndInterrogation();
+            it.questionsDone = true;
+            scrShowInterroAskButton();
         }
     });
     }
@@ -3923,6 +3714,385 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             }
             renderScenarioPage();
         };
+    }
+
+    function scrGetMinigameRoundConfig(interroId, roundIndex) {
+        if (!interroId || !window.TDNarration || !window.TDNarration.interrogations) return null;
+        var interro = window.TDNarration.interrogations[interroId];
+        if (!interro || !interro.minigame) return null;
+        var act = scrGetState() ? (scrGetState().act || 1) : 1;
+        var diffIdx = Math.min(act - 1, interro.minigame.difficulty.length - 1);
+        var diff = interro.minigame.difficulty[diffIdx];
+        if (!diff) return null;
+        var roundCfg = diff.rounds && diff.rounds[roundIndex] ? diff.rounds[roundIndex] : null;
+        if (!roundCfg) return null;
+
+        var mgType = interro.minigame.type;
+        var themeId = (typeof getThemeId === 'function' ? getThemeId() : null) || 'agatha-christie';
+        if (themeId === 'cyberpunk') {
+            var cyberpunkMap = {
+                'femme-fatale': 'pong',
+                'criminel': 'breakout',
+                'marginal': 'pacman',
+                'suspect': 'space-invaders',
+                'seducteur': 'breakout',
+                'scientifique': 'asteroids'
+            };
+            if (cyberpunkMap[interroId]) {
+                mgType = cyberpunkMap[interroId];
+            }
+        }
+
+        var cfg = {
+            type: mgType,
+            act: act,
+            clue: diff.clue,
+            failClue: diff.failClue,
+            dialogues: extractInterrogationDialogues(interro),
+            interroId: interroId
+        };
+        if (mgType === 'chess') {
+            cfg.depth = roundCfg.depth;
+            cfg.title = roundCfg.title;
+        } else if (mgType === 'puzzle') {
+            cfg.title = roundCfg.title;
+        } else if (mgType === 'sudoku') {
+            cfg.title = roundCfg.title;
+        } else if (mgType === 'jackpot') {
+            cfg.spins = Math.min(roundCfg.spins || 6, 6);
+            cfg.winThreshold = roundCfg.winThreshold;
+            cfg.title = roundCfg.title;
+            if (roundCfg.dialogues) cfg.dialogues = roundCfg.dialogues;
+        } else if (mgType === 'domino') {
+            cfg.title = roundCfg.title;
+        } else if (mgType === 'pong' || mgType === 'pacman' || mgType === 'space-invaders' || mgType === 'breakout' || mgType === 'asteroids' || mgType === 'shooting-gallery') {
+            cfg.title = roundCfg.title;
+        }
+        return cfg;
+    }
+
+    function extractInterrogationDialogues(interro) {
+        var lines = [];
+        if (!interro) return lines;
+        var collect = function (arr) {
+            if (!arr) return;
+            for (var i = 0; i < arr.length; i++) {
+                var item = arr[i];
+                if (item && item.response) {
+                    var text = '';
+                    if (typeof item.response === 'string') {
+                        text = item.response;
+                    } else if (item.response.fr || item.response.en) {
+                        text = item.response.fr || item.response.en || '';
+                    }
+                    if (text) lines.push(text);
+                }
+                if (item && item.intro) {
+                    var introText = '';
+                    if (typeof item.intro === 'string') {
+                        introText = item.intro;
+                    } else if (item.intro.fr || item.intro.en) {
+                        introText = item.intro.fr || item.intro.en || '';
+                    }
+                    if (introText) lines.push(introText);
+                }
+            }
+        };
+        collect(interro.questions);
+        collect(interro.rounds2);
+        collect(interro.rounds3);
+        return lines;
+    }
+
+    function getGlobalGameMap() {
+        return {
+            chess: 'TDChessGame',
+            memory: 'TDMemoryGame',
+            sudoku: 'TDSudokuGame',
+            jackpot: 'TDMiniGames',
+            domino: 'TDDominoGame',
+            reseau_alibis: 'TDMiniGames',
+            shooting: 'TDShootingGallery',
+            pong: 'TDPongGame',
+            pacman: 'TDPacmanGame',
+            'space-invaders': 'TDSpaceInvaders',
+            breakout: 'TDBreakoutGame',
+            asteroids: 'TDAsteroids'
+        };
+    }
+
+    function launchMinigameFromSelection(minigameType) {
+        $.minigameSelectScreen.classList.remove('active');
+        $.minigameSelectScreen.classList.add('hidden');
+
+        var gameMap = getGlobalGameMap();
+
+        var gameNS = gameMap[minigameType];
+        if (!gameNS || !window[gameNS]) {
+            showToast('Minigame not available: ' + minigameType, true);
+            $.minigameSelectScreen.classList.remove('hidden');
+            $.minigameSelectScreen.classList.add('active');
+            return;
+        }
+
+        var cfg = { type: minigameType, act: 1 };
+        if (minigameType === 'chess') {
+            cfg.depth = 1;
+            cfg.title = { fr: 'Échec', en: 'Chess' };
+        } else if (minigameType === 'memory') {
+            cfg.title = { fr: 'Mémoire', en: 'Memory' };
+        } else if (minigameType === 'sudoku') {
+            cfg.title = { fr: 'Sudoku', en: 'Sudoku' };
+        } else if (minigameType === 'jackpot') {
+            cfg.spins = 6;
+            cfg.title = { fr: 'Jackpot', en: 'Jackpot' };
+        } else if (minigameType === 'domino') {
+            cfg.title = { fr: 'Tour de cartes', en: 'Card Tower' };
+        } else if (minigameType === 'reseau_alibis') {
+            cfg.title = { fr: 'Réseau d\'alibis', en: 'Alibi Network' };
+        }
+
+        $.minigameTitle.textContent = cfg.title[ui.language] || cfg.title.en || minigameType;
+        $.minigameContent.innerHTML = '';
+
+        if (['chess', 'sudoku', 'memory', 'domino'].indexOf(minigameType) !== -1) {
+            showDifficultySelection(cfg, function (selectedDifficulty) {
+                cfg.difficulty = selectedDifficulty;
+                startSelectedMinigame(minigameType, cfg);
+            });
+        } else {
+            startSelectedMinigame(minigameType, cfg);
+        }
+    }
+
+    function startSelectedMinigame(minigameType, cfg) {
+        var overlay = document.getElementById('minigame-overlay');
+        if (overlay) {
+            overlay.classList.remove('hidden');
+        }
+        populateMinigameOverlayChrome(scr.interro ? scr.interro.id : null, cfg.title ? (cfg.title[ui.language] || cfg.title.fr || cfg.title.en || minigameType) : minigameType);
+        $.minigameSkipBtn.classList.remove('hidden');
+        $.minigameSkipBtn.disabled = false;
+        $.minigameSkipBtn.textContent = ui.language === 'fr' ? 'Passer' : 'Skip';
+
+        window._minigameSkipHandler = null;
+        var resultAnnounced = false;
+
+        function onMinigameDone(result) {
+            if (resultAnnounced) return;
+            resultAnnounced = true;
+            window._minigameSkipHandler = null;
+            if (overlay) {
+                overlay.classList.add('hidden');
+                overlay.querySelector('#minigame-screen-content').innerHTML = '';
+            }
+            $.minigameSelectScreen.classList.remove('hidden');
+            $.minigameSelectScreen.classList.add('active');
+        }
+        window._minigameSkipHandler = onMinigameDone;
+
+        var gameMap = getGlobalGameMap();
+        var gameNS = gameMap[minigameType];
+        if (!gameNS || !window[gameNS]) {
+            showToast('Minigame not available: ' + minigameType, true);
+            $.minigameSelectScreen.classList.remove('hidden');
+            $.minigameSelectScreen.classList.add('active');
+            return;
+        }
+
+        try {
+            window[gameNS].play(cfg, ui.language, onMinigameDone, $.minigameContent);
+        } catch (e) {
+            console.error('[True Detective] Minigame error "' + minigameType + '" :', e);
+            onMinigameDone({ won: false });
+        }
+    }
+
+    function scrShowMinigameRound(roundIndex) {
+        var it = scr.interro;
+        if (!it) return;
+        var roundCfg = scrGetMinigameRoundConfig(it.id, roundIndex);
+        if (!roundCfg) {
+            scrShowInterroQuestions();
+            return;
+        }
+
+        $.continueBtn.classList.add('hidden');
+        $.choicesContainer.innerHTML = '';
+        $.dialogueText.textContent = itl({
+            fr: 'Défi ' + (roundIndex + 1) + '/3 : ' + (roundCfg.title ? roundCfg.title.fr : 'Minijeux'),
+            en: 'Challenge ' + (roundIndex + 1) + '/3 : ' + (roundCfg.title ? roundCfg.title.en : 'Minigame')
+        });
+        $.typeCursor.classList.add('hidden');
+
+        var mgTitle = roundCfg.title
+            ? (roundCfg.title[ui.language] || roundCfg.title.fr || roundCfg.title.en || '')
+            : '';
+        $.minigameTitle.textContent = mgTitle || (ui.language === 'fr' ? 'Minijeux ' + (roundIndex + 1) : 'Minigame ' + (roundIndex + 1));
+        $.minigameContent.innerHTML = '';
+
+        // Show difficulty selection for applicable games
+        if (['chess', 'sudoku', 'memory', 'domino'].indexOf(roundCfg.type) !== -1) {
+            showDifficultySelection(roundCfg, function (selectedDifficulty) {
+                roundCfg.difficulty = selectedDifficulty;
+                launchMinigame(roundIndex, roundCfg);
+            });
+        } else {
+            launchMinigame(roundIndex, roundCfg);
+        }
+    }
+
+    function scrHandleMinigameResult(roundIndex, result) {
+        if (typeof window._interroSidebarCleanup === 'function') {
+            window._interroSidebarCleanup();
+            window._interroSidebarCleanup = null;
+        }
+        var layer = document.getElementById('minigame-layer');
+        if (layer) { layer.classList.remove('active'); layer.innerHTML = ''; }
+        var overlay = document.getElementById('minigame-overlay');
+        if (overlay) {
+            overlay.classList.add('hidden');
+            overlay.classList.remove('interro-layout');
+            overlay.classList.remove('chess-layout');
+            overlay.classList.remove('retro-layout');
+            var container = overlay.querySelector('.minigame-overlay-container');
+            if (container) container.classList.remove('chess-game-layout');
+            if (overlay.querySelector('#minigame-screen-content')) {
+                overlay.querySelector('#minigame-screen-content').innerHTML = '';
+            }
+        }
+        hideScreen($.minigameScreen);
+        showScreen($.gameScreen);
+
+        var it = scr.interro;
+        if (!it) return;
+
+        var won = result && result.won;
+        var clueText = won
+            ? (itl(scrGetMinigameRoundConfig(it.id, roundIndex).clue) || '')
+            : (itl(scrGetMinigameRoundConfig(it.id, roundIndex).failClue) || '');
+
+        if (clueText) {
+            var s = scrGetState();
+            if (!s.clues) s.clues = [];
+            if (s.clues.indexOf(clueText) === -1) s.clues.push(clueText);
+            if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
+                window.TDNarrativeEngine.addClue(clueText, won ? 'dialogue' : 'dialogue');
+            }
+            showClueToast(clueText);
+            updateNotebook();
+        }
+
+        it.minigameRound = roundIndex + 1;
+        if (it.minigameRound < 3) {
+            scrShowInterroAskButton();
+        } else {
+            scrEndInterrogation();
+        }
+    }
+
+    function populateMinigameOverlayChrome(suspectId, dialogueText) {
+        if ($.minigameBgLayer) {
+            var decorKey = 'residence';
+            if (scr && scr.interro && scr.interro.id) {
+                var interroData = window.TDNarration && window.TDNarration.interrogations ? window.TDNarration.interrogations[scr.interro.id] : null;
+                if (interroData && interroData.decor) decorKey = interroData.decor;
+            }
+            var bgUrl = scrDecorImage(decorKey);
+            $.minigameBgLayer.style.backgroundImage = bgUrl ? 'url(' + bgUrl + ')' : '';
+        }
+        if ($.minigameNpcImage) {
+            var npcUrl = scrNpcImage(suspectId || (scr && scr.interro ? scr.interro.id : null));
+            $.minigameNpcImage.src = npcUrl || '';
+            $.minigameNpcImage.style.display = npcUrl ? 'block' : 'none';
+        }
+        if ($.minigameDialogueText && dialogueText) {
+            $.minigameDialogueText.textContent = dialogueText;
+        }
+    }
+
+    function showDifficultySelection(roundCfg, callback) {
+        var overlay = document.createElement('div');
+        overlay.className = 'difficulty-overlay active';
+        var lang = ui.language;
+        var difficulties = [
+            { id: 'easy', label: lang === 'fr' ? 'Facile' : 'Easy', desc: lang === 'fr' ? 'Pour débutants' : 'For beginners' },
+            { id: 'medium', label: lang === 'fr' ? 'Moyen' : 'Medium', desc: lang === 'fr' ? 'Équilibré' : 'Balanced' },
+            { id: 'hard', label: lang === 'fr' ? 'Difficile' : 'Hard', desc: lang === 'fr' ? 'Pour experts' : 'For experts' }
+        ];
+        var html = '<div class="difficulty-box"><h3>' + (lang === 'fr' ? 'Choisissez la difficulté' : 'Choose difficulty') + '</h3><div class="difficulty-options">';
+        difficulties.forEach(function (d) {
+            html += '<button class="btn btn-difficulty" data-difficulty="' + d.id + '"><span class="difficulty-label">' + d.label + '</span><span class="difficulty-desc">' + d.desc + '</span></button>';
+        });
+        html += '</div></div>';
+        overlay.innerHTML = html;
+        document.body.appendChild(overlay);
+
+        overlay.querySelectorAll('.btn-difficulty').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var difficulty = btn.dataset.difficulty;
+                overlay.remove();
+                callback(difficulty);
+            });
+        });
+    }
+
+    function launchMinigame(roundIndex, roundCfg) {
+        $.minigameOverlay = document.getElementById('minigame-overlay');
+        if ($.minigameOverlay) {
+            $.minigameOverlay.classList.remove('hidden');
+        }
+        populateMinigameOverlayChrome(scr.interro ? scr.interro.id : null, (roundCfg.title && (roundCfg.title.fr || roundCfg.title.en)) ? (roundCfg.title[ui.language] || roundCfg.title.fr || roundCfg.title.en) : (ui.language === 'fr' ? 'Minijeux ' + (roundIndex + 1) : 'Minigame ' + (roundIndex + 1)));
+        $.minigameSkipBtn.classList.remove('hidden');
+        $.minigameSkipBtn.disabled = false;
+        $.minigameSkipBtn.textContent = ui.language === 'fr' ? 'Continuer' : 'Continue';
+
+        window._minigameSkipHandler = null;
+        var resultAnnounced = false;
+
+        function onMinigameDone(result) {
+            if (typeof window._interroSidebarCleanup === 'function') {
+                window._interroSidebarCleanup();
+                window._interroSidebarCleanup = null;
+            }
+            if (resultAnnounced) return;
+            resultAnnounced = true;
+            window._minigameSkipHandler = null;
+            if ($.minigameOverlay) {
+                $.minigameOverlay.classList.add('hidden');
+            }
+            scrHandleMinigameResult(roundIndex, result);
+        }
+        window._minigameSkipHandler = onMinigameDone;
+
+        var gameMap = getGlobalGameMap();
+        var gameNS = gameMap[roundCfg.type];
+        if (!gameNS || !window[gameNS]) {
+            setTimeout(function () { scrHandleMinigameResult(roundIndex, { won: false }); }, 100);
+            return;
+        }
+
+        var mgCfg = {
+            type: roundCfg.type,
+            depth: roundCfg.depth,
+            spins: roundCfg.spins,
+            winThreshold: roundCfg.winThreshold,
+            title: roundCfg.title,
+            clue: roundCfg.clue,
+            failClue: roundCfg.failClue,
+            act: roundCfg.act,
+            difficulty: roundCfg.difficulty,
+            dialogues: roundCfg.dialogues,
+            interroId: roundCfg.interroId,
+            storyMode: true
+        };
+
+        try {
+            window[gameNS].play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
+        } catch (e) {
+            console.error('[True Detective] Minigame error "' + roundCfg.type + '" :', e);
+            scrHandleMinigameResult(roundIndex, { won: false });
+        }
     }
 
     function scrClueFromMinigame(mg) {
@@ -4005,7 +4175,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                         if (!scr.awaitingChoice) return;
                         scr.awaitingChoice = false;
                         s.prochainSuspect = suspectId;
-                        scr.interro = { id: suspectId, round: 0, done: false };
+                        scr.interro = { id: suspectId, questionRound: 0, minigameRound: 0, done: false, questionsDone: false };
                         $.continueBtn.classList.remove('hidden');
                         $.continueBtn.disabled = !isMobile();
                         $.continueBtn.textContent = getText('continue') || 'Continuer';
@@ -4074,7 +4244,7 @@ function scrApplyChoice(choiceKey, choiceId) {
                 return;
             }
             s.reinterroges.push(choiceId);
-            scr.interro = { id: choiceId, round: 0, done: false };
+            scr.interro = { id: choiceId, questionRound: 0, minigameRound: 0, done: false, questionsDone: false };
             $.continueBtn.classList.remove('hidden');
             $.continueBtn.disabled = !isMobile();
             $.continueBtn.textContent = getText('continue') || 'Continuer';
@@ -4274,6 +4444,7 @@ function scrApplyChoice(choiceKey, choiceId) {
     window.scrShowActPage = scrShowActPage;
     window.scrShouldShowActPage = scrShouldShowActPage;
     window.THEME_ACT_TITLES = THEME_ACT_TITLES;
+    window.THEME_ASSETS = THEME_ASSETS;
     window.scr = scr;
     window.getThemeId = getThemeId;
     window.skipTypeWriter = skipTypeWriter;

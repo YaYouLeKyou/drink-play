@@ -30,12 +30,8 @@
 
     var THEME_DESCRIPTORS = {
         'agatha-christie': 'An elegant 1930s aristocrat or suspect, wearing refined period clothing, sharp attire, clean line art style, high contrast, moody color palette',
-        'sherlock-holmes': 'A 19th-century Victorian gentleman or witness, wearing a tailcoat, top hat, or waistcoat, suspicious posture, clean line art style, cinematic lighting',
         'cyberpunk': 'A futuristic cyberpunk hacker or street operative, augmented cyberware implants, leather jacket, neon cyan highlights, clean line art style, high contrast',
-        'heroic-fantasy': 'A mysterious fantasy guild master or mage, wearing ornate dark robes, holding a subtle relic, clean line art comic book style, high contrast',
-        'sci-fi': 'A space station commander or alien suspect, wearing a sleek modern flight suit, high-tech gadgetry, clean line art style, atmospheric shadows',
-        'lovecraftian': 'A pale cultist or unhinged scholar, holding an ancient grimoire, unsettling gaze, dark comic book line art, deep blues and shadowy tones',
-        'antiquite': 'An ancient Roman senator or Egyptian noble, wearing traditional toga or robes with gold trim, calculating look, clean graphic line art',
+        'film-noir': 'A 1940s noir detective or suspect, wearing a trench coat, fedora, or elegant evening dress, dramatic shadows, high contrast black and white line art, cinematic lighting',
     };
 
     function encodePrompt(prompt) {

@@ -118,45 +118,77 @@
         if (!pageGrid || !window.TDPhases) return;
         pageGrid.innerHTML = '';
 
+        var acts = {};
         TDPhases.forEach(function (phase, phaseIdx) {
-            var phaseDiv = document.createElement('div');
-            phaseDiv.className = 'dev-phase-group';
+            var actKey = phase.act || 'Other';
+            if (!acts[actKey]) acts[actKey] = [];
+            acts[actKey].push({ phase: phase, phaseIdx: phaseIdx });
+        });
 
-            var phaseTitle = document.createElement('div');
-            phaseTitle.className = 'dev-phase-title';
-            phaseTitle.textContent = phase.label ? (phase.label.fr || phase.label.en || 'Phase ' + phaseIdx) : 'Phase ' + phaseIdx;
-            phaseDiv.appendChild(phaseTitle);
+        Object.keys(acts).forEach(function (actKey) {
+            var actDiv = document.createElement('div');
+            actDiv.className = 'dev-phase-group';
 
-            var pagesDiv = document.createElement('div');
-            pagesDiv.className = 'dev-pages';
+            var actTitle = document.createElement('div');
+            actTitle.className = 'dev-phase-title';
+            actTitle.textContent = actKey;
+            actDiv.appendChild(actTitle);
 
-            if (phase.pages) {
-                phase.pages.forEach(function (page, pageIdx) {
-                    var pageBtn = document.createElement('button');
-                    pageBtn.className = 'dev-page-btn';
-                    if (page.minigame) {
-                        pageBtn.classList.add('dev-page-btn-mg');
-                    }
-                    var pageText = '';
-                    if (page.text) {
-                        var text = page.text.fr || page.text.en || '';
-                        pageText = text.substring(0, 40) + (text.length > 40 ? '...' : '');
-                    }
-                    var mgLabel = '';
-                    if (page.minigame) {
-                        mgLabel = ' [MG:' + page.minigame.type + ']';
-                    }
-                    pageBtn.textContent = 'P' + (pageIdx + 1) + (pageText ? ': ' + pageText : '') + mgLabel;
-                    pageBtn.title = page.text ? (page.text.fr || page.text.en || '') : (page.minigame ? ('Minigame: ' + page.minigame.type) : '');
-                    pageBtn.addEventListener('click', function () {
-                        jumpToPhase(phaseIdx, pageIdx);
+            acts[actKey].forEach(function (item) {
+                var phase = item.phase;
+                var phaseIdx = item.phaseIdx;
+
+                var phaseDiv = document.createElement('div');
+                phaseDiv.className = 'dev-phase-subgroup';
+
+                var phaseLabel = document.createElement('div');
+                phaseLabel.className = 'dev-phase-subtitle';
+                phaseLabel.textContent = phase.label ? (phase.label.fr || phase.label.en || 'Phase ' + phaseIdx) : 'Phase ' + phaseIdx;
+                phaseDiv.appendChild(phaseLabel);
+
+                var pagesDiv = document.createElement('div');
+                pagesDiv.className = 'dev-pages';
+
+                if (phase.pages) {
+                    phase.pages.forEach(function (page, pageIdx) {
+                        var pageBtn = document.createElement('button');
+                        pageBtn.className = 'dev-page-btn';
+                        var isInterroMinigame = false;
+                        if (page.minigame) {
+                            pageBtn.classList.add('dev-page-btn-mg');
+                        }
+                        if (page.interrogation && window.TDNarration && window.TDNarration.interrogations) {
+                            var interro = window.TDNarration.interrogations[page.interrogation];
+                            if (interro && interro.minigame) {
+                                isInterroMinigame = true;
+                                pageBtn.classList.add('dev-page-btn-interro-mg');
+                            }
+                        }
+                        var pageText = '';
+                        if (page.text) {
+                            var text = page.text.fr || page.text.en || '';
+                            pageText = text.substring(0, 40) + (text.length > 40 ? '...' : '');
+                        }
+                        var mgLabel = '';
+                        if (page.minigame) {
+                            mgLabel = ' [MG:' + page.minigame.type + ']';
+                        } else if (isInterroMinigame) {
+                            mgLabel = ' [INT:' + page.interrogation + ']';
+                        }
+                        pageBtn.textContent = 'P' + (pageIdx + 1) + (pageText ? ': ' + pageText : '') + mgLabel;
+                        pageBtn.title = page.text ? (page.text.fr || page.text.en || '') : (page.minigame ? ('Minigame: ' + page.minigame.type) : (isInterroMinigame ? ('Interrogation minigame: ' + page.interrogation) : ''));
+                        pageBtn.addEventListener('click', function () {
+                            jumpToPhase(phaseIdx, pageIdx);
+                        });
+                        pagesDiv.appendChild(pageBtn);
                     });
-                    pagesDiv.appendChild(pageBtn);
-                });
-            }
+                }
 
-            phaseDiv.appendChild(pagesDiv);
-            pageGrid.appendChild(phaseDiv);
+                phaseDiv.appendChild(pagesDiv);
+                actDiv.appendChild(phaseDiv);
+            });
+
+            pageGrid.appendChild(actDiv);
         });
     }
 

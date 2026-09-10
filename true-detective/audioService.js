@@ -16,12 +16,7 @@
 
     var THEME_MUSIC = {
         'agatha-christie': 'sherlock.mp3',
-        'sherlock-holmes': 'sherlock.mp3',
         'cyberpunk': 'cyberpunk.mp3',
-        'heroic-fantasy': 'heroic fantasy.mp3',
-        'sci-fi': 'SF.mp3',
-        'lovecraftian': 'peur.mp3',
-        'antiquite': 'gaginator.mp3',
         'film-noir': 'noire.mp3',
     };
 
@@ -279,12 +274,7 @@
 
     var THEME_MUSIC_TRACKS = {
         'agatha-christie': 'sherlock.mp3',
-        'sherlock-holmes': 'sherlock.mp3',
         'cyberpunk': 'cyberpunk.mp3',
-        'heroic-fantasy': 'heroic fantasy.mp3',
-        'sci-fi': 'SF.mp3',
-        'lovecraftian': 'peur.mp3',
-        'antiquite': 'gaginator.mp3',
         'film-noir': 'noire.mp3',
     };
 
@@ -551,7 +541,7 @@
 
     function isCyberpunkTheme() {
         var id = (currentTheme || '').toLowerCase();
-        return id === 'cyberpunk' || id === 'sci-fi' || id === 'sf';
+        return id === 'cyberpunk';
     }
 
     function getTypingSoundProfile() {

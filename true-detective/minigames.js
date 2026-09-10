@@ -761,7 +761,14 @@
             for (var k = 0; k < cards.length; k++) if (cards[k].isLie) lieIds.push(cards[k].id);
             var foundLies = 0;
             var mistakes = 0;
+            var perfectRun = true;
             var locked = false;
+            function showEndMessage(text) {
+                var msg = document.createElement('div');
+                msg.className = 'reseau-alibis-message';
+                msg.textContent = text;
+                board.appendChild(msg);
+            }
 
             var board = document.createElement('div');
             board.className = 'reseau-alibis-board';
@@ -851,10 +858,17 @@
                                     }
                                 }
                             });
-                            complete(true);
+                            if (perfectRun) {
+                                showEndMessage(lang === 'fr' ? 'Indice obtenu !' : 'Clue obtained!');
+                                complete(true);
+                            } else {
+                                showEndMessage(lang === 'fr' ? 'Vous avez identifié les mensonges mais avez fait des erreurs. Pas d\'indice.' : 'You found the lies but made errors. No clue.');
+                                complete(false);
+                            }
                         }
                     } else {
                         mistakes++;
+                        perfectRun = false;
                         card.classList.add('wrong');
                         tag.textContent = (lang === 'fr' ? 'Erreur' : 'Wrong');
                         tag.classList.add('tag-wrong');
@@ -868,10 +882,9 @@
                             card.classList.add('confirmed-true');
                             tag.textContent = (lang === 'fr' ? 'Vrai' : 'True');
                             tag.classList.add('tag-true');
-                            if (foundLies >= lieCount) {
-                                locked = true;
-                                complete(true);
-                            }
+                            locked = true;
+                            showEndMessage(lang === 'fr' ? 'Trop d\'erreurs. Pas d\'indice.' : 'Too many errors. No clue.');
+                            complete(false);
                         }
                     }
                 });
@@ -1429,6 +1442,423 @@
                     sampleEls.forEach(function (b, i) { if (i === match) b.classList.add('hint'); });
                 }
             });
+        },
+
+        /* Jackpot slot machine for seducteur interrogation minigame
+           Max 6 spins, with seducteur dialogue before/after each spin
+           Interrogation questions triggered on each spin */
+        'jackpot': function (body, registerHint) {
+            var cfgSpins = cfg.spins || 6;
+            var spins = Math.min(cfgSpins, 6);
+            var winThreshold = cfg.winThreshold || 2;
+            var wrap = document.createElement('div');
+            wrap.className = 'jackpot-wrap';
+            body.appendChild(wrap);
+
+            var reelFrame = document.createElement('div');
+            reelFrame.className = 'jackpot-reels';
+            var reels = [];
+            var symbols = ['🍒', '🍋', '🍊', '🔔', '💎', '7️⃣', '❤️', '💵'];
+            for (var i = 0; i < 3; i++) {
+                var reel = document.createElement('div');
+                reel.className = 'jackpot-reel';
+                var sym = document.createElement('span');
+                sym.className = 'jackpot-symbol';
+                sym.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                reel.appendChild(sym);
+                reelFrame.appendChild(reel);
+                reels.push(reel);
+            }
+            wrap.appendChild(reelFrame);
+
+            var status = document.createElement('div');
+            status.className = 'jackpot-status';
+            status.textContent = lang === 'fr'
+                ? 'Tours restants : ' + spins
+                : 'Spins left: ' + spins;
+            wrap.appendChild(status);
+
+            var dialogueEl = document.createElement('div');
+            dialogueEl.className = 'jackpot-dialogue';
+            wrap.appendChild(dialogueEl);
+
+            var won = false;
+            var totalWins = 0;
+            var spinsLeft = spins;
+            var spinning = false;
+            var dialogues = cfg.dialogues || {};
+            var currentSpinIndex = 0;
+            var result = null;
+
+            var suspectName = 'Pembrooke';
+            if (lang === 'fr') suspectName = 'Julian Pembrooke';
+
+            var phraseList = [];
+            if (dialogues && dialogues.beforeSpin && dialogues.beforeSpin.length) {
+                phraseList = dialogues.beforeSpin;
+            }
+            var tauntList = [];
+            if (dialogues && dialogues.afterLose && dialogues.afterLose.length) {
+                tauntList = dialogues.afterLose;
+            }
+
+            var interroData = null;
+            var interroState = null;
+            var interroCompleted = false;
+            var interroPause = false;
+
+            var historyEl = null;
+            var interroBoxEl = null;
+            var dialogueTextEl = null;
+
+            function createInterroSidebar() {
+                var overlay = document.getElementById('minigame-overlay');
+                if (overlay) overlay.classList.add('chess-layout');
+
+                var layoutContainer = document.querySelector('.minigame-overlay-container') || body.parentNode;
+                if (layoutContainer) layoutContainer.classList.add('chess-game-layout');
+
+                var sidePanel = document.getElementById('chess-side-panel');
+                if (sidePanel) sidePanel.style.display = 'flex';
+                var leftPanel = document.getElementById('chess-left-panel');
+                if (leftPanel) leftPanel.style.display = 'flex';
+
+                var imgSrc = (typeof window !== 'undefined' && window.scr && typeof window.scrNpcImage === 'function')
+                    ? window.scrNpcImage('seducteur')
+                    : null;
+                var charImg = document.getElementById('chess-character-image');
+                if (charImg && imgSrc) {
+                    charImg.src = imgSrc;
+                    charImg.alt = suspectName;
+                }
+                var charNameEl = document.getElementById('chess-character-name');
+                if (charNameEl) charNameEl.textContent = suspectName;
+                var charRoleEl = document.getElementById('chess-character-role');
+                if (charRoleEl) charRoleEl.textContent = lang === 'fr' ? 'Séducteur' : 'Charmer';
+
+                dialogueTextEl = document.getElementById('chess-dialogue-text');
+                historyEl = document.getElementById('chess-dialogue-history');
+                interroBoxEl = document.getElementById('chess-interro-box');
+            }
+
+            function cleanupInterro() {
+                var overlay = document.getElementById('minigame-overlay');
+                if (overlay) overlay.classList.remove('chess-layout');
+                var layoutContainer = document.querySelector('.minigame-overlay-container') || body.parentNode;
+                if (layoutContainer) layoutContainer.classList.remove('chess-game-layout');
+                var sidePanel = document.getElementById('chess-side-panel');
+                if (sidePanel) sidePanel.style.display = 'none';
+                var leftPanel = document.getElementById('chess-left-panel');
+                if (leftPanel) leftPanel.style.display = 'none';
+                if (historyEl) historyEl.innerHTML = '';
+                if (interroBoxEl) interroBoxEl.innerHTML = '';
+                dialogueTextEl = null;
+            }
+
+            function clearInterro() {
+                if (historyEl) historyEl.innerHTML = '';
+                if (interroBoxEl) interroBoxEl.innerHTML = '';
+            }
+
+            function appendDialogue(text, speaker) {
+                if (!historyEl) return;
+                var line = document.createElement('div');
+                line.className = 'chess-interro-history';
+                if (speaker) {
+                    line.textContent = speaker + ': ' + text;
+                } else {
+                    line.textContent = text;
+                }
+                historyEl.appendChild(line);
+                historyEl.scrollTop = historyEl.scrollHeight;
+            }
+
+            function setDialogueText(text) {
+                if (dialogueTextEl) dialogueTextEl.textContent = text;
+            }
+
+            function fetchInterroData() {
+                if (typeof window !== 'undefined' && window.scr && window.scr.interro && window.scr.interro.id) {
+                    if (window.TDNarration && window.TDNarration.interrogations) {
+                        interroData = window.TDNarration.interrogations[window.scr.interro.id];
+                    }
+                }
+                return interroData;
+            }
+
+            function getRounds() {
+                if (!interroData) return [];
+                var rounds = [];
+                if (interroData.questions) rounds.push(interroData.questions);
+                if (interroData.rounds2) rounds.push(interroData.rounds2);
+                if (interroData.rounds3) rounds.push(interroData.rounds3);
+                return rounds.filter(function (r) { return r && r.length; });
+            }
+
+            function renderInterrogation() {
+                if (!interroData || !interroState || !interroBoxEl) return;
+                var rounds = getRounds();
+                if (!rounds.length) return;
+
+                if (interroState.round >= rounds.length) {
+                    appendDialogue(lang === 'fr' ? 'Interrogatoire terminé.' : 'Interrogation complete.', null);
+                    finishInterrogation();
+                    return;
+                }
+
+                var currentRound = rounds[interroState.round] || [];
+                var remaining = currentRound.filter(function (q) {
+                    return interroState.answered.indexOf(q.id || q.label) === -1;
+                });
+
+                if (!remaining.length) {
+                    if (interroState.round + 1 < rounds.length) {
+                        interroState.round++;
+                        interroState.answered = [];
+                        renderInterrogation();
+                    } else {
+                        appendDialogue(lang === 'fr' ? 'Interrogatoire terminé.' : 'Interrogation complete.', null);
+                        finishInterrogation();
+                    }
+                    return;
+                }
+
+                interroBoxEl.innerHTML = '';
+
+                var phaseLabel = document.createElement('div');
+                phaseLabel.className = 'chess-interro-history';
+                phaseLabel.textContent = (lang === 'fr' ? 'Phase ' : 'Phase ') +
+                    (interroState.round + 1) + '/' + rounds.length;
+                interroBoxEl.appendChild(phaseLabel);
+
+                remaining.forEach(function (q) {
+                    var btn = document.createElement('button');
+                    btn.className = 'chess-interro-question';
+                    btn.textContent = t(q.label, lang);
+                    btn.addEventListener('click', function () {
+                        if (!interroState) return;
+                        interroState.answered.push(q.id || q.label);
+                        var response = t(q.response, lang) || '';
+                        if (typeof window !== 'undefined' && typeof window.scrEnrichResponse === 'function') {
+                            response = window.scrEnrichResponse(response, q);
+                        }
+                        if (typeof window !== 'undefined' && typeof window.scrSubstituteNames === 'function') {
+                            var themeId = typeof window.getThemeId === 'function' ? window.getThemeId() : 'agatha-christie';
+                            response = window.scrSubstituteNames(response, themeId);
+                        }
+                        appendDialogue((lang === 'fr' ? 'Vous: ' : 'You: ') + t(q.label, lang), null);
+                        appendDialogue(suspectName + ': ' + response, null);
+
+                        var clue = null;
+                        if (typeof window !== 'undefined' && typeof window.scrClueFromInterroResponse === 'function') {
+                            clue = window.scrClueFromInterroResponse(response);
+                        }
+                        if (clue && typeof window !== 'undefined' && window.TDNarrativeEngine &&
+                            typeof window.TDNarrativeEngine.addClue === 'function') {
+                            window.TDNarrativeEngine.addClue(clue, q.evidence || 'dialogue');
+                            if (typeof window.showClueToast === 'function') {
+                                window.showClueToast(clue);
+                            }
+                        }
+
+                        renderInterrogation();
+                    });
+                    interroBoxEl.appendChild(btn);
+                });
+            }
+
+            function startInterrogation() {
+                clearInterro();
+                fetchInterroData();
+                if (!interroData) return;
+
+                interroState = { round: 0, answered: [] };
+                interroCompleted = false;
+
+                var rounds = getRounds();
+                if (!rounds.length) return;
+
+                interroPause = true;
+
+                setDialogueText(lang === 'fr' ? 'Phase 1/3, Choisissez votre question :' : 'Phase 1/3, Pick your question:');
+                appendDialogue(lang === 'fr' ? 'Phase 1/3, Choisissez votre question :' : 'Phase 1/3, Pick your question:', null);
+                renderInterrogation();
+            }
+
+            function finishInterrogation() {
+                interroState = null;
+                interroData = null;
+                interroCompleted = true;
+                interroPause = false;
+                clearInterro();
+            }
+
+            function onSpinAction() {
+                if (interroCompleted || interroPause) return;
+                fetchInterroData();
+                if (interroData && getRounds().length) {
+                    startInterrogation();
+                    return;
+                }
+
+                var isTaunt = currentSpinIndex % 2 === 1;
+                var phrases = isTaunt ? tauntList : phraseList;
+                if (phrases && phrases.length && dialogues) {
+                    if (isTaunt && dialogues.afterLose && dialogues.afterLose.length) {
+                        showDialogue(dialogues.afterLose[currentSpinIndex] || dialogues.afterLose[0]);
+                    } else if (!isTaunt && dialogues.beforeSpin && dialogues.beforeSpin.length) {
+                        showDialogue(dialogues.beforeSpin[currentSpinIndex] || dialogues.beforeSpin[0]);
+                    }
+                }
+            }
+
+            createInterroSidebar();
+
+            function showDialogue(text) {
+                dialogueEl.textContent = '';
+                if (!text) { dialogueEl.style.display = 'none'; return; }
+                var tText = typeof text === 'string' ? text : t(text, lang);
+                dialogueEl.textContent = tText;
+                dialogueEl.style.display = '';
+            }
+
+            if (dialogues.intro) {
+                showDialogue(t(dialogues.intro, lang));
+            }
+
+            function spinReels() {
+                if (spinning || interroPause) return;
+                if (spinsLeft <= 0) {
+                    finishMinigame(false);
+                    return;
+                }
+                spinning = true;
+                spinsLeft--;
+
+                onSpinAction();
+
+                var beforeLines = dialogues.beforeSpin || [];
+                if (beforeLines[currentSpinIndex]) {
+                    showDialogue(beforeLines[currentSpinIndex]);
+                }
+
+                status.textContent = (lang === 'fr' ? 'Tours restants : ' : 'Spins left: ') + spinsLeft;
+                spinBtn.disabled = true;
+
+                var spinInterval = setInterval(function () {
+                    reels.forEach(function (reel) {
+                        var sym = reel.querySelector('.jackpot-symbol');
+                        sym.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                        sym.style.opacity = '0.5';
+                    });
+                }, 80);
+
+                setTimeout(function () {
+                    clearInterval(spinInterval);
+                    var finalSymbols = [];
+                    reels.forEach(function (reel) {
+                        var sym = reel.querySelector('.jackpot-symbol');
+                        var s = symbols[Math.floor(Math.random() * symbols.length)];
+                        sym.textContent = s;
+                        sym.style.opacity = '1';
+                        finalSymbols.push(s);
+                    });
+
+                    var spinWon = false;
+                    var winType = null;
+                    if (finalSymbols[0] === finalSymbols[1] && finalSymbols[1] === finalSymbols[2]) {
+                        spinWon = true;
+                        totalWins++;
+                        var sym = finalSymbols[0];
+                        if (sym === '💎') {
+                            winType = 'dollars';
+                            status.textContent = lang === 'fr'
+                                ? '💰 JACKPOT DOLLARS ! Piste financière !'
+                                : '💰 DOLLARS JACKPOT! Financial trail!';
+                            status.style.color = '#00ff88';
+                        } else if (sym === '❤️' || sym === '💖') {
+                            winType = 'hearts';
+                            status.textContent = lang === 'fr'
+                                ? '💔 JACKPOT COEURS ! Liaison révélée !'
+                                : '💔 HEARTS JACKPOT! Affair revealed!';
+                            status.style.color = '#ff69b4';
+                        } else {
+                            winType = 'generic';
+                            status.textContent = lang === 'fr'
+                                ? '🎰 JACKPOT ! Trois symboles identiques !'
+                                : '🎰 JACKPOT! Three matching symbols!';
+                            status.style.color = '#ffd700';
+                        }
+                    } else if (finalSymbols[0] === finalSymbols[1] || finalSymbols[1] === finalSymbols[2] || finalSymbols[0] === finalSymbols[2]) {
+                        spinWon = true;
+                        totalWins++;
+                        status.textContent = lang === 'fr'
+                            ? '✨ Petit gain ! Deux symboles identiques.'
+                            : '✨ Small win! Two matching symbols.';
+                        status.style.color = '#00ff88';
+                    } else {
+                        status.textContent = lang === 'fr'
+                            ? 'Pas de gain cette fois.'
+                            : 'No win this time.';
+                        status.style.color = '#ff6b6b';
+                    }
+
+                    if (spinWon) {
+                        if (winType === 'hearts' && dialogues.afterWinHearts) {
+                            showDialogue(t(dialogues.afterWinHearts, lang));
+                        } else if (winType === 'dollars' && dialogues.afterWinDollars) {
+                            showDialogue(t(dialogues.afterWinDollars, lang));
+                        } else if (winType === 'generic' || winType === null) {
+                            if (dialogues.afterWinHearts) {
+                                showDialogue(t(dialogues.afterWinHearts, lang));
+                            } else if (dialogues.afterWinDollars) {
+                                showDialogue(t(dialogues.afterWinDollars, lang));
+                            }
+                        }
+                        if (totalWins >= winThreshold) {
+                            won = true;
+                            result = { spinResult: 'win', winType: winType || 'generic' };
+                        }
+                    } else {
+                        var afterLoseLines = dialogues.afterLose || [];
+                        if (afterLoseLines[currentSpinIndex]) {
+                            showDialogue(afterLoseLines[currentSpinIndex]);
+                        }
+                        result = result || { spinResult: 'lose' };
+                    }
+
+                    currentSpinIndex++;
+
+                    if (spinsLeft <= 0) {
+                        if (!result) result = { spinResult: won ? 'win' : 'lose' };
+                        setTimeout(function () { finishMinigame(won); }, 1200);
+                    } else {
+                        spinning = false;
+                        spinBtn.disabled = false;
+                    }
+                }, 1500);
+            }
+
+            function finishMinigame(gameWon) {
+                if (spinning) return;
+                spinning = true;
+                spinBtn.disabled = true;
+                var finalResult = result || { spinResult: gameWon ? 'win' : 'lose' };
+                if (won) { finalResult.won = true; } else { finalResult.won = false; }
+                setTimeout(function () {
+                    cleanupInterro();
+                    if (complete) complete(gameWon, finalResult);
+                }, 600);
+            }
+
+            var spinBtn = document.createElement('button');
+            spinBtn.className = 'btn jackpot-spin-btn';
+            spinBtn.textContent = lang === 'fr' ? '🎰 Tourner' : '🎰 Spin';
+            spinBtn.addEventListener('click', function () {
+                if (spinning || spinsLeft <= 0 || interroPause) return;
+                spinReels();
+            });
+            wrap.appendChild(spinBtn);
         },
     };
     } /* fin BUILD_CREATORS */

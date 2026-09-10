@@ -90,6 +90,106 @@
         <button id="start-game-btn" class="btn btn-primary start-game-btn hidden">Start Investigation</button>
     </section>
 
+    <!-- ===== GAME MODE SELECTION SCREEN ===== -->
+    <section id="game-mode-screen" class="screen">
+        <div class="game-mode-content">
+            <button id="game-mode-back-btn" class="btn btn-back-to-hub game-mode-back-btn">←</button>
+            <h1>Choose Your Experience</h1>
+            <p class="game-mode-subtitle">Select how you want to play</p>
+            <div class="game-mode-buttons">
+                <button id="solo-game-btn" class="btn btn-primary game-mode-btn">
+                    <span class="game-mode-icon">🎮</span>
+                    <span class="game-mode-label">Solo Adventure</span>
+                    <span class="game-mode-desc">Continue the story and solve the case</span>
+                </button>
+                <button id="minigame-select-btn" class="btn btn-secondary game-mode-btn">
+                    <span class="game-mode-icon">🕹️</span>
+                    <span class="game-mode-label">Mini Games</span>
+                    <span class="game-mode-desc">Play individual mini-games</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MINIGAME SELECTION SCREEN ===== -->
+    <section id="minigame-select-screen" class="screen">
+        <div class="minigame-select-content">
+            <h1>Mini Games</h1>
+            <p class="minigame-select-subtitle">Choose a mini-game to play</p>
+            <div class="minigame-category">
+                <h2 class="minigame-category-title">Classic / Film Noir</h2>
+                <div class="minigame-select-grid">
+                    <button class="minigame-select-card" data-minigame="chess">
+                        <span class="minigame-select-icon">♛</span>
+                        <span class="minigame-select-name">Chess</span>
+                        <span class="minigame-select-desc">Challenge Lady Vivienne</span>
+                    </button>
+                <button class="minigame-select-card" data-minigame="memory">
+                    <span class="minigame-select-icon">🔪</span>
+                    <span class="minigame-select-name">Memory</span>
+                    <span class="minigame-select-desc">Face Krane</span>
+                </button>
+                <button class="minigame-select-card" data-minigame="shooting">
+                    <span class="minigame-select-icon">🎯</span>
+                    <span class="minigame-select-name">Shooting Gallery</span>
+                    <span class="minigame-select-desc">Manor exterior - Protecteur</span>
+                </button>
+                    <button class="minigame-select-card" data-minigame="jackpot">
+                        <span class="minigame-select-icon">🎰</span>
+                        <span class="minigame-select-name">Jackpot</span>
+                        <span class="minigame-select-desc">Play with Pembrooke</span>
+                    </button>
+                    <button class="minigame-select-card" data-minigame="sudoku">
+                        <span class="minigame-select-icon">🔢</span>
+                        <span class="minigame-select-name">Sudoku</span>
+                        <span class="minigame-select-desc">Challenge Blackwood</span>
+                    </button>
+                    <button class="minigame-select-card" data-minigame="domino">
+                        <span class="minigame-select-icon">🏗️</span>
+                        <span class="minigame-select-name">Card Tower</span>
+                        <span class="minigame-select-desc">Build with Silas</span>
+                    </button>
+                    <button class="minigame-select-card" data-minigame="reseau_alibis">
+                        <span class="minigame-select-icon">🕸️</span>
+                        <span class="minigame-select-name">Alibi Network</span>
+                        <span class="minigame-select-desc">Cross-examine witnesses</span>
+                    </button>
+                </div>
+            </div>
+            <div class="minigame-category">
+                <h2 class="minigame-category-title">Cyberpunk Retro Games</h2>
+                <div class="minigame-select-grid">
+                    <button class="minigame-select-card" data-minigame="pong">
+                        <span class="minigame-select-icon">🏓</span>
+                        <span class="minigame-select-name">Pong</span>
+                        <span class="minigame-select-desc">Cyberpunk duel</span>
+                    </button>
+                    <button class="minigame-select-card" data-minigame="pacman">
+                        <span class="minigame-select-icon">👻</span>
+                        <span class="minigame-select-name">Pacman</span>
+                        <span class="minigame-select-desc">Neon maze</span>
+                    </button>
+                    <button class="minigame-select-card" data-minigame="space-invaders">
+                        <span class="minigame-select-icon">👾</span>
+                        <span class="minigame-select-name">Space Invaders</span>
+                        <span class="minigame-select-desc">Retro shooter</span>
+                    </button>
+                    <button class="minigame-select-card" data-minigame="breakout">
+                        <span class="minigame-select-icon">🧱</span>
+                        <span class="minigame-select-name">Breakout</span>
+                        <span class="minigame-select-desc">Neon bricks</span>
+                    </button>
+                    <button class="minigame-select-card" data-minigame="asteroids">
+                        <span class="minigame-select-icon">☄️</span>
+                        <span class="minigame-select-name">Asteroids</span>
+                        <span class="minigame-select-desc">Space survival</span>
+                    </button>
+                </div>
+            </div>
+            <button id="minigame-select-back-btn" class="btn btn-secondary">← Back</button>
+        </div>
+    </section>
+
     <!-- ===== GAME SCREEN ===== -->
     <section id="game-screen" class="screen">
         <div class="top-bar">
@@ -231,20 +331,59 @@
         </div>
     </section>
 
-    <!-- ===== MINIGAME SCREEN ===== -->
-    <section id="minigame-screen" class="screen">
-        <div class="minigame-screen-container">
-            <div class="minigame-screen-header">
-                <h2 id="minigame-screen-title" class="minigame-screen-title"></h2>
-                <div class="minigame-screen-buttons">
-                    <button id="minigame-skip-btn" class="btn btn-skip">Passer</button>
+    <!-- ===== MINIGAME OVERLAY ===== -->
+    <div id="minigame-overlay" class="minigame-overlay hidden">
+        <div class="minigame-bg-layer" id="minigame-bg-layer"></div>
+        <div class="minigame-overlay-backdrop"></div>
+
+        <div class="minigame-overlay-topbar">
+            <div class="minigame-topbar-character">
+                <img id="minigame-npc-image" class="minigame-npc-image" src="" alt="NPC">
+            </div>
+            <div class="minigame-topbar-dialogue">
+                <div class="minigame-dialogue-box">
+                    <span id="minigame-dialogue-text" class="minigame-dialogue-text"></span>
                 </div>
+            </div>
+            <div class="minigame-topbar-actions">
+                <button id="minigame-settings-toggle" class="btn btn-icon" type="button" aria-label="Ouvrir les réglages" aria-expanded="false">☰</button>
+                <button id="minigame-back-btn" class="btn btn-back" title="Close minigame">✕</button>
+            </div>
+            <div class="top-bar-right settings-menu-panel" id="minigame-settings-panel">
+                <div class="lang-selector">
+                    <button id="lang-en-minigame" class="lang-btn active-lang" title="English">EN</button>
+                    <button id="lang-fr-minigame" class="lang-btn" title="Français">FR</button>
+                </div>
+                <button id="minigame-mute-btn" class="btn btn-icon" title="Couper la narration" aria-label="Couper la narration"><span class="btn-icon-label">◒</span> <span class="btn-text-label">Mute</span></button>
+                <button id="minigame-volume-btn" class="btn btn-icon" title="Volume de la narration" aria-label="Modifier le volume"><span class="btn-icon-label">◐</span> <span class="btn-text-label">Volume</span></button>
+                <button id="minigame-music-toggle-btn" class="btn btn-icon" title="Masquer/Afficher le lecteur de musique" aria-label="Musique"><span class="btn-icon-label">🎵</span> <span class="btn-text-label">Music</span></button>
+                <button id="minigame-fullscreen-btn" class="btn btn-icon" title="Plein écran" aria-label="Plein écran"><span class="btn-icon-label">⛶</span> <span class="btn-text-label">Full</span></button>
+            </div>
+        </div>
+
+        <div class="minigame-overlay-container">
+            <div class="chess-left-panel" id="chess-left-panel">
+                <img id="chess-character-image" class="chess-character-image" src="" alt="Character">
             </div>
             <div id="minigame-screen-content" class="minigame-screen-content">
                 <!-- Le mini-jeu est injecté ici par minigames.js -->
             </div>
+             <div class="chess-right-panel" id="chess-side-panel">
+                <div class="chess-character-bubble">
+                    <span id="chess-character-name" class="chess-character-name"></span>
+                    <span id="chess-character-role" class="chess-character-role"></span>
+                    <span id="chess-dialogue-text" class="chess-dialogue-text"></span>
+                </div>
+                <div class="chess-dialogue-history" id="chess-dialogue-history"></div>
+                <div class="chess-interro-box" id="chess-interro-box"></div>
+            </div>
         </div>
-    </section>
+
+        <div class="minigame-overlay-bottombar">
+            <button id="minigame-skip-btn" class="btn btn-skip">Passer</button>
+        </div>
+        <h2 id="minigame-screen-title" class="minigame-screen-title hidden" aria-hidden="true"></h2>
+    </div>
 
     <!-- ===== LOADING OVERLAY ===== -->
     <div id="loading-overlay" class="loading-overlay hidden">
@@ -270,11 +409,24 @@
     <script src="phases.js"></script>
     <script src="minigames.js"></script>
     <script src="narration.js"></script>
+    <script src="interrogation-system.js"></script>
+    <script src="chess-game.js"></script>
+    <script src="puzzle-game.js"></script>
+    <script src="shooting-gallery.js"></script>
+    <script src="sudoku-game.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="domino-game.js"></script>
+    <script src="memory-game.js"></script>
+    <script src="pong-game.js"></script>
+    <script src="pacman-game.js"></script>
+    <script src="space-invaders.js"></script>
+    <script src="breakout-game.js"></script>
+    <script src="asteroids-game.js"></script>
     <script src="devmode.js"></script>
     <script src="app.js"></script>
     <script src="../music-player.js"
         data-start="generique.mp3"
-        data-tracks="night ride.mp3,true-detective/music true detective/phases/generique.mp3,true-detective/music true detective/phases/recherche.mp3,true-detective/music true detective/phases/enigme.mp3,true-detective/music true detective/phases/tension.mp3,true-detective/music true detective/phases/stress.mp3,true-detective/music true detective/phases/peur.mp3,true-detective/music true detective/phases/mystere flipant.mp3,true-detective/music true detective/phases/reflexion.mp3,true-detective/music true detective/phases/Act III Revelations.mp3,true-detective/music true detective/phases/Rising Tension.mp3,true-detective/music true detective/univers/victorian.mp3,true-detective/music true detective/univers/sherlock.mp3,true-detective/music true detective/univers/SF.mp3,true-detective/music true detective/univers/noire.mp3,true-detective/music true detective/univers/heroic fantasy.mp3,true-detective/music true detective/univers/cyberpunk.mp3,true-detective/music true detective/univers/paranormal.mp3,true-detective/music true detective/univers/antiquite.mp3,true-detective/music true detective/univers/Midnight Ticking.mp3"
+        data-tracks="night ride.mp3,true-detective/music true detective/phases/generique.mp3,true-detective/music true detective/phases/recherche.mp3,true-detective/music true detective/phases/enigme.mp3,true-detective/music true detective/phases/tension.mp3,true-detective/music true detective/phases/stress.mp3,true-detective/music true detective/phases/peur.mp3,true-detective/music true detective/phases/mystere flipant.mp3,true-detective/music true detective/phases/reflexion.mp3,true-detective/music true detective/phases/Act III Revelations.mp3,true-detective/music true detective/phases/Rising Tension.mp3,true-detective/music true detective/univers/sherlock.mp3,true-detective/music true detective/univers/noire.mp3,true-detective/music true detective/univers/cyberpunk.mp3,true-detective/music true detective/univers/Midnight Ticking.mp3"
         defer></script>
 </body>
 
