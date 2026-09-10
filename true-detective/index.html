@@ -13,20 +13,21 @@
     <body>
         <!-- ===== HOME / SPLASH SCREEN ===== -->
         <section id="home-screen" class="screen active">
-            <header class="mobile-header">
-                <div class="home-header-left">
-                    <button id="hub-btn" class="btn btn-icon btn-back-to-hub mobile-hub-btn" title="Retour au hub" aria-label="Retour au hub">⌂ Hub</button>
-                    <button id="dev-btn" class="btn btn-dev mobile-dev-btn" title="Dev" aria-label="Dev">⚙ Dev</button>
-                </div>
+        <header class="mobile-header">
+            <button id="hub-btn" class="btn btn-icon btn-back-to-hub mobile-hub-btn" title="Retour au hub" aria-label="Retour au hub">⌂ Hub</button>
+            <div class="home-lang-selector">
+                <button id="lang-en-home" class="lang-btn" title="English">🌍 English</button>
+                <button id="lang-fr-home" class="lang-btn active-lang" title="Français">🌍 Français</button>
+            </div>
+            <button id="home-mobile-settings-toggle" class="btn btn-icon mobile-settings-toggle" type="button" aria-label="Ouvrir les réglages" aria-expanded="false">☰</button>
+            <div class="top-bar-right settings-menu-panel" id="home-settings-panel">
+                <button id="home-music-toggle-btn" class="btn btn-icon" title="Afficher/Masquer la musique" aria-label="Afficher ou masquer le lecteur de musique">
+                    <span class="btn-icon-label">🔇</span> <span class="btn-text-label">Show Music</span>
+                </button>
+                <button id="dev-btn" class="btn btn-dev mobile-dev-btn" title="Dev" aria-label="Dev">⚙ Dev</button>
                 <a href="https://portfolio2026-ss9v.vercel.app/" target="_blank" rel="noopener" class="dev-contact-btn mobile-dev-btn" title="Contacter le développeur">⌨ Contacter le dev</a>
-                <button id="home-mobile-settings-toggle" class="btn btn-icon mobile-settings-toggle" type="button" aria-label="Ouvrir les réglages" aria-expanded="false">☰</button>
-                <div class="top-bar-right settings-menu-panel" id="home-settings-panel">
-                    <div class="lang-selector">
-                        <button id="lang-en-home" class="lang-btn active-lang" title="English">🌍 English</button>
-                        <button id="lang-fr-home" class="lang-btn" title="Français">🌍 Français</button>
-                    </div>
-                </div>
-            </header>
+            </div>
+        </header>
             <div class="home-content">
                 <img id="cover-image" class="cover-image" src="assets/true-detective.png" alt="True Detective">
                 <div class="home-title">
@@ -80,6 +81,9 @@
                     <button id="lang-en-theme" class="lang-btn active-lang" title="English">🌍 English</button>
                     <button id="lang-fr-theme" class="lang-btn" title="Français">🌍 Français</button>
                 </div>
+                <button id="theme-music-toggle-btn" class="btn btn-icon" title="Afficher/Masquer la musique" aria-label="Afficher ou masquer le lecteur de musique">
+                    <span class="btn-icon-label">🔇</span> <span class="btn-text-label">Show Music</span>
+                </button>
                 <button id="theme-back-to-hub-btn" class="btn btn-icon btn-back-to-hub theme-back-btn" title="Retour au hub" aria-label="Retour au hub">⌂ Retour au hub</button>
             </div>
             <h1>Universes</h1>
@@ -114,75 +118,86 @@
     <!-- ===== MINIGAME SELECTION SCREEN ===== -->
     <section id="minigame-select-screen" class="screen">
         <div class="minigame-select-content">
-            <h1>Mini Games</h1>
-            <p class="minigame-select-subtitle">Choose a mini-game to play</p>
+            <h1 data-i18n-title="Mini-jeux">Mini Games</h1>
+            <p class="minigame-select-subtitle" data-i18n-title="Choisissez un mini-jeu à jouer">Choose a mini-game to play</p>
             <div class="minigame-category">
-                <h2 class="minigame-category-title">Classic / Film Noir</h2>
+                <h2 class="minigame-category-title" data-i18n-title="Classique / Film Noir">Classic / Film Noir</h2>
                 <div class="minigame-select-grid">
                     <button class="minigame-select-card" data-minigame="chess">
                         <span class="minigame-select-icon">♛</span>
-                        <span class="minigame-select-name">Chess</span>
-                        <span class="minigame-select-desc">Challenge Lady Vivienne</span>
+                        <span class="minigame-select-name" data-i18n-name="Échecs">Chess</span>
+                        <span class="minigame-select-desc" data-i18n-desc="Défiez Vivienne aux échecs">Challenge Vivienne at chess</span>
+                        <span class="minigame-select-difficulty" data-i18n-diff="3 niveaux">3 levels</span>
                     </button>
                 <button class="minigame-select-card" data-minigame="memory">
                     <span class="minigame-select-icon">🔪</span>
-                    <span class="minigame-select-name">Memory</span>
-                    <span class="minigame-select-desc">Face Krane</span>
+                    <span class="minigame-select-name" data-i18n-name="Mémoire">Memory</span>
+                    <span class="minigame-select-desc" data-i18n-desc="Affrontez la mémoire de Krane">Face Krane's memory</span>
+                    <span class="minigame-select-difficulty" data-i18n-diff="3 niveaux">3 levels</span>
                 </button>
                 <button class="minigame-select-card" data-minigame="shooting">
                     <span class="minigame-select-icon">🎯</span>
-                    <span class="minigame-select-name">Shooting Gallery</span>
-                    <span class="minigame-select-desc">Manor exterior - Protecteur</span>
+                    <span class="minigame-select-name" data-i18n-name="Tir forain">Shooting Gallery</span>
+                    <span class="minigame-select-desc" data-i18n-desc="L'adresse de Hale, cour du manoir">Hale's aim, manor yard</span>
+                    <span class="minigame-select-difficulty" data-i18n-diff="3 niveaux">3 levels</span>
                 </button>
                     <button class="minigame-select-card" data-minigame="jackpot">
                         <span class="minigame-select-icon">🎰</span>
                         <span class="minigame-select-name">Jackpot</span>
-                        <span class="minigame-select-desc">Play with Pembrooke</span>
+                        <span class="minigame-select-desc" data-i18n-desc="Tentez la chance avec Pembrooke">Try your luck with Pembrooke</span>
                     </button>
                     <button class="minigame-select-card" data-minigame="sudoku">
                         <span class="minigame-select-icon">🔢</span>
                         <span class="minigame-select-name">Sudoku</span>
-                        <span class="minigame-select-desc">Challenge Blackwood</span>
+                        <span class="minigame-select-desc" data-i18n-desc="La grille logique de Blackwood">Blackwood's logical grid</span>
+                        <span class="minigame-select-difficulty" data-i18n-diff="3 niveaux">3 levels</span>
                     </button>
                     <button class="minigame-select-card" data-minigame="domino">
                         <span class="minigame-select-icon">🏗️</span>
-                        <span class="minigame-select-name">Card Tower</span>
-                        <span class="minigame-select-desc">Build with Silas</span>
+                        <span class="minigame-select-name" data-i18n-name="Tour de cartes">Card Tower</span>
+                        <span class="minigame-select-desc" data-i18n-desc="Construisez avec Silas">Build with Silas</span>
+                        <span class="minigame-select-difficulty" data-i18n-diff="3 niveaux">3 levels</span>
                     </button>
                     <button class="minigame-select-card" data-minigame="reseau_alibis">
                         <span class="minigame-select-icon">🕸️</span>
-                        <span class="minigame-select-name">Alibi Network</span>
-                        <span class="minigame-select-desc">Cross-examine witnesses</span>
+                        <span class="minigame-select-name" data-i18n-name="Réseau d'alibis">Alibi Network</span>
+                        <span class="minigame-select-desc" data-i18n-desc="Contre-interrogez les témoins">Cross-examine witnesses</span>
+                    </button>
+                    <button class="minigame-select-card" data-minigame="puzzle">
+                        <span class="minigame-select-icon">🧩</span>
+                        <span class="minigame-select-name" data-i18n-name="Casse-tête">Sliding Puzzle</span>
+                        <span class="minigame-select-desc" data-i18n-desc="Remettez la photo en ordre">Reassemble the photo</span>
+                        <span class="minigame-select-difficulty" data-i18n-diff="3 niveaux">3 levels</span>
                     </button>
                 </div>
             </div>
             <div class="minigame-category">
-                <h2 class="minigame-category-title">Cyberpunk Retro Games</h2>
+                <h2 class="minigame-category-title" data-i18n-title="Jeux rétro Cyberpunk">Cyberpunk Retro Games</h2>
                 <div class="minigame-select-grid">
                     <button class="minigame-select-card" data-minigame="pong">
                         <span class="minigame-select-icon">🏓</span>
-                        <span class="minigame-select-name">Pong</span>
-                        <span class="minigame-select-desc">Cyberpunk duel</span>
+                        <span class="minigame-select-name" data-i18n-name="Duel Néon">Pong</span>
+                        <span class="minigame-select-desc" data-i18n-desc="Duel rétro en néon">Neon retro duel</span>
                     </button>
                     <button class="minigame-select-card" data-minigame="pacman">
                         <span class="minigame-select-icon">👻</span>
-                        <span class="minigame-select-name">Pacman</span>
-                        <span class="minigame-select-desc">Neon maze</span>
+                        <span class="minigame-select-name" data-i18n-name="Labyrinthe Néon">Pacman</span>
+                        <span class="minigame-select-desc" data-i18n-desc="Labyrinthe hanté">Haunted maze</span>
                     </button>
                     <button class="minigame-select-card" data-minigame="space-invaders">
                         <span class="minigame-select-icon">👾</span>
-                        <span class="minigame-select-name">Space Invaders</span>
-                        <span class="minigame-select-desc">Retro shooter</span>
+                        <span class="minigame-select-name" data-i18n-name="Invasion Néon">Space Invaders</span>
+                        <span class="minigame-select-desc" data-i18n-desc="Tir rétro">Retro shooter</span>
                     </button>
                     <button class="minigame-select-card" data-minigame="breakout">
                         <span class="minigame-select-icon">🧱</span>
-                        <span class="minigame-select-name">Breakout</span>
-                        <span class="minigame-select-desc">Neon bricks</span>
+                        <span class="minigame-select-name" data-i18n-name="Démolition Néon">Breakout</span>
+                        <span class="minigame-select-desc" data-i18n-desc="Briques néon">Neon bricks</span>
                     </button>
                     <button class="minigame-select-card" data-minigame="asteroids">
                         <span class="minigame-select-icon">☄️</span>
-                        <span class="minigame-select-name">Asteroids</span>
-                        <span class="minigame-select-desc">Space survival</span>
+                        <span class="minigame-select-name" data-i18n-name="Champ d'astéroïdes">Asteroids</span>
+                        <span class="minigame-select-desc" data-i18n-desc="Survie spatiale">Space survival</span>
                     </button>
                 </div>
             </div>

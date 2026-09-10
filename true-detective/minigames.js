@@ -569,42 +569,39 @@
                     var dist = Math.sqrt(Math.pow(cx - spotX, 2) + Math.pow(cy - spotY, 2));
                     if (dist < 50) {
                         var h = spots.find(function (s) { return s.label === spot.dataset.label; });
-                        if (h) { openZoneWin(h, spot); }
+                        if (h) { showEvidence(h); }
                     }
                 });
             }
 
-            /* Fenêtre d'indice de zone */
-            var win = null;
-            function openZoneWin(h, spot) {
-                if (win) win.remove();
-                win = document.createElement('div');
-                win.className = 'zone-window';
-                var head = document.createElement('div');
-                head.className = 'zone-window-head';
-                head.textContent = (lang === 'fr' ? 'Pièce à conviction ' : 'Evidence ') + h.label;
-                var txt = document.createElement('div');
-                txt.className = 'zone-window-text';
-                txt.textContent = t(h.info, lang);
-                var close = document.createElement('button');
-                close.className = 'btn zone-window-close';
-                close.textContent = lang === 'fr' ? 'Poursuivre l\u2019examen' : 'Keep examining';
-                close.addEventListener('click', function () { win.remove(); win = null; });
-                win.appendChild(head); win.appendChild(txt); win.appendChild(close);
-                wrap.appendChild(win);
-                win.style.left = '50%';
-                win.style.top = 'auto';
-                win.style.bottom = '12px';
-                win.style.transform = 'translate(-50%, 0)';
-                win.style.width = 'min(92%, 520px)';
-                win.style.maxWidth = '520px';
-                win.style.maxHeight = 'none';
-                win.style.zIndex = '2000';
-                if (!spot.dataset.done) {
-                    spot.dataset.done = '1';
-                    spot.classList.add('found');
-                    found++;
+            /* Fenêtre d'indice : dock unique HORS de l'image (sous la scène),
+               affiché au survol, persistant jusqu'au survol d'un autre indice */
+            var evidenceDock = null;
+            var evidenceDockHead = null;
+            var evidenceDockText = null;
+            function ensureEvidenceDock() {
+                if (evidenceDock && evidenceDock.parentNode) return;
+                evidenceDock = document.createElement('div');
+                evidenceDock.className = 'evidence-dock';
+                evidenceDockHead = document.createElement('div');
+                evidenceDockHead.className = 'evidence-dock-head';
+                evidenceDockText = document.createElement('div');
+                evidenceDockText.className = 'evidence-dock-text';
+                evidenceDock.appendChild(evidenceDockHead);
+                evidenceDock.appendChild(evidenceDockText);
+                if (wrap.parentNode) {
+                    wrap.parentNode.insertBefore(evidenceDock, wrap.nextSibling);
+                } else {
+                    document.body.appendChild(evidenceDock);
                 }
+            }
+            function showEvidence(h) {
+                ensureEvidenceDock();
+                evidenceDockHead.textContent = (lang === 'fr' ? 'Pièce à conviction ' : 'Evidence ') + h.label;
+                evidenceDockText.textContent = t(h.info, lang);
+                evidenceDock.classList.remove('evidence-dock-pulse');
+                void evidenceDock.offsetWidth; /* relance l'animation */
+                evidenceDock.classList.add('evidence-dock-pulse');
             }
 
             var spotButtons = [];
@@ -623,7 +620,7 @@
                 spot.addEventListener('mouseenter', function () {
                     if (!editMode) {
                         if (hoverTimer) clearTimeout(hoverTimer);
-                        hoverTimer = setTimeout(function () { openZoneWin(h, spot); }, 250);
+                        hoverTimer = setTimeout(function () { showEvidence(h); }, 250);
                     }
                 });
                 spot.addEventListener('mouseleave', function () {
@@ -632,7 +629,7 @@
                 spot.addEventListener('click', function (e) {
                     if (editMode) { e.stopPropagation(); return; }
                     if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
-                    openZoneWin(h, spot);
+                    showEvidence(h);
                     if (!spot.dataset.journaled && global.TDNarrativeEngine && typeof global.TDNarrativeEngine.addClue === 'function') {
                     var cat = h.evidence || 'forensic';
                     var clueText = lang === 'fr' ? 'Pièce ' + h.label + ' : ' + t(h.info, lang) : 'Evidence ' + h.label + ' : ' + t(h.info, lang);

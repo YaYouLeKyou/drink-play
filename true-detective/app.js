@@ -286,6 +286,8 @@ langEnBtn: document.getElementById('lang-en'),
         musicInfo: document.getElementById('music-info'),
         narrationTimer: document.getElementById('narration-timer'),
         musicToggleBtn: document.getElementById('music-toggle-btn'),
+        homeMusicToggleBtn: document.getElementById('home-music-toggle-btn'),
+        themeMusicToggleBtn: document.getElementById('theme-music-toggle-btn'),
         themeSettingsToggle: document.getElementById('theme-settings-toggle'),
         themeSettingsPanel: document.getElementById('theme-settings-panel'),
         objectiveDisplay: document.getElementById('objective-display'),
@@ -687,14 +689,48 @@ function saveSettings() {
             });
         }
 
-        if ($.musicToggleBtn) {
-            $.musicToggleBtn.addEventListener('click', function () {
-                var player = document.getElementById('dp-music-player');
-                if (!player) return;
-                var hidden = player.classList.toggle('music-hidden');
-                $.musicToggleBtn.querySelector('.btn-text-label').textContent = hidden ? 'Show Music' : 'Music';
-                $.musicToggleBtn.querySelector('.btn-icon-label').textContent = hidden ? '🔇' : '🎵';
+        function applyMusicHidden(hidden) {
+            var player = document.getElementById('dp-music-player');
+            if (player) player.classList.toggle('music-hidden', hidden);
+            var labels = [
+                document.getElementById('music-toggle-btn'),
+                document.getElementById('minigame-music-toggle-btn'),
+                document.getElementById('home-music-toggle-btn'),
+                document.getElementById('theme-music-toggle-btn')
+            ];
+            labels.forEach(function (btn) {
+                if (!btn) return;
+                var txt = btn.querySelector('.btn-text-label');
+                var ico = btn.querySelector('.btn-icon-label');
+                if (txt) txt.textContent = hidden ? (ui.language === 'fr' ? 'Musique' : 'Show Music') : (ui.language === 'fr' ? 'Musique' : 'Music');
+                if (ico) ico.textContent = hidden ? '🔇' : '🎵';
             });
+            try { localStorage.setItem('td_music_hidden', hidden ? '1' : '0'); } catch (e) {}
+        }
+
+        // Lecteur masqué par défaut dans True Detective (préférence mémorisée)
+        var savedMusicHidden = null;
+        try { savedMusicHidden = localStorage.getItem('td_music_hidden'); } catch (e) {}
+        applyMusicHidden(savedMusicHidden === null ? true : savedMusicHidden === '1');
+
+        function toggleMusicPlayer() {
+            var player = document.getElementById('dp-music-player');
+            if (!player) return;
+            applyMusicHidden(!player.classList.contains('music-hidden'));
+        }
+        if ($.musicToggleBtn) {
+            $.musicToggleBtn.addEventListener('click', toggleMusicPlayer);
+        }
+        var minigameMusicBtn = document.getElementById('minigame-music-toggle-btn');
+        if (minigameMusicBtn) {
+            minigameMusicBtn.addEventListener('click', toggleMusicPlayer);
+        }
+
+        if ($.homeMusicToggleBtn) {
+            $.homeMusicToggleBtn.addEventListener('click', toggleMusicPlayer);
+        }
+        if ($.themeMusicToggleBtn) {
+            $.themeMusicToggleBtn.addEventListener('click', toggleMusicPlayer);
         }
         
         // Add orientation toggle handler
@@ -986,6 +1022,14 @@ function saveSettings() {
         if ($.startBtn) {
             $.startBtn.textContent = ui.language === 'fr' ? "Commencer l'enquête" : 'Start Investigation';
         }
+        // Écran de sélection des mini-jeux : traduction via attributs data-i18n-*
+        document.querySelectorAll('[data-i18n-title], [data-i18n-name], [data-i18n-desc], [data-i18n-diff]').forEach(function (el) {
+            var fr = el.getAttribute('data-i18n-title') || el.getAttribute('data-i18n-name') || el.getAttribute('data-i18n-desc') || el.getAttribute('data-i18n-diff');
+            var en = el.textContent;
+            if (!fr) return;
+            var text = ui.language === 'fr' ? fr : en;
+            if (text) el.textContent = text;
+        });
     }
 
     function setLanguage(lang) {
@@ -999,6 +1043,10 @@ function saveSettings() {
         }
         updateLanguageUI();
         updateLanguageButtons();
+        if (typeof applyMusicHidden === 'function') {
+            var player = document.getElementById('dp-music-player');
+            if (player) applyMusicHidden(player.classList.contains('music-hidden'));
+        }
         // Mode scénario : ré-affiche la page courante dans la nouvelle langue
         if (changed && typeof scr !== 'undefined' && scr && scr.active && typeof renderScenarioPage === 'function' && !ui.isTyping) {
             renderScenarioPage();
@@ -3804,6 +3852,25 @@ $.minigameSkipBtn.classList.remove('hidden');
         return lines;
     }
 
+    // Map a difficulty tier (1..4) onto per-game config parameters
+    function applyDifficultyToCfg(minigameType, cfg, difficulty) {
+        var tier = { easy: 1, medium: 2, hard: 3, extreme: 4 }[difficulty] || 2;
+        cfg.difficulty = difficulty || 'medium';
+        cfg.diffTier = tier;
+        cfg.act = Math.min(tier, 3);
+        if (tier >= 4) cfg.extreme = true;
+        if (minigameType === 'chess') {
+            cfg.depth = Math.min(tier, 3); // minimax depth 1..3 (4 would be too slow)
+        } else if (minigameType === 'pong') {
+            cfg.winScore = 2 + tier;               // 3..6 points to win
+            cfg.aiSpeed = 0.02 + tier * 0.03;      // 0.05..0.14
+        } else if (minigameType === 'space-invaders') {
+            cfg.rows = Math.min(2 + tier, 6);      // 3..6 rows of aliens
+            cfg.cols = 4 + tier;                   // 5..8 columns
+        }
+        return cfg;
+    }
+
     function getGlobalGameMap() {
         return {
             chess: 'TDChessGame',
@@ -3811,6 +3878,7 @@ $.minigameSkipBtn.classList.remove('hidden');
             sudoku: 'TDSudokuGame',
             jackpot: 'TDMiniGames',
             domino: 'TDDominoGame',
+            puzzle: 'TDPuzzleGame',
             reseau_alibis: 'TDMiniGames',
             shooting: 'TDShootingGallery',
             pong: 'TDPongGame',
@@ -3850,14 +3918,16 @@ $.minigameSkipBtn.classList.remove('hidden');
             cfg.title = { fr: 'Tour de cartes', en: 'Card Tower' };
         } else if (minigameType === 'reseau_alibis') {
             cfg.title = { fr: 'Réseau d\'alibis', en: 'Alibi Network' };
+        } else if (minigameType === 'puzzle') {
+            cfg.title = { fr: 'Casse-tête', en: 'Sliding Puzzle' };
         }
 
         $.minigameTitle.textContent = cfg.title[ui.language] || cfg.title.en || minigameType;
         $.minigameContent.innerHTML = '';
 
-        if (['chess', 'sudoku', 'memory', 'domino'].indexOf(minigameType) !== -1) {
+        if (minigameType !== 'reseau_alibis') {
             showDifficultySelection(cfg, function (selectedDifficulty) {
-                cfg.difficulty = selectedDifficulty;
+                applyDifficultyToCfg(minigameType, cfg, selectedDifficulty);
                 startSelectedMinigame(minigameType, cfg);
             });
         } else {
@@ -3932,9 +4002,9 @@ $.minigameSkipBtn.classList.remove('hidden');
         $.minigameContent.innerHTML = '';
 
         // Show difficulty selection for applicable games
-        if (['chess', 'sudoku', 'memory', 'domino'].indexOf(roundCfg.type) !== -1) {
+        if (roundCfg.type !== 'reseau_alibis') {
             showDifficultySelection(roundCfg, function (selectedDifficulty) {
-                roundCfg.difficulty = selectedDifficulty;
+                applyDifficultyToCfg(roundCfg.type, roundCfg, selectedDifficulty);
                 launchMinigame(roundIndex, roundCfg);
             });
         } else {
@@ -4018,7 +4088,8 @@ $.minigameSkipBtn.classList.remove('hidden');
         var difficulties = [
             { id: 'easy', label: lang === 'fr' ? 'Facile' : 'Easy', desc: lang === 'fr' ? 'Pour débutants' : 'For beginners' },
             { id: 'medium', label: lang === 'fr' ? 'Moyen' : 'Medium', desc: lang === 'fr' ? 'Équilibré' : 'Balanced' },
-            { id: 'hard', label: lang === 'fr' ? 'Difficile' : 'Hard', desc: lang === 'fr' ? 'Pour experts' : 'For experts' }
+            { id: 'hard', label: lang === 'fr' ? 'Difficile' : 'Hard', desc: lang === 'fr' ? 'Pour experts' : 'For experts' },
+            { id: 'extreme', label: lang === 'fr' ? 'Extrême' : 'Extreme', desc: lang === 'fr' ? 'Sans pitié' : 'No mercy' }
         ];
         var html = '<div class="difficulty-box"><h3>' + (lang === 'fr' ? 'Choisissez la difficulté' : 'Choose difficulty') + '</h3><div class="difficulty-options">';
         difficulties.forEach(function (d) {
@@ -4086,6 +4157,7 @@ $.minigameSkipBtn.classList.remove('hidden');
             interroId: roundCfg.interroId,
             storyMode: true
         };
+        if (mgCfg.difficulty) applyDifficultyToCfg(mgCfg.type, mgCfg, mgCfg.difficulty);
 
         try {
             window[gameNS].play(mgCfg, ui.language, onMinigameDone, $.minigameContent);

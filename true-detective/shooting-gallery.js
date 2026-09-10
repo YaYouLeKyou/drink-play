@@ -43,6 +43,23 @@
 
     var PHRASE_TRIGGERS = [2, 4, 6];
 
+    /* ==== 4 NIVEAUX DE DIFFICULTÉ ====================================
+       easy   : cibles lentes & larges, femme-fatale très lente
+       medium : vitesse équilibrée
+       hard   : cibles rapides & étroites, femme-fatale rapide
+       extreme: cibles très rapides & minuscules, femme-fatale furtive
+       ================================================================= */
+    var DIFFICULTIES = {
+        easy:   { speedMult: 0.7,  forbiddenSpeedMult: 0.6,  targetW: 60, targetH: 70, minTargets: 6, scoreBonus: 0 },
+        medium: { speedMult: 1.0,  forbiddenSpeedMult: 1.0,  targetW: 48, targetH: 56, minTargets: 8, scoreBonus: 1 },
+        hard:   { speedMult: 1.45, forbiddenSpeedMult: 1.6,  targetW: 38, targetH: 44, minTargets: 10, scoreBonus: 2 },
+        extreme:{ speedMult: 2.0,  forbiddenSpeedMult: 2.4,  targetW: 30, targetH: 36, minTargets: 12, scoreBonus: 4 }
+    };
+
+    function getDifficultyConfig(difficulty) {
+        return DIFFICULTIES[difficulty] || DIFFICULTIES.medium;
+    }
+
     function getNpcName(npcId, lang) {
         if (typeof window !== 'undefined' && window.scr && typeof window.scrNpcName === 'function') {
             return window.scrNpcName(npcId || 'protecteur');
@@ -119,7 +136,8 @@
         var dialogues = cfg.dialogues || [];
         var dialogueLines = dialogues.beforeSpin || (PHRASES[lang] || PHRASES.en);
         var tauntLines = dialogues.afterLose || (TAUNTS[lang] || TAUNTS.en);
-        var targetCount = cfg.targetCount || 8;
+        var diffCfg = getDifficultyConfig(cfg.difficulty);
+        var targetCount = Math.max(cfg.targetCount || 0, diffCfg.minTargets) || diffCfg.minTargets;
         var forbiddenTarget = 'femme-fatale';
 
         var wrap = document.createElement('div');
@@ -182,15 +200,19 @@
         function createTarget(type) {
             var name = suspectNames[type] || type;
             var color = suspectColors[type] || '#ffffff';
+            var isForbidden = type === forbiddenTarget;
+            var speedMult = isForbidden ? diffCfg.forbiddenSpeedMult : diffCfg.speedMult;
             return {
                 type: type,
                 name: name,
-                x: type === forbiddenTarget ? cw + 60 : -60,
+                x: isForbidden ? cw + 60 : -60,
                 y: 50 + Math.random() * (ch - 100),
-                w: 48,
-                h: 56,
-                vx: type === forbiddenTarget ? -(1 + Math.random() * 0.6) : (1 + Math.random() * 1.1),
-                vy: (Math.random() - 0.5) * 0.5,
+                w: diffCfg.targetW,
+                h: diffCfg.targetH,
+                vx: isForbidden
+                    ? -(1 + Math.random() * 0.6) * speedMult
+                    : (1 + Math.random() * 1.1) * speedMult,
+                vy: (Math.random() - 0.5) * 0.5 * speedMult,
                 color: color,
                 alive: true
             };
@@ -204,7 +226,7 @@
                 var type = suspectList[i % suspectList.length];
                 var t = createTarget(type);
                 t.x = -80 - Math.random() * 240;
-                t.vx = 0.9 + Math.random() * 1.1;
+                t.vx = (0.9 + Math.random() * 1.1) * diffCfg.speedMult;
                 targets.push(t);
             }
         }
@@ -307,6 +329,7 @@
             if (remaining === 0 && (!forbidden || !forbidden.alive)) {
                 ended = true;
                 won = true;
+                score += diffCfg.scoreBonus;
                 showDialogue(t(dialogueLines[dialogueLines.length - 1], lang));
                 setTimeout(function () {
                     cleanup();
@@ -355,6 +378,10 @@
             ctx.fillStyle = '#ff4444';
             ctx.textAlign = 'center';
             ctx.fillText('DO NOT SHOOT: VIVIENNE', cw / 2, 20);
+            var diffLabels = { easy: 'EASY', medium: 'MEDIUM', hard: 'HARD', extreme: 'EXTREME' };
+            ctx.fillStyle = '#ffff00';
+            ctx.font = 'bold 10px monospace';
+            ctx.fillText('DIFF: ' + (diffLabels[cfg.difficulty] || 'MEDIUM'), 10, 36);
 
             targets.forEach(function (t) {
                 if (!t.alive) return;

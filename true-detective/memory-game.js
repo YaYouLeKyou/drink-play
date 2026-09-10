@@ -551,6 +551,7 @@
                     cardImg.style.maxWidth = '100%';
                     cardImg.style.maxHeight = '100%';
                     cardImg.addEventListener('error', function () {
+                        cardImg.style.display = 'none';
                         back.textContent = cardData.emoji;
                     });
                     back.appendChild(cardImg);
@@ -567,14 +568,14 @@
                 card.appendChild(front);
                 card.appendChild(back);
 
-                (function (idx) {
+                (function (idx, cardEl, cardData, backEl) {
                     card.addEventListener('click', function () {
                         if (locked || interroPause) return;
                         if (flipped.indexOf(idx) !== -1) return;
                         if (matched.indexOf(idx) !== -1) return;
 
                         flipped.push(idx);
-                        card.classList.add('flipped');
+                        cardEl.classList.add('flipped');
 
                         if (flipped.length === 2) {
                             locked = true;
@@ -615,7 +616,7 @@
                             }
                         }
                     });
-                })(i);
+                })(i, card, cardData, back);
 
                 gridEl.appendChild(card);
             }

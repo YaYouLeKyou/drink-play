@@ -189,13 +189,13 @@ html {
         flex-shrink: 0;
     }
 
-    .mobile-header .lang-toggle {
-        position: static;
-        left: auto;
-        right: auto;
-        transform: none;
-        display: flex;
-        gap: 6px;
+    .home-lang-selector {
+        gap: 4px;
+    }
+
+    .home-lang-selector .lang-btn {
+        font-size: 0.75em;
+        padding: 4px 8px;
     }
 
     /* Accueil mobile : titre au-dessus, grande image centrée, actions dessous */
@@ -377,9 +377,7 @@ html {
 }
 
 #dp-music-player.music-hidden {
-    transform: translateY(100%);
-    opacity: 0;
-    pointer-events: none;
+    display: none !important;
 }
 
 /* Floating music toggle button when player is hidden */
@@ -452,6 +450,7 @@ html {
     height: 56px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 0 16px;
     background: linear-gradient(to bottom, rgba(0, 0, 10, 0.85) 0%, transparent 100%);
     backdrop-filter: blur(8px);
@@ -460,12 +459,14 @@ html {
     box-sizing: border-box;
 }
 
-.home-header-left {
+.home-lang-selector {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
     gap: 6px;
-    flex-shrink: 0;
+    z-index: 1001;
 }
 
 .mobile-hub-btn {
@@ -899,6 +900,13 @@ html {
     z-index: 1101;
     align-items: center;
     justify-content: center;
+}
+
+#home-screen .mobile-settings-toggle {
+    position: static;
+    top: auto;
+    right: auto;
+    margin-left: auto;
 }
 
 .settings-menu-panel {
@@ -3730,6 +3738,32 @@ html {
 }
 .zone-window-head { font-family: 'Special Elite', monospace; font-weight: 700; color: #f0d890; font-size: 1.05rem; margin-bottom: 10px; letter-spacing: 0.04em; }
 .zone-window-text { font-size: 0.95rem; line-height: 1.5; color: #e8e6df; margin-bottom: 14px; }
+
+/* Fenêtre d'indice (fouille) : dock unique HORS de l'image, sous la scène.
+   Survée → s'affiche, reste jusqu'à l'affichage d'un autre indice (persistant). */
+.evidence-dock {
+  position: relative;
+  margin: 12px auto 0;
+  width: min(92%, 640px);
+  min-height: 58px;
+  z-index: 5;
+  display: flex; flex-direction: column; gap: 6px;
+  background: linear-gradient(160deg, #1b2230, #10151f);
+  border: 1px solid rgba(255,215,120,0.5); border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 10px 34px rgba(0,0,0,0.6);
+  font-family: 'Special Elite', monospace;
+  animation: sincerity-in 0.25s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.evidence-dock-head { font-weight: 700; color: #f0d890; font-size: 1rem; letter-spacing: 0.04em; }
+.evidence-dock-text { font-size: 0.92rem; line-height: 1.5; color: #e8e6df; }
+.evidence-dock.evidence-dock-pulse { animation: evidence-pulse 0.6s ease; }
+@keyframes evidence-pulse {
+  0% { border-color: rgba(255,215,120,1); box-shadow: 0 0 0 3px rgba(255,215,120,0.35), 0 10px 34px rgba(0,0,0,0.6); }
+  100% { border-color: rgba(255,215,120,0.5); box-shadow: 0 10px 34px rgba(0,0,0,0.6); }
+}
+
 
 /* ===== Panneau de récompense d'indice (fin de mini-jeu gagné) ===== */
 .clue-reward {

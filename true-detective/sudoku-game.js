@@ -187,6 +187,7 @@
 
         var act = cfg.act || 1;
         var gc = getGridConfig(act);
+        if (cfg.extreme) gc.remove += Math.min(14, Math.floor(gc.size * gc.size * 0.12));
         var size = gc.size, boxR = gc.boxRows, boxC = gc.boxCols;
         var generated = buildSudokuPuzzle(size, boxR, boxC, gc.remove);
         var puzzle = generated.puzzle.map(function (r) { return r.slice(); });
