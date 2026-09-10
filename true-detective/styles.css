@@ -932,6 +932,27 @@ html {
     display: flex;
 }
 
+#home-settings-panel .dev-contact-btn,
+#home-settings-panel .btn-dev {
+    position: static;
+    top: auto;
+    right: auto;
+    left: auto;
+    bottom: auto;
+    width: 100%;
+    height: 40px;
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    padding: 0 12px;
+    border-radius: 8px;
+    gap: 8px;
+    font-size: 0.95em;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    z-index: auto;
+}
+
 .lang-toggle {
     position: absolute;
     top: 20px;
