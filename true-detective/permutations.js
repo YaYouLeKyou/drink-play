@@ -104,6 +104,69 @@
             roue_alibis: { fr: 'Les trois horloges s accordent sur 22h09 : l appartement 18h de Krane ne tient plus. Le dossier de Krane est verrouille.', en: 'The three clocks agree on 10:09pm : Krane\'s home at 6pm no longer holds. The case against Krane is sealed.' }
         }
     };
+    /* ===== PERMUTATION 2b - Julian Pembrooke (alibi de panne) ===== */
+    /* Pembrooke est le faux suspect principal : panne simulee, alibi de Hale, mais pas le meurtre. */
+    PERMUTATIONS['seducteur'] = {
+        id: 'seducteur',
+        coupable: { fr: 'Julian Pembrooke', en: 'Julian Pembrooke' },
+        coComplice: { fr: 'le Major Hale (l alibi de confiance)', en: 'Major Hale (the trustworthy alibi)' },
+        faussePiste: { fr: 'Victor Krane (la lame)', en: 'Victor Krane (the blade)' },
+        lame: { fr: 'Victor Krane', en: 'Victor Krane' },
+        heure: '22:09',
+        mobile: { fr: 'Endette et jaloux, il voulait la fortune et Lady Vivienne. La mort de la victime arrangait tout.', en: 'In debt and jealous, he wanted the fortune and Lady Vivienne. The victim\'s death suited him.' },
+        alibi: { fr: 'Sa panne a 22h etait son alibi - mais la durite a ete coupure exprés. L heure du meurtre et l heure de sa panne coïncident parfaitement.', en: 'His 10pm breakdown was his alibi - but the hose was cut on purpose. The time of the murder and the time of his breakdown coincide perfectly.' },
+        fouille: [
+            { label: '1', info: { fr: 'Bureau non force, cachet intact : quelqu un de l interieur a ouvert. Un proche de confiance.', en: 'Desk unforced, seal intact: someone inside opened. A trusted close one.' } },
+            { label: '2', info: { fr: 'La carafe renversee, DEUX verres au bord de la table : le duel se jouait entre deux.', en: 'The overturned decanter, TWO glasses on the table rim: the duel was between two.' } },
+            { label: '3', info: { fr: 'Le livre de comptes montre la signature de la victime sur un pret recent : Pembrooke devait une somme au bar de Krane.', en: 'The ledger shows the victim\'s signature on a recent loan: Pembrooke owed a sum to Krane\'s bar.' } },
+            { label: 'A', info: { fr: 'Une demonteuse de durite, neuve, dans la cave : pas un outil de voleur, un couteau de coupe. L alibi de panne est une mise en scene.', en: 'A new hose cutter in the cellar: not a thief\'s tool, a cutting knife. The breakdown alibi is staged.' } },
+            { label: 'C', info: { fr: 'Sur la commode, une trace d essence rare : Pembrooke y passait des heures, brillant comme un nez de requin dans l ombre.', en: 'On the dresser, a trace of rare essence: Pembrooke spent hours there, sharp as a shark\'s nose in the shadows.' } },
+            { label: '4', info: { fr: 'Le fauteuil renverse près de la fenêtre : la victime a été attaquée de face, debout, par un homme de taille.', en: 'The overturned chair near the window: the victim was attacked face-on, standing, by a man of stature.' } },
+            { label: '5', info: { fr: 'La mare de sang, le visage tourné vers le bureau : il a reconnu son agresseur. Pas de lutte fémale - un coup de poignard, précis.', en: 'The pool of blood, face turned toward the desk: he recognized his attacker. No female struggle - a precise stab.' } },
+            { label: '6', info: { fr: 'Un reçu V.K. plié dans la poche du manteau : un versement pour dette soldée, daté de la veille. Le meurtre était reglé à l avance.', en: 'A folded receipt dated yesterday in the coat pocket: a payment for a settled debt. The murder was settled in advance.' } }
+        ],
+        fouilleClue: { fr: 'La panne etait simulee (durite neuve coupee), Pembrooke devait de l argent au bar de Krane (récé daté d hier), la victime a ete frappée de face par un homme. Le charme de Pembrooke masque un comptable.', en: 'The breakdown was staged (new cut hose), Pembrooke owed money to Krane\'s bar (dated receipt), the victim was struck face-on by a man. Pembrooke\'s charm masks an accountant.' },
+        clues: {
+            carnet_dechir: { fr: 'Le carnet montre la dette de Pembrooke au bar de Krane et le versement daté d hier : le meurtre était planifié.', en: 'The ledger shows Pembrooke\'s debt to Krane\'s bar and yesterday\'s payment: the murder was planned.' },
+            pression: { fr: 'Le rodeur vers 22h : Pembrooke, habillé fin, mais seul Hale et Krane sont attendus au manoir. Un intrus.', en: 'The lurker around 10pm: Pembrooke, sharply dressed, but only Hale and Krane were expected at the manor. An intruder.' },
+            labo_verrou: { fr: 'Le verrou ouvert de l interieur : un initié. Mais la demonteuse de durite dans la cave et le récé daté d hier éliminent le voleur.', en: 'The lock opened from inside: an insider. But the hose cutter in the cellar and the dated receipt eliminate the thief.' },
+            montre_code: { fr: 'INDICE MINEUR : 1981 (coffre). INDICE MAJEUR : 22h09 - la panne de Pembrooke coïncide exactement avec le meurtre.', en: 'MINOR : 1981 (safe). MAJOR : 10:09pm - Pembrooke\'s breakdown coincides exactly with the murder.' },
+            coffre_code: { fr: 'Le coffre (code 1981) ne contient pas de bijoux mais la dette de Pembrooke au bar : l argent a été retiré.', en: 'The safe (code 1981) holds no jewels but Pembrooke\'s bar debt: the money was withdrawn.' },
+            chronologie: { fr: 'La chronologie situe Pembrooke dans la rue à 22h, mais l alibi de panne est truqué. Personne n a vu Pembrooke franchir le perron.', en: 'The timeline pins Pembrooke in the street at 10pm, but the breakdown alibi is faked.' },
+            roue_alibis: { fr: 'Les trois horloges s accordent sur 22h09 : l alibi de panne est un mensonge. Pembrooke était dans la maison.', en: 'The three clocks agree on 10:09pm: the breakdown alibi is a lie. Pembrooke was in the house.' }
+        }
+        };
+
+    /* ===== PERMUTATION 3b - Silas Crane (marginal / ex-cambrioleur) ===== */
+    /* Silas est le temoin marginal : il connait la maison, mais pas le meurtre. Fausse piste par le biais du vissage. */
+    PERMUTATIONS['marginal'] = {
+        id: 'marginal',
+        coupable: { fr: 'Silas Crane', en: 'Silas Crane' },
+        coComplice: { fr: 'Rupert Blackwood (le creancier)', en: 'Rupert Blackwood (the creditor)' },
+        faussePiste: { fr: 'un habitue des ruelles (le vrai alibi)', en: 'an alley regular (the real alibi)' },
+        lame: { fr: 'Victor Krane', en: 'Victor Krane' },
+        heure: '22:09',
+        mobile: { fr: 'Ancien cambrioleur, il connaissait la maison. La victime qui lui donnait des pieces meritoit sa fin.', en: 'An ex-burglar who knew the house. The victim who gave him coins "deserved his end".' },
+        alibi: { fr: 'Il dit avoir dormi dans les ruelles. Son ADN est partout, mais un voleur soigne son alibi.', en: 'He says he slept in the alleys. His DNA is everywhere, but a burglar minds his alibi.' },
+        fouille: [
+            { label: '1', info: { fr: 'Bureau non force, cachet intact : un initié. Mais un clochard n ouvre pas de cachet.', en: 'Desk unforced, seal intact: an insider. But a tramp does not seal wax.' } },
+            { label: '2', info: { fr: 'La carafe renversée, UN SEUL verre, mais les doigts sont grands : la victime tenait la montre.', en: 'The overturned decanter, ONE glass, but the grip is large: the victim held the watch.' } },
+            { label: '3', info: { fr: 'Le livre de comptes montre l emprunt colossal de Rupert : le creancier ruine Silas.', en: 'The ledger shows Rupert\'s colossal loan: the creditor ruins Silas.' } },
+            { label: 'A', info: { fr: 'Une empreinte de clé en plastique jetable, dans la poubelle : pas le souple d un voleur. Un plan.', en: 'A disposable plastic key print in the trash: not a burglar\'s trade. A setup.' } },
+            { label: '4', info: { fr: 'Le fauteuil renversé près de la fenêtre : la lutte a été contre un homme, pas un clochard frêle.', en: 'The overturned chair near the window: the struggle was against a man, not a frail tramp.' } },
+            { label: '5', info: { fr: 'La mare de sang, le visage tourné vers la porte : il a reconnu son agresseur.', en: 'The pool of blood, face turned toward the door: he recognized his attacker.' } },
+            { label: '6', info: { fr: 'Un fragment de tissu rare près de la montre brisée : pas de l habillement de Silas, mais un costume.', en: 'A rare fabric fragment near the watch: not from Silas\'s rags, but a tailored suit.' } }
+        ],
+        fouilleClue: { fr: 'Silas connaissait la maison, mais son alibi de ruelles est truqué : empreinte de clé jetable, grain de café, cigare de qualité. Le vrai tueur, habillé, a utilisé le clochard comme écran.', en: 'Silas knew the house, but his alley alibi is faked: disposable key print, coffee grain, quality cigar. The real killer, tailored, used the tramp as a screen.' },
+        clues: {
+            carnet_dechir: { fr: 'Le carnet montre l emprunt colossal de Rupert, que Silas paie encore aujourd hui.', en: 'The ledger shows Rupert\'s colossal loan, which Silas still pays today.' },
+            pression: { fr: 'Le rodeur vers 22h : une trace de cigare et un grain de café - un convivial, pas un voleur seul.', en: 'The lurker around 10pm: a cigar trace and a coffee grain - a companionable man, not a lone burglar.' },
+            labo_verrou: { fr: 'Le verrou ouvert de l interieur : un initié. Mais une empreinte de clé en plastique jetable pousse Silas dans la scene.', en: 'The lock opened from inside: an insider. But a disposable plastic key print pushes Silas into the scene.' },
+            montre_code: { fr: 'INDICE MINEUR : 1981 (coffre). INDICE MAJEUR : 22h09 - le tissu rare près de la montre n est pas de l habillement de Silas.', en: 'MINOR : 1981 (safe). MAJOR : 10:09pm - the rare fabric near the watch is not from Silas\'s clothing.' },
+            roue_alibis: { fr: 'Les trois horloges s accordent sur 22h09 : Silas etait la, mais pas comme auteur. Le vêtement de qualité reveile le vrai visage.', en: 'The three clocks agree on 10:09pm: Silas was here, but not as the author. The quality clothing reveals the true face.' }
+        }
+    };
+
     /* ===== PERMUTATION 3 - Rupert Blackwood (maitre d'oeuvre) ===== */
     PERMUTATIONS['suspect'] = {
         id: 'suspect',
@@ -139,7 +202,7 @@
     /* API */
     var API = {
         DATA: PERMUTATIONS,
-        list: function () { return ['protecteur', 'femme-fatale', 'criminel', 'suspect']; },
+        list: function () { return ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel']; },
         get: function (id) { return PERMUTATIONS[id] || PERMUTATIONS['protecteur']; }
     };
 

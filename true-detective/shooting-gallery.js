@@ -138,43 +138,6 @@
         var tauntLines = dialogues.afterLose || (TAUNTS[lang] || TAUNTS.en);
         var diffCfg = getDifficultyConfig(cfg.difficulty);
         var targetCount = Math.max(cfg.targetCount || 0, diffCfg.minTargets) || diffCfg.minTargets;
-        var forbiddenTarget = 'femme-fatale';
-
-        var wrap = document.createElement('div');
-        wrap.className = 'retro-wrap';
-        var maxWidth = Math.min(600, window.innerWidth - 32);
-        var maxHeight = Math.min(420, window.innerHeight - 220);
-        wrap.style.cssText = 'width:100%;max-width:' + maxWidth + 'px;max-height:' + maxHeight + 'px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:8px;overflow:hidden;';
-
-        var themeId = getThemeId();
-        var bgUrl = getSceneBackground(themeId);
-        if (bgUrl) {
-            wrap.style.backgroundImage = 'url(' + bgUrl + ')';
-            wrap.style.backgroundSize = 'cover';
-            wrap.style.backgroundPosition = 'center';
-            wrap.style.borderRadius = '16px';
-            wrap.style.boxShadow = '0 20px 50px rgba(0,0,0,0.5)';
-        }
-
-        var canvas = document.createElement('canvas');
-        canvas.width = Math.min(640, window.innerWidth - 24);
-        canvas.height = Math.min(400, window.innerHeight - 220);
-        canvas.style.cssText = 'display:block;width:100%;height:auto;max-width:100%;border:2px solid #00ffff;border-radius:8px;box-shadow:0 0 20px rgba(0,255,255,0.3);cursor:crosshair;background:#0a0a1a;';
-        wrap.appendChild(canvas);
-
-        target.appendChild(wrap);
-
-        var ctx = canvas.getContext('2d');
-        var cw = canvas.width, ch = canvas.height;
-        var score = 0;
-        var won = false;
-        var ended = false;
-        var targets = [];
-        var forbidden = null;
-        var phraseTimeout = null;
-        var dialogueEl = null;
-        var lastPhraseScore = 0;
-
         var suspectList = ['protecteur', 'seducteur', 'suspect', 'marginal', 'criminel', 'scientifique', 'detective'];
         var suspectNames = {
             protecteur: 'Hale',
@@ -196,6 +159,46 @@
             detective: '#ff0000',
             'femme-fatale': '#ff00ff'
         };
+
+        var forbiddenTarget = 'femme-fatale';
+        var instructionText = (lang === 'fr'
+            ? 'Visez les suspects vivants. Évitez ' + suspectNames[forbiddenTarget] + ' !'
+            : 'Shoot the living suspects. Avoid ' + suspectNames[forbiddenTarget] + '!');
+
+        var wrap = document.createElement('div');
+        wrap.className = 'retro-wrap';
+        var maxWidth = Math.min(600, window.innerWidth - 32);
+        var maxHeight = Math.min(420, window.innerHeight - 220);
+        wrap.style.cssText = 'width:100%;max-width:' + maxWidth + 'px;max-height:' + maxHeight + 'px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:8px;overflow:hidden;';
+
+        var themeId = getThemeId();
+        var bgUrl = getSceneBackground(themeId);
+        if (bgUrl) {
+                        wrap.style.backgroundImage = 'url(' + bgUrl + ')';
+            wrap.style.backgroundSize = 'cover';
+            wrap.style.backgroundPosition = 'center';
+            wrap.style.borderRadius = '16px';
+            wrap.style.boxShadow = '0 20px 50px rgba(0,0,0,0.5)';
+        }
+
+        var canvas = document.createElement('canvas');
+        canvas.width = Math.min(640, window.innerWidth - 24);
+        canvas.height = Math.min(400, window.innerHeight - 220);
+        canvas.style.cssText = 'display:block;width:100%;height:auto;max-width:100%;min-width:280px;min-height:200px;border:2px solid #00ffff;border-radius:8px;box-shadow:0 0 20px rgba(0,255,255,0.3);cursor:crosshair;background:#0a0a1a;';
+        wrap.appendChild(canvas);
+
+        target.appendChild(wrap);
+
+        var ctx = canvas.getContext('2d');
+        var cw = canvas.width, ch = canvas.height;
+        var score = 0;
+        var won = false;
+        var ended = false;
+        var targets = [];
+        var forbidden = null;
+        var phraseTimeout = null;
+        var dialogueEl = null;
+        var lastPhraseScore = 0;
 
         function createTarget(type) {
             var name = suspectNames[type] || type;
@@ -235,7 +238,8 @@
         dialogueEl.className = 'retro-dialogue';
         dialogueEl.style.cssText = 'text-align:center;padding:6px 10px;color:#ffff00;font-family:monospace;max-width:90%;text-shadow:0 0 8px #ff00ff;font-size:0.9em;';
         wrap.appendChild(dialogueEl);
-        showDialogue(dialogueLines[0]);
+        showDialogue(instructionText);
+        setTimeout(function () { showDialogue(dialogueLines[0] || ''); }, 2500);
 
         function showDialogue(text) {
             if (!text) { dialogueEl.style.display = 'none'; return; }

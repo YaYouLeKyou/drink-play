@@ -80,9 +80,8 @@ html {
 /* ===== Home / Splash Screen ===== */
 
 #hub-btn {
-    position: fixed;
-    top: 72px;
-    left: 20px;
+    top: auto;
+    left: auto;
     width: auto;
     height: auto;
     padding: 10px 18px;
@@ -90,7 +89,7 @@ html {
     font-size: 0.9rem;
     z-index: 99999;
     background: rgba(40, 40, 60, 0.95);
-    border: 2px solid rgba(0, 255, 255, 0.7);
+    border: 1px solid rgba(0, 255, 255, 0.6);
     color: #00ffff;
     font-family: 'Special Elite', monospace;
     box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
@@ -2327,6 +2326,11 @@ html {
 }
 
 .minigame-overlay.hidden {
+    display: none !important;
+}
+
+#minigame-overlay:not(.hidden) #character-layer,
+#minigame-overlay:not(.hidden) #npc-image {
     display: none !important;
 }
 

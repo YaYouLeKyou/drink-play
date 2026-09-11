@@ -329,7 +329,7 @@ langEnBtn: document.getElementById('lang-en'),
     }
 
     var ui = {
-        language: 'en',
+        language: 'fr',
         theme: null,
         isWaiting: false,
         isTyping: false,
@@ -532,6 +532,25 @@ function saveSettings() {
         });
     }
 
+    function applyMusicHidden(hidden) {
+        var player = document.getElementById('dp-music-player');
+        if (player) player.classList.toggle('music-hidden', hidden);
+        var labels = [
+            document.getElementById('music-toggle-btn'),
+            document.getElementById('minigame-music-toggle-btn'),
+            document.getElementById('home-music-toggle-btn'),
+            document.getElementById('theme-music-toggle-btn')
+        ];
+        labels.forEach(function (btn) {
+            if (!btn) return;
+            var txt = btn.querySelector('.btn-text-label');
+            var ico = btn.querySelector('.btn-icon-label');
+            if (txt) txt.textContent = hidden ? (ui.language === 'fr' ? 'Musique' : 'Show Music') : (ui.language === 'fr' ? 'Musique' : 'Music');
+            if (ico) ico.textContent = hidden ? '🔇' : '🎵';
+        });
+        try { localStorage.setItem('td_music_hidden', hidden ? '1' : '0'); } catch (e) {}
+    }
+
     function setupEventListeners() {
         if ($.startBtn) {
             $.startBtn.addEventListener('click', function () {
@@ -689,24 +708,6 @@ function saveSettings() {
             });
         }
 
-        function applyMusicHidden(hidden) {
-            var player = document.getElementById('dp-music-player');
-            if (player) player.classList.toggle('music-hidden', hidden);
-            var labels = [
-                document.getElementById('music-toggle-btn'),
-                document.getElementById('minigame-music-toggle-btn'),
-                document.getElementById('home-music-toggle-btn'),
-                document.getElementById('theme-music-toggle-btn')
-            ];
-            labels.forEach(function (btn) {
-                if (!btn) return;
-                var txt = btn.querySelector('.btn-text-label');
-                var ico = btn.querySelector('.btn-icon-label');
-                if (txt) txt.textContent = hidden ? (ui.language === 'fr' ? 'Musique' : 'Show Music') : (ui.language === 'fr' ? 'Musique' : 'Music');
-                if (ico) ico.textContent = hidden ? '🔇' : '🎵';
-            });
-            try { localStorage.setItem('td_music_hidden', hidden ? '1' : '0'); } catch (e) {}
-        }
 
         // Lecteur masqué par défaut dans True Detective (préférence mémorisée)
         var savedMusicHidden = null;
@@ -928,6 +929,15 @@ function saveSettings() {
 
         if ($.minigameSkipBtn) {
             $.minigameSkipBtn.addEventListener('click', function () {
+                // Cleanup any active game
+                if (typeof window._minigameCleanup === 'function') {
+                    window._minigameCleanup();
+                    window._minigameCleanup = null;
+                }
+                if (typeof window._interroSidebarCleanup === 'function') {
+                    window._interroSidebarCleanup();
+                    window._interroSidebarCleanup = null;
+                }
                 if (window._minigameSkipHandler) {
                     window._minigameSkipHandler({ won: false });
                     window._minigameSkipHandler = null;
@@ -3813,7 +3823,7 @@ $.minigameSkipBtn.classList.remove('hidden');
             if (roundCfg.dialogues) cfg.dialogues = roundCfg.dialogues;
         } else if (mgType === 'domino') {
             cfg.title = roundCfg.title;
-        } else if (mgType === 'pong' || mgType === 'pacman' || mgType === 'space-invaders' || mgType === 'breakout' || mgType === 'asteroids' || mgType === 'shooting-gallery') {
+        } else if (mgType === 'pong' || mgType === 'pacman' || mgType === 'space-invaders' || mgType === 'breakout' || mgType === 'asteroids' || mgType === 'shooting' || mgType === 'shooting-gallery') {
             cfg.title = roundCfg.title;
         }
         return cfg;
@@ -4001,12 +4011,20 @@ $.minigameSkipBtn.classList.remove('hidden');
         $.minigameTitle.textContent = mgTitle || (ui.language === 'fr' ? 'Minijeux ' + (roundIndex + 1) : 'Minigame ' + (roundIndex + 1));
         $.minigameContent.innerHTML = '';
 
-        // Show difficulty selection for applicable games
+                        // Story mode : no difficulty selection, auto-difficulty by act.
+        // Act 1 = Easy, Act 2 = Medium, Act 3 = Hard, Final confrontation = Very Hard (extreme).
+        var state = scrGetState();
+        var actForStory = (state && state.act) ? state.act : (roundIndex + 1);
+        var autoDiff = (actForStory === 1) ? 'easy'
+                     : (actForStory === 2) ? 'medium'
+                     : (actForStory >= 3) ? (roundIndex === 2 ? 'extreme' : 'hard')
+                     : 'medium';
+        var chosenDiff = roundCfg.difficulty || autoDiff;
+
         if (roundCfg.type !== 'reseau_alibis') {
-            showDifficultySelection(roundCfg, function (selectedDifficulty) {
-                applyDifficultyToCfg(roundCfg.type, roundCfg, selectedDifficulty);
-                launchMinigame(roundIndex, roundCfg);
-            });
+            // Story mode always auto-resolves difficulty; selection only on Mini Games page.
+            applyDifficultyToCfg(roundCfg.type, roundCfg, chosenDiff);
+            launchMinigame(roundIndex, roundCfg);
         } else {
             launchMinigame(roundIndex, roundCfg);
         }
