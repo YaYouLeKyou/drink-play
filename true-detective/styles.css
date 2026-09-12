@@ -2564,7 +2564,7 @@ html {
 
 /* Chess left panel - large character image */
 .chess-left-panel {
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
@@ -2582,11 +2582,17 @@ html {
 
 /* Chess side panel - right panel with dialogue */
 .chess-right-panel {
-    display: flex;
+    display: none;
     flex-direction: column;
     gap: 12px;
     width: 320px;
     flex-shrink: 0;
+}
+
+/* Show character/side panels only for chess-layout minigames */
+.minigame-overlay.chess-layout .chess-left-panel,
+.minigame-overlay.chess-layout .chess-right-panel {
+    display: flex;
 }
 
 /* Chess dialogue history */
