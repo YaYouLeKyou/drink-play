@@ -19,6 +19,7 @@
                 <button id="lang-en-home" class="lang-btn" title="English">🌍 English</button>
                 <button id="lang-fr-home" class="lang-btn active-lang" title="Français">🌍 Français</button>
             </div>
+            <button id="dev-btn" class="dev-btn" title="Developer Mode">🛠️</button>
         </header>
             <div class="home-content">
                 <img id="cover-image" class="cover-image" src="assets/true-detective.png" alt="True Detective">
@@ -451,8 +452,8 @@
                 },
                 onBackToHub: function () { window.location.href = '../index.html'; },
                 onDevMode: function () {
-                    if (window.devMode && window.devMode.open) {
-                        window.devMode.open();
+                    if (window.TDDevMode && window.TDDevMode.open) {
+                        window.TDDevMode.open();
                     } else {
                         var modal = document.getElementById('dev-modal');
                         if (modal) modal.classList.add('active');

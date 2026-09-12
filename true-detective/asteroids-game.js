@@ -75,8 +75,6 @@
         if (overlay) {
             var topbar = overlay.querySelector('.minigame-overlay-topbar');
             var bottombar = overlay.querySelector('.minigame-overlay-bottombar');
-            if (topbar) topbar.style.display = 'none';
-            if (bottombar) bottombar.style.display = 'none';
         }
 
         if (overlayContent) {

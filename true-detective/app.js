@@ -693,6 +693,22 @@ function saveSettings() {
             });
         }
 
+        // Plein écran : câblage générique pour tous les écrans (accueil, thème, mini-jeu…)
+        var fullscreenBtns = document.querySelectorAll('[id$="-fullscreen-btn"]');
+        Array.prototype.forEach.call(fullscreenBtns, function (btn) {
+            btn.addEventListener('click', function (event) {
+                event.stopPropagation();
+                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                    var el = document.documentElement;
+                    if (el.requestFullscreen) { el.requestFullscreen(); }
+                    else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+                } else {
+                    if (document.exitFullscreen) { document.exitFullscreen(); }
+                    else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+                }
+            });
+        });
+
         if ($.themeSettingsToggle && $.themeSettingsPanel) {
             $.themeSettingsToggle.addEventListener('click', function (event) {
                 event.stopPropagation();
@@ -710,9 +726,8 @@ function saveSettings() {
 
 
         // Lecteur masqué par défaut dans True Detective (préférence mémorisée)
-        var savedMusicHidden = null;
-        try { savedMusicHidden = localStorage.getItem('td_music_hidden'); } catch (e) {}
-        applyMusicHidden(savedMusicHidden === null ? true : savedMusicHidden === '1');
+// Force hide music player on init
+applyMusicHidden(true);
 
         function toggleMusicPlayer() {
             var player = document.getElementById('dp-music-player');
@@ -3491,18 +3506,135 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 overlay.classList.remove('hidden');
             }
             populateMinigameOverlayChrome(scr.interro ? scr.interro.id : null, mgCfg.title ? (mgCfg.title[ui.language] || mgCfg.title.fr || mgCfg.title.en || 'Mini-jeu') : 'Mini-jeu');
-$.minigameSkipBtn.classList.remove('hidden');
-        $.minigameSkipBtn.disabled = false;
-        $.minigameSkipBtn.textContent = ui.language === 'fr' ? 'Passer' : 'Skip';
+            $.minigameSkipBtn.classList.remove('hidden');
+            $.minigameSkipBtn.disabled = false;
+            $.minigameSkipBtn.textContent = ui.language === 'fr' ? 'Passer' : 'Skip';
             $.minigameSkipBtn.onclick = null;
 
-            TDMiniGames.play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
-            currentOnDone = onMinigameDone;
-            $.minigameSkipBtn.onclick = function () {
-                if (currentOnDone) {
-                    currentOnDone({ won: false });
+            var gameMap = getGlobalGameMap();
+            var gameNS = gameMap[mgCfg.type];
+            if (!gameNS || !window[gameNS]) {
+                TDMiniGames.play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
+                currentOnDone = onMinigameDone;
+            } else {
+                try {
+                    window[gameNS].play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
+                    currentOnDone = onMinigameDone;
+                } catch (e) {
+                    console.error('[True Detective] Minigame error "' + mgCfg.type + '" :', e);
+                    onMinigameDone({ won: false });
                 }
-            };
+            }
+        } catch (e) {
+            console.error('[True Detective] Erreur mini-jeu "' + mgCfg.type + '" :', e);
+            var overlay = document.getElementById('minigame-overlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+                overlay.querySelector('#minigame-screen-content').innerHTML = '';
+            }
+            onMinigameDone({ won: false });
+        }
+    }
+
+    function scrLaunchMinigame(page) {
+        var mgCfg = page.minigame;
+        var launched = false;
+        var currentOnDone = null;
+        function onMinigameDone(res) {
+            if (launched) return;
+            launched = true;
+            if (res && res.won) {
+                var s = scrGetState();
+                s.miniGamesWon++;
+                s.score += 10;
+                if (!s.clues) s.clues = [];
+                var clue = scrClueFromMinigame(page.minigame);
+                var clueCategory = mgCfg.evidence || (mgCfg.type === 'scene_fouille' ? 'forensic' : (mgCfg.type === 'montre_code' ? 'timeline' : (mgCfg.type === 'coffre_code' ? 'mobile' : (mgCfg.type === 'reseau_alibis' ? 'witness' : 'scene'))));
+                s.clues.push(clue);
+                if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
+                    window.TDNarrativeEngine.addClue(clue, clueCategory);
+                    if (typeof window.TDNarrativeEngine.addStep === 'function') {
+                        window.TDNarrativeEngine.addStep(mgCfg.type, clue);
+                    }
+                }
+                showClueToast(clue);
+                updateNotebook();
+                if (mgCfg.type === 'montre_code' && res.notes) {
+                    s.playerNotes = res.notes;
+                }
+            }
+            currentOnDone = null;
+            var layer = document.getElementById('minigame-layer');
+            if (layer) {
+                layer.classList.remove('active');
+                layer.innerHTML = '';
+            }
+            var overlay = document.getElementById('minigame-overlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+                overlay.querySelector('#minigame-screen-content').innerHTML = '';
+            }
+            showScreen($.gameScreen);
+            scrNext();
+        }
+
+        try {
+            var s0 = scrGetState();
+            if (s0 && s0.watchCode) {
+                if (mgCfg.type === 'montre_code') {
+                    mgCfg.code = s0.watchCode.slice();
+                    mgCfg.timeStr = s0.watchTimeStr;
+                }
+                if (mgCfg.type === 'coffre_code' && s0 && s0.watchCode) {
+                    mgCfg.code = s0.watchCode.slice();
+                    mgCfg.timeStr = s0.watchTimeStr;
+                }
+            }
+            if ((mgCfg.type === 'scene_fouille' || mgCfg.type === 'montre_code') && !mgCfg.sceneImage) {
+                mgCfg.sceneImage = scrDecorImage('crimeScene');
+            }
+            var mgThemeId = getThemeId();
+            if (mgCfg.clue) {
+                if (mgCfg.clue.fr) mgCfg.clue.fr = scrSubstituteNames(mgCfg.clue.fr, mgThemeId);
+                if (mgCfg.clue.en) mgCfg.clue.en = scrSubstituteNames(mgCfg.clue.en, mgThemeId);
+            }
+            if (mgCfg.testimonies) {
+                for (var ti = 0; ti < mgCfg.testimonies.length; ti++) {
+                    var tm = mgCfg.testimonies[ti];
+                    if (tm.witness) {
+                        if (tm.witness.fr) tm.witness.fr = scrSubstituteNames(tm.witness.fr, mgThemeId);
+                        if (tm.witness.en) tm.witness.en = scrSubstituteNames(tm.witness.en, mgThemeId);
+                    }
+                }
+            }
+            $.minigameTitle.textContent = mgCfg.title ? (mgCfg.title[ui.language] || mgCfg.title.fr || mgCfg.title.en || 'Mini-jeu') : 'Mini-jeu';
+            $.minigameContent.innerHTML = '';
+
+            var overlay = document.getElementById('minigame-overlay');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+            }
+            populateMinigameOverlayChrome(scr.interro ? scr.interro.id : null, mgCfg.title ? (mgCfg.title[ui.language] || mgCfg.title.fr || mgCfg.title.en || 'Mini-jeu') : 'Mini-jeu');
+            $.minigameSkipBtn.classList.remove('hidden');
+            $.minigameSkipBtn.disabled = false;
+            $.minigameSkipBtn.textContent = ui.language === 'fr' ? 'Passer' : 'Skip';
+            $.minigameSkipBtn.onclick = null;
+
+            var gameMap = getGlobalGameMap();
+            var gameNS = gameMap[mgCfg.type];
+            if (!gameNS || !window[gameNS]) {
+                // Fallback to TDMiniGames.play for unrecognized types
+                TDMiniGames.play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
+                currentOnDone = onMinigameDone;
+            } else {
+                try {
+                    window[gameNS].play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
+                    currentOnDone = onMinigameDone;
+                } catch (e) {
+                    console.error('[True Detective] Minigame error "' + mgCfg.type + '" :', e);
+                    onMinigameDone({ won: false });
+                }
+            }
         } catch (e) {
             console.error('[True Detective] Erreur mini-jeu "' + mgCfg.type + '" :', e);
             var overlay = document.getElementById('minigame-overlay');
@@ -3615,17 +3747,38 @@ $.minigameSkipBtn.classList.remove('hidden');
             it.questionsDone = true;
         }
 
-        var minigameCfg = interroData && interroData.minigame ? scrGetMinigameRoundConfig(it.id, it.minigameRound) : null;
+        var phaseNow = scrCurrentPhase();
+        var isConfrontation = !!(phaseNow && phaseNow.id === 'act3_3');
+        var minigameCfg = null;
+        if (isConfrontation && interroData) {
+            // Confrontation finale : bataille navale contre chaque suspect,
+            // une manche, avant de le désigner coupable ou innocent.
+            var mgData = interroData.minigame || null;
+            var mgLastDiff = (mgData && mgData.difficulty) ? mgData.difficulty[mgData.difficulty.length - 1] : null;
+            minigameCfg = {
+                type: 'bataille-navale',
+                act: 3,
+                title: { fr: 'Bataille navale', en: 'Battleship' },
+                clue: (mgLastDiff && mgLastDiff.clue) || { fr: 'Au terme de la bataille navale, le suspect a perdu le contrôle : ses réactions trahissent sa implication dans le complot.', en: 'After the battleship duel, the suspect lost his composure: his reactions betray his involvement in the plot.' },
+                failClue: (mgLastDiff && mgLastDiff.failClue) || { fr: 'Vaincu à la bataille navale, le suspect triomphe : il connaît trop bien les eaux de cette affaire.', en: 'Defeated at battleship, the suspect triumphs: he knows these waters far too well.' },
+                dialogues: extractInterrogationDialogues(interroData),
+                interroId: it.id
+            };
+        } else if (interroData && interroData.minigame && scrMinigameAllowedHere(it.id)) {
+            // Mode normal uniquement : une seule manche, configuration standard.
+            minigameCfg = scrGetMinigameRoundConfig(it.id, 0);
+        }
 
         if (minigameCfg) {
             scr.awaitingChoice = true;
             $.choicesContainer.innerHTML = '';
+            it.pendingMinigameCfg = minigameCfg;
             var mgLabel = minigameCfg.title
                 ? (minigameCfg.title[lang] || minigameCfg.title.fr || minigameCfg.title.en || '')
                 : '';
             var btnText = mgLabel
                 ? (lang === 'fr' ? '🎮 ' + mgLabel : '🎮 ' + mgLabel)
-                : (lang === 'fr' ? '🎮 Lancer le défi (' + (it.minigameRound + 1) + '/3)' : '🎮 Launch challenge (' + (it.minigameRound + 1) + '/3)');
+                : (lang === 'fr' ? '🎮 Lancer le défi' : '🎮 Launch challenge');
             var btn = document.createElement('button');
             btn.className = 'btn btn-choice interrogation-ask';
             btn.textContent = btnText;
@@ -3633,7 +3786,7 @@ $.minigameSkipBtn.classList.remove('hidden');
                 if (!scr.awaitingChoice || ui.isTyping) return;
                 scr.awaitingChoice = false;
                 $.choicesContainer.innerHTML = '';
-                scrShowMinigameRound(it.minigameRound);
+                scrShowMinigameRound(0, it.pendingMinigameCfg);
             });
             $.choicesContainer.appendChild(btn);
             $.continueBtn.classList.remove('hidden');
@@ -3773,6 +3926,26 @@ $.minigameSkipBtn.classList.remove('hidden');
             renderScenarioPage();
         };
     }
+    // ===== LOCALISATION DES MINI-JEUX D'INTERROGATOIRE =====
+    // Chaque suspect n'a son mini-jeu qu'à UN seul endroit de l'aventure.
+    // Clé = id de l'interrogation, valeur = { phase: id de phase, pageIdx: index de page }.
+    // Tout autre emplacement (Acte 1, Acte 2, Révélation...) reste en interrogation simple.
+    var MINIGAME_LOCATIONS = {
+        'protecteur':    { phase: 'act2_3', pageIdx: 0 },  // Acte 2, Interrogatoires P1 : tir forain
+        'femme-fatale':  { phase: 'act1_1', pageIdx: 1 },  // Acte 1, Interrogatoires P2 : échecs
+        'seducteur':     { phase: 'act2_3', pageIdx: 2 },  // Acte 2, Interrogatoires P3 : jackpot
+        'suspect':       { phase: 'act2_3', pageIdx: 4 },  // Acte 2, Interrogatoires P5 : sudoku
+        'marginal':      { phase: 'act1_2', pageIdx: 3 },  // Acte 1, Témoignages P4 : tour de cartes
+        'criminel':      { phase: 'act1_3', pageIdx: 2 }   // Acte 1, Piste du bar P3 : mémoire
+    };
+
+    function scrMinigameAllowedHere(interroId) {
+        var loc = MINIGAME_LOCATIONS[interroId];
+        if (!loc) { return false; }
+        var phase = scrCurrentPhase();
+        if (!phase) { return false; }
+        return phase.id === loc.phase && scr.pageIdx === loc.pageIdx;
+    }
 
     function scrGetMinigameRoundConfig(interroId, roundIndex) {
         if (!interroId || !window.TDNarration || !window.TDNarration.interrogations) return null;
@@ -3786,20 +3959,9 @@ $.minigameSkipBtn.classList.remove('hidden');
         if (!roundCfg) return null;
 
         var mgType = interro.minigame.type;
+        // Le jeu est propre à chaque suspect, quel que soit l'univers :
+        // protecteur = tir forain, seducteur = jackpot, etc. (pas de remap par thème).
         var themeId = (typeof getThemeId === 'function' ? getThemeId() : null) || 'agatha-christie';
-        if (themeId === 'cyberpunk') {
-            var cyberpunkMap = {
-                'femme-fatale': 'pong',
-                'criminel': 'breakout',
-                'marginal': 'pacman',
-                'suspect': 'space-invaders',
-                'seducteur': 'breakout',
-                'scientifique': 'asteroids'
-            };
-            if (cyberpunkMap[interroId]) {
-                mgType = cyberpunkMap[interroId];
-            }
-        }
 
         var cfg = {
             type: mgType,
@@ -3817,7 +3979,7 @@ $.minigameSkipBtn.classList.remove('hidden');
         } else if (mgType === 'sudoku') {
             cfg.title = roundCfg.title;
         } else if (mgType === 'jackpot') {
-            cfg.spins = Math.min(roundCfg.spins || 6, 6);
+            cfg.spins = Math.min(roundCfg.spins || 9, 9);
             cfg.winThreshold = roundCfg.winThreshold;
             cfg.title = roundCfg.title;
             if (roundCfg.dialogues) cfg.dialogues = roundCfg.dialogues;
@@ -3872,7 +4034,7 @@ $.minigameSkipBtn.classList.remove('hidden');
         if (minigameType === 'chess') {
             cfg.depth = Math.min(tier, 3); // minimax depth 1..3 (4 would be too slow)
         } else if (minigameType === 'pong') {
-            cfg.winScore = 2 + tier;               // 3..6 points to win
+            cfg.winScore = 10;
             cfg.aiSpeed = 0.02 + tier * 0.03;      // 0.05..0.14
         } else if (minigameType === 'space-invaders') {
             cfg.rows = Math.min(2 + tier, 6);      // 3..6 rows of aliens
@@ -3885,7 +4047,12 @@ $.minigameSkipBtn.classList.remove('hidden');
         return {
             chess: 'TDChessGame',
             memory: 'TDMemoryGame',
-            sudoku: 'TDSudokuGame',
+            sudoku: 'TDConnect4Game',
+            connect4: 'TDConnect4Game',
+            chemistry: 'TDChemistryGame',
+            coffre_code: 'TDMiniGames',
+            cryptogramme: 'TDMiniGames',
+            confrontation_ultime: 'TDMiniGames',
             jackpot: 'TDMiniGames',
             domino: 'TDDominoGame',
             puzzle: 'TDPuzzleGame',
@@ -3895,7 +4062,8 @@ $.minigameSkipBtn.classList.remove('hidden');
             pacman: 'TDPacmanGame',
             'space-invaders': 'TDSpaceInvaders',
             breakout: 'TDBreakoutGame',
-            asteroids: 'TDAsteroids'
+            asteroids: 'TDAsteroids',
+            'bataille-navale': 'TDBatailleNavale'
         };
     }
 
@@ -3988,10 +4156,10 @@ $.minigameSkipBtn.classList.remove('hidden');
         }
     }
 
-    function scrShowMinigameRound(roundIndex) {
+    function scrShowMinigameRound(roundIndex, forcedCfg) {
         var it = scr.interro;
         if (!it) return;
-        var roundCfg = scrGetMinigameRoundConfig(it.id, roundIndex);
+        var roundCfg = forcedCfg || scrGetMinigameRoundConfig(it.id, roundIndex);
         if (!roundCfg) {
             scrShowInterroQuestions();
             return;
@@ -4000,29 +4168,21 @@ $.minigameSkipBtn.classList.remove('hidden');
         $.continueBtn.classList.add('hidden');
         $.choicesContainer.innerHTML = '';
         $.dialogueText.textContent = itl({
-            fr: 'Défi ' + (roundIndex + 1) + '/3 : ' + (roundCfg.title ? roundCfg.title.fr : 'Minijeux'),
-            en: 'Challenge ' + (roundIndex + 1) + '/3 : ' + (roundCfg.title ? roundCfg.title.en : 'Minigame')
+            fr: 'Défi : ' + (roundCfg.title ? roundCfg.title.fr : 'Minijeux'),
+            en: 'Challenge: ' + (roundCfg.title ? roundCfg.title.en : 'Minigame')
         });
         $.typeCursor.classList.add('hidden');
 
         var mgTitle = roundCfg.title
             ? (roundCfg.title[ui.language] || roundCfg.title.fr || roundCfg.title.en || '')
             : '';
-        $.minigameTitle.textContent = mgTitle || (ui.language === 'fr' ? 'Minijeux ' + (roundIndex + 1) : 'Minigame ' + (roundIndex + 1));
+        $.minigameTitle.textContent = mgTitle || (ui.language === 'fr' ? 'Minijeux' : 'Minigame');
         $.minigameContent.innerHTML = '';
 
-                        // Story mode : no difficulty selection, auto-difficulty by act.
-        // Act 1 = Easy, Act 2 = Medium, Act 3 = Hard, Final confrontation = Very Hard (extreme).
-        var state = scrGetState();
-        var actForStory = (state && state.act) ? state.act : (roundIndex + 1);
-        var autoDiff = (actForStory === 1) ? 'easy'
-                     : (actForStory === 2) ? 'medium'
-                     : (actForStory >= 3) ? (roundIndex === 2 ? 'extreme' : 'hard')
-                     : 'medium';
-        var chosenDiff = roundCfg.difficulty || autoDiff;
+        // Mode normal uniquement : une seule difficulté standard pour tous les mini-jeux.
+        var chosenDiff = roundCfg.difficulty || 'medium';
 
         if (roundCfg.type !== 'reseau_alibis') {
-            // Story mode always auto-resolves difficulty; selection only on Mini Games page.
             applyDifficultyToCfg(roundCfg.type, roundCfg, chosenDiff);
             launchMinigame(roundIndex, roundCfg);
         } else {
@@ -4537,6 +4697,20 @@ function scrApplyChoice(choiceKey, choiceId) {
     window.THEME_ASSETS = THEME_ASSETS;
     window.scr = scr;
     window.getThemeId = getThemeId;
+    window.scrNpcImage = scrNpcImage;
+    window.scrDecorImage = scrDecorImage;
+    window.scrNpcName = scrNpcName;
+    window.scrNpcDecorImage = function (npcId) {
+        var id = String(npcId || 'suspect').toLowerCase();
+        var decorKey = (id === 'seducteur') ? 'barInterieur'
+            : (id === 'suspect') ? 'secretPlace'
+            : (id === 'marginal') ? 'alley'
+            : (id === 'criminel') ? 'publicPlace'
+            : (id === 'scientifique') ? 'laboratory'
+            : (id === 'detective-partner' || id === 'detective') ? 'headquarters'
+            : 'residence';
+        return scrDecorImage(decorKey);
+    };
     window.skipTypeWriter = skipTypeWriter;
     window.startScenarioGame = startScenarioGame;
     window.THEMES = THEMES;

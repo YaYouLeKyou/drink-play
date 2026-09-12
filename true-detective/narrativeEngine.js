@@ -42,7 +42,7 @@
                 gameState.currentAct = saved.currentAct || 1;
                 gameState.currentSceneIndex = saved.currentSceneIndex || 0;
                 gameState.playerChoices = saved.playerChoices || [];
-                gameState.discoveredClues = saved.discoveredClues || [];
+                gameState.discoveredClues = sanitizeClues(saved.discoveredClues);
                 gameState.npcsEncountered = saved.npcsEncountered || [];
                 gameState.investigationSteps = saved.investigationSteps || [];
                 gameState.currentNPC = saved.currentNPC || null;
@@ -336,6 +336,27 @@
             console.error('[TrueDetective] talkToNPC failed:', error.message);
             throw error;
         }
+    }
+
+    // Purge les indices corrompus (caractères de remplacement U+FFFD issus
+    // d'un bug d'encodage antérieur) et nettoie les textes résiduels.
+    function sanitizeClues(clues) {
+        if (!Array.isArray(clues)) { return []; }
+        var REFFFD = /\uFFFD/g;
+        var cleaned = [];
+        for (var i = 0; i < clues.length; i++) {
+            var c = clues[i];
+            if (typeof c === 'object' && c !== null) {
+                var text = typeof c.text === 'string' ? c.text.replace(REFFFD, '') : '';
+                if (!text) { continue; }
+                cleaned.push({ text: text, category: c.category || 'general' });
+            } else if (typeof c === 'string') {
+                var t = c.replace(REFFFD, '');
+                if (!t) { continue; }
+                cleaned.push(t);
+            }
+        }
+        return cleaned;
     }
 
     function addClue(clue, category) {

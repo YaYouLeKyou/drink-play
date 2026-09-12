@@ -101,21 +101,15 @@ function validate() {
         if (docLower.indexOf('face') === -1) issues.push('Le doc ne décrit pas la révélation de la FACE de la montre');
     } else issues.push('Mini-jeu montre_code absent de phases.js');
 
-    /* 4. Coffre-fort : narrative text instead of minigame */
+    /* 4. Coffre-fort : minigame integrated in act3_1 with 1981 code */
     const acte3 = phases.find(function (p) { return p.id === 'act3_1'; });
     if (acte3) {
         const pages = acte3.pages || [];
         const hasCoffreMinigame = pages.some(function (pg) {
             return pg.minigame && pg.minigame.type === 'coffre_code';
         });
-        if (hasCoffreMinigame) {
-            issues.push('minigame coffre_code encore présent dans phases.js (devrait être narrative)');
-        }
-        const hasCoffreNarrative = pages.some(function (pg) {
-            return pg.text && (pg.text.fr || '').toLowerCase().indexOf('coffre') !== -1;
-        });
-        if (!hasCoffreNarrative) {
-            warnings.push('L acte 3 / coffre n a pas de page narrative de remplacement');
+        if (!hasCoffreMinigame) {
+            warnings.push('L acte 3 / coffre n a pas le mini-jeu coffre_code dans phases.js');
         }
     } else {
         issues.push('Phase act3_1 (coffre) introuvable dans phases.js');

@@ -4,7 +4,7 @@
    Chaque mini-jeu est OPTIONNEL : le joueur peut toujours « Passer ».
    Le timer crée la pression ; un échec = perte de l'indice bonus,
    jamais de game over. Mobile-friendly (clic).
-===================================================================== */
+   ===================================================================== */
 (function (global) {
     'use strict';
 
@@ -579,30 +579,56 @@
             var evidenceDock = null;
             var evidenceDockHead = null;
             var evidenceDockText = null;
-            function ensureEvidenceDock() {
-                if (evidenceDock && evidenceDock.parentNode) return;
-                evidenceDock = document.createElement('div');
-                evidenceDock.className = 'evidence-dock';
-                evidenceDockHead = document.createElement('div');
-                evidenceDockHead.className = 'evidence-dock-head';
-                evidenceDockText = document.createElement('div');
-                evidenceDockText.className = 'evidence-dock-text';
-                evidenceDock.appendChild(evidenceDockHead);
-                evidenceDock.appendChild(evidenceDockText);
-                if (wrap.parentNode) {
-                    wrap.parentNode.insertBefore(evidenceDock, wrap.nextSibling);
-                } else {
-                    document.body.appendChild(evidenceDock);
-                }
-            }
-            function showEvidence(h) {
-                ensureEvidenceDock();
-                evidenceDockHead.textContent = (lang === 'fr' ? 'Pièce à conviction ' : 'Evidence ') + h.label;
-                evidenceDockText.textContent = t(h.info, lang);
-                evidenceDock.classList.remove('evidence-dock-pulse');
-                void evidenceDock.offsetWidth; /* relance l'animation */
-                evidenceDock.classList.add('evidence-dock-pulse');
-            }
+ function ensureEvidenceDock(h) {
+    if (evidenceDock && evidenceDock.parentNode) return;
+    evidenceDock = document.createElement('div');
+    evidenceDock.className = 'evidence-dock';
+    evidenceDockHead = document.createElement('div');
+    evidenceDockHead.className = 'evidence-dock-head';
+    evidenceDockText = document.createElement('div');
+    evidenceDockText.className = 'evidence-dock-text';
+    evidenceDock.appendChild(evidenceDockHead);
+    evidenceDock.appendChild(evidenceDockText);
+    if (wrap.parentNode) {
+        wrap.appendChild(evidenceDock);
+        // Position evidence-dock near the hotspot
+        const rect = wrap.getBoundingClientRect();
+        const spotX = parseFloat(h.x) / 100 * rect.width;
+        const spotY = parseFloat(h.y) / 100 * rect.height;
+        evidenceDock.style.position = 'absolute';
+        evidenceDock.style.left = (spotX - evidenceDock.offsetWidth / 2) + 'px';
+        evidenceDock.style.top = (spotY - evidenceDock.offsetHeight / 2) + 'px';
+    } else {
+        document.body.appendChild(evidenceDock);
+        // Position evidence-dock near the hotspot
+        const r = document.body.getBoundingClientRect();
+        const spotX = parseFloat(h.x) / 100 * r.width;
+        const spotY = parseFloat(h.y) / 100 * r.height;
+        evidenceDock.style.position = 'absolute';
+        evidenceDock.style.left = (spotX - evidenceDock.offsetWidth / 2) + 'px';
+        evidenceDock.style.top = (spotY - evidenceDock.offsetHeight / 2) + 'px';
+    }
+}
+function showEvidence(h) {
+     ensureEvidenceDock(h);
+    evidenceDockHead.textContent = (lang === 'fr' ? 'Pièce à conviction ' : 'Evidence ') + h.label;
+    evidenceDockText.textContent = t(h.info, lang);
+    evidenceDock.classList.remove('evidence-dock-pulse');
+    void evidenceDock.offsetWidth; /* relance l\'animation */
+    evidenceDock.classList.add('evidence-dock-pulse');
+     
+    // Position evidence-dock outside the image (near the center of the scene)
+    const rect = wrap.getBoundingClientRect();
+    const spotX = (parseFloat(h.x) / 100) * rect.width;
+    const spotY = (parseFloat(h.y) / 100) * rect.height;
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const offsetX = spotX - rect.left - rect.width / 2;
+    const offsetY = spotY - rect.top - rect.height / 2;
+    evidenceDock.style.position = 'absolute';
+    evidenceDock.style.left = (centerX + offsetX) + 'px';
+    evidenceDock.style.top = (centerY + offsetY) + 'px';
+}
 
             var spotButtons = [];
             var hoverTimer = null;
@@ -626,24 +652,7 @@
                 spot.addEventListener('mouseleave', function () {
                     if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
                 });
-                spot.addEventListener('click', function (e) {
-                    if (editMode) { e.stopPropagation(); return; }
-                    if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
-                    showEvidence(h);
-                    if (!spot.dataset.journaled && global.TDNarrativeEngine && typeof global.TDNarrativeEngine.addClue === 'function') {
-                    var cat = h.evidence || 'forensic';
-                    var clueText = lang === 'fr' ? 'Pièce ' + h.label + ' : ' + t(h.info, lang) : 'Evidence ' + h.label + ' : ' + t(h.info, lang);
-                    global.TDNarrativeEngine.addClue(clueText, cat);
-                    if (typeof global.TDNarrativeEngine.addStep === 'function') {
-                        global.TDNarrativeEngine.addStep('fouille', clueText);
-                    }
-                    if (global.TDScenario && global.TDScenario.recordEvidence) {
-                        global.TDScenario.recordEvidence(cat);
-                    }
-                    spot.dataset.journaled = '1';
-                    }
-                    if (found >= needed) complete(true);
-                });
+
                 wrap.appendChild(spot);
                 spotButtons.push(spot);
             });
@@ -949,10 +958,11 @@
             face.title = lang === 'fr' ? 'Montre de poche du Duc, brisée dans la bagarre.' : 'The Duke\'s pocket watch, broken in the struggle.';
             var dosWrap = document.createElement('div');
             dosWrap.className = 'mg-dos-wrap hidden-dos';
-            var dos = document.createElement('img');
-            dos.className = 'mg-item mg-montre-dos';
-            dos.src = 'mini-games/montre/montre-du-duc-dos.png';
-            dosWrap.appendChild(dos);
+var dos = document.createElement('img');
+             dos.className = 'mg-item mg-montre-dos';
+             dos.style.display = 'none';  // Hide the second image (was causing display issues)
+             dos.src = 'mini-games/montre/montre-du-duc-dos.png';
+             dosWrap.appendChild(dos);
             wrap.appendChild(face);
             wrap.appendChild(dosWrap);
 
@@ -1442,11 +1452,12 @@
         },
 
         /* Jackpot slot machine for seducteur interrogation minigame
-           Max 6 spins, with seducteur dialogue before/after each spin
+           9 spins, ~40% jackpot chance (always a different clue),
+           with seducteur dialogue before/after each spin
            Interrogation questions triggered on each spin */
         'jackpot': function (body, registerHint) {
-            var cfgSpins = cfg.spins || 6;
-            var spins = Math.min(cfgSpins, 6);
+            var cfgSpins = cfg.spins || 9;
+            var spins = Math.min(cfgSpins, 9);
             var winThreshold = cfg.winThreshold || 2;
             var wrap = document.createElement('div');
             wrap.className = 'jackpot-wrap';
@@ -1455,7 +1466,7 @@
             var reelFrame = document.createElement('div');
             reelFrame.className = 'jackpot-reels';
             var reels = [];
-            var symbols = ['🍒', '🍋', '🍊', '🔔', '💎', '7️⃣', '❤️', '💵'];
+            var symbols = ['🍒', '🍋', '🍊', '🔔', '💎', '7️⃣', '❤️', '💵', '💔'];
             for (var i = 0; i < 3; i++) {
                 var reel = document.createElement('div');
                 reel.className = 'jackpot-reel';
@@ -1487,6 +1498,26 @@
             var currentSpinIndex = 0;
             var result = null;
 
+            // Pool de jackpots partagé sur TOUS les spins : chaque jackpot
+            // tiré est retiré du pool pour ne jamais se répéter.
+            var jackpotPool = [
+                { key: 'dollars', sym: '💵', emoji: '💰' },
+                { key: 'hearts',  sym: '❤️', emoji: '❤️' },
+                { key: 'broken',  sym: '💔', emoji: '💔' },
+                { key: 'generic', sym: '💎', emoji: '🎰' }
+            ];
+            var usedJackpots = [];
+            var lastJackpotClues = [];
+            var pickJackpot = function () {
+                var avail = jackpotPool.filter(function (j) {
+                    return usedJackpots.indexOf(j.key) === -1;
+                });
+                if (!avail.length) { usedJackpots = []; avail = jackpotPool.slice(); }
+                var pick = avail[Math.floor(Math.random() * avail.length)];
+                usedJackpots.push(pick.key);
+                return pick;
+            };
+
             var suspectName = 'Pembrooke';
             if (lang === 'fr') suspectName = 'Julian Pembrooke';
 
@@ -1498,6 +1529,19 @@
             if (dialogues && dialogues.afterLose && dialogues.afterLose.length) {
                 tauntList = dialogues.afterLose;
             }
+
+            // Enregistre un indice de jackpot directement dans l'état du jeu
+            var registerJackpotClue = function (text) {
+                if (!text) { return; }
+                try {
+                    if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
+                        window.TDNarrativeEngine.addClue(text, 'dialogue');
+                    }
+                    if (typeof window.updateNotebook === 'function') {
+                        window.updateNotebook();
+                    }
+                } catch (e) { /* best effort */ }
+            };
 
             var interroData = null;
             var interroState = null;
@@ -1752,39 +1796,65 @@
 
                 setTimeout(function () {
                     clearInterval(spinInterval);
+
+                    // ===== OUTCOME PONDÉRÉ : 40% de jackpot, toujours différent =====
+                    var jackpotIdx = -1;
+                    if (Math.random() < 0.40) {
+                        jackpotIdx = jackpotPool.indexOf(pickJackpot());
+                    }
+
                     var finalSymbols = [];
+                    var forcedSym = jackpotIdx >= 0 ? jackpotPool[jackpotIdx].sym : null;
                     reels.forEach(function (reel) {
                         var sym = reel.querySelector('.jackpot-symbol');
-                        var s = symbols[Math.floor(Math.random() * symbols.length)];
+                        var s = forcedSym || symbols[Math.floor(Math.random() * symbols.length)];
                         sym.textContent = s;
                         sym.style.opacity = '1';
                         finalSymbols.push(s);
                     });
+                    if (!forcedSym && finalSymbols[0] === finalSymbols[1] && finalSymbols[1] === finalSymbols[2]) {
+                        // Tirage non-jackpot tombé sur un triple : casse le troisième rouleau
+                        var others = symbols.filter(function (s) { return s !== finalSymbols[0]; });
+                        var replacement = others[Math.floor(Math.random() * others.length)];
+                        reels[2].querySelector('.jackpot-symbol').textContent = replacement;
+                        finalSymbols[2] = replacement;
+                    }
 
                     var spinWon = false;
                     var winType = null;
-                    if (finalSymbols[0] === finalSymbols[1] && finalSymbols[1] === finalSymbols[2]) {
+                    var jackpotClues = {
+                        dollars: {
+                            fr: "💰 [Indice Argent] Un virement de 5 000 £ sur le compte de Pembrooke, versé la veille du drame. L'argent parlera toujours.",
+                            en: "💰 [Money clue] A £5,000 transfer to Pembrooke's account, paid the day before. Money always talks."
+                        },
+                        hearts: {
+                            fr: "❤️ [Indice Liaison] Une lettre parfumée signée « V. » : une liaison secrète unit deux suspects du manoir.",
+                            en: "❤️ [Affair clue] A perfumed letter signed \"V.\": a secret affair binds two suspects of the manor."
+                        },
+                        broken: {
+                            fr: "💔 [Indice Jalousie] Un billet froissé : « Tu ne m'auras jamais, ni elle, ni son héritage. » La jalousie dévore.",
+                            en: "💔 [Jealousy clue] A crumpled note: \"You will never have me, neither her nor her fortune.\" Jealousy devours."
+                        },
+                        generic: {
+                            fr: "🎰 [Indice Chance] Un ticket gagnant encaissé au manoir la nuit du crime. La chance tourne… contre lui.",
+                            en: "🎰 [Luck clue] A winning ticket cashed at the manor on the night of the crime. Luck turns... against him."
+                        }
+                    };
+                    if (jackpotIdx >= 0) {
+                        var jp = jackpotPool[jackpotIdx];
                         spinWon = true;
                         totalWins++;
-                        var sym = finalSymbols[0];
-                        if (sym === '💎') {
-                            winType = 'dollars';
-                            status.textContent = lang === 'fr'
-                                ? '💰 JACKPOT DOLLARS ! Piste financière !'
-                                : '💰 DOLLARS JACKPOT! Financial trail!';
-                            status.style.color = '#00ff88';
-                        } else if (sym === '❤️' || sym === '💖') {
-                            winType = 'hearts';
-                            status.textContent = lang === 'fr'
-                                ? '💔 JACKPOT COEURS ! Liaison révélée !'
-                                : '💔 HEARTS JACKPOT! Affair revealed!';
-                            status.style.color = '#ff69b4';
-                        } else {
-                            winType = 'generic';
-                            status.textContent = lang === 'fr'
-                                ? '🎰 JACKPOT ! Trois symboles identiques !'
-                                : '🎰 JACKPOT! Three matching symbols!';
-                            status.style.color = '#ffd700';
+                        winType = jp.key;
+                        var clueObj = jackpotClues[jp.key];
+                        var clueText = (clueObj && (clueObj[lang] || clueObj.fr)) || '';
+                        lastJackpotClues.push(clueText);
+                        registerJackpotClue(clueText);
+                        status.textContent = jp.emoji + ' ' + (lang === 'fr'
+                            ? 'JACKPOT ! Indice révélé'
+                            : 'JACKPOT! Clue revealed');
+                        status.style.color = jp.key === 'broken' ? '#ff4d6d' : (jp.key === 'hearts' ? '#ff69b4' : '#00ff88');
+                        if (clueText) {
+                            showDialogue(clueText);
                         }
                     } else if (finalSymbols[0] === finalSymbols[1] || finalSymbols[1] === finalSymbols[2] || finalSymbols[0] === finalSymbols[2]) {
                         spinWon = true;
@@ -1801,20 +1871,22 @@
                     }
 
                     if (spinWon) {
+                        // Gain (jackpot ou paire) : dialogue de victoire du suspect
                         if (winType === 'hearts' && dialogues.afterWinHearts) {
                             showDialogue(t(dialogues.afterWinHearts, lang));
                         } else if (winType === 'dollars' && dialogues.afterWinDollars) {
                             showDialogue(t(dialogues.afterWinDollars, lang));
-                        } else if (winType === 'generic' || winType === null) {
-                            if (dialogues.afterWinHearts) {
-                                showDialogue(t(dialogues.afterWinHearts, lang));
-                            } else if (dialogues.afterWinDollars) {
-                                showDialogue(t(dialogues.afterWinDollars, lang));
-                            }
+                        } else if (dialogues.afterWinHearts) {
+                            showDialogue(t(dialogues.afterWinHearts, lang));
+                        } else if (dialogues.afterWinDollars) {
+                            showDialogue(t(dialogues.afterWinDollars, lang));
                         }
                         if (totalWins >= winThreshold) {
                             won = true;
                             result = { spinResult: 'win', winType: winType || 'generic' };
+                        } else if (jackpotIdx >= 0) {
+                            // Jackpot sans seuil atteint : compte quand même comme manche gagnante
+                            result = result || { spinResult: 'win', winType: winType };
                         }
                     } else {
                         var afterLoseLines = dialogues.afterLose || [];
@@ -1841,6 +1913,7 @@
                 spinning = true;
                 spinBtn.disabled = true;
                 var finalResult = result || { spinResult: gameWon ? 'win' : 'lose' };
+                if (lastJackpotClues.length) { finalResult.jackpotClues = lastJackpotClues.slice(); }
                 if (won) { finalResult.won = true; } else { finalResult.won = false; }
                 setTimeout(function () {
                     cleanupInterro();
@@ -1856,6 +1929,124 @@
                 spinReels();
             });
             wrap.appendChild(spinBtn);
+        },
+        'connect4': function (body) {
+            if (global.TDConnect4Game) {
+                global.TDConnect4Game.play(cfg, lang, function (res) {
+                    complete(res ? res.won : false);
+                }, body);
+            } else {
+                complete(true);
+            }
+        },
+        'chemistry': function (body) {
+            if (global.TDChemistryGame) {
+                global.TDChemistryGame.play(cfg, lang, function (res) {
+                    complete(res ? res.won : false);
+                }, body);
+            } else {
+                complete(true);
+            }
+        },
+        'confrontation_ultime': function (body, registerHint) {
+            var wrap = document.createElement('div');
+            wrap.className = 'confrontation-wrapper';
+
+            var header = document.createElement('div');
+            header.className = 'confrontation-header';
+
+            var title = document.createElement('div');
+            title.className = 'confrontation-title';
+            title.textContent = lang === 'fr'
+                ? '⚖️ CONFRONTATION ULTIME & DÉTECTEUR DE MENSONGE'
+                : '⚖️ ULTIMATE CONFRONTATION & LIE DETECTOR';
+
+            var sub = document.createElement('div');
+            sub.className = 'confrontation-sub';
+            sub.textContent = lang === 'fr'
+                ? 'Confrontez le suspect avec les preuves pour faire monter son niveau de stress et briser ses alibis.'
+                : 'Confront the suspect with evidence to raise their stress level and shatter their alibi.';
+
+            header.appendChild(title);
+            header.appendChild(sub);
+            wrap.appendChild(header);
+
+            var gaugeWrap = document.createElement('div');
+            gaugeWrap.className = 'confrontation-gauge-wrap';
+
+            var gaugeLabel = document.createElement('div');
+            gaugeLabel.className = 'confrontation-gauge-label';
+            gaugeLabel.textContent = lang === 'fr' ? 'Niveau de tension du suspect :' : 'Suspect stress level :';
+
+            var gaugeBar = document.createElement('div');
+            gaugeBar.className = 'confrontation-gauge-bar';
+            var gaugeFill = document.createElement('div');
+            gaugeFill.className = 'confrontation-gauge-fill';
+            gaugeFill.style.width = '0%';
+            gaugeBar.appendChild(gaugeFill);
+
+            gaugeWrap.appendChild(gaugeLabel);
+            gaugeWrap.appendChild(gaugeBar);
+            wrap.appendChild(gaugeWrap);
+
+            var claims = cfg.claims || [
+                { claim: lang === 'fr' ? "J'étais absent à l'heure du meurtre." : "I was absent at the time of murder.", cat: 'timeline', proof: lang === 'fr' ? 'Horloge & Montre 22h09' : 'Watch & Clock 10:09pm' },
+                { claim: lang === 'fr' ? "Je n'avais aucun motif d'argent." : "I had no monetary motive.", cat: 'mobile', proof: lang === 'fr' ? 'Dettes & Versements V.K.' : 'Debts & V.K. Payments' },
+                { claim: lang === 'fr' ? "Je ne connaissais pas les lieux." : "I didn't know the layout.", cat: 'forensic', proof: lang === 'fr' ? 'Empreintes du Coffre 1981' : 'Safe Fingerprints 1981' },
+                { claim: lang === 'fr' ? "Personne ne m'a vu approcher." : "Nobody saw me approach.", cat: 'witness', proof: lang === 'fr' ? 'Témoignage du Rôdeur' : 'Lurker Witness' }
+            ];
+
+            var score = 0;
+            var maxScore = claims.length;
+
+            var cardsGrid = document.createElement('div');
+            cardsGrid.className = 'confrontation-grid';
+
+            claims.forEach(function (item) {
+                var card = document.createElement('div');
+                card.className = 'confrontation-card';
+
+                var claimTxt = document.createElement('div');
+                claimTxt.className = 'confrontation-claim';
+                claimTxt.textContent = '« ' + item.claim + ' »';
+
+                var btn = document.createElement('button');
+                btn.className = 'btn btn-primary confrontation-btn';
+                btn.textContent = lang === 'fr' ? 'Confronter avec ' + item.proof : 'Confront with ' + item.proof;
+
+                btn.addEventListener('click', function () {
+                    if (card.dataset.done) return;
+                    card.dataset.done = '1';
+                    card.classList.add('cracked');
+                    btn.disabled = true;
+                    btn.textContent = lang === 'fr' ? '✔️ Déclaration brisée !' : '✔️ Statement shattered!';
+
+                    score++;
+                    var pct = Math.min(100, Math.round((score / maxScore) * 100));
+                    gaugeFill.style.width = pct + '%';
+
+                    if (pct > 50) gaugeFill.style.background = 'linear-gradient(90deg, #ffaa00, #ff3300)';
+                    if (pct >= 100) gaugeFill.style.background = 'linear-gradient(90deg, #ff0000, #ff0055)';
+
+                    if (score >= maxScore) {
+                        setTimeout(function () {
+                            complete(true, { won: true });
+                        }, 800);
+                    }
+                });
+
+                card.appendChild(claimTxt);
+                card.appendChild(btn);
+                cardsGrid.appendChild(card);
+            });
+
+            wrap.appendChild(cardsGrid);
+            body.appendChild(wrap);
+
+            registerHint(function () {
+                var uncracked = cardsGrid.querySelectorAll('.confrontation-card:not([data-done])');
+                if (uncracked.length) uncracked[0].classList.add('hint');
+            });
         },
     };
     } /* fin BUILD_CREATORS */

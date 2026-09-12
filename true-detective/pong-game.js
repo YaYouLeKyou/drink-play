@@ -73,8 +73,6 @@
         if (overlay) {
             var topbar = overlay.querySelector('.minigame-overlay-topbar');
             var bottombar = overlay.querySelector('.minigame-overlay-bottombar');
-            if (topbar) topbar.style.display = 'none';
-            if (bottombar) bottombar.style.display = 'none';
         }
 
         if (overlayContent) {
@@ -94,7 +92,7 @@
         var dialogues = cfg.dialogues || [];
         var dialogueLines = dialogues.beforeSpin || (PHRASES[lang] || PHRASES.en);
         var tauntLines = dialogues.afterLose || (TAUNTS[lang] || TAUNTS.en);
-        var winScore = cfg.winScore || 5;
+        var winScore = cfg.winScore || 10;
         var aiSpeed = cfg.aiSpeed || 0.08;
         var phraseTimeout = null;
         var lastPhraseTime = 0;
@@ -370,11 +368,43 @@
                 gameOver = true;
                 var won = playerScore >= winScore;
                 if (phraseTimeout) clearTimeout(phraseTimeout);
-                setTimeout(function () {
-                    cleanupInterro();
-                    restoreOverlay();
-                    if (onDone) onDone({ won: won, score: playerScore });
-                }, 500);
+                drawGameOver(won, playerScore, winScore);
+                showContinueBtn(won, playerScore);
+            }
+        }
+
+        function drawGameOver(won, score, targetScore) {
+            ctx.fillStyle = '#0a0a1a';
+            ctx.fillRect(0, 0, cw, ch);
+            ctx.fillStyle = won ? '#00ff88' : '#ff6b6b';
+            ctx.font = 'bold 32px monospace';
+            ctx.textAlign = 'center';
+            var msg = won
+                ? (lang === 'fr' ? 'VICTOIRE' : 'VICTORY')
+                : (lang === 'fr' ? 'DEFAITE' : 'DEFEAT');
+            ctx.fillText(msg, cw / 2, ch / 2 - 20);
+            ctx.fillStyle = '#ffff00';
+            ctx.font = 'bold 20px monospace';
+            ctx.fillText(score + ' / ' + targetScore, cw / 2, ch / 2 + 20);
+        }
+
+        function showContinueBtn(won, score) {
+            var continueBtn = document.createElement('button');
+            continueBtn.className = 'btn pong-continue';
+            continueBtn.textContent = lang === 'fr' ? 'Continuer' : 'Continue';
+            continueBtn.style.cssText = 'display:inline-block;margin-top:16px;padding:10px 24px;font-size:1.1rem;background:linear-gradient(135deg,#00ffff,#00b3b3);color:#0a0a1a;border:none;border-radius:8px;cursor:pointer;';
+            continueBtn.addEventListener('click', function () {
+                cleanupInterro();
+                restoreOverlay();
+                continueBtn.remove();
+                if (onDone) onDone({ won: won, score: score });
+            });
+            if (dialogueEl) {
+                dialogueEl.innerHTML = '';
+                dialogueEl.appendChild(continueBtn);
+                dialogueEl.style.display = '';
+            } else {
+                wrap.appendChild(continueBtn);
             }
         }
 

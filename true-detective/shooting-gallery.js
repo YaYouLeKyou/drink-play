@@ -75,13 +75,17 @@
     }
 
     function getNpcImage(npcId) {
-        if (typeof window !== 'undefined' && window.scr && typeof window.scrNpcImage === 'function') {
-            return window.scrNpcImage(npcId || 'protecteur');
+        var id = String(npcId || 'protecteur').toLowerCase();
+        if (typeof window !== 'undefined' && typeof window.scrNpcImage === 'function') {
+            // Les assets d'app.js sont indexés par id de scénario ; 'detective'
+            // du stand de tir correspond à 'detective-partner'.
+            var assetId = (id === 'detective') ? 'detective-partner' : id;
+            return window.scrNpcImage(assetId);
         }
         if (typeof window !== 'undefined' && window.THEME_ASSETS) {
             var themeId = typeof window.getThemeId === 'function' ? window.getThemeId() : 'agatha-christie';
             var assets = window.THEME_ASSETS[themeId] || window.THEME_ASSETS['agatha-christie'];
-            return assets && assets.protecteur;
+            return assets && (assets[id === 'femme-fatale' ? 'femmeFatale' : id] || assets.protecteur);
         }
         return null;
     }
@@ -99,7 +103,7 @@
     function getSceneBackground(themeId) {
         if (typeof window !== 'undefined' && window.THEME_ASSETS && window.THEME_ASSETS[themeId]) {
             var assets = window.THEME_ASSETS[themeId];
-            return assets.exteriorManorImg || assets.exteriorManor || assets.universeImg || assets.universe || '';
+            return assets.universe || assets.exteriorManorImg || assets.exteriorManor || assets.universeImg || '';
         }
         return '';
     }
@@ -114,9 +118,6 @@
             var topbar = overlay.querySelector('.minigame-overlay-topbar');
             var bottombar = overlay.querySelector('.minigame-overlay-bottombar');
             var title = overlay.querySelector('.minigame-screen-title');
-            if (topbar) topbar.style.display = 'none';
-            if (bottombar) bottombar.style.display = 'none';
-            if (title) title.classList.add('hidden');
         }
 
         if (overlayContent) {
@@ -160,6 +161,12 @@
             'femme-fatale': '#ff00ff'
         };
 
+        // Préchargement des images des personnages (thème courant)
+        var suspectImages = {};
+        suspectList.concat([forbiddenTarget]).forEach(function (id) {
+            suspectImages[id] = getNpcImage(id);
+        });
+
         var forbiddenTarget = 'femme-fatale';
         var instructionText = (lang === 'fr'
             ? 'Visez les suspects vivants. Évitez ' + suspectNames[forbiddenTarget] + ' !'
@@ -172,7 +179,10 @@
         wrap.style.cssText = 'width:100%;max-width:' + maxWidth + 'px;max-height:' + maxHeight + 'px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:8px;overflow:hidden;';
 
         var themeId = getThemeId();
-        var bgUrl = getSceneBackground(themeId);
+        // Décor = lieu d'interrogatoire du suspect (cohérent avec le reste du jeu)
+        var bgUrl = (typeof window.scrNpcDecorImage === 'function')
+            ? window.scrNpcDecorImage(interroId)
+            : getSceneBackground(themeId);
         if (bgUrl) {
                         wrap.style.backgroundImage = 'url(' + bgUrl + ')';
             wrap.style.backgroundSize = 'cover';
@@ -217,6 +227,7 @@
                     : (1 + Math.random() * 1.1) * speedMult,
                 vy: (Math.random() - 0.5) * 0.5 * speedMult,
                 color: color,
+                img: suspectImages[type] || null,
                 alive: true
             };
         }
@@ -282,6 +293,26 @@
             if (wrap && wrap.parentNode) wrap.parentNode.removeChild(wrap);
         }
 
+        window._minigameCleanup = cleanup;
+
+        function cleanupSkip() {
+            if (ended) return;
+            ended = true;
+            if (phraseTimeout) clearTimeout(phraseTimeout);
+            if (overlay) {
+                overlay.classList.remove('retro-layout');
+                var topbar = overlay.querySelector('.minigame-overlay-topbar');
+                var bottombar = overlay.querySelector('.minigame-overlay-bottombar');
+                var title = overlay.querySelector('.minigame-screen-title');
+                if (topbar) topbar.style.display = '';
+                if (bottombar) bottombar.style.display = '';
+                if (title) title.classList.remove('hidden');
+                var content = overlay.querySelector('#minigame-screen-content');
+                if (content) content.innerHTML = '';
+            }
+            if (wrap && wrap.parentNode) wrap.parentNode.removeChild(wrap);
+        }
+
         initTargets();
 
         canvas.addEventListener('click', function (e) {
@@ -314,7 +345,7 @@
                 won = false;
                 showDialogue(t(tauntLines[0], lang));
                 setTimeout(function () {
-                    cleanup();
+                    cleanupSkip();
                     if (onDone) onDone({ won: false, score: score });
                 }, 800);
                 return;
@@ -336,11 +367,17 @@
                 score += diffCfg.scoreBonus;
                 showDialogue(t(dialogueLines[dialogueLines.length - 1], lang));
                 setTimeout(function () {
-                    cleanup();
+                    cleanupSkip();
                     if (onDone) onDone({ won: true, score: score });
                 }, 600);
             }
         });
+
+        window._minigameSkipHandler = function (skipData) {
+            if (ended) return;
+            cleanupSkip();
+            if (onDone) onDone({ won: false, score: score });
+        };
 
         function update() {
             if (ended) return;
@@ -389,11 +426,27 @@
 
             targets.forEach(function (t) {
                 if (!t.alive) return;
-                ctx.fillStyle = t.color;
-                ctx.shadowColor = t.color;
-                ctx.shadowBlur = 6;
-                ctx.fillRect(t.x, t.y, t.w, t.h);
-                ctx.shadowBlur = 0;
+                var hasImg = t.img && t.img.complete && t.img.naturalWidth > 0;
+                if (hasImg) {
+                    try {
+                        ctx.drawImage(t.img, t.x, t.y, t.w, t.h);
+                        ctx.strokeStyle = t.color;
+                        ctx.lineWidth = 1.5;
+                        ctx.strokeRect(t.x, t.y, t.w, t.h);
+                    } catch (e) {
+                        ctx.fillStyle = t.color;
+                        ctx.shadowColor = t.color;
+                        ctx.shadowBlur = 6;
+                        ctx.fillRect(t.x, t.y, t.w, t.h);
+                        ctx.shadowBlur = 0;
+                    }
+                } else {
+                    ctx.fillStyle = t.color;
+                    ctx.shadowColor = t.color;
+                    ctx.shadowBlur = 6;
+                    ctx.fillRect(t.x, t.y, t.w, t.h);
+                    ctx.shadowBlur = 0;
+                }
                 ctx.fillStyle = '#ffffff';
                 ctx.font = '9px monospace';
                 ctx.textAlign = 'center';
@@ -401,14 +454,32 @@
             });
 
             if (forbidden && forbidden.alive) {
+                var fImg = forbidden.img && forbidden.img.complete && forbidden.img.naturalWidth > 0;
                 ctx.strokeStyle = '#ff0000';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(forbidden.x - 2, forbidden.y - 2, forbidden.w + 4, forbidden.h + 4);
-                ctx.fillStyle = '#ff66aa';
-                ctx.shadowColor = '#ff0000';
-                ctx.shadowBlur = 12;
-                ctx.fillRect(forbidden.x, forbidden.y, forbidden.w, forbidden.h);
-                ctx.shadowBlur = 0;
+                if (fImg) {
+                    try {
+                        ctx.globalAlpha = 0.85;
+                        ctx.drawImage(forbidden.img, forbidden.x, forbidden.y, forbidden.w, forbidden.h);
+                        ctx.globalAlpha = 1;
+                        // Bandeau rouge translucide par-dessus pour marquer l'interdiction
+                        ctx.fillStyle = 'rgba(255, 0, 0, 0.35)';
+                        ctx.fillRect(forbidden.x, forbidden.y, forbidden.w, forbidden.h);
+                    } catch (e) {
+                        ctx.fillStyle = '#ff66aa';
+                        ctx.shadowColor = '#ff0000';
+                        ctx.shadowBlur = 12;
+                        ctx.fillRect(forbidden.x, forbidden.y, forbidden.w, forbidden.h);
+                        ctx.shadowBlur = 0;
+                    }
+                } else {
+                    ctx.fillStyle = '#ff66aa';
+                    ctx.shadowColor = '#ff0000';
+                    ctx.shadowBlur = 12;
+                    ctx.fillRect(forbidden.x, forbidden.y, forbidden.w, forbidden.h);
+                    ctx.shadowBlur = 0;
+                }
                 ctx.fillStyle = '#ffffff';
                 ctx.font = 'bold 10px monospace';
                 ctx.textAlign = 'center';

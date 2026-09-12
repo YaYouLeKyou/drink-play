@@ -24,11 +24,21 @@
         actList = document.getElementById('dev-act-list');
 
         var devBtn = document.getElementById('dev-btn');
-        var closeBtn = document.getElementById('dev-close-btn');
+    var devOpenBtns = Array.prototype.slice.call(document.querySelectorAll('.td-dev-open-btn'));
 
-        if (devBtn) {
-            devBtn.addEventListener('click', openModal);
-        }
+    function openModalFromEvent(event) {
+        if (event) { event.stopPropagation(); event.preventDefault(); }
+        openModal();
+    }
+
+    if (devBtn) {
+        devBtn.addEventListener('click', openModalFromEvent);
+    }
+    devOpenBtns.forEach(function (btn) {
+        btn.addEventListener('click', openModalFromEvent);
+    });
+    var closeBtn = document.getElementById('dev-close-btn');
+
         if (closeBtn) {
             closeBtn.addEventListener('click', closeModal);
         }
@@ -56,6 +66,29 @@
 
     function openModal() {
         if (!modal) return;
+        if (!window.TDPhases) {
+            var script = document.createElement('script');
+            script.src = 'phases.js';
+            var loaded = false;
+            script.onload = function () {
+                if (loaded) return;
+                loaded = true;
+                renderThemeList();
+                renderPhaseList();
+                renderPageGrid();
+                renderActList();
+                syncVoiceToggle();
+                modal.classList.add('active');
+            };
+            script.onerror = function () {
+                if (loaded) return;
+                loaded = true;
+                console.error('Failed to load phases.js for dev modal');
+                modal.classList.add('active');
+            };
+            document.head.appendChild(script);
+            return;
+        }
         renderThemeList();
         renderPhaseList();
         renderPageGrid();
@@ -82,18 +115,19 @@
             btn.className = 'dev-theme-btn';
             btn.textContent = theme.emoji + ' ' + theme.name;
             btn.dataset.theme = theme.id;
+            if (window.getThemeId && window.getThemeId() === theme.id) {
+                btn.classList.add('active');
+            }
             btn.addEventListener('click', function () {
-                if (window.selectTheme) {
-                    window.selectTheme(theme);
+                if (window.ui) {
+                    window.ui.theme = theme;
                 }
-                var homeScreen = document.getElementById('home-screen');
-                var themeScreen = document.getElementById('theme-selector-screen');
-                if (homeScreen) homeScreen.classList.remove('active');
-                if (themeScreen) {
-                    themeScreen.classList.remove('hidden');
-                    themeScreen.classList.add('active');
-                }
-                closeModal();
+                renderPhaseList();
+                renderPageGrid();
+                renderActList();
+                var buttons = themeList.querySelectorAll('.dev-theme-btn');
+                buttons.forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
             });
             themeList.appendChild(btn);
         });
@@ -154,8 +188,15 @@
                         var pageBtn = document.createElement('button');
                         pageBtn.className = 'dev-page-btn';
                         var isInterroMinigame = false;
+                        var isPuzzle = false;
                         if (page.minigame) {
-                            pageBtn.classList.add('dev-page-btn-mg');
+                            var puzzleTypes = ['scene_fouille', 'montre_code', 'coffre_code', 'reseau_alibis'];
+                            if (puzzleTypes.indexOf(page.minigame.type) !== -1) {
+                                isPuzzle = true;
+                                pageBtn.classList.add('dev-page-btn-puzzle');
+                            } else {
+                                pageBtn.classList.add('dev-page-btn-mg');
+                            }
                         }
                         if (page.interrogation && window.TDNarration && window.TDNarration.interrogations) {
                             var interro = window.TDNarration.interrogations[page.interrogation];

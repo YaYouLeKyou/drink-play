@@ -73,8 +73,6 @@
         if (overlay) {
             var topbar = overlay.querySelector('.minigame-overlay-topbar');
             var bottombar = overlay.querySelector('.minigame-overlay-bottombar');
-            if (topbar) topbar.style.display = 'none';
-            if (bottombar) bottombar.style.display = 'none';
         }
 
         if (overlayContent) {
@@ -123,6 +121,7 @@
         var ghosts = [];
         var pacman = { x: 10, y: 15, dir: { x: 0, y: 0 }, nextDir: { x: 0, y: 0 } };
         var lastPhraseScore = 0;
+        var gameOver = false;
 
         var map = [
             "####################",
@@ -383,17 +382,21 @@
                     restoreOverlay();
                     if (onDone) onDone({ won: true, score: score });
                 }, 500);
+            } else if (remaining === 0 && !gameOver) {
+                gameOver = true;
+                if (onDone) onDone({ won: true, score: score });
             }
-            ghosts.forEach(function (g) {
-                if (g.x === pacman.x && g.y === pacman.y) {
-                    ended = true;
-                    setTimeout(function () {
-                        cleanupInterro();
-                        restoreOverlay();
-                        if (onDone) onDone({ won: false, score: score });
-                    }, 500);
-                }
-            });
+ghosts.forEach(function (g) {
+                 if (g.x === pacman.x && g.y === pacman.y) {
+                     ended = true;
+                     gameOver = true;
+                     setTimeout(function () {
+                         cleanupInterro();
+                         restoreOverlay();
+                         if (onDone) onDone({ won: false, score: score });
+                     }, 500);
+                 }
+             });
             if (PHRASE_TRIGGERS.indexOf(score) !== -1 && score > lastPhraseScore) {
                 lastPhraseScore = score;
                 if (!interroCompleted) tryStartInterrogation();
