@@ -3826,17 +3826,20 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             });
             $.choicesContainer.appendChild(btn);
         });
-        var skipToMinigameBtn = document.createElement('button');
-        skipToMinigameBtn.className = 'btn btn-choice interrogation-skip';
-        skipToMinigameBtn.textContent = lang === 'fr' ? '⏭ Passer au défi' : '⏭ Skip to challenge';
-        skipToMinigameBtn.addEventListener('click', function () {
-            if (!scr.awaitingChoice) return;
-            scr.awaitingChoice = false;
-            $.choicesContainer.innerHTML = '';
-            it.questionsDone = true;
-            scrShowInterroAskButton();
-        });
-        $.choicesContainer.appendChild(skipToMinigameBtn);
+        var interroData = window.TDNarration && window.TDNarration.interrogations ? window.TDNarration.interrogations[it.id] : null;
+        if (interroData && interroData.minigame) {
+            var skipToMinigameBtn = document.createElement('button');
+            skipToMinigameBtn.className = 'btn btn-choice interrogation-skip';
+            skipToMinigameBtn.textContent = lang === 'fr' ? '⏭ Passer au défi' : '⏭ Skip to challenge';
+            skipToMinigameBtn.addEventListener('click', function () {
+                if (!scr.awaitingChoice) return;
+                scr.awaitingChoice = false;
+                $.choicesContainer.innerHTML = '';
+                it.questionsDone = true;
+                scrShowInterroAskButton();
+            });
+            $.choicesContainer.appendChild(skipToMinigameBtn);
+        }
     }
 
     function scrAskInterroQuestion(q) {
@@ -3935,9 +3938,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         'protecteur':    { phase: 'act2_3', pageIdx: 0 },  // Acte 2, Interrogatoires P1 : tir forain
         'femme-fatale':  { phase: 'act1_1', pageIdx: 1 },  // Acte 1, Interrogatoires P2 : échecs
         'seducteur':     { phase: 'act2_3', pageIdx: 2 },  // Acte 2, Interrogatoires P3 : jackpot
-        'suspect':       { phase: 'act2_3', pageIdx: 4 },  // Acte 2, Interrogatoires P5 : sudoku
+        'suspect':       { phase: 'act2_3', pageIdx: 3 },  // Acte 2, Interrogatoires P4 : sudoku
         'marginal':      { phase: 'act1_2', pageIdx: 3 },  // Acte 1, Témoignages P4 : tour de cartes
-        'criminel':      { phase: 'act1_3', pageIdx: 2 }   // Acte 1, Piste du bar P3 : mémoire
+        'criminel':      { phase: 'act2_1', pageIdx: 2 }   // Acte 2, Piste du bar P3 : mémoire
     };
 
     function scrMinigameAllowedHere(interroId) {
