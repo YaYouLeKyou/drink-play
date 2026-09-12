@@ -3294,7 +3294,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     };
 
     function scrEnrichDialogue(txt, page) {
-        if (!txt || txt.indexOf('[ENRICH:clues]') === -1) {
+        if (!txt || txt.indexOf('') === -1) {
             return txt;
         }
         var s = scrGetState();
@@ -3316,7 +3316,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 enrichment = '\n\n"' + hintText + ' (Score: ' + evidenceCount + '/18)"';
             }
         }
-        return txt.replace('[ENRICH:clues]', enrichment);
+        return txt.replace('', enrichment);
     }
 
     function renderScenarioPage() {
