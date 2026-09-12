@@ -8,24 +8,16 @@
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Special+Elite&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../settings-menu.css">
 </head>
 
     <body>
         <!-- ===== HOME / SPLASH SCREEN ===== -->
         <section id="home-screen" class="screen active">
         <header class="mobile-header">
-            <button id="hub-btn" class="btn btn-icon btn-back-to-hub mobile-hub-btn" title="Retour au hub" aria-label="Retour au hub">⌂ Hub</button>
             <div class="home-lang-selector">
                 <button id="lang-en-home" class="lang-btn" title="English">🌍 English</button>
                 <button id="lang-fr-home" class="lang-btn active-lang" title="Français">🌍 Français</button>
-            </div>
-            <button id="home-mobile-settings-toggle" class="btn btn-icon mobile-settings-toggle" type="button" aria-label="Ouvrir les réglages" aria-expanded="false">☰</button>
-            <div class="top-bar-right settings-menu-panel" id="home-settings-panel">
-                <button id="home-music-toggle-btn" class="btn btn-icon" title="Afficher/Masquer la musique" aria-label="Afficher ou masquer le lecteur de musique">
-                    <span class="btn-icon-label">🔇</span> <span class="btn-text-label">Show Music</span>
-                </button>
-                <button id="dev-btn" class="btn btn-dev mobile-dev-btn" title="Dev" aria-label="Dev">⚙ Dev</button>
-                <a href="https://portfolio2026-ss9v.vercel.app/" target="_blank" rel="noopener" class="dev-contact-btn mobile-dev-btn" title="Contacter le développeur">⌨ Contacter le dev</a>
             </div>
         </header>
             <div class="home-content">
@@ -75,17 +67,6 @@
     <!-- ===== THEME SELECTOR SCREEN ===== -->
     <section id="theme-selector-screen" class="screen">
         <div class="theme-selector-header">
-            <button id="theme-settings-toggle" class="btn btn-icon mobile-settings-toggle" type="button" aria-label="Ouvrir les réglages" aria-expanded="false">☰</button>
-            <div class="top-bar-right settings-menu-panel" id="theme-settings-panel">
-                <div class="lang-selector">
-                    <button id="lang-en-theme" class="lang-btn active-lang" title="English">🌍 English</button>
-                    <button id="lang-fr-theme" class="lang-btn" title="Français">🌍 Français</button>
-                </div>
-                <button id="theme-music-toggle-btn" class="btn btn-icon" title="Afficher/Masquer la musique" aria-label="Afficher ou masquer le lecteur de musique">
-                    <span class="btn-icon-label">🔇</span> <span class="btn-text-label">Show Music</span>
-                </button>
-                <button id="theme-back-to-hub-btn" class="btn btn-icon btn-back-to-hub theme-back-btn" title="Retour au hub" aria-label="Retour au hub">⌂ Retour au hub</button>
-            </div>
             <h1>Universes</h1>
                 <p>Choisissez votre univers d'enquête</p>
         </div>
@@ -194,6 +175,11 @@
                         <span class="minigame-select-name" data-i18n-name="Démolition Néon">Breakout</span>
                         <span class="minigame-select-desc" data-i18n-desc="Briques néon">Neon bricks</span>
                     </button>
+                    <button class="minigame-select-card" data-minigame="bataille-navale">
+                        <span class="minigame-select-icon">⚓</span>
+                        <span class="minigame-select-name" data-i18n-name="Bataille navale">Naval Battle</span>
+                        <span class="minigame-select-desc" data-i18n-desc="Coulez la flotte ennemie">Sink the enemy fleet</span>
+                    </button>
                     <button class="minigame-select-card" data-minigame="asteroids">
                         <span class="minigame-select-icon">☄️</span>
                         <span class="minigame-select-name" data-i18n-name="Champ d'astéroïdes">Asteroids</span>
@@ -212,23 +198,6 @@
                 <span class="act-indicator">Act <span id="current-act">1</span> / 3</span>
                 <span class="scene-indicator">Scene <span id="current-scene">1</span></span>
                 <span class="clue-indicator" id="clue-indicator" style="display:none;">🕵️ Clues: <span id="clues-count">0</span></span>
-            </div>
-            <button id="mobile-settings-toggle" class="btn btn-icon mobile-settings-toggle" type="button" aria-label="Ouvrir les réglages" aria-expanded="false">☰</button>
-            <div class="top-bar-right settings-menu-panel" id="settings-menu-panel">
-                <div class="lang-selector" id="lang-selector">
-                    <button id="lang-en" class="lang-btn active-lang" title="English">EN</button>
-                    <button id="lang-fr" class="lang-btn" title="Français">FR</button>
-                </div>
-                <button id="restart-btn" class="btn btn-icon btn-restart" title="Recommencer une histoire" aria-label="Recommencer une histoire"><span class="btn-icon-label">↻</span> <span class="btn-text-label">Restart</span></button>
-                <button id="game-back-to-hub-btn" class="btn btn-icon btn-back-to-hub" title="Retour au hub" aria-label="Retour au hub"><span class="btn-icon-label">⌂</span> <span class="btn-text-label">Hub</span></button>
-                <button id="notebook-btn" class="btn btn-icon" title="Carnet d'enquête" aria-label="Ouvrir le carnet d'enquête"><span class="btn-icon-label">▤</span> <span class="btn-text-label">Notebook</span></button>
-                <button id="voice-btn" class="btn btn-icon" title="Saisie vocale" aria-label="Activer la saisie vocale"><span class="btn-icon-label">◉</span> <span class="btn-text-label">Voice</span></button>
-                <button id="mute-btn" class="btn btn-icon" title="Couper la narration" aria-label="Couper la narration"><span class="btn-icon-label">◒</span> <span class="btn-text-label">Mute</span></button>
-                <button id="volume-btn" class="btn btn-icon" title="Volume de la narration" aria-label="Modifier le volume de la narration"><span class="btn-icon-label">◐</span> <span class="btn-text-label">Volume</span></button>
-                <button id="typing-btn" class="btn btn-icon" title="Son de machine à écrire" aria-label="Activer le son de machine à écrire"><span class="btn-icon-label">⌨</span> <span class="btn-text-label">Typing</span></button>
-                <button id="music-toggle-btn" class="btn btn-icon" title="Masquer/Afficher le lecteur de musique" aria-label="Masquer ou afficher le lecteur de musique"><span class="btn-icon-label">🎵</span> <span class="btn-text-label">Music</span></button>
-                <span class="music-info" id="music-info">🎵 Investigation</span>
-                <span class="narration-timer hidden" id="narration-timer">❱ 30s</span>
             </div>
         </div>
 
@@ -361,18 +330,7 @@
                 </div>
             </div>
             <div class="minigame-topbar-actions">
-                <button id="minigame-settings-toggle" class="btn btn-icon" type="button" aria-label="Ouvrir les réglages" aria-expanded="false">☰</button>
                 <button id="minigame-back-btn" class="btn btn-back" title="Close minigame">✕</button>
-            </div>
-            <div class="top-bar-right settings-menu-panel" id="minigame-settings-panel">
-                <div class="lang-selector">
-                    <button id="lang-en-minigame" class="lang-btn active-lang" title="English">EN</button>
-                    <button id="lang-fr-minigame" class="lang-btn" title="Français">FR</button>
-                </div>
-                <button id="minigame-mute-btn" class="btn btn-icon" title="Couper la narration" aria-label="Couper la narration"><span class="btn-icon-label">◒</span> <span class="btn-text-label">Mute</span></button>
-                <button id="minigame-volume-btn" class="btn btn-icon" title="Volume de la narration" aria-label="Modifier le volume"><span class="btn-icon-label">◐</span> <span class="btn-text-label">Volume</span></button>
-                <button id="minigame-music-toggle-btn" class="btn btn-icon" title="Masquer/Afficher le lecteur de musique" aria-label="Musique"><span class="btn-icon-label">🎵</span> <span class="btn-text-label">Music</span></button>
-                <button id="minigame-fullscreen-btn" class="btn btn-icon" title="Plein écran" aria-label="Plein écran"><span class="btn-icon-label">⛶</span> <span class="btn-text-label">Full</span></button>
             </div>
         </div>
 
@@ -437,8 +395,72 @@
     <script src="space-invaders.js"></script>
     <script src="breakout-game.js"></script>
     <script src="asteroids-game.js"></script>
+    <script src="bataille-navale.js"></script>
     <script src="devmode.js"></script>
     <script src="app.js"></script>
+    <script src="../settings-menu.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            DPSettings.init({
+                currentLang: 'fr',
+                showMusicToggle: true,
+                showMusicVolume: true,
+                showMuteToggle: true,
+                showNarrationVolume: true,
+                showGameSection: true,
+                showBackToHub: true,
+                showRestart: true,
+                showRules: false,
+                customButtons: [
+                    { icon: '📓', label: "Carnet d'enquête", onClick: function (close) { close(); var b = document.getElementById('notebook-btn'); if (!b) { var nb = document.querySelector('[data-notebook]'); if (nb) nb.click(); } else { b.click(); } } },
+                    { icon: '🎤', label: 'Saisie vocale', onClick: function (close) { close(); } },
+                    { icon: '⌨️', label: 'Son machine à écrire', onClick: function (close) { close(); } },
+                    { icon: '⛶', label: 'Plein écran', onClick: function (close) { close(); if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); } }
+                ],
+                onLangChange: function (val) {
+                    var btns = document.querySelectorAll('.lang-btn');
+                    btns.forEach(function (b) {
+                        b.classList.toggle('active-lang', b.getAttribute('title') && (
+                            (val === 'en' && b.getAttribute('title').indexOf('English') >= 0) ||
+                            (val === 'fr' && b.getAttribute('title').indexOf('Français') >= 0)
+                        ));
+                    });
+                    if (window.switchLang) window.switchLang(val);
+                    else if (window.switchLanguage) window.switchLanguage(val);
+                    else if (window.i18n) window.i18n.setLang(val);
+                },
+                onMusicToggle: function (on) {
+                    var player = document.getElementById('dp-music-player');
+                    if (player) {
+                        if (on && player.classList.contains('music-hidden')) player.classList.remove('music-hidden');
+                        else if (!on && !player.classList.contains('music-hidden')) player.classList.add('music-hidden');
+                    }
+                },
+                onMusicVolume: function (val) {
+                    var audio = document.querySelector('#dp-music-player audio');
+                    if (audio) audio.volume = val / 100;
+                },
+                onMuteToggle: function (muted) {
+                    var muteBtn = document.getElementById('mute-btn');
+                    if (muteBtn) muteBtn.click();
+                },
+                onRestart: function () {
+                    var b = document.getElementById('restart-btn');
+                    if (b) b.click();
+                    else if (window.restartStory) window.restartStory();
+                },
+                onBackToHub: function () { window.location.href = '../index.html'; },
+                onDevMode: function () {
+                    if (window.devMode && window.devMode.open) {
+                        window.devMode.open();
+                    } else {
+                        var modal = document.getElementById('dev-modal');
+                        if (modal) modal.classList.add('active');
+                    }
+                }
+            });
+        });
+    </script>
     <script src="../music-player.js"
         data-start="generique.mp3"
         data-tracks="night ride.mp3,true-detective/music true detective/phases/generique.mp3,true-detective/music true detective/phases/recherche.mp3,true-detective/music true detective/phases/enigme.mp3,true-detective/music true detective/phases/tension.mp3,true-detective/music true detective/phases/stress.mp3,true-detective/music true detective/phases/peur.mp3,true-detective/music true detective/phases/mystere flipant.mp3,true-detective/music true detective/phases/reflexion.mp3,true-detective/music true detective/phases/Act III Revelations.mp3,true-detective/music true detective/phases/Rising Tension.mp3,true-detective/music true detective/univers/sherlock.mp3,true-detective/music true detective/univers/noire.mp3,true-detective/music true detective/univers/cyberpunk.mp3,true-detective/music true detective/univers/Midnight Ticking.mp3"
