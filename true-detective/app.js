@@ -3617,8 +3617,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             populateMinigameOverlayChrome(scr.interro ? scr.interro.id : null, mgCfg.title ? (mgCfg.title[ui.language] || mgCfg.title.fr || mgCfg.title.en || 'Mini-jeu') : 'Mini-jeu');
             $.minigameSkipBtn.classList.remove('hidden');
             $.minigameSkipBtn.disabled = false;
-            $.minigameSkipBtn.textContent = ui.language === 'fr' ? 'Passer' : 'Skip';
+            $.minigameSkipBtn.textContent = ui.language === 'fr' ? 'Continuer' : 'Continue';
             $.minigameSkipBtn.onclick = null;
+            window._minigameSkipHandler = onMinigameDone;
 
             var gameMap = getGlobalGameMap();
             var gameNS = gameMap[mgCfg.type];
@@ -3766,7 +3767,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             };
         } else if (interroData && interroData.minigame && scrMinigameAllowedHere(it.id)) {
             // Mode normal uniquement : une seule manche, configuration standard.
-            minigameCfg = scrGetMinigameRoundConfig(it.id, 0);
+            minigameCfg = scrGetMinigameRoundConfig(it.id, it.minigameRound || 0);
         }
 
         if (minigameCfg) {
@@ -4121,7 +4122,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         populateMinigameOverlayChrome(scr.interro ? scr.interro.id : null, cfg.title ? (cfg.title[ui.language] || cfg.title.fr || cfg.title.en || minigameType) : minigameType);
         $.minigameSkipBtn.classList.remove('hidden');
         $.minigameSkipBtn.disabled = false;
-        $.minigameSkipBtn.textContent = ui.language === 'fr' ? 'Passer' : 'Skip';
+        $.minigameSkipBtn.textContent = ui.language === 'fr' ? 'Continuer' : 'Continue';
 
         window._minigameSkipHandler = null;
         var resultAnnounced = false;
@@ -4232,7 +4233,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         }
 
         it.minigameRound = roundIndex + 1;
-        if (it.minigameRound < 3) {
+        if (it.minigameRound < 3 && scrGetMinigameRoundConfig(it.id, it.minigameRound)) {
             scrShowInterroAskButton();
         } else {
             scrEndInterrogation();
