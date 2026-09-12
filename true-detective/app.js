@@ -3927,7 +3927,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             if (s.prochainSuspect) {
                 s.prochainSuspect = null;
             }
-            renderScenarioPage();
+            scrNext();
         };
     }
     // ===== LOCALISATION DES MINI-JEUX D'INTERROGATOIRE =====

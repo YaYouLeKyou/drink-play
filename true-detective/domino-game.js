@@ -51,6 +51,16 @@
             platformW: { 1: 240, 2: 190, 3: 150 },
             friction: { 1: 0.9, 2: 0.75, 3: 0.6 },
             cardW: 55, cardH: 36
+        },
+        'card-castle': {
+            name: { fr: 'Château de cartes', en: 'Card Castle' },
+            desc: { fr: 'Construisez une tour jusqu\'à la barre de hauteur', en: 'Build a tower to reach the height bar' },
+            gravity: { x: 0, y: 1.2 },
+            pieces: { 1: 15, 2: 20, 3: 25 },
+            platformW: { 1: 300, 2: 260, 3: 220 },
+            friction: { 1: 0.9, 2: 0.8, 3: 0.7 },
+            cardW: 50, cardH: 70,
+            targetHeight: 100
         }
     };
 
@@ -110,6 +120,7 @@
         var cardW = vCfg.cardW;
         var cardH = vCfg.cardH;
         var gravity = vCfg.gravity;
+        var targetHeight = (variant === 'card-castle') ? (vCfg.targetHeight || 100) : null;
 
         var piecesPlaced = 0;
         var gameOver = false;
@@ -124,6 +135,7 @@
         var groundY;
         var animFrameId = null;
         var intervalId = null;
+        var autoSpawnInterval = null;
         var dialogueTimer = null;
         var stableTimer = null;
 
@@ -173,7 +185,11 @@
         var infoEl = document.createElement('div');
         infoEl.className = 'domino-info';
         infoEl.style.cssText = 'color:#aaddff;font-family:Montserrat,sans-serif;font-size:0.85em;text-align:center;margin-bottom:6px;';
-        infoEl.textContent = (lang === 'fr' ? 'Pièces : 0/' + totalPieces : 'Pieces: 0/' + totalPieces);
+        if (variant === 'card-castle') {
+            infoEl.textContent = (lang === 'fr' ? 'Atteignez la barre jaune !' : 'Reach the yellow bar!');
+        } else {
+            infoEl.textContent = (lang === 'fr' ? 'Pièces : 0/' + totalPieces : 'Pieces: 0/' + totalPieces);
+        }
         wrap.appendChild(infoEl);
 
         var canvasContainer = document.createElement('div');
@@ -216,6 +232,7 @@
             gameOver = true;
             clearDialogueCycle();
             if (intervalId) { clearInterval(intervalId); intervalId = null; }
+            if (autoSpawnInterval) { clearInterval(autoSpawnInterval); autoSpawnInterval = null; }
             if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
             if (stableTimer) { clearTimeout(stableTimer); stableTimer = null; }
             if (engine && world) {
@@ -395,7 +412,26 @@
                     break;
                 }
             }
-            if (allStable && outOfBounds === 0 && !stableTimer) {
+
+            if (!allStable) return;
+
+            if (variant === 'card-castle') {
+                var reachedHeight = false;
+                for (var k = 0; k < bodies.length; k++) {
+                    var bk = bodies[k];
+                    if (!bk) continue;
+                    if (bk.position.y < targetHeight) {
+                        reachedHeight = true;
+                        break;
+                    }
+                }
+                if (!reachedHeight) {
+                    endGame(false);
+                    return;
+                }
+            }
+
+            if (!stableTimer) {
                 stableTimer = setTimeout(function () {
                     stableTimer = null;
                     endGame(true);
@@ -433,6 +469,21 @@
             }
             for (var gy = 0; gy < ch; gy += 36) {
                 ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(0, ch); ctx.stroke();
+            }
+
+            if (variant === 'card-castle' && typeof targetHeight === 'number') {
+                ctx.strokeStyle = 'rgba(255, 200, 0, 0.7)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([8, 6]);
+                ctx.beginPath();
+                ctx.moveTo(0, targetHeight);
+                ctx.lineTo(cw, targetHeight);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = 'rgba(255, 200, 0, 0.9)';
+                ctx.font = '12px Montserrat,sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(lang === 'fr' ? 'Objectif' : 'Goal', cw - 10, targetHeight - 8);
             }
 
             drawBody(platformBody, platformDrawW, 14, '#141828', 'rgba(0,212,255,0.35)');
@@ -518,6 +569,13 @@
         }
 
         startDialogueCycle();
+        if (variant === 'card-castle') {
+            autoSpawnInterval = setInterval(function () {
+                if (gameOver || piecesPlaced >= totalPieces) return;
+                var x = Math.random() * (cw - 100) + 50;
+                spawnPiece(x, 30);
+            }, 1500);
+        }
         loop();
 
         window._minigameCleanup = cleanup;
