@@ -959,9 +959,8 @@ function showEvidence(h) {
             var dosWrap = document.createElement('div');
             dosWrap.className = 'mg-dos-wrap hidden-dos';
 var dos = document.createElement('img');
-             dos.className = 'mg-item mg-montre-dos';
-             dos.style.display = 'none';  // Hide the second image (was causing display issues)
-             dos.src = 'mini-games/montre/montre-du-duc-dos.png';
+              dos.className = 'mg-item mg-montre-dos';
+              dos.src = 'mini-games/montre/montre-du-duc-dos.png';
              dosWrap.appendChild(dos);
             wrap.appendChild(face);
             wrap.appendChild(dosWrap);

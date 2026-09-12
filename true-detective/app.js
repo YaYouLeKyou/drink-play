@@ -3807,6 +3807,10 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         if (!it) { return; }
         var rounds = scrInterroRounds(window.TDNarration.interrogations[it.id]);
         var qs = rounds[it.questionRound] || [];
+        if (!qs.length) {
+            scrEndInterrogation();
+            return;
+        }
         var lang = ui.language;
         $.dialogueText.textContent = lang === 'fr'
             ? 'Phase ' + (it.questionRound + 1) + '/3, Choisissez votre question :'
