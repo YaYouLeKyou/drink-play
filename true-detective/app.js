@@ -4090,6 +4090,11 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             return;
         }
 
+        if (minigameType === 'chess') {
+            window.location.href = 'chess.html';
+            return;
+        }
+
         var gameMap = getGlobalGameMap();
 
         var gameNS = gameMap[minigameType];
