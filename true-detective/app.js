@@ -532,7 +532,7 @@ function saveSettings() {
                                     if (rp.theme && typeof setThemeId === 'function') { try { setThemeId(rp.theme); } catch (eB) {} }
                                     if (rp.culprit && TDScenario && TDScenario.getState) { try { TDScenario.getState().culprit = rp.culprit; } catch (eC) {} }
                                     scr.active = true; scr.awaitingChoice = false;
-                                    scr.phaseIdx = rp.phaseIdx; scr.pageIdx = rp.pageIdx || 0;
+                                    scr.phaseIdx = rp.phaseIdx; scr.pageIdx = (rp.pageIdx || 0) + 1;
                                     scr.interro = { id: rp.interroId || 'standalone', questionRound: 99, minigameRound: 0, done: false, questionsDone: true, fromDuel: true };
                                     scrEnsureThemeMusic();
                                     if ($.homeScreen) { $.homeScreen.classList.remove('active'); $.homeScreen.classList.add('hidden'); }
