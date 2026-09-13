@@ -399,12 +399,11 @@
                 }
             ],
             minigame: {
-                type: 'domino',
-                variant: 'card-castle',
+                type: 'marginal-tower',
                 difficulty: [
-                    { clue: { fr: "Silas crache le morceau : « J'ai vu Krane dans la ruelle, cette nuit-là. Il avait une clef du manoir. »", en: "Silas spills: \"I saw Krane in the alley that night. He had a manor key.\"" }, failClue: { fr: "Silas se tait : « Krane sait où je dors. Je ne dis rien de plus. »", en: "Silas goes silent: \"Krane knows where I sleep. I'm saying nothing more.\"" },                     rounds: [{ title: { fr: 'Maison de cartes (5)', en: 'Card Tower (5)' } }] },
-                    { clue: { fr: "Silas révèle : « Krane travaille pour Hale. On me paie pour surveiller la ruelle depuis le manoir. »", en: "Silas reveals: \"Krane works for Hale. I'm paid to watch the alley from the manor.\"" }, failClue: { fr: "Silas se dérobe : « Des billets dans ma canette. Je ne sais pas d'où ils viennent. »", en: "Silas dodges: \"Banknotes in my tin can. I don't know where they come from.\"" }, rounds: [{ title: { fr: 'Maison de cartes (8)', en: 'Card Tower (8)' } }] },
-                    { clue: { fr: "Silas dit tout : « J'ai vu Hale donner les clés à Krane. C'est Hale qui a tout organisé. »", en: "Silas tells all: \"I saw Hale give the keys to Krane. Hale organized everything.\"" }, failClue: { fr: "Silas regarde ailleurs : « La pluie efface les heures. Je ne peux pas confirmer l'heure pour personne. »", en: "Silas looks away: \"The rain washes away the hours. I can't confirm the time for anyone.\"" }, rounds: [{ title: { fr: 'Maison de cartes (12)', en: 'Card Tower (12)' } }] }
+                    { clue: { fr: "Silas crache le morceau : « J'ai vu Krane dans la ruelle, cette nuit-là. Il avait une clef du manoir. »", en: "Silas spills: \"I saw Krane in the alley that night. He had a manor key.\"" }, failClue: { fr: "Silas se tait : « Krane sait où je dors. Je ne dis rien de plus. »", en: "Silas goes silent: \"Krane knows where I sleep. I'm saying nothing more.\"" }, rounds: [{ title: { fr: 'Tour de Silas (5)', en: "Silas' Tower (5)" } }] },
+                    { clue: { fr: "Silas révèle : « Krane travaille pour Hale. On me paie pour surveiller la ruelle depuis le manoir. »", en: "Silas reveals: \"Krane works for Hale. I'm paid to watch the alley from the manor.\"" }, failClue: { fr: "Silas se dérobe : « Des billets dans ma canette. Je ne sais pas d'où ils viennent. »", en: "Silas dodges: \"Banknotes in my tin can. I don't know where they come from.\"" }, rounds: [{ title: { fr: 'Tour de Silas (8)', en: "Silas' Tower (8)" } }] },
+                    { clue: { fr: "Silas dit tout : « J'ai vu Hale donner les clés à Krane. C'est Hale qui a tout organisé. »", en: "Silas tells all: \"I saw Hale give the keys to Krane. Hale organized everything.\"" }, failClue: { fr: "Silas regarde ailleurs : « La pluie efface les heures. Je ne peux pas confirmer l'heure pour personne. »", en: "Silas looks away: \"The rain washes away the hours. I can't confirm the time for anyone.\"" }, rounds: [{ title: { fr: 'Tour de Silas (12)', en: "Silas' Tower (12)" } }] }
                 ]
             }
         },

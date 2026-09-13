@@ -319,6 +319,7 @@
         var victoryBtn = document.getElementById('victory-continue-btn');
         if (victoryBtn) {
             victoryBtn.addEventListener('click', function() {
+                try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: true, ts: Date.now() })); } catch (e) {}
                 cleanup();
                 window.location.href = '../true-detective/index.html?marginalTower=complete';
             });
@@ -334,6 +335,7 @@
         var defeatContinueBtn = document.getElementById('defeat-continue-btn');
         if (defeatContinueBtn) {
             defeatContinueBtn.addEventListener('click', function() {
+                try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: false, ts: Date.now() })); } catch (e) {}
                 cleanup();
                 window.location.href = '../true-detective/index.html?marginalTower=complete';
             });

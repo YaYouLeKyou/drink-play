@@ -453,6 +453,64 @@ function saveSettings() {
         renderThemeCards();
         checkSavedGame();
         setupEventListeners();
+        /* Retour duel standalone (?chess=won|l ost) : saute l'accueil, restaure la phase et consomme le resultat. */
+        try {
+            var qs = new URLSearchParams(window.location.search);
+            var chessFlag = qs.get('chess');
+            var retRaw = localStorage.getItem('td_echecs_duel_return');
+            if ((chessFlag === 'won' || chessFlag === 'lost') && retRaw) {
+                var rp0 = JSON.parse(retRaw);
+                localStorage.removeItem('td_echecs_duel_return');
+                if (rp0 && typeof rp0.phaseIdx === 'number') {
+                    if (rp0.lang === 'en' || rp0.lang === 'fr') { ui.language = rp0.lang; try { if (TDScenario && TDScenario.getState) TDScenario.getState().lang = rp0.lang; } catch (eA) {} }
+                    if (rp0.theme && typeof setThemeId === 'function') { try { setThemeId(rp0.theme); } catch (eB) {} }
+                    if (rp0.culprit && TDScenario && TDScenario.getState) { try { TDScenario.getState().culprit = rp0.culprit; } catch (eC) {} }
+                    scr.active = true; scr.awaitingChoice = false;
+                    scr.phaseIdx = rp0.phaseIdx; scr.pageIdx = rp0.pageIdx || 0;
+                    scr.interro = { id: rp0.interroId || 'femme-fatale', questionRound: 99, minigameRound: 0, done: false, questionsDone: true, fromDuel: true };
+                    if (window.history && window.history.replaceState) window.history.replaceState({}, '', window.location.pathname);
+                    scrEnsureThemeMusic();
+                    if ($.homeScreen) { $.homeScreen.classList.remove('active'); $.homeScreen.classList.add('hidden'); }
+                    if ($.themeScreen) { $.themeScreen.classList.remove('active'); $.themeScreen.classList.add('hidden'); }
+                    if ($.gameScreen) { $.gameScreen.classList.remove('hidden'); $.gameScreen.classList.add('active'); }
+                    if ($.endScreen) { $.endScreen.classList.add('hidden'); $.endScreen.classList.remove('active'); }
+                    hideLoading();
+                    updateLanguageUI(); updateLanguageButtons();
+                    animateDots();
+                    renderScenarioPage();
+                    return;
+                }
+            }
+        } catch (e) {}
+        /* Retour tour de Silas standalone (?marginalTower=complete) : restaure la phase et consomme le resultat. */
+        try {
+            var qs2 = new URLSearchParams(window.location.search);
+            var towerFlag = qs2.get('marginalTower');
+            var towerRaw = localStorage.getItem('td_marginal_tower_return');
+            if (towerFlag === 'complete' && towerRaw) {
+                var rpT = JSON.parse(towerRaw);
+                localStorage.removeItem('td_marginal_tower_return');
+                if (rpT && typeof rpT.phaseIdx === 'number') {
+                    if (rpT.lang === 'en' || rpT.lang === 'fr') { ui.language = rpT.lang; try { if (TDScenario && TDScenario.getState) TDScenario.getState().lang = rpT.lang; } catch (eA) {} }
+                    if (rpT.theme && typeof setThemeId === 'function') { try { setThemeId(rpT.theme); } catch (eB) {} }
+                    if (rpT.culprit && TDScenario && TDScenario.getState) { try { TDScenario.getState().culprit = rpT.culprit; } catch (eC) {} }
+                    scr.active = true; scr.awaitingChoice = false;
+                    scr.phaseIdx = rpT.phaseIdx; scr.pageIdx = rpT.pageIdx || 0;
+                    scr.interro = { id: rpT.interroId || 'marginal', questionRound: 99, minigameRound: 0, done: false, questionsDone: true, fromDuel: true };
+                    if (window.history && window.history.replaceState) window.history.replaceState({}, '', window.location.pathname);
+                    scrEnsureThemeMusic();
+                    if ($.homeScreen) { $.homeScreen.classList.remove('active'); $.homeScreen.classList.add('hidden'); }
+                    if ($.themeScreen) { $.themeScreen.classList.remove('active'); $.themeScreen.classList.add('hidden'); }
+                    if ($.gameScreen) { $.gameScreen.classList.remove('hidden'); $.gameScreen.classList.add('active'); }
+                    if ($.endScreen) { $.endScreen.classList.add('hidden'); $.endScreen.classList.remove('active'); }
+                    hideLoading();
+                    updateLanguageUI(); updateLanguageButtons();
+                    animateDots();
+                    renderScenarioPage();
+                    return;
+                }
+            }
+        } catch (e) {}
         updateVolumeButton();
         updateTypingSoundButton();
         // Initialize orientation from saved settings
@@ -3275,7 +3333,25 @@ applyMusicHidden(true);
 function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
 
     function startScenarioGame() {
-        scrResetState();
+        /* Retour du duel standalone : NE PAS reset, restaure la phase exacte. */
+        var restored = false;
+        try {
+            var ret = localStorage.getItem('td_echecs_duel_return');
+            if (ret) {
+                var rp = JSON.parse(ret);
+                localStorage.removeItem('td_echecs_duel_return');
+                if (rp && typeof rp.phaseIdx === 'number') {
+                    restored = true;
+                    if (rp.lang) { ui.language = rp.lang; try { if (TDScenario && TDScenario.getState) TDScenario.getState().lang = rp.lang; } catch (e) {} }
+                    if (rp.theme && typeof setThemeId === 'function') { try { setThemeId(rp.theme); } catch (e2) {} }
+                    if (rp.culprit && TDScenario && TDScenario.getState) { try { TDScenario.getState().culprit = rp.culprit; } catch (e3) {} }
+                    scr.active = true; scr.awaitingChoice = false;
+                    scr.phaseIdx = rp.phaseIdx; scr.pageIdx = rp.pageIdx || 0;
+                    scr.interro = { id: rp.interroId || 'femme-fatale', questionRound: 99, minigameRound: 0, done: false, questionsDone: true, fromDuel: true };
+                }
+            }
+        } catch (e) {}
+        if (!restored) scrResetState();
         scrEnsureThemeMusic();
         $.themeScreen.classList.add('hidden');
         $.gameScreen.classList.remove('hidden');
@@ -3413,6 +3489,14 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 interroId = s2.prochainSuspect || 'suspect';
             }
             var alreadyDone = scr.interro && scr.interro.done && scr.interro.id === interroId;
+            /* Retour du duel standalone : consomme le resultat puis reprend l'histoire. */
+            if (scr.interro && scr.interro.fromDuel && scr.interro.id === interroId) {
+                scr.interro.fromDuel = false;
+                if (scrCheckChessReturn()) return;
+                if (scrCheckMarginalTowerReturn()) return;
+                scrShowInterroAskButton();
+                return;
+            }
             if (!alreadyDone) {
                 scrStartInterrogation(page);
             } else {
@@ -3713,6 +3797,106 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         scrShowInterroAskButton();
     }
 
+    function scrChessRedirect(it, minigameCfg) {
+        var lang = ui.language || 'fr';
+        var themeId = (typeof getThemeId === 'function' ? getThemeId() : null) || 'agatha-christie';
+        var diff = (minigameCfg && minigameCfg.difficulty) || 'medium';
+        var cfg = { type: 'chess-duel', lang: lang, theme: themeId, difficulty: diff, interroId: (it && it.id) || 'femme-fatale' };
+        try {
+            var clue = minigameCfg && minigameCfg.clue ? (minigameCfg.clue[lang] || minigameCfg.clue.fr || minigameCfg.clue.en || '') : '';
+            var fail = minigameCfg && minigameCfg.failClue ? (minigameCfg.failClue[lang] || minigameCfg.failClue.fr || minigameCfg.failClue.en || '') : '';
+            if (clue) cfg.clueWin = clue;
+            if (fail) cfg.clueLose = fail;
+            localStorage.setItem('td_echecs_duel_cfg', JSON.stringify(cfg));
+            /* Sauvegarde du point exact de reprise (probleme actuel : reset au debut). */
+            var rp = { phaseIdx: scr.phaseIdx, pageIdx: scr.pageIdx, interroId: (it && it.id) || 'femme-fatale', questionRound: (it && it.questionRound) || 0, lang: lang, theme: themeId, culprit: null, ts: Date.now() };
+            try { var st0 = scrGetState(); if (st0) rp.culprit = st0.culprit || null; } catch (e0) {}
+            localStorage.setItem('td_echecs_duel_return', JSON.stringify(rp));
+        } catch (e) {}
+        scr.awaitingChoice = false;
+        $.choicesContainer.innerHTML = '';
+        /* Pont narratif : l'interrogatoire se termine sur le defi, le bouton Continuer mene au duel standalone. */
+        $.dialogueText.textContent = lang === 'fr'
+            ? 'Vivienne renverse son the, fait glisser l\u2019echiquier du manoir entre vous deux : \u00ab Les mots m\u2019ennuient, inspecteur. Jouons. \u00bb Appuyez sur Continuer pour entrer dans le salon et disputer le duel.'
+            : 'Vivienne spills her tea and slides the manor chessboard between you: "Words bore me, inspector. Let us play." Press Continue to enter the lounge and play the duel.';
+        if ($.typeCursor) $.typeCursor.classList.add('hidden');
+        $.continueBtn.classList.remove('hidden');
+        $.continueBtn.disabled = false;
+        $.continueBtn.textContent = getText('continue') || 'Continuer';
+        $.continueBtn.onclick = function () {
+            var q = 'lang=' + lang + '&theme=' + themeId + '&difficulty=' + diff;
+            window.location.href = 'echecs-duel.html?' + q;
+        };
+    }
+
+    function scrCheckChessReturn() {
+        var res = null;
+        try { var raw = localStorage.getItem('td_echecs_duel_result'); if (raw) res = JSON.parse(raw); } catch (e) {}
+        if (!res || !res.ts) return false;
+        if (Date.now() - res.ts > 1000 * 60 * 60 * 6) return false;
+        if (res.consumed) return false;
+        try { res.consumed = true; localStorage.setItem('td_echecs_duel_result', JSON.stringify(res)); } catch (e2) {}
+        var it = scr.interro;
+        if (!it || it.id !== 'femme-fatale') return false;
+        if (it.minigameRoundConsumed) return false;
+        it.minigameRoundConsumed = true;
+        it.questionsDone = true;
+        scrHandleMinigameResult(0, { won: !!res.won, clue: res.clue });
+        return true;
+    }
+
+    function scrMarginalTowerRedirect(it, minigameCfg) {
+        var lang = ui.language || 'fr';
+        var themeId = (typeof getThemeId === 'function' ? getThemeId() : null) || 'agatha-christie';
+        var diffIdx = (minigameCfg && minigameCfg.difficulty) ? 0 : 0;
+        var diff = diffIdx + 1;
+        try {
+            var rp = { phaseIdx: scr.phaseIdx, pageIdx: scr.pageIdx, interroId: (it && it.id) || 'marginal', questionRound: (it && it.questionRound) || 0, lang: lang, theme: themeId, culprit: null, ts: Date.now() };
+            try { var st0 = scrGetState(); if (st0) rp.culprit = st0.culprit || null; } catch (e0) {}
+            localStorage.setItem('td_marginal_tower_return', JSON.stringify(rp));
+        } catch (e) {}
+        scr.awaitingChoice = false;
+        $.choicesContainer.innerHTML = '';
+        if (scr.interro) { scr.interro.fromDuel = true; scr.interro.done = false; }
+        $.dialogueText.textContent = lang === 'fr'
+            ? 'Silas vous regarde, puis désigne la ruelle : « Construis-moi une tour, inspecteur. Si elle tient, je te dis ce que j\u2019ai vu. » Appuyez sur Continuer pour relever le défi.'
+            : 'Silas looks at you, then points to the alley: "Build me a tower, inspector. If it stands, I\'ll tell you what I saw." Press Continue to take the challenge.';
+        if ($.typeCursor) $.typeCursor.classList.add('hidden');
+        $.continueBtn.classList.remove('hidden');
+        $.continueBtn.disabled = false;
+        $.continueBtn.textContent = getText('continue') || 'Continuer';
+        $.continueBtn.onclick = function () {
+            window.location.href = 'marginal-tower.html?difficulty=' + diff + '&lang=' + lang;
+        };
+    }
+
+    function scrCheckMarginalTowerReturn() {
+        var res = null;
+        try { var raw = localStorage.getItem('td_marginal_tower_result'); if (raw) res = JSON.parse(raw); } catch (e) {}
+        if (!res || !res.ts) return false;
+        if (Date.now() - res.ts > 1000 * 60 * 60 * 6) return false;
+        if (res.consumed) return false;
+        try { res.consumed = true; localStorage.setItem('td_marginal_tower_result', JSON.stringify(res)); } catch (e2) {}
+        var it = scr.interro;
+        if (!it || it.id !== 'marginal') return false;
+        if (it.minigameRoundConsumed) return false;
+        it.minigameRoundConsumed = true;
+        it.questionsDone = true;
+        var mgCfg = null;
+        if (it.pendingMinigameCfg) {
+            mgCfg = it.pendingMinigameCfg;
+        } else {
+            var interroData = window.TDNarration && window.TDNarration.interrogations ? window.TDNarration.interrogations[it.id] : null;
+            mgCfg = interroData ? scrGetMinigameRoundConfig(it.id, 0) : null;
+        }
+        if (!mgCfg) mgCfg = { clue: { fr: '', en: '' }, failClue: { fr: '', en: '' } };
+        var clueText = res.won
+            ? (mgCfg.clue && (mgCfg.clue[ui.language] || mgCfg.clue.fr || mgCfg.clue.en || ''))
+            : (mgCfg.failClue && (mgCfg.failClue[ui.language] || mgCfg.failClue.fr || mgCfg.failClue.en || ''));
+        scrHandleMinigameResult(0, { won: !!res.won, clue: clueText });
+        return true;
+    }
+
     function scrShowInterroAskButton() {
         var lang = ui.language;
         var it = scr.interro;
@@ -3771,6 +3955,16 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         }
 
         if (minigameCfg) {
+            /* Duel d'echecs femme-fatale : page standalone (plus de fenetre overlay). */
+            if (minigameCfg.type === 'chess') {
+                scrChessRedirect(it, minigameCfg);
+                return;
+            }
+            /* Tour de Silas (marginal) : page standalone. */
+            if (minigameCfg.type === 'marginal-tower') {
+                scrMarginalTowerRedirect(it, minigameCfg);
+                return;
+            }
             scr.awaitingChoice = true;
             $.choicesContainer.innerHTML = '';
             it.pendingMinigameCfg = minigameCfg;
@@ -3978,8 +4172,6 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             cfg.winThreshold = roundCfg.winThreshold;
             cfg.title = roundCfg.title;
             if (roundCfg.dialogues) cfg.dialogues = roundCfg.dialogues;
-        } else if (mgType === 'domino') {
-            cfg.title = roundCfg.title;
         } else if (mgType === 'pong' || mgType === 'pacman' || mgType === 'space-invaders' || mgType === 'breakout' || mgType === 'asteroids' || mgType === 'shooting' || mgType === 'shooting-gallery') {
             cfg.title = roundCfg.title;
         }
@@ -4049,7 +4241,6 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             cryptogramme: 'TDMiniGames',
             confrontation_ultime: 'TDMiniGames',
             jackpot: 'TDMiniGames',
-            domino: 'TDDominoGame',
             puzzle: 'TDPuzzleGame',
             reseau_alibis: 'TDMiniGames',
             shooting: 'TDShootingGallery',
@@ -4103,8 +4294,6 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         } else if (minigameType === 'jackpot') {
             cfg.spins = 6;
             cfg.title = { fr: 'Jackpot', en: 'Jackpot' };
-        } else if (minigameType === 'domino') {
-            cfg.title = { fr: 'Tour de cartes', en: 'Card Tower' };
         } else if (minigameType === 'reseau_alibis') {
             cfg.title = { fr: 'Réseau d\'alibis', en: 'Alibi Network' };
         } else if (minigameType === 'puzzle') {
@@ -4227,9 +4416,11 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         if (!it) return;
 
         var won = result && result.won;
-        var clueText = won
-            ? (itl(scrGetMinigameRoundConfig(it.id, roundIndex).clue) || '')
-            : (itl(scrGetMinigameRoundConfig(it.id, roundIndex).failClue) || '');
+        var cfgNow = scrGetMinigameRoundConfig(it.id, roundIndex);
+        /* Le duel standalone transmet son indice via result.clue (pont scenario). */
+        var clueText = (result && result.clue) ? result.clue : (won
+            ? (itl(cfgNow.clue) || '')
+            : (itl(cfgNow.failClue) || ''));
 
         if (clueText) {
             var s = scrGetState();
