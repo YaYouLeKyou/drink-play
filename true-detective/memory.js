@@ -201,8 +201,6 @@
 
         for (var i = 0; i < cards.length; i++) {
             var cardData = cards[i];
-            var isFlipped = false;
-            var isMatched = false;
 
             var card = document.createElement('div');
             card.className = 'memory-card';
@@ -245,12 +243,12 @@
             (function (idx, cardEl, data) {
                 cardEl.addEventListener('click', function () {
                     if (locked || gameWon) return;
-                    if (isFlipped || isMatched) return;
-
-                    isFlipped = true;
-                    cardEl.classList.add('flipped');
+                    if (flipped.indexOf(idx) !== -1) return;
+                    if (matched.indexOf(idx) !== -1) return;
 
                     flipped.push(idx);
+                    cardEl.classList.add('flipped');
+
                     if (flipped.length === 2) {
                         locked = true;
                         var idx1 = flipped[0];
@@ -265,7 +263,6 @@
 
                         if (card1.suspectId === card2.suspectId) {
                             matched.push(idx1, idx2);
-                            isMatched = true;
                             var otherIdx = idx1 === idx ? idx2 : idx1;
                             var otherCard = $grid.querySelector('[data-index="' + otherIdx + '"]');
                             if (otherCard) {

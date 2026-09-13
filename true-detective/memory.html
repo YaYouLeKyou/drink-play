@@ -65,7 +65,7 @@
             justify-content: center;
             font-size: 2rem;
             position: relative;
-            transition: transform 0.2s ease, border-color 0.2s ease;
+            transition: transform 0.25s ease, border-color 0.2s ease;
             transform-style: preserve-3d;
             min-height: 70px;
         }
@@ -74,6 +74,7 @@
             transform: translateY(-2px);
         }
         .memory-card.flipped {
+            transform: rotateY(180deg);
             background: #0a0a1a;
             border-color: #ff00ff;
         }
@@ -97,11 +98,13 @@
             color: #00d4ff;
             font-size: 1.5rem;
             font-weight: 700;
+            transform: rotateY(0deg);
         }
         .memory-card-back {
             flex-direction: column;
             gap: 4px;
             padding: 4px;
+            transform: rotateY(180deg);
         }
         .memory-card-img {
             max-width: 100%;

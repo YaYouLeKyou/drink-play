@@ -611,7 +611,6 @@
                                     if (el2) el2.classList.remove('flipped');
                                     flipped = [];
                                     locked = false;
-                                    renderCards();
                                 }, 800);
                             }
                         }
