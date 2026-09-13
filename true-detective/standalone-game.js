@@ -172,7 +172,7 @@
     }
 
     function loadSceneFouille() {
-        if (!global.TDMiniGames || !global.TDMiniGames.builders || !global.TDMiniGames.builders['scene_fouille']) {
+        if (!global.TDMiniGames || !global.TDMiniGames.createBuilder) {
             showPlaceholder();
             return;
         }
@@ -197,16 +197,23 @@
             ]
         };
         try {
-            var builder = global.TDMiniGames.builders['scene_fouille'];
-            var wrap = builder(cfg);
-            $content.appendChild(wrap);
+            var builder = global.TDMiniGames.createBuilder(cfg, lang, function (result) {
+                if (result && result.won) {
+                    showVictory(cfg.clue);
+                } else {
+                    showDefeat(cfg.clue);
+                }
+            }, function () {
+                // hint
+            })['scene_fouille'];
+            var wrap = builder($content);
         } catch (e) {
             showPlaceholder();
         }
     }
 
     function loadReseauAlibis() {
-        if (!global.TDMiniGames || !global.TDMiniGames.builders || !global.TDMiniGames.builders['reseau_alibis']) {
+        if (!global.TDMiniGames || !global.TDMiniGames.createBuilder) {
             showPlaceholder();
             return;
         }
@@ -225,16 +232,23 @@
             ]
         };
         try {
-            var builder = global.TDMiniGames.builders['reseau_alibis'];
-            var wrap = builder(cfg);
-            $content.appendChild(wrap);
+            var builder = global.TDMiniGames.createBuilder(cfg, lang, function (result) {
+                if (result && result.won) {
+                    showVictory(cfg.clue);
+                } else {
+                    showDefeat(cfg.clue);
+                }
+            }, function () {
+                // hint
+            })['reseau_alibis'];
+            var wrap = builder($content);
         } catch (e) {
             showPlaceholder();
         }
     }
 
     function loadCryptogramme() {
-        if (!global.TDMiniGames || !global.TDMiniGames.builders || !global.TDMiniGames.builders['cryptogramme']) {
+        if (!global.TDMiniGames || !global.TDMiniGames.createBuilder) {
             showPlaceholder();
             return;
         }
@@ -247,16 +261,23 @@
             clue: { fr: 'HALE ENGAGE KRANE', en: 'HALE HIRES KRANE' }
         };
         try {
-            var builder = global.TDMiniGames.builders['cryptogramme'];
-            var wrap = builder(cfg);
-            $content.appendChild(wrap);
+            var builder = global.TDMiniGames.createBuilder(cfg, lang, function (result) {
+                if (result && result.won) {
+                    showVictory(cfg.clue);
+                } else {
+                    showDefeat(cfg.clue);
+                }
+            }, function () {
+                // hint
+            })['cryptogramme'];
+            var wrap = builder($content);
         } catch (e) {
             showPlaceholder();
         }
     }
 
     function loadCoffreCode() {
-        if (!global.TDMiniGames || !global.TDMiniGames.builders || !global.TDMiniGames.builders['coffre_code']) {
+        if (!global.TDMiniGames || !global.TDMiniGames.createBuilder) {
             showPlaceholder();
             return;
         }
@@ -269,9 +290,16 @@
             clue: { fr: 'Le code est 1981.', en: 'The code is 1981.' }
         };
         try {
-            var builder = global.TDMiniGames.builders['coffre_code'];
-            var wrap = builder(cfg);
-            $content.appendChild(wrap);
+            var builder = global.TDMiniGames.createBuilder(cfg, lang, function (result) {
+                if (result && result.won) {
+                    showVictory(cfg.clue);
+                } else {
+                    showDefeat(cfg.clue);
+                }
+            }, function () {
+                // hint
+            })['coffre_code'];
+            var wrap = builder($content);
         } catch (e) {
             showPlaceholder();
         }
@@ -416,6 +444,43 @@
         currentGame = null;
         gameResult = null;
     }
+
+    function setSuspectChrome(options) {
+        options = options || {};
+        var $chrome = document.getElementById('suspect-chrome');
+        var $portrait = document.getElementById('suspect-portrait');
+        var $name = document.getElementById('suspect-name');
+        var $dialogue = document.getElementById('suspect-dialogue');
+        if ($chrome) {
+            if (options.hidden) {
+                $chrome.classList.add('hidden');
+            } else {
+                $chrome.classList.remove('hidden');
+            }
+        }
+        if ($portrait && options.portrait) {
+            $portrait.src = options.portrait;
+            $portrait.alt = options.name || '';
+        }
+        if ($name && options.name) {
+            $name.textContent = options.name;
+        }
+        if ($dialogue && options.dialogue) {
+            $dialogue.textContent = options.dialogue;
+        }
+        if (options.background && $chrome) {
+            $chrome.style.backgroundImage = 'url(' + options.background + ')';
+            $chrome.style.backgroundSize = 'cover';
+            $chrome.style.backgroundPosition = 'center';
+        }
+    }
+
+    global.TDStandaloneGame = {
+        setSuspectChrome: setSuspectChrome,
+        cleanup: cleanup,
+        showVictory: showVictory,
+        showDefeat: showDefeat
+    };
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);

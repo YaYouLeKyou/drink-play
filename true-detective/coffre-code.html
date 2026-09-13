@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>True Detective - Le Coffre-fort</title>
+    <link rel="icon" href="../icon/Logo%20d%26p.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="standalone-game.css">
+    <style>
+        .coffre-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .coffre-safe {
+            width: 300px;
+            height: 280px;
+            background: linear-gradient(180deg, #3a2f2a, #2a1f1a);
+            border-radius: 16px;
+            border: 6px solid #5c3a21;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            position: relative;
+        }
+        .coffre-door {
+            width: 220px;
+            height: 180px;
+            background: linear-gradient(180deg, #4a3f3a, #3a2f2a);
+            border-radius: 12px;
+            border: 3px solid #8b6914;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .coffre-dial {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #5c3a21, #3a2f2a);
+            border: 4px solid #8b6914;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        .coffre-dial-marker {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 35px;
+            background: #ffd600;
+            transform-origin: bottom center;
+            transform: translate(-50%, -100%);
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(255, 214, 0, 0.6);
+        }
+        .coffre-dial-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #8b6914;
+            border: 2px solid #5c3a21;
+        }
+        .coffre-display {
+            width: 120px;
+            height: 40px;
+            background: #0a0a0a;
+            border: 2px solid #333;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Special Elite', monospace;
+            font-size: 1.5rem;
+            color: #00ff00;
+            text-shadow: 0 0 8px rgba(0, 255, 0, 0.6);
+            letter-spacing: 0.3em;
+        }
+        .coffre-handle {
+            width: 40px;
+            height: 20px;
+            background: #8b6914;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .coffre-handle:hover {
+            background: #ffd600;
+            box-shadow: 0 0 12px rgba(255, 214, 0, 0.5);
+        }
+        .coffre-hint {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 400px;
+            line-height: 1.5;
+        }
+        .coffre-btn {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: rgba(0, 212, 255, 0.15);
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            color: #00d4ff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .coffre-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <header class="sg-header" style="position:relative;">
+        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
+        <h2 class="sg-title" style="color:#00d4ff;font-family:'Playfair Display',serif;">Le Coffre-fort</h2>
+        <button id="continue-btn" class="btn btn-primary always-active">Continuer</button>
+    </header>
+    <nav id="hamburger-menu" class="sg-menu">
+        <button class="sg-menu-item" id="menu-back">
+            <span class="menu-icon">←</span>
+            <span>Retour à l'enquête</span>
+        </button>
+        <button class="sg-menu-item" id="menu-home">
+            <span class="menu-icon">🏠</span>
+            <span>Menu principal</span>
+        </button>
+        <div class="sg-menu-divider"></div>
+        <button class="sg-menu-item" id="menu-continue">
+            <span class="menu-icon">▶</span>
+            <span>Continuer</span>
+        </button>
+    </nav>
+    <main class="sg-main">
+        <div class="coffre-wrap">
+            <div class="coffre-safe">
+                <div class="coffre-door">
+                    <div class="coffre-display" id="code-display">----</div>
+                    <div class="coffre-dial" id="dial">
+                        <div class="coffre-dial-marker" id="dial-marker"></div>
+                        <div class="coffre-dial-center"></div>
+                    </div>
+                    <div class="coffre-handle" id="handle"></div>
+                </div>
+            </div>
+            <div class="coffre-hint">
+                Faites tourner le cadran pour trouver le bon code. Le cadran affiche le chiffre actuel.
+            </div>
+            <button class="coffre-btn" id="validate-safe">Ouvrir</button>
+        </div>
+    </main>
+
+    <script src="minigames.js"></script>
+    <script>
+        (function () {
+            'use strict';
+            var CODE = '1981';
+            var currentCode = '----';
+            var dialValue = 0;
+            var $dial, $marker, $display;
+
+            function init() {
+                $dial = document.getElementById('dial');
+                $marker = document.getElementById('dial-marker');
+                $display = document.getElementById('code-display');
+
+                if ($dial) {
+                    $dial.addEventListener('click', function () {
+                        dialValue = (dialValue + 1) % 10;
+                        updateDial();
+                    });
+                }
+
+                var validateBtn = document.getElementById('validate-safe');
+                if (validateBtn) {
+                    validateBtn.addEventListener('click', function () {
+                        if (currentCode === CODE) {
+                            try {
+                                localStorage.setItem('td_standalone_game_result', JSON.stringify({
+                                    type: 'coffre_code',
+                                    won: true,
+                                    ts: Date.now()
+                                }));
+                            } catch (e) {}
+                            window.location.href = '../true-detective/index.html?standalone=coffre_code';
+                        } else {
+                            if ($display) {
+                                $display.style.color = '#ff006e';
+                                $display.style.textShadow = '0 0 8px rgba(255, 0, 110, 0.6)';
+                                setTimeout(function () {
+                                    $display.style.color = '#00ff00';
+                                    $display.style.textShadow = '0 0 8px rgba(0, 255, 0, 0.6)';
+                                }, 800);
+                            }
+                        }
+                    });
+                }
+
+                setupControls();
+            }
+
+            function updateDial() {
+                if ($marker) {
+                    $marker.style.transform = 'translate(-50%, -100%) rotate(' + (dialValue * 36) + 'deg)';
+                }
+                currentCode = currentCode.substring(1) + dialValue;
+                if ($display) {
+                    $display.textContent = currentCode;
+                }
+            }
+
+            function setupControls() {
+                var hamburgerBtn = document.getElementById('hamburger-btn');
+                var menu = document.getElementById('hamburger-menu');
+                if (hamburgerBtn && menu) {
+                    hamburgerBtn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        menu.classList.toggle('open');
+                    });
+                    document.addEventListener('click', function (e) {
+                        if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
+                            menu.classList.remove('open');
+                        }
+                    });
+                }
+                var menuBack = document.getElementById('menu-back');
+                if (menuBack) {
+                    menuBack.addEventListener('click', function () {
+                        if (menu) menu.classList.remove('open');
+                        window.location.href = '../true-detective/index.html';
+                    });
+                }
+                var menuHome = document.getElementById('menu-home');
+                if (menuHome) {
+                    menuHome.addEventListener('click', function () {
+                        if (menu) menu.classList.remove('open');
+                        window.location.href = '../true-detective/index.html';
+                    });
+                }
+                var menuContinue = document.getElementById('menu-continue');
+                if (menuContinue) {
+                    menuContinue.addEventListener('click', function () {
+                        if (menu) menu.classList.remove('open');
+                        window.location.href = '../true-detective/index.html';
+                    });
+                }
+                var continueBtn = document.getElementById('continue-btn');
+                if (continueBtn) {
+                    continueBtn.addEventListener('click', function () {
+                        window.location.href = '../true-detective/index.html';
+                    });
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+</html>

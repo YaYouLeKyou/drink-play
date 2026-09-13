@@ -201,14 +201,9 @@
                         }
                         if (page.interrogation && window.TDNarration && window.TDNarration.interrogations) {
                             var interro = window.TDNarration.interrogations[page.interrogation];
-                            // Liste des pages interrogatoires ayant un mini-jeu (standalone)
-                            var interroMinigamePages = {
-                                'femme-fatale': { phase: 'act1_1', pageIdx: 1 },  // Acte 1, P2 : échecs
-                                'seducteur':   { phase: 'act2_3', pageIdx: 2 }   // Acte 2, P3 : jackpot
-                            };
                             var hasMinigameHere = false;
-                            if (interroMinigamePages[page.interrogation]) {
-                                var loc = interroMinigamePages[page.interrogation];
+                            if (typeof window.MINIGAME_LOCATIONS === 'object' && window.MINIGAME_LOCATIONS[page.interrogation]) {
+                                var loc = window.MINIGAME_LOCATIONS[page.interrogation];
                                 if (loc.phase === phase.id && loc.pageIdx === pageIdx) {
                                     hasMinigameHere = true;
                                 }

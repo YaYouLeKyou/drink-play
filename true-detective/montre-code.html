@@ -2,86 +2,351 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>True Detective - La Montre du Duc</title>
     <link rel="icon" href="../icon/Logo%20d%26p.png">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Special+Elite&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="montre-code.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="standalone-game.css">
+    <style>
+        .montre-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .montre-watch {
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #2a1f1a, #1a1210);
+            border: 8px solid #5c3a21;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 2px 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .montre-face {
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, #f5f0e6, #e8dcc8);
+            border: 3px solid #8b6914;
+            position: relative;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .montre-hands {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+        }
+        .montre-hand {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 4px;
+        }
+        .montre-hour {
+            width: 6px;
+            height: 60px;
+            background: #2a1f1a;
+            margin-left: -3px;
+        }
+        .montre-minute {
+            width: 4px;
+            height: 80px;
+            background: #2a1f1a;
+            margin-left: -2px;
+        }
+        .montre-second {
+            width: 2px;
+            height: 90px;
+            background: #c41e3a;
+            margin-left: -1px;
+        }
+        .montre-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #5c3a21;
+            border: 2px solid #8b6914;
+            z-index: 5;
+        }
+        .montre-markers {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .montre-marker {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #5c3a21;
+        }
+        .montre-engraving {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Special Elite', cursive;
+            font-size: 0.85rem;
+            color: #8b6914;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 4px 12px;
+            border-radius: 4px;
+            letter-spacing: 0.15em;
+        }
+        .montre-code-input {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .montre-digit {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            background: var(--bg-panel);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--neon-cyan);
+            caret-color: var(--neon-cyan);
+        }
+        .montre-btn {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: rgba(0, 212, 255, 0.15);
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            color: #00d4ff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .montre-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+        .montre-hint {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 400px;
+            line-height: 1.5;
+        }
+    </style>
 </head>
 <body>
-    <div id="montre-app">
-        <header class="montre-header">
-            <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
-            <button id="back-to-game-btn" class="btn btn-back">← Retour à l'enquête</button>
-            <h1 class="montre-title">La Montre du Duc</h1>
-            <div class="montre-progress">
-                <span id="engrave-counter">0</span>/4 gravures décryptées
-            </div>
-        </header>
-
-        <nav id="hamburger-menu" class="sg-menu">
-            <button class="sg-menu-item" id="menu-back">
-                <span class="menu-icon">←</span>
-                <span>Retour à l'enquête</span>
-            </button>
-            <button class="sg-menu-item" id="menu-home">
-                <span class="menu-icon">🏠</span>
-                <span>Menu principal</span>
-            </button>
-            <div class="sg-menu-divider"></div>
-            </nav>
-
-        <main class="montre-main">
-            <div class="montre-scene" id="montre-scene">
-                <div class="montre-face-wrap" id="face-wrap">
-                    <img id="watch-face" class="watch-face" src="mini-games/montre/montre-du-duc-face.png" alt="Face de la montre">
-                    <div id="face-loupe" class="face-loupe"></div>
-                </div>
-                <div class="montre-dos-wrap hidden-dos" id="dos-wrap">
-                    <img id="watch-dos" class="watch-dos" src="mini-games/montre/montre-du-duc-dos.png" alt="Dos de la montre">
-                    <div id="dos-loupe" class="dos-loupe">
-                        <div class="loupe-inner" id="loupe-inner">
-                            <img id="loupe-img" class="loupe-img" src="mini-games/montre/montre-du-duc-dos.png" alt="Dos de la montre">
-                            <div class="engrave-zone engrave-zone-loupe" id="engrave-loupe-zone"></div>
-                        </div>
+    <header class="sg-header" style="position:relative;">
+        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
+        <h2 class="sg-title" style="color:#00d4ff;font-family:'Playfair Display',serif;">La Montre du Duc</h2>
+        <button id="continue-btn" class="btn btn-primary always-active">Continuer</button>
+    </header>
+    <nav id="hamburger-menu" class="sg-menu">
+        <button class="sg-menu-item" id="menu-back">
+            <span class="menu-icon">←</span>
+            <span>Retour à l'enquête</span>
+        </button>
+        <button class="sg-menu-item" id="menu-home">
+            <span class="menu-icon">🏠</span>
+            <span>Menu principal</span>
+        </button>
+        <div class="sg-menu-divider"></div>
+        <button class="sg-menu-item" id="menu-continue">
+            <span class="menu-icon">▶</span>
+            <span>Continuer</span>
+        </button>
+    </nav>
+    <main class="sg-main">
+        <div class="montre-wrap">
+            <div class="montre-watch">
+                <div class="montre-face">
+                    <div class="montre-markers">
+                        <span class="montre-marker" style="transform: translate(-50%, -50%) rotate(0deg) translateY(-90px);">12</span>
+                        <span class="montre-marker" style="transform: translate(-50%, -50%) rotate(30deg) translateY(-90px);">1</span>
+                        <span class="montre-marker" style="transform: translate(-50%, -50%) rotate(60deg) translateY(-90px);">2</span>
+                        <span class="montre-marker" style="transform: translate(-50%, -50%) rotate(90deg) translateY(-90px);">3</span>
+                        <span class="montre-marker" style="transform: translate(-50%, -50%) rotate(120deg) translateY(-90px);">4</span>
+                        <span class="montre-marker" style="transform: translate(-50%, -50%) rotate(150deg) translateY(-90px);">5</span>
+                        <span class="montre-marker" style="transform: translate(-50%, -50%) rotate(180deg) translateY(-90px);">6</span>
+                        <span class="montre-marker" style="transform: translate(-50%, -50%) rotate(210deg) translateY(-90px);">7</span>
+                        <span class="montre-marker" style="transform: translate(-50%, -50%) rotate(240deg) translateY(-90px);">8</span>
+                        <span class="montre-marker" style="transform: translate(-50%, -50%) rotate(270deg) translateY(-90px);">9</span>
+                        <span class="montre-marker" style="transform: translate(-50%, -50%) rotate(300deg) translateY(-90px);">10</span>
+                        <span class="montre-marker" style="transform: translate(-50%, -50%) rotate(330deg) translateY(-90px);">11</span>
                     </div>
-                    <div class="engrave-zone" id="engrave-box"></div>
-                </div>
-                <div class="montre-status" id="montre-status">Approchez la loupe de la face. Une aiguille s'y est figée…</div>
-                <button id="flip-btn" class="btn flip-btn">🔄 Retourner la montre</button>
-            </div>
-
-            <aside class="montre-panel">
-                <h2 class="montre-panel-title">Indices</h2>
-                <div class="montre-answers" id="montre-answers">
-                    <div class="montre-answers-label">Code gravé (dos de la montre) :</div>
-                    <div class="code-row" id="code-row"></div>
-                    <div class="time-row">
-                        <input type="text" class="time-cell" id="time-cell" placeholder="Heure relevée (ex: 20h45)" maxlength="5" disabled>
-                        <button id="validate-btn" class="btn btn-primary" disabled>Valider</button>
+                    <div class="montre-hands">
+                        <div class="montre-hand montre-hour" id="hour-hand"></div>
+                        <div class="montre-hand montre-minute" id="minute-hand"></div>
+                        <div class="montre-hand montre-second" id="second-hand"></div>
                     </div>
+                    <div class="montre-center"></div>
+                    <div class="montre-engraving">1981</div>
                 </div>
-                <div class="montre-notes">
-                    <h3>Notes d'observation</h3>
-                    <textarea id="montre-notes" placeholder="Notez vos observations ici..."></textarea>
-                    <button id="save-notes-btn" class="btn btn-secondary">💾 Consigner dans le carnet</button>
-                </div>
-                <button id="continue-btn" class="btn btn-primary" disabled>Continuer l'enquête</button>
-            </aside>
-        </main>
-
-        <div id="sincerity-modal" class="sincerity-modal hidden">
-            <div class="sincerity-modal-content">
-                <h2 class="sincerity-modal-title">Question décisive</h2>
-                <p class="sincerity-q" id="sincerity-question"></p>
-                <div class="sincerity-choices">
-                    <button id="sincerity-yes" class="btn btn-primary"></button>
-                    <button id="sincerity-no" class="btn btn-secondary"></button>
-                </div>
+            </div>
+            <div class="montre-hint">
+                La montre est arrêtée à 22h15. Le code gravé au dos semble former une date...
+            </div>
+            <div class="montre-code-input">
+                <input type="text" class="montre-digit" id="code-1" maxlength="1" inputmode="numeric">
+                <input type="text" class="montre-digit" id="code-2" maxlength="1" inputmode="numeric">
+                <input type="text" class="montre-digit" id="code-3" maxlength="1" inputmode="numeric">
+                <input type="text" class="montre-digit" id="code-4" maxlength="1" inputmode="numeric">
+                <button class="montre-btn" id="validate-code">Valider</button>
             </div>
         </div>
-    </div>
+    </main>
 
-    <script src="montre-code.js"></script>
+    <script src="minigames.js"></script>
+    <script>
+        (function () {
+            'use strict';
+            var CODE = '1981';
+            var inputs = [];
+
+            function init() {
+                for (var i = 1; i <= 4; i++) {
+                    var el = document.getElementById('code-' + i);
+                    inputs.push(el);
+                    if (el) {
+                        el.addEventListener('input', function (e, idx) {
+                            if (e.target.value.length === 1 && idx < 3) {
+                                inputs[idx + 1].focus();
+                            }
+                        });
+                        el.addEventListener('keydown', function (e, idx) {
+                            if (e.key === 'Backspace' && e.target.value === '' && idx > 0) {
+                                inputs[idx - 1].focus();
+                            }
+                        });
+                    }
+                }
+
+                var validateBtn = document.getElementById('validate-code');
+                if (validateBtn) {
+                    validateBtn.addEventListener('click', checkCode);
+                }
+
+                startClock();
+                setupControls();
+            }
+
+            function startClock() {
+                var hourHand = document.getElementById('hour-hand');
+                var minuteHand = document.getElementById('minute-hand');
+                var secondHand = document.getElementById('second-hand');
+
+                function updateHands() {
+                    var now = new Date();
+                    var h = now.getHours() % 12;
+                    var m = now.getMinutes();
+                    var s = now.getSeconds();
+                    if (hourHand) hourHand.style.transform = 'rotate(' + (h * 30 + m * 0.5) + 'deg)';
+                    if (minuteHand) minuteHand.style.transform = 'rotate(' + (m * 6) + 'deg)';
+                    if (secondHand) secondHand.style.transform = 'rotate(' + (s * 6) + 'deg)';
+                }
+                updateHands();
+                setInterval(updateHands, 1000);
+            }
+
+            function checkCode() {
+                var entered = inputs.map(function (el) { return el ? el.value : ''; }).join('');
+                if (entered === CODE) {
+                    try {
+                        localStorage.setItem('td_standalone_game_result', JSON.stringify({
+                            type: 'montre_code',
+                            won: true,
+                            ts: Date.now()
+                        }));
+                    } catch (e) {}
+                    window.location.href = '../true-detective/index.html?standalone=montre_code';
+                } else {
+                    inputs.forEach(function (el) {
+                        if (el) {
+                            el.style.borderColor = '#ff006e';
+                            el.style.color = '#ff006e';
+                            setTimeout(function () {
+                                el.style.borderColor = '';
+                                el.style.color = '';
+                            }, 800);
+                        }
+                    });
+                }
+            }
+
+            function setupControls() {
+                var hamburgerBtn = document.getElementById('hamburger-btn');
+                var menu = document.getElementById('hamburger-menu');
+                if (hamburgerBtn && menu) {
+                    hamburgerBtn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        menu.classList.toggle('open');
+                    });
+                    document.addEventListener('click', function (e) {
+                        if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
+                            menu.classList.remove('open');
+                        }
+                    });
+                }
+                var menuBack = document.getElementById('menu-back');
+                if (menuBack) {
+                    menuBack.addEventListener('click', function () {
+                        if (menu) menu.classList.remove('open');
+                        window.location.href = '../true-detective/index.html';
+                    });
+                }
+                var menuHome = document.getElementById('menu-home');
+                if (menuHome) {
+                    menuHome.addEventListener('click', function () {
+                        if (menu) menu.classList.remove('open');
+                        window.location.href = '../true-detective/index.html';
+                    });
+                }
+                var menuContinue = document.getElementById('menu-continue');
+                if (menuContinue) {
+                    menuContinue.addEventListener('click', function () {
+                        if (menu) menu.classList.remove('open');
+                        window.location.href = '../true-detective/index.html';
+                    });
+                }
+                var continueBtn = document.getElementById('continue-btn');
+                if (continueBtn) {
+                    continueBtn.addEventListener('click', function () {
+                        window.location.href = '../true-detective/index.html';
+                    });
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
 </body>
 </html>

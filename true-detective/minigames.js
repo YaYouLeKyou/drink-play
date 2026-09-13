@@ -2050,6 +2050,6 @@ var dos = document.createElement('img');
     };
     } /* fin BUILD_CREATORS */
 
-    global.TDMiniGames = { play: play };
+    global.TDMiniGames = { play: play, createBuilder: BUILD_CREATORS };
 
 }(typeof globalThis !== 'undefined' ? globalThis : this));

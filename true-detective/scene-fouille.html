@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>True Detective - Fouille de la scène</title>
+    <link rel="icon" href="../icon/Logo%20d%26p.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="standalone-game.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .fouille-scene {
+            width: 100%;
+            max-width: 900px;
+            height: 500px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+            cursor: none;
+            margin: 0 auto;
+        }
+        .scene-loupe {
+            display: none;
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 3px solid #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            z-index: 10;
+            background-repeat: no-repeat;
+        }
+        .fouille-hotspot {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255, 0, 110, 0.3);
+            border: 2px solid #ff006e;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 5;
+        }
+        .fouille-hotspot:hover {
+            background: rgba(255, 0, 110, 0.6);
+            box-shadow: 0 0 16px rgba(255, 0, 110, 0.6);
+        }
+        .fouille-hotspot.found {
+            background: rgba(0, 212, 255, 0.5);
+            border-color: #00d4ff;
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.5);
+        }
+        .fouille-evidence-card {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 260px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            z-index: 100;
+            display: none;
+        }
+        .fouille-evidence-card.visible {
+            display: block;
+        }
+        .fouille-evidence-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+        .fouille-evidence-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        @media (max-width: 768px) {
+            .fouille-evidence-card {
+                position: static;
+                transform: none;
+                width: 100%;
+                margin-top: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="sg-header" style="position:relative;">
+        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
+        <h2 class="sg-title" style="color:#00d4ff;font-family:'Playfair Display',serif;">Fouille de la scène</h2>
+        <button id="continue-btn" class="btn btn-primary always-active">Continuer</button>
+    </header>
+    <nav id="hamburger-menu" class="sg-menu">
+        <button class="sg-menu-item" id="menu-back">
+            <span class="menu-icon">←</span>
+            <span>Retour à l'enquête</span>
+        </button>
+        <button class="sg-menu-item" id="menu-home">
+            <span class="menu-icon">🏠</span>
+            <span>Menu principal</span>
+        </button>
+        <div class="sg-menu-divider"></div>
+        <button class="sg-menu-item" id="menu-continue">
+            <span class="menu-icon">▶</span>
+            <span>Continuer</span>
+        </button>
+    </nav>
+    <main class="sg-main">
+        <div class="suspect-chrome hidden" id="suspect-chrome">
+            <div class="suspect-portrait-wrap">
+                <img id="suspect-portrait" class="suspect-portrait" src="" alt="Suspect">
+            </div>
+            <div class="suspect-dialogue-box">
+                <div class="suspect-name" id="suspect-name"></div>
+                <div class="suspect-dialogue" id="suspect-dialogue"></div>
+            </div>
+        </div>
+        <div id="fouille-container" class="fouille-scene"></div>
+        <div id="evidence-card" class="fouille-evidence-card">
+            <div class="fouille-evidence-title" id="evidence-title"></div>
+            <div class="fouille-evidence-text" id="evidence-text"></div>
+        </div>
+    </main>
+
+    <script src="minigames.js"></script>
+    <script>
+        (function () {
+            'use strict';
+            var $container = document.getElementById('fouille-container');
+            var $evidenceCard = document.getElementById('evidence-card');
+            var $evidenceTitle = document.getElementById('evidence-title');
+            var $evidenceText = document.getElementById('evidence-text');
+
+            var hotspots = [
+                { label: 'A', x: 10.2, y: 62.5, title: { fr: 'Lettre de menace', en: 'Threat letter' }, info: { fr: 'Lettre de menace aux armes de Blackwood.', en: 'Threat letter with Blackwood crest.' } },
+                { label: 'B', x: 24.0, y: 67.1, title: { fr: 'Encrier', en: 'Inkwell' }, info: { fr: 'Encrier intact et plume sèche.', en: 'Intact inkwell and dry pen.' } },
+                { label: '1', x: 30.7, y: 55.4, title: { fr: 'Documents', en: 'Documents' }, info: { fr: 'Cachet intact, bureau non forcé.', en: 'Intact seal, unforced desk.' } },
+                { label: '2', x: 37.6, y: 56.4, title: { fr: 'Verres', en: 'Glasses' }, info: { fr: 'Carafe renversée et verre marqué.', en: 'Overturned decanter and marked glass.' } },
+                { label: '3', x: 46.8, y: 56.8, title: { fr: 'Livre', en: 'Book' }, info: { fr: 'Livre de comptes : dette énorme.', en: 'Ledger: huge debt.' } },
+                { label: '4', x: 65.2, y: 77.2, title: { fr: 'Tache de sang', en: 'Blood stain' }, info: { fr: 'Fauteuil renversé et montre au sol.', en: 'Overturned chair and watch on floor.' } },
+                { label: '5', x: 69.9, y: 82.6, title: { fr: 'Douille', en: 'Bullet casing' }, info: { fr: 'Mare de sang face au bureau.', en: 'Pool of blood facing the desk.' } },
+                { label: '6', x: 81.8, y: 84.1, title: { fr: 'Papier froissé', en: 'Crumpled paper' }, info: { fr: 'Reçu V.K. plié.', en: 'Folded V.K. receipt.' } }
+            ];
+
+            function init() {
+                var sceneImageUrl = 'assets/image true detective/lieux/classic/scene de crime manoir.png';
+                $container.style.backgroundImage = 'url("' + sceneImageUrl + '")';
+
+                var loupe = document.createElement('div');
+                loupe.className = 'scene-loupe';
+                loupe.style.backgroundImage = 'url("' + sceneImageUrl + '")';
+                $container.appendChild(loupe);
+
+                hotspots.forEach(function (spot, idx) {
+                    var btn = document.createElement('button');
+                    btn.className = 'fouille-hotspot';
+                    btn.textContent = spot.label;
+                    btn.style.left = spot.x + '%';
+                    btn.style.top = spot.y + '%';
+                    btn.addEventListener('mouseenter', function () {
+                        showEvidence(spot);
+                    });
+                    btn.addEventListener('mouseleave', function () {
+                        hideEvidence();
+                    });
+                    btn.addEventListener('click', function () {
+                        btn.classList.toggle('found');
+                    });
+                    $container.appendChild(btn);
+                });
+
+                $container.addEventListener('mousemove', function (e) {
+                    var r = $container.getBoundingClientRect();
+                    var cx = e.clientX - r.left;
+                    var cy = e.clientY - r.top;
+                    loupe.style.display = 'block';
+                    loupe.style.left = cx + 'px';
+                    loupe.style.top = cy + 'px';
+                    var ZOOM = 2;
+                    var LR = 95;
+                    loupe.style.backgroundSize = (r.width * ZOOM) + 'px ' + (r.height * ZOOM) + 'px';
+                    loupe.style.backgroundPosition = (LR - cx * ZOOM) + 'px ' + (LR - cy * ZOOM) + 'px';
+                });
+                $container.addEventListener('mouseleave', function () {
+                    loupe.style.display = 'none';
+                });
+
+                setupControls();
+            }
+
+            function showEvidence(spot) {
+                if (!$evidenceCard) return;
+                $evidenceTitle.textContent = (spot.title && spot.title.fr) || spot.label;
+                $evidenceText.textContent = (spot.info && spot.info.fr) || '';
+                $evidenceCard.classList.add('visible');
+            }
+
+            function hideEvidence() {
+                if ($evidenceCard) $evidenceCard.classList.remove('visible');
+            }
+
+            function setupControls() {
+                var hamburgerBtn = document.getElementById('hamburger-btn');
+                var menu = document.getElementById('hamburger-menu');
+                if (hamburgerBtn && menu) {
+                    hamburgerBtn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        menu.classList.toggle('open');
+                    });
+                    document.addEventListener('click', function (e) {
+                        if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
+                            menu.classList.remove('open');
+                        }
+                    });
+                }
+                var menuBack = document.getElementById('menu-back');
+                if (menuBack) {
+                    menuBack.addEventListener('click', function () {
+                        if (menu) menu.classList.remove('open');
+                        window.location.href = '../true-detective/index.html';
+                    });
+                }
+                var menuHome = document.getElementById('menu-home');
+                if (menuHome) {
+                    menuHome.addEventListener('click', function () {
+                        if (menu) menu.classList.remove('open');
+                        window.location.href = '../true-detective/index.html';
+                    });
+                }
+                var menuContinue = document.getElementById('menu-continue');
+                if (menuContinue) {
+                    menuContinue.addEventListener('click', function () {
+                        if (menu) menu.classList.remove('open');
+                        window.location.href = '../true-detective/index.html?evidence=scene_fouille';
+                    });
+                }
+                var continueBtn = document.getElementById('continue-btn');
+                if (continueBtn) {
+                    continueBtn.addEventListener('click', function () {
+                        window.location.href = '../true-detective/index.html?evidence=scene_fouille';
+                    });
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+</html>

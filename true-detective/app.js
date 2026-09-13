@@ -4356,6 +4356,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             asteroids: 'TDAsteroids',
             'bataille-navale': 'TDBatailleNavale',
             scene_fouille: 'TDSF',
+            montre_code: 'TDMiniGames'
         };
     }
 
