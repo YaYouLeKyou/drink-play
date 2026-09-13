@@ -4308,6 +4308,42 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         } else if (minigameType === 'space-invaders') {
             cfg.rows = Math.min(2 + tier, 6);      // 3..6 rows of aliens
             cfg.cols = 4 + tier;                   // 5..8 columns
+        } else if (minigameType === 'breakout') {
+            cfg.bricks = Math.min(5 + tier * 2, 15); // 7..11 bricks per row
+            cfg.ballSpeed = 0.05 + tier * 0.02;
+        } else if (minigameType === 'asteroids') {
+            cfg.maxAsteroids = Math.min(4 + tier, 8);
+            cfg.spawnRate = 1000 - tier * 150; // 850..550ms
+        } else if (minigameType === 'pacman') {
+            cfg.ghostSpeed = 0.03 + tier * 0.015;
+            cfg.pelletCount = 10 + tier * 5;
+        } else if (minigameType === 'memory') {
+            cfg.cardPairs = Math.min(4 + tier * 2, 12); // 6..10 pairs
+        } else if (minigameType === 'shooting') {
+            cfg.targetSpeed = 0.02 + tier * 0.015;
+            cfg.targetCount = 5 + tier * 2;
+        } else if (minigameType === 'jackpot') {
+            cfg.spinCount = 5 + tier; // 6..9 spins
+            cfg.stakeMultiplier = 1 + (tier - 1) * 0.5;
+        } else if (minigameType === 'connect4') {
+            cfg.aiDepth = Math.min(tier, 4);
+            cfg.winScore = 10;
+        } else if (minigameType === 'bataille-navale') {
+            cfg.shipCount = 3 + tier; // 4..6 ships per player
+            cfg.gridSize = 6 + tier;  // 7..9 grid
+        } else if (minigameType === 'montre_code') {
+            cfg.time = 30 + tier * 10; // 40..60 seconds
+        } else if (minigameType === 'scene_fouille') {
+            cfg.time = 45 + tier * 10; // 55..75 seconds
+            cfg.hotspotCount = 5 + tier; // 6..8 hotspots
+        } else if (minigameType === 'coffre_code') {
+            cfg.time = 25 + tier * 10; // 35..55 seconds
+        } else if (minigameType === 'cryptogramme') {
+            cfg.time = 30 + tier * 10; // 40..60 seconds
+            cfg.wordCount = 3 + tier; // 4..6 words
+        } else if (minigameType === 'reseau_alibis') {
+            cfg.time = 20 + tier * 5; // 25..40 seconds
+            cfg.nodeCount = 4 + tier;
         }
         return cfg;
     }

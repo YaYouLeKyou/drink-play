@@ -12,30 +12,26 @@
 <div id="duel-app">
 <div class="manor-bg" id="manor-bg"></div>
 <div class="manor-vignette"></div>
-<header class="duel-header">
+<header class="duel-header" style="position:relative;">
     <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
-    <button id="back-btn" class="btn btn-ghost">Retour enquete</button>
     <div class="duel-title-block">
         <h1 class="duel-title">Duel d'Echecs</h1>
         <p class="duel-subtitle" id="duel-subtitle">Interrogatoire sous tension - Lady Vivienne</p>
     </div>
-    <div class="duel-lang">
-        <button id="lang-fr" class="lang-btn active-lang">FR</button>
-        <button id="lang-en" class="lang-btn">EN</button>
-    </div>
+    <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
 </header>
 
 <nav id="hamburger-menu" class="sg-menu">
-    <button class="sg-menu-item" id="menu-back">
-        <span class="menu-icon">←</span>
-        <span>Retour à l'enquête</span>
-    </button>
     <button class="sg-menu-item" id="menu-home">
         <span class="menu-icon">🏠</span>
         <span>Menu principal</span>
     </button>
     <div class="sg-menu-divider"></div>
-    </nav>
+    <button class="sg-menu-item" id="menu-settings">
+        <span class="menu-icon">⚙</span>
+        <span>Paramètres</span>
+    </button>
+</nav>
 <div id="briefing-overlay" class="briefing-overlay">
 <div class="briefing-card">
 <div class="briefing-portrait"><img id="briefing-img" src="" alt="Vivienne"></div>

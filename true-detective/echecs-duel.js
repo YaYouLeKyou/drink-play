@@ -423,7 +423,7 @@ if (btns[b].getAttribute('data-diff') === difficulty) btns[b].className = 'diff-
 var lf = el('lang-fr'); if (lf) lf.addEventListener('click', function () { lang = 'fr'; applyLangUI(); renderDuel(); });
 var le = el('lang-en'); if (le) le.addEventListener('click', function () { lang = 'en'; applyLangUI(); renderDuel(); });
 var st2 = el('start-duel-btn'); if (st2) st2.addEventListener('click', function () { var o = el('briefing-overlay'); if (o) o.className = 'briefing-overlay hidden'; started = true; resetDuel(); });
-var bb = el('back-btn'); if (bb) bb.addEventListener('click', function () { goBack(false); });
+var bb = el('back-to-minigame-btn'); if (bb) bb.addEventListener('click', function () { goBack(false); });
 var hamburgerBtn = el('hamburger-btn');
 var menu = el('hamburger-menu');
 if (hamburgerBtn && menu) {
@@ -437,13 +437,6 @@ if (hamburgerBtn && menu) {
         }
     });
 }
-var menuBack = el('menu-back');
-if (menuBack) {
-    menuBack.addEventListener('click', function () {
-        if (menu) menu.classList.remove('open');
-        goBack(false);
-    });
-}
 var menuHome = el('menu-home');
 if (menuHome) {
     menuHome.addEventListener('click', function () {
@@ -451,12 +444,13 @@ if (menuHome) {
         window.location.href = '../true-detective/index.html';
     });
 }
-var menuContinue = el('menu-continue');
-if (menuContinue) {
-    menuContinue.addEventListener('click', function () {
+var menuSettings = el('menu-settings');
+if (menuSettings) {
+    menuSettings.addEventListener('click', function () {
         if (menu) menu.classList.remove('open');
-        var won = false; try { won = !!JSON.parse(localStorage.getItem(RES_KEY) || '{}').won; } catch (e) {}
-        goBack(won);
+        alert('Paramètres : aucun réglage pour l\'instant.');
+    });
+}
     });
 }
 var hb = el('hint-btn'); if (hb) hb.addEventListener('click', function () {

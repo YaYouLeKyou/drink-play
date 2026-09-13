@@ -89,10 +89,18 @@
         var params = new URLSearchParams(window.location.search);
         gameType = params.get('game') || '';
         lang = params.get('lang') || 'fr';
-        var diff = parseInt(params.get('difficulty'), 10);
-        if (diff >= 1 && diff <= 3) difficulty = diff;
+        var diff = params.get('difficulty') || '2'; // default = medium (2)
+        difficulty = diff;
         themeId = params.get('theme') || 'agatha-christie';
         fromStory = params.get('story') === '1';
+        
+        // For retro games, support level param (1-3) instead of difficulty number
+        var level = parseInt(params.get('level'), 10);
+        if (!isNaN(level) && level >= 1 && level <= 3 && isRetroGame(gameType)) {
+            retroLevel = level;
+            difficulty = '2'; // retro games use levels, map to medium
+        }
+        
         try {
             var raw = sessionStorage.getItem('td_story_return');
             if (raw) storyReturn = JSON.parse(raw);
@@ -102,6 +110,12 @@
             gameType = 'scene_fouille';
         }
     }
+
+    function isRetroGame(type) {
+        return ['pong', 'pacman', 'space-invaders', 'breakout', 'asteroids'].indexOf(type) >= 0;
+    }
+
+    var retroLevel = 1;
 
     function loadGame() {
         if (!gameType) return;
@@ -495,6 +509,15 @@
                 if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
                     menu.classList.remove('open');
                 }
+            });
+        }
+
+        var backBtn = document.getElementById('back-to-minigame-btn');
+        if (backBtn) {
+            backBtn.addEventListener('click', function () {
+                if (menu) menu.classList.remove('open');
+                cleanup();
+                window.location.href = '../true-detective/index.html';
             });
         }
 

@@ -98,6 +98,7 @@
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
         <h2 class="sg-title" style="color:#00d4ff;font-family:'Playfair Display',serif;">Fouille de la scène</h2>
+        <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
@@ -216,6 +217,13 @@
                         if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
                             menu.classList.remove('open');
                         }
+                    });
+                }
+                var backBtn = document.getElementById('back-to-minigame-btn');
+                if (backBtn) {
+                    backBtn.addEventListener('click', function () {
+                        if (menu) menu.classList.remove('open');
+                        window.location.href = '../true-detective/index.html';
                     });
                 }
                 var menuHome = document.getElementById('menu-home');

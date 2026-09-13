@@ -34,19 +34,19 @@
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
         <h2 class="sg-title" style="color:#00d4ff;font-family:'Playfair Display',serif;">Pong</h2>
-        <button id="continue-btn" class="btn btn-primary always-active">Continuer</button>
+        <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
     <nav id="hamburger-menu" class="sg-menu">
-        <button class="sg-menu-item" id="menu-back">
-            <span class="menu-icon">←</span>
-            <span>Retour à l'enquête</span>
-        </button>
         <button class="sg-menu-item" id="menu-home">
             <span class="menu-icon">🏠</span>
             <span>Menu principal</span>
         </button>
         <div class="sg-menu-divider"></div>
-        </nav>
+        <button class="sg-menu-item" id="menu-settings">
+            <span class="menu-icon">⚙</span>
+            <span>Paramètres</span>
+        </button>
+    </nav>
     <div class="pong-wrap">
         <div class="pong-info" id="pong-info">Joueur: 0 | IA: 0</div>
         <canvas id="pong-canvas"></canvas>
@@ -69,9 +69,9 @@
                     }
                 });
             }
-            var menuBack = document.getElementById('menu-back');
-            if (menuBack) {
-                menuBack.addEventListener('click', function () {
+            var backBtn = document.getElementById('back-to-minigame-btn');
+            if (backBtn) {
+                backBtn.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
                     window.location.href = '../true-detective/index.html';
                 });
@@ -83,17 +83,11 @@
                     window.location.href = '../true-detective/index.html';
                 });
             }
-            var menuContinue = document.getElementById('menu-continue');
-            if (menuContinue) {
-                menuContinue.addEventListener('click', function () {
+            var menuSettings = document.getElementById('menu-settings');
+            if (menuSettings) {
+                menuSettings.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    window.location.href = '../true-detective/index.html';
-                });
-            }
-            var continueBtn = document.getElementById('continue-btn');
-            if (continueBtn) {
-                continueBtn.addEventListener('click', function () {
-                    window.location.href = '../true-detective/index.html';
+                    alert('Paramètres : aucun réglage pour l\'instant.');
                 });
             }
         })();

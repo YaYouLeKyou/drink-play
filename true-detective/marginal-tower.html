@@ -10,37 +10,23 @@
 </head>
 <body>
     <div id="marginal-tower-app">
-        <header class="tower-header">
+        <header class="tower-header" style="position:relative;">
             <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
-            <button id="back-to-game-btn" class="btn btn-back">← Retour à l'enquête</button>
             <h1 class="tower-title">La Tour de Silas</h1>
-            <div class="tower-hud">
-                <div class="tower-hud-item" id="height-display">
-                    <span class="tower-hud-label">Hauteur</span>
-                    <span class="tower-hud-value">0m</span>
-                </div>
-                <div class="tower-hud-item" id="target-display">
-                    <span class="tower-hud-label">Objectif</span>
-                    <span class="tower-hud-value">--</span>
-                </div>
-                <div class="tower-hud-item" id="pieces-display">
-                    <span class="tower-hud-label">Blocs</span>
-                    <span class="tower-hud-value">0/0</span>
-                </div>
-            </div>
+            <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
         </header>
 
         <nav id="hamburger-menu" class="sg-menu">
-            <button class="sg-menu-item" id="menu-back">
-                <span class="menu-icon">←</span>
-                <span>Retour à l'enquête</span>
-            </button>
             <button class="sg-menu-item" id="menu-home">
                 <span class="menu-icon">🏠</span>
                 <span>Menu principal</span>
             </button>
             <div class="sg-menu-divider"></div>
-            </nav>
+            <button class="sg-menu-item" id="menu-settings">
+                <span class="menu-icon">⚙</span>
+                <span>Paramètres</span>
+            </button>
+        </nav>
 
         <main class="tower-main">
             <div id="game-container" class="game-container">

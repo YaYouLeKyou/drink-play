@@ -308,7 +308,7 @@
             handlePlace(pos.x, pos.y);
         }, { passive: false });
 
-        var backBtn = document.getElementById('back-to-game-btn');
+        var backBtn = document.getElementById('back-to-minigame-btn');
         if (backBtn) {
             backBtn.addEventListener('click', function() {
                 cleanup();
@@ -329,20 +329,19 @@
                 }
             });
         }
-        var menuBack = document.getElementById('menu-back');
-        if (menuBack) {
-            menuBack.addEventListener('click', function () {
-                if (menu) menu.classList.remove('open');
-                cleanup();
-                window.location.href = '../true-detective/index.html';
-            });
-        }
         var menuHome = document.getElementById('menu-home');
         if (menuHome) {
             menuHome.addEventListener('click', function () {
                 if (menu) menu.classList.remove('open');
                 cleanup();
                 window.location.href = '../true-detective/index.html';
+            });
+        }
+        var menuSettings = document.getElementById('menu-settings');
+        if (menuSettings) {
+            menuSettings.addEventListener('click', function () {
+                if (menu) menu.classList.remove('open');
+                alert('Paramètres : aucun réglage pour l\'instant.');
             });
         }
 
