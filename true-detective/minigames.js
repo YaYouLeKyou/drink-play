@@ -871,6 +871,8 @@ function showEvidence(h) {
                                 showEndMessage(lang === 'fr' ? 'Vous avez identifié les mensonges mais avez fait des erreurs. Pas d\'indice.' : 'You found the lies but made errors. No clue.');
                                 complete(false);
                             }
+                            addContinueButton();
+                            addContinueButton();
                         }
                     } else {
                         mistakes++;
@@ -888,15 +890,38 @@ function showEvidence(h) {
                             card.classList.add('confirmed-true');
                             tag.textContent = (lang === 'fr' ? 'Vrai' : 'True');
                             tag.classList.add('tag-true');
-                            locked = true;
-                            showEndMessage(lang === 'fr' ? 'Trop d\'erreurs. Pas d\'indice.' : 'Too many errors. No clue.');
-                            complete(false);
+                                locked = true;
+                                showEndMessage(lang === 'fr' ? 'Trop d\'erreurs. Pas d\'indice.' : 'Too many errors. No clue.');
+                                complete(false);
+                                addContinueButton();
                         }
                     }
                 });
                 grid.appendChild(card);
                 cardEls.push(card);
             });
+
+            function addContinueButton() {
+                var btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.textContent = lang === 'fr' ? 'Continuer' : 'Continue';
+                btn.style.cssText = 'margin-top:16px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
+                btn.addEventListener('click', function () {
+                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau_alibis', won: true, ts: Date.now() })); } catch (e) {}
+                    try {
+                        var returnRaw = localStorage.getItem('td_standalone_game_return');
+                        if (returnRaw) {
+                            var rp = JSON.parse(returnRaw);
+                            if (rp && rp.returnUrl) {
+                                window.location.href = rp.returnUrl;
+                                return;
+                            }
+                        }
+                    } catch (e) {}
+                    window.location.href = '../true-detective/index.html?standalone=reseau_alibis';
+                });
+                board.appendChild(btn);
+            }
 
             /* Hint adaptatif : à 40% du temps, illumine les cartes
                qui contiennent un mensonge.                          */
