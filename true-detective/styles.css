@@ -2193,6 +2193,32 @@ html {
     color: #ffffff;
     text-shadow: 0 0 14px rgba(0, 212, 255, 0.7);
 }
+.minigame-category.puzzles .minigame-category-title {
+    color: #ffb347;
+    text-shadow: 0 0 10px rgba(255, 179, 71, 0.5);
+}
+.minigame-category.puzzles.matched {
+    background: linear-gradient(160deg, rgba(255, 179, 71, 0.08), rgba(255, 140, 0, 0.04));
+    border: 1px solid rgba(255, 179, 71, 0.25);
+    box-shadow: 0 0 30px rgba(255, 140, 0, 0.08);
+}
+.minigame-category.puzzles.matched .minigame-category-title {
+    color: #ffffff;
+    text-shadow: 0 0 14px rgba(255, 179, 71, 0.7);
+}
+.minigame-category.classic .minigame-category-title {
+    color: #ff6b6b;
+    text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+}
+.minigame-category.classic.matched {
+    background: linear-gradient(160deg, rgba(255, 107, 107, 0.08), rgba(255, 50, 50, 0.04));
+    border: 1px solid rgba(255, 107, 107, 0.25);
+    box-shadow: 0 0 30px rgba(255, 50, 50, 0.08);
+}
+.minigame-category.classic.matched .minigame-category-title {
+    color: #ffffff;
+    text-shadow: 0 0 14px rgba(255, 107, 107, 0.7);
+}
 .minigame-category.minimer {
     opacity: 0.78;
 }

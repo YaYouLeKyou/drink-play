@@ -3831,19 +3831,6 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             $.choicesContainer.appendChild(btn);
         });
         var interroData = window.TDNarration && window.TDNarration.interrogations ? window.TDNarration.interrogations[it.id] : null;
-        if (interroData && interroData.minigame) {
-            var skipToMinigameBtn = document.createElement('button');
-            skipToMinigameBtn.className = 'btn btn-choice interrogation-skip';
-            skipToMinigameBtn.textContent = lang === 'fr' ? '⏭ Passer au défi' : '⏭ Skip to challenge';
-            skipToMinigameBtn.addEventListener('click', function () {
-                if (!scr.awaitingChoice) return;
-                scr.awaitingChoice = false;
-                $.choicesContainer.innerHTML = '';
-                it.questionsDone = true;
-                scrShowInterroAskButton();
-            });
-            $.choicesContainer.appendChild(skipToMinigameBtn);
-        }
     }
 
     function scrAskInterroQuestion(q) {
@@ -4080,18 +4067,18 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.minigameSelectScreen.classList.remove('active');
         $.minigameSelectScreen.classList.add('hidden');
 
-        if (minigameType === 'scene_fouille') {
-            window.location.href = 'scene-fouille.html';
-            return;
-        }
-
         if (minigameType === 'montre_code') {
             window.location.href = 'montre-code.html';
             return;
         }
 
-        if (minigameType === 'chess') {
-            window.location.href = 'chess.html';
+        if (minigameType === 'marginal-tower') {
+            var towerCfg = { type: 'marginal-tower', act: 1, title: { fr: 'La Tour de Silas', en: "Silas' Tower" } };
+            $.minigameTitle.textContent = (towerCfg.title[ui.language] || towerCfg.title.en || 'Tour de Silas');
+            showDifficultySelection(towerCfg, function (selectedDifficulty) {
+                var langParam = ui.language === 'en' ? 'en' : 'fr';
+                window.location.href = 'marginal-tower.html?difficulty=' + selectedDifficulty + '&lang=' + langParam;
+            });
             return;
         }
 
@@ -4256,11 +4243,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         }
 
         it.minigameRound = roundIndex + 1;
-        if (it.minigameRound < 3 && scrGetMinigameRoundConfig(it.id, it.minigameRound)) {
-            scrShowInterroAskButton();
-        } else {
-            scrEndInterrogation();
-        }
+        scrEndInterrogation();
     }
 
     function populateMinigameOverlayChrome(suspectId, dialogueText) {

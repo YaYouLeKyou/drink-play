@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>True Detective - La Tour de Silas</title>
+    <link rel="icon" href="../icon/Logo%20d%26p.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="marginal-tower.css">
+</head>
+<body>
+    <div id="marginal-tower-app">
+        <header class="tower-header">
+            <button id="back-to-game-btn" class="btn btn-back">← Retour à l'enquête</button>
+            <h1 class="tower-title">La Tour de Silas</h1>
+            <div class="tower-hud">
+                <div class="tower-hud-item" id="height-display">
+                    <span class="tower-hud-label">Hauteur</span>
+                    <span class="tower-hud-value">0m</span>
+                </div>
+                <div class="tower-hud-item" id="target-display">
+                    <span class="tower-hud-label">Objectif</span>
+                    <span class="tower-hud-value">--</span>
+                </div>
+                <div class="tower-hud-item" id="pieces-display">
+                    <span class="tower-hud-label">Blocs</span>
+                    <span class="tower-hud-value">0/0</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="tower-main">
+            <div id="game-container" class="game-container">
+                <canvas id="tower-canvas"></canvas>
+                <div id="wind-indicator" class="wind-indicator hidden">
+                    <span class="wind-arrow">→</span>
+                    <span class="wind-label">VENT</span>
+                </div>
+                <div id="victory-overlay" class="victory-overlay hidden">
+                    <div class="victory-content">
+                        <h2 class="victory-title">Tour achevée !</h2>
+                        <p class="victory-text">Silas a construit sa tour. La vérité émerge du chaos.</p>
+                        <button id="victory-continue-btn" class="btn btn-primary">Continuer l'enquête</button>
+                    </div>
+                </div>
+                <div id="defeat-overlay" class="defeat-overlay hidden">
+                    <div class="defeat-content">
+                        <h2 class="defeat-title">Tour effondrée</h2>
+                        <p class="defeat-text">Les blocs se sont écroulés. Silas recommencera...</p>
+                        <button id="defeat-retry-btn" class="btn btn-primary">Réessayer</button>
+                        <button id="defeat-continue-btn" class="btn btn-secondary">Continuer sans gagner</button>
+                    </div>
+                </div>
+            </div>
+
+            <aside id="block-palette" class="block-palette">
+                <h3 class="palette-title">Matériaux</h3>
+                <div class="palette-grid" id="palette-grid">
+                    <button class="palette-btn active" data-block="wood" data-i18n-name="Bois">
+                        <span class="palette-icon">🪵</span>
+                        <span class="palette-name">Bois</span>
+                        <span class="palette-count" id="count-wood">x8</span>
+                    </button>
+                    <button class="palette-btn" data-block="stone" data-i18n-name="Pierre">
+                        <span class="palette-icon">🪨</span>
+                        <span class="palette-name">Pierre</span>
+                        <span class="palette-count" id="count-stone">x6</span>
+                    </button>
+                    <button class="palette-btn" data-block="glass" data-i18n-name="Verre">
+                        <span class="palette-icon">🧊</span>
+                        <span class="palette-name">Verre</span>
+                        <span class="palette-count" id="count-glass">x4</span>
+                    </button>
+                    <button class="palette-btn" data-block="metal" data-i18n-name="Métal">
+                        <span class="palette-icon">🔩</span>
+                        <span class="palette-name">Métal</span>
+                        <span class="palette-count" id="count-metal">x3</span>
+                    </button>
+                    <button class="palette-btn" data-block="cardboard" data-i18n-name="Carton">
+                        <span class="palette-icon">📦</span>
+                        <span class="palette-name">Carton</span>
+                        <span class="palette-count" id="count-cardboard">x5</span>
+                    </button>
+                    <button class="palette-btn" data-block="brick" data-i18n-name="Brique">
+                        <span class="palette-icon">🧱</span>
+                        <span class="palette-name">Brique</span>
+                        <span class="palette-count" id="count-brick">x5</span>
+                    </button>
+                </div>
+                <div class="palette-info">
+                    <p class="palette-hint" id="palette-hint">Cliquez sur la plateforme pour placer un bloc</p>
+                </div>
+            </aside>
+        </main>
+
+        <div id="loading-overlay" class="loading-overlay hidden">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p class="loading-text">Chargement de la physique...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="marginal-tower.js"></script>
+</body>
+</html>
