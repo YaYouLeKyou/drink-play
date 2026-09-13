@@ -1,7 +1,7 @@
 /* =====================================================================
-   TRUE DETECTIVE - PACMAN (Standalone)
-   Simple Pacman-style maze game.
-   ===================================================================== */
+    TRUE DETECTIVE - PACMAN (Standalone)
+    Improved gameplay, visuals, mobile controls, and responsive design.
+    ===================================================================== */
 (function (global) {
     'use strict';
 
@@ -59,20 +59,35 @@
         var score = 0;
         var lives = 3;
         var gameOver = false;
-        var ghosts = [
-            { x: 7 * cellSize, y: 5 * cellSize, vx: 1, vy: 0, color: '#ff006e' },
-            { x: 8 * cellSize, y: 5 * cellSize, vx: -1, vy: 0, color: '#00d4ff' }
-        ];
         var mouthAngle = 0;
         var mouthDir = 1;
+        var powerMode = false;
+        var powerTimer = 0;
 
+        var ghosts = [
+            { x: 7 * cellSize, y: 5 * cellSize, vx: 1, vy: 0, color: '#ff006e', name: 'Blinky' },
+            { x: 8 * cellSize, y: 5 * cellSize, vx: -1, vy: 0, color: '#00d4ff', name: 'Inky' },
+            { x: 7 * cellSize, y: 6 * cellSize, vx: 0, vy: 1, color: '#ffd600', name: 'Clyde' },
+            { x: 8 * cellSize, y: 6 * cellSize, vx: 0, vy: -1, color: '#ff00ff', name: 'Pinky' }
+        ];
+
+        var keys = {};
         document.addEventListener('keydown', function (e) {
-            if (gameOver) return;
-            if (e.key === 'ArrowUp' || e.key === 'w') { pvx = 0; pvy = -1; }
-            if (e.key === 'ArrowDown' || e.key === 's') { pvx = 0; pvy = 1; }
-            if (e.key === 'ArrowLeft' || e.key === 'a') { pvx = -1; pvy = 0; }
-            if (e.key === 'ArrowRight' || e.key === 'd') { pvx = 1; pvy = 0; }
+            keys[e.key] = true;
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].indexOf(e.key) !== -1) {
+                e.preventDefault();
+            }
         });
+        document.addEventListener('keyup', function (e) {
+            keys[e.key] = false;
+        });
+
+        function updateDirection() {
+            if (keys['ArrowUp'] || keys['w']) { pvx = 0; pvy = -1; }
+            if (keys['ArrowDown'] || keys['s']) { pvx = 0; pvy = 1; }
+            if (keys['ArrowLeft'] || keys['a']) { pvx = -1; pvy = 0; }
+            if (keys['ArrowRight'] || keys['d']) { pvx = 1; pvy = 0; }
+        }
 
         function canMove(x, y) {
             var col = Math.floor(x / cellSize);
@@ -83,11 +98,13 @@
 
         function update() {
             if (gameOver) return;
-            mouthAngle += 0.1 * mouthDir;
-            if (mouthAngle > 0.3 || mouthAngle < 0) mouthDir *= -1;
+            updateDirection();
+            mouthAngle += 0.15 * mouthDir;
+            if (mouthAngle > 0.35 || mouthAngle < 0) mouthDir *= -1;
 
-            var nextX = px + pvx * (cellSize / 8);
-            var nextY = py + pvy * (cellSize / 8);
+            var speed = cellSize / 7;
+            var nextX = px + pvx * speed;
+            var nextY = py + pvy * speed;
             if (canMove(nextX, nextY)) {
                 px = nextX;
                 py = nextY;
@@ -105,16 +122,21 @@
                 }
             }
 
+            if (powerTimer > 0) {
+                powerTimer--;
+                if (powerTimer <= 0) powerMode = false;
+            }
+
             for (var g = 0; g < ghosts.length; g++) {
                 var ghost = ghosts[g];
-                if (Math.random() < 0.02) {
+                if (Math.random() < 0.03 + diff * 0.01) {
                     var dirs = [[1,0],[-1,0],[0,1],[0,-1]];
                     var dir = dirs[Math.floor(Math.random() * dirs.length)];
                     ghost.vx = dir[0];
                     ghost.vy = dir[1];
                 }
-                var gx = ghost.x + ghost.vx * (cellSize / 10);
-                var gy = ghost.y + ghost.vy * (cellSize / 10);
+                var gx = ghost.x + ghost.vx * (cellSize / 8);
+                var gy = ghost.y + ghost.vy * (cellSize / 8);
                 if (canMove(gx, gy)) {
                     ghost.x = gx;
                     ghost.y = gy;
@@ -126,20 +148,26 @@
                 var gdx = px - ghost.x;
                 var gdy = py - ghost.y;
                 if (Math.sqrt(gdx * gdx + gdy * gdy) < cellSize / 2) {
-                    lives--;
-                    px = 1 * cellSize + cellSize / 2;
-                    py = 1 * cellSize + cellSize / 2;
-                    pvx = 0; pvy = 0;
-                    if (lives <= 0) {
-                        gameOver = true;
-                        if ($info) $info.textContent = lang === 'fr' ? 'Game Over !' : 'Game Over!';
-                        setTimeout(function () {
-                            try {
-                                localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'pacman', won: false, ts: Date.now() }));
-                            } catch (e) {}
-                            window.location.href = '../true-detective/index.html?standalone=pacman';
-                        }, 1500);
-                        return;
+                    if (powerMode) {
+                        score += 50;
+                        ghost.x = 7 * cellSize + (g % 2) * cellSize;
+                        ghost.y = 5 * cellSize + Math.floor(g / 2) * cellSize;
+                    } else {
+                        lives--;
+                        px = 1 * cellSize + cellSize / 2;
+                        py = 1 * cellSize + cellSize / 2;
+                        pvx = 0; pvy = 0;
+                        if (lives <= 0) {
+                            gameOver = true;
+                            if ($info) $info.textContent = lang === 'fr' ? 'Game Over !' : 'Game Over!';
+                            setTimeout(function () {
+                                try {
+                                    localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'pacman', won: false, ts: Date.now() }));
+                                } catch (e) {}
+                                window.location.href = '../true-detective/index.html?standalone=pacman';
+                            }, 1500);
+                            return;
+                        }
                     }
                 }
             }
@@ -160,19 +188,20 @@
             if ($info) $info.textContent = (lang === 'fr' ? 'Score' : 'Score') + ': ' + score + ' | ' + (lang === 'fr' ? 'Vies' : 'Lives') + ': ' + lives;
         }
 
-        function draw() {
-            ctx.fillStyle = '#0a0a1a';
-            ctx.fillRect(0, 0, cw, ch);
-
+        function drawMaze() {
             for (var r = 0; r < ROWS; r++) {
                 for (var c = 0; c < COLS; c++) {
                     if (map[r][c] === 1) {
                         ctx.fillStyle = '#1a2030';
                         ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+                        ctx.strokeStyle = '#2a3040';
+                        ctx.strokeRect(c * cellSize, r * cellSize, cellSize, cellSize);
                     }
                 }
             }
+        }
 
+        function drawDots() {
             for (var i = 0; i < dots.length; i++) {
                 var d = dots[i];
                 if (!d.eaten) {
@@ -182,25 +211,50 @@
                     ctx.fill();
                 }
             }
+        }
 
+        function drawPacman() {
             ctx.fillStyle = '#ffd600';
+            ctx.shadowColor = '#ffd600';
+            ctx.shadowBlur = 10;
             ctx.beginPath();
             ctx.arc(px, py, cellSize / 2 - 2, mouthAngle, Math.PI * 2 - mouthAngle);
             ctx.lineTo(px, py);
             ctx.fill();
+            ctx.shadowBlur = 0;
+        }
 
+        function drawGhosts() {
             for (var g = 0; g < ghosts.length; g++) {
                 var ghost = ghosts[g];
-                ctx.fillStyle = ghost.color;
+                ctx.fillStyle = powerMode ? '#00d4ff' : ghost.color;
+                ctx.shadowColor = powerMode ? '#00d4ff' : ghost.color;
+                ctx.shadowBlur = powerMode ? 15 : 8;
                 ctx.beginPath();
                 ctx.arc(ghost.x, ghost.y, cellSize / 2 - 2, 0, Math.PI * 2);
                 ctx.fill();
+                ctx.shadowBlur = 0;
+
                 ctx.fillStyle = '#fff';
                 ctx.beginPath();
                 ctx.arc(ghost.x - 4, ghost.y - 3, 3, 0, Math.PI * 2);
                 ctx.arc(ghost.x + 4, ghost.y - 3, 3, 0, Math.PI * 2);
                 ctx.fill();
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(ghost.x - 4, ghost.y - 3, 1.5, 0, Math.PI * 2);
+                ctx.arc(ghost.x + 4, ghost.y - 3, 1.5, 0, Math.PI * 2);
+                ctx.fill();
             }
+        }
+
+        function draw() {
+            ctx.fillStyle = '#0a0a1a';
+            ctx.fillRect(0, 0, cw, ch);
+            drawMaze();
+            drawDots();
+            drawPacman();
+            drawGhosts();
         }
 
         function loop() {

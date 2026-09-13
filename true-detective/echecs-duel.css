@@ -1,7 +1,8 @@
 /* ECHECS DUEL standalone - Lady Vivienne, interieur manoir */
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Montserrat', sans-serif; background: #070605; color: #e8ddc4; min-height: 100vh; }
-#duel-app { position: relative; min-height: 100vh; display: flex; flex-direction: column; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: 'Montserrat', sans-serif; background: #070605; color: #e8ddc4; height: 100vh; }
+#duel-app { position: relative; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 .manor-bg { position: fixed; inset: 0; background-size: cover; background-position: center; filter: brightness(.5); z-index: 0; background-color: #14100b; }
 .manor-vignette { position: fixed; inset: 0; z-index: 1; pointer-events: none;
 background: radial-gradient(ellipse at 50% 35%, rgba(0,0,0,0) 30%, rgba(0,0,0,.6) 78%, rgba(0,0,0,.92) 100%); }
@@ -27,8 +28,8 @@ background: radial-gradient(ellipse at 50% 35%, rgba(0,0,0,0) 30%, rgba(0,0,0,.6
 .diff-btns { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; margin-top: .5rem; }
 .diff-btn { background: transparent; border: 1px solid rgba(212,175,55,.5); color: #e8ddc4; border-radius: 20px; padding: .4rem 1rem; cursor: pointer; }
 .diff-btn.active { background: #d4af37; color: #000; font-weight: 700; }
-.duel-main { position: relative; z-index: 4; display: grid; grid-template-columns: 300px 1fr 280px; gap: 1rem; padding: 1rem 1.2rem 2rem; flex: 1; align-items: start; max-width: 1400px; margin: 0 auto; width: 100%; }
-.vivienne-panel, .story-panel { background: rgba(10,7,4,.87); border: 1px solid rgba(212,175,55,.35); border-radius: 12px; padding: 1rem; }
+.duel-main { position: relative; z-index: 4; display: grid; grid-template-columns: 300px 1fr 280px; gap: 1rem; padding: 1rem 1.2rem; flex: 1; align-items: stretch; max-width: 1400px; margin: 0 auto; width: 100%; overflow: hidden; }
+.vivienne-panel, .story-panel { background: rgba(10,7,4,.87); border: 1px solid rgba(212,175,55,.35); border-radius: 12px; padding: 1rem; overflow-y: auto; max-height: calc(100vh - 120px); }
 
 .portrait-frame { position: relative; width: 170px; height: 210px; margin: 0 auto; }
 .portrait-frame img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; border: 2px solid rgba(212,175,55,.7); }
@@ -51,7 +52,7 @@ background: radial-gradient(ellipse at 50% 35%, rgba(0,0,0,0) 30%, rgba(0,0,0,.6
 #clue-list li { font-size: .78rem; background: rgba(212,175,55,.1); border: 1px solid rgba(212,175,55,.3); padding: .45rem .55rem; border-radius: 6px; line-height: 1.45; }
 #clue-list li.false-lead { border-color: rgba(255,90,90,.5); background: rgba(255,60,60,.08); }
 #clue-list li.final { border-color: #d4af37; background: rgba(212,175,55,.2); font-weight: 600; }
-.board-panel { display: flex; flex-direction: column; align-items: center; gap: .6rem; }
+.board-panel { display: flex; flex-direction: column; align-items: center; gap: .6rem; overflow: hidden; }
 .board-hud { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; }
 .hud-chip { background: rgba(8,5,3,.85); border: 1px solid rgba(212,175,55,.4); border-radius: 20px; padding: .35rem .9rem; font-size: .8rem; color: #f0e3bd; }
 .hud-chip.danger { border-color: #ff5b5b; color: #ffb3b3; animation: pulse 1s infinite; }
