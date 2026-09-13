@@ -3807,7 +3807,8 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 lang: langParam,
                 theme: (typeof getThemeId === 'function' ? getThemeId() : null) || 'agatha-christie',
                 culprit: (st && st.culprit) ? st.culprit : null,
-                ts: Date.now()
+                ts: Date.now(),
+                returnUrl: 'index.html?standalone=' + standaloneType
             };
             localStorage.setItem('td_standalone_game_return', JSON.stringify(returnData));
         } catch (e) {}
@@ -4055,7 +4056,8 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                     lang: langParam,
                     theme: themeId,
                     culprit: (st && st.culprit) ? st.culprit : null,
-                    ts: Date.now()
+                    ts: Date.now(),
+                    returnUrl: 'index.html?standalone=' + standaloneType
                 };
                 localStorage.setItem('td_standalone_game_return', JSON.stringify(returnData));
             } catch (e) {}
