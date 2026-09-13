@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>True Detective - Bataille navale</title>
+    <link rel="icon" href="../icon/Logo%20d%26p.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="standalone-game.css">
+    <style>
+        .battleship-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .battleship-board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 3px;
+            background: #0c1018;
+            padding: 8px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .battleship-cell {
+            aspect-ratio: 1;
+            background: #1a2030;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 28px;
+            min-height: 28px;
+        }
+        .battleship-cell:hover {
+            background: #2a3040;
+        }
+        .battleship-cell.hit {
+            background: #ff006e;
+            border-color: #ff006e;
+        }
+        .battleship-cell.miss {
+            background: #4a5e72;
+            border-color: #4a5e72;
+        }
+        .battleship-info {
+            text-align: center;
+            color: #e8f4ff;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="battleship-wrap">
+        <h2 class="sg-title" style="color:#00d4ff;font-family:'Playfair Display',serif;">Bataille navale</h2>
+        <div class="battleship-info" id="battleship-status">Trouvez les 5 navires ennemis</div>
+        <div class="battleship-board" id="battleship-board"></div>
+    </div>
+
+    <script src="bataille-navale.js"></script>
+</body>
+</html>

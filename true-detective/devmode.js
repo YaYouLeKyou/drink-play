@@ -201,9 +201,28 @@
                         }
                         if (page.interrogation && window.TDNarration && window.TDNarration.interrogations) {
                             var interro = window.TDNarration.interrogations[page.interrogation];
-                            if (interro && interro.minigame) {
-                                isInterroMinigame = true;
-                                pageBtn.classList.add('dev-page-btn-interro-mg');
+                            // Page dynamique (révélation) : toujours vert (pas de mini-jeu)
+                            if (page.interrogation === 'dynamic') {
+                                isInterro = true;
+                                pageBtn.classList.add('dev-page-btn-interro');
+                            } else if (interro && interro.minigame) {
+                                // Vérifier si le mini-jeu est autorisé à cette page précise
+                                // Uniquement si l'ID d'interrogation figure dans MINIGAME_LOCATIONS
+                                // et que la phase/page correspondent
+                                var minigameHere = false;
+                                if (window.MINIGAME_LOCATIONS && window.MINIGAME_LOCATIONS[page.interrogation]) {
+                                    var loc = window.MINIGAME_LOCATIONS[page.interrogation];
+                                    if (loc.phase === phase.id && loc.pageIdx === pageIdx) {
+                                        minigameHere = true;
+                                    }
+                                }
+                                if (minigameHere) {
+                                    isInterroMinigame = true;
+                                    pageBtn.classList.add('dev-page-btn-interro-mg');
+                                } else {
+                                    isInterro = true;
+                                    pageBtn.classList.add('dev-page-btn-interro');
+                                }
                             } else if (interro) {
                                 isInterro = true;
                                 pageBtn.classList.add('dev-page-btn-interro');

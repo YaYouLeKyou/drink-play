@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>True Detective - Space Invaders</title>
+    <link rel="icon" href="../icon/Logo%20d%26p.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="standalone-game.css">
+    <style>
+        .si-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+        }
+        #si-canvas {
+            display: block;
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            background: #0a0a1a;
+            border: 2px solid #ff006e;
+            border-radius: 12px;
+        }
+        .si-info {
+            color: #e8f4ff;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="si-wrap">
+        <h2 class="sg-title" style="color:#ff006e;font-family:'Playfair Display',serif;">Space Invaders</h2>
+        <div class="si-info" id="si-info">Score: 0 | Vies: 3</div>
+        <canvas id="si-canvas"></canvas>
+    </div>
+
+    <script src="space-invaders.js"></script>
+</body>
+</html>

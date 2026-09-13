@@ -4372,6 +4372,56 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             return;
         }
 
+        if (minigameType === 'memory') {
+            window.location.href = 'memory.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
+            return;
+        }
+
+        if (minigameType === 'shooting') {
+            window.location.href = 'shooting.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
+            return;
+        }
+
+        if (minigameType === 'jackpot') {
+            window.location.href = 'jackpot.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
+            return;
+        }
+
+        if (minigameType === 'connect4') {
+            window.location.href = 'connect4.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
+            return;
+        }
+
+        if (minigameType === 'bataille-navale') {
+            window.location.href = 'bataille-navale.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
+            return;
+        }
+
+        if (minigameType === 'pong') {
+            window.location.href = 'pong.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
+            return;
+        }
+
+        if (minigameType === 'pacman') {
+            window.location.href = 'pacman.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
+            return;
+        }
+
+        if (minigameType === 'space-invaders') {
+            window.location.href = 'space-invaders.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
+            return;
+        }
+
+        if (minigameType === 'breakout') {
+            window.location.href = 'breakout.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
+            return;
+        }
+
+        if (minigameType === 'asteroids') {
+            window.location.href = 'asteroids.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
+            return;
+        }
+
         if (minigameType === 'montre_code') {
             window.location.href = 'montre-code.html';
             return;
@@ -4963,6 +5013,7 @@ function scrApplyChoice(choiceKey, choiceId) {
     window.scr = scr;
     window.getThemeId = getThemeId;
     window.scrNpcImage = scrNpcImage;
+    window.MINIGAME_LOCATIONS = MINIGAME_LOCATIONS;
     window.scrDecorImage = scrDecorImage;
     window.scrNpcName = scrNpcName;
     window.scrNpcDecorImage = function (npcId) {

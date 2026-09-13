@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>True Detective - Pacman</title>
+    <link rel="icon" href="../icon/Logo%20d%26p.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="standalone-game.css">
+    <style>
+        .pacman-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+        }
+        #pacman-canvas {
+            display: block;
+            width: 100%;
+            max-width: 500px;
+            height: 400px;
+            background: #0a0a1a;
+            border: 2px solid #ffd600;
+            border-radius: 12px;
+        }
+        .pacman-info {
+            color: #e8f4ff;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="pacman-wrap">
+        <h2 class="sg-title" style="color:#ffd600;font-family:'Playfair Display',serif;">Pacman</h2>
+        <div class="pacman-info" id="pacman-info">Score: 0 | Vies: 3</div>
+        <canvas id="pacman-canvas"></canvas>
+    </div>
+
+    <script src="pacman.js"></script>
+</body>
+</html>

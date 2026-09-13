@@ -25,8 +25,6 @@
         'cryptogramme': 'minigames.js',
         'coffre_code': 'minigames.js',
         'chess': 'chess-game.js',
-        'memory': 'memory-game.js',
-        'shooting': 'shooting-gallery.js',
         'jackpot': 'minigames.js',
         'connect4': 'connect4-game.js',
         'bataille-navale': 'bataille-navale.js',
@@ -36,6 +34,19 @@
         'breakout': 'breakout-game.js',
         'asteroids': 'asteroids-game.js',
         'marginal-tower': null
+    };
+
+    var STANDALONE_REDIRECT = {
+        'memory': 'memory.html',
+        'shooting': 'shooting.html',
+        'jackpot': 'jackpot.html',
+        'connect4': 'connect4.html',
+        'bataille-navale': 'bataille-navale.html',
+        'pong': 'pong.html',
+        'pacman': 'pacman.html',
+        'space-invaders': 'space-invaders.html',
+        'breakout': 'breakout.html',
+        'asteroids': 'asteroids.html'
     };
 
     function loadScript(src) {
@@ -111,6 +122,11 @@
 
         if (gameType === 'marginal-tower') {
             window.location.href = 'marginal-tower.html?difficulty=' + difficulty + '&lang=' + lang;
+            return;
+        }
+
+        if (STANDALONE_REDIRECT[gameType]) {
+            window.location.href = STANDALONE_REDIRECT[gameType] + '?difficulty=' + difficulty + '&lang=' + lang;
             return;
         }
 

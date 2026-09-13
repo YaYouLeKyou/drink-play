@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>True Detective - Tir forain</title>
+    <link rel="icon" href="../icon/Logo%20d%26p.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="standalone-game.css">
+    <style>
+        .shooting-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .shooting-header {
+            width: 100%;
+            text-align: center;
+            background: rgba(12, 16, 24, 0.85);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .shooting-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: #f0d890;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+            margin: 0;
+        }
+        .shooting-stats {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .shooting-stat {
+            font-size: 0.9rem;
+            color: #00d4ff;
+            font-weight: 600;
+        }
+        #shooting-canvas {
+            display: block;
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            background: #0a0a1a;
+            border: 2px solid #00d4ff;
+            border-radius: 12px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+        .shooting-dialogue {
+            width: 100%;
+            background: rgba(12, 16, 24, 0.85);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 12px;
+            padding: 12px 16px;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #e8f4ff;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+        @media (max-width: 600px) {
+            #shooting-canvas {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="shooting-wrap">
+        <div class="shooting-header">
+            <h2 class="shooting-title" id="shooting-title">Tir forain</h2>
+            <div class="shooting-stats">
+                <div class="shooting-stat" id="shooting-score">Score: 0</div>
+                <div class="shooting-stat" id="shooting-targets">Cibles: 0/0</div>
+                <div class="shooting-stat" id="shooting-misses">Manqués: 0</div>
+            </div>
+        </div>
+        <canvas id="shooting-canvas"></canvas>
+        <div class="shooting-dialogue" id="shooting-dialogue">Tirez sur les cibles. Évitez les innocents.</div>
+    </div>
+
+    <script src="shooting.js"></script>
+</body>
+</html>
