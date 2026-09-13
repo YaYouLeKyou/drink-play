@@ -3818,7 +3818,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.continueBtn.onclick = function () {
             $.continueBtn.disabled = true;
             if (standaloneType) {
-                window.location.href = standaloneType + '.html?difficulty=' + diff + '&lang=' + langParam;
+                window.location.href = getMinigameStandaloneUrl(standaloneType, diff, langParam, 'story');
             } else {
                 scrLaunchMinigame(page);
             }
@@ -4070,7 +4070,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             $.continueBtn.disabled = false;
             $.continueBtn.textContent = getText('continue') || 'Continuer';
             $.continueBtn.onclick = function () {
-                window.location.href = standaloneType + '.html?difficulty=' + diff + '&lang=' + langParam;
+                window.location.href = getMinigameStandaloneUrl(standaloneType, diff, langParam, 'story');
             };
             return;
         }
@@ -4312,6 +4312,29 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         return cfg;
     }
 
+    function getMinigameStandaloneUrl(type, diff, lang, mode) {
+        var standalonePages = {
+            'marginal-tower': 'marginal-tower.html',
+            'memory': 'memory.html',
+            'shooting': 'shooting.html',
+            'jackpot': 'jackpot.html',
+            'connect4': 'connect4.html',
+            'bataille-navale': 'bataille-navale.html',
+            'pong': 'pong.html',
+            'pacman': 'pacman.html',
+            'space-invaders': 'space-invaders.html',
+            'breakout': 'breakout.html',
+            'asteroids': 'asteroids.html',
+            'montre_code': 'montre-code.html'
+        };
+
+        if (standalonePages[type]) {
+            return standalonePages[type] + '?difficulty=' + diff + '&lang=' + lang;
+        }
+
+        return 'standalone-game.html?game=' + type + '&difficulty=' + diff + '&lang=' + lang + (mode ? ('&mode=' + mode) : '');
+    }
+
     function getGlobalGameMap() {
         return {
             chess: 'TDChessGame',
@@ -4363,71 +4386,14 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         var title = titles[minigameType] || { fr: 'Mini-jeu', en: 'Mini-game' };
         $.minigameTitle.textContent = title[ui.language] || title.en || minigameType;
 
-        var standaloneUrl = 'standalone-game.html?game=' + minigameType + '&lang=' + (ui.language === 'en' ? 'en' : 'fr') + '&mode=selection';
-
         if (minigameType === 'marginal-tower') {
             showDifficultySelection({ type: 'marginal-tower', title: title }, function (selectedDifficulty) {
-                window.location.href = 'marginal-tower.html?difficulty=' + selectedDifficulty + '&lang=' + (ui.language === 'en' ? 'en' : 'fr');
+                window.location.href = getMinigameStandaloneUrl('marginal-tower', selectedDifficulty, (ui.language === 'en' ? 'en' : 'fr'), 'selection');
             });
             return;
         }
 
-        if (minigameType === 'memory') {
-            window.location.href = 'memory.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
-            return;
-        }
-
-        if (minigameType === 'shooting') {
-            window.location.href = 'shooting.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
-            return;
-        }
-
-        if (minigameType === 'jackpot') {
-            window.location.href = 'jackpot.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
-            return;
-        }
-
-        if (minigameType === 'connect4') {
-            window.location.href = 'connect4.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
-            return;
-        }
-
-        if (minigameType === 'bataille-navale') {
-            window.location.href = 'bataille-navale.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
-            return;
-        }
-
-        if (minigameType === 'pong') {
-            window.location.href = 'pong.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
-            return;
-        }
-
-        if (minigameType === 'pacman') {
-            window.location.href = 'pacman.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
-            return;
-        }
-
-        if (minigameType === 'space-invaders') {
-            window.location.href = 'space-invaders.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
-            return;
-        }
-
-        if (minigameType === 'breakout') {
-            window.location.href = 'breakout.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
-            return;
-        }
-
-        if (minigameType === 'asteroids') {
-            window.location.href = 'asteroids.html?difficulty=1&lang=' + (ui.language === 'en' ? 'en' : 'fr');
-            return;
-        }
-
-        if (minigameType === 'montre_code') {
-            window.location.href = 'montre-code.html';
-            return;
-        }
-
-        window.location.href = standaloneUrl;
+        window.location.href = getMinigameStandaloneUrl(minigameType, 1, (ui.language === 'en' ? 'en' : 'fr'), 'selection');
     }
 
     function startSelectedMinigame(minigameType, cfg) {

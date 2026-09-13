@@ -12,9 +12,23 @@
     <div id="standalone-game-app">
         <header class="sg-header">
             <button id="back-to-game-btn" class="btn btn-back">← Retour</button>
+            <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
             <h1 class="sg-title" id="sg-title">Mini-jeu</h1>
             <div class="sg-hud" id="sg-hud"></div>
+
         </header>
+
+        <nav id="hamburger-menu" class="sg-menu">
+            <button class="sg-menu-item" id="menu-back">
+                <span class="menu-icon">←</span>
+                <span>Retour à l'enquête</span>
+            </button>
+            <button class="sg-menu-item" id="menu-home">
+                <span class="menu-icon">🏠</span>
+                <span>Menu principal</span>
+            </button>
+            <div class="sg-menu-divider"></div>
+            </nav>
 
         <main class="sg-main">
             <div id="game-container" class="game-container">

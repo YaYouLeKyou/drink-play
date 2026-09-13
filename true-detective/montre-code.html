@@ -11,12 +11,25 @@
 <body>
     <div id="montre-app">
         <header class="montre-header">
+            <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
             <button id="back-to-game-btn" class="btn btn-back">← Retour à l'enquête</button>
             <h1 class="montre-title">La Montre du Duc</h1>
             <div class="montre-progress">
                 <span id="engrave-counter">0</span>/4 gravures décryptées
             </div>
         </header>
+
+        <nav id="hamburger-menu" class="sg-menu">
+            <button class="sg-menu-item" id="menu-back">
+                <span class="menu-icon">←</span>
+                <span>Retour à l'enquête</span>
+            </button>
+            <button class="sg-menu-item" id="menu-home">
+                <span class="menu-icon">🏠</span>
+                <span>Menu principal</span>
+            </button>
+            <div class="sg-menu-divider"></div>
+            </nav>
 
         <main class="montre-main">
             <div class="montre-scene" id="montre-scene">

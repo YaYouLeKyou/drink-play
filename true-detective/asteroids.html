@@ -31,12 +31,74 @@
     </style>
 </head>
 <body>
-    <div class="asteroids-wrap">
+    <header class="sg-header" style="position:relative;">
+        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
         <h2 class="sg-title" style="color:#ff006e;font-family:'Playfair Display',serif;">Astéroïdes</h2>
-        <div class="asteroids-info" id="asteroids-info">Score: 0 | Vies: 3</div>
-        <canvas id="asteroids-canvas"></canvas>
-    </div>
+        <button id="continue-btn" class="btn btn-primary always-active">Continuer</button>
+    </header>
+    <nav id="hamburger-menu" class="sg-menu">
+        <button class="sg-menu-item" id="menu-back">
+            <span class="menu-icon">←</span>
+            <span>Retour à l'enquête</span>
+        </button>
+        <button class="sg-menu-item" id="menu-home">
+            <span class="menu-icon">🏠</span>
+            <span>Menu principal</span>
+        </button>
+        <div class="sg-menu-divider"></div>
+        </nav>
+    <main class="sg-main">
+        <div class="asteroids-wrap">
+            <div class="asteroids-info" id="asteroids-info">Score: 0 | Vies: 3</div>
+            <canvas id="asteroids-canvas"></canvas>
+        </div>
+    </main>
 
     <script src="asteroids.js"></script>
+    <script>
+        (function () {
+            'use strict';
+            var hamburgerBtn = document.getElementById('hamburger-btn');
+            var menu = document.getElementById('hamburger-menu');
+            if (hamburgerBtn && menu) {
+                hamburgerBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    menu.classList.toggle('open');
+                });
+                document.addEventListener('click', function (e) {
+                    if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
+                        menu.classList.remove('open');
+                    }
+                });
+            }
+            var menuBack = document.getElementById('menu-back');
+            if (menuBack) {
+                menuBack.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    window.location.href = '../true-detective/index.html';
+                });
+            }
+            var menuHome = document.getElementById('menu-home');
+            if (menuHome) {
+                menuHome.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    window.location.href = '../true-detective/index.html';
+                });
+            }
+            var menuContinue = document.getElementById('menu-continue');
+            if (menuContinue) {
+                menuContinue.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    window.location.href = '../true-detective/index.html';
+                });
+            }
+            var continueBtn = document.getElementById('continue-btn');
+            if (continueBtn) {
+                continueBtn.addEventListener('click', function () {
+                    window.location.href = '../true-detective/index.html';
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

@@ -81,19 +81,82 @@
     </style>
 </head>
 <body>
-    <div class="shooting-wrap">
-        <div class="shooting-header">
-            <h2 class="shooting-title" id="shooting-title">Tir forain</h2>
-            <div class="shooting-stats">
-                <div class="shooting-stat" id="shooting-score">Score: 0</div>
-                <div class="shooting-stat" id="shooting-targets">Cibles: 0/0</div>
-                <div class="shooting-stat" id="shooting-misses">Manqués: 0</div>
+    <header class="sg-header" style="position:relative;">
+        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
+        <h2 class="sg-title" style="color:#f0d890;font-family:'Playfair Display',serif;">Tir forain</h2>
+        <button id="continue-btn" class="btn btn-primary always-active">Continuer</button>
+    </header>
+    <nav id="hamburger-menu" class="sg-menu">
+        <button class="sg-menu-item" id="menu-back">
+            <span class="menu-icon">←</span>
+            <span>Retour à l'enquête</span>
+        </button>
+        <button class="sg-menu-item" id="menu-home">
+            <span class="menu-icon">🏠</span>
+            <span>Menu principal</span>
+        </button>
+        <div class="sg-menu-divider"></div>
+        </nav>
+    <main class="sg-main">
+        <div class="shooting-wrap">
+            <div class="shooting-header">
+                <h2 class="shooting-title" id="shooting-title">Tir forain</h2>
+                <div class="shooting-stats">
+                    <div class="shooting-stat" id="shooting-score">Score: 0</div>
+                    <div class="shooting-stat" id="shooting-targets">Cibles: 0/0</div>
+                    <div class="shooting-stat" id="shooting-misses">Manqués: 0</div>
+                </div>
             </div>
+            <canvas id="shooting-canvas"></canvas>
+            <div class="shooting-dialogue" id="shooting-dialogue">Tirez sur les cibles. Évitez les innocents.</div>
         </div>
-        <canvas id="shooting-canvas"></canvas>
-        <div class="shooting-dialogue" id="shooting-dialogue">Tirez sur les cibles. Évitez les innocents.</div>
-    </div>
+    </main>
 
     <script src="shooting.js"></script>
+    <script>
+        (function () {
+            'use strict';
+            var hamburgerBtn = document.getElementById('hamburger-btn');
+            var menu = document.getElementById('hamburger-menu');
+            if (hamburgerBtn && menu) {
+                hamburgerBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    menu.classList.toggle('open');
+                });
+                document.addEventListener('click', function (e) {
+                    if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
+                        menu.classList.remove('open');
+                    }
+                });
+            }
+            var menuBack = document.getElementById('menu-back');
+            if (menuBack) {
+                menuBack.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    window.location.href = '../true-detective/index.html';
+                });
+            }
+            var menuHome = document.getElementById('menu-home');
+            if (menuHome) {
+                menuHome.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    window.location.href = '../true-detective/index.html';
+                });
+            }
+            var menuContinue = document.getElementById('menu-continue');
+            if (menuContinue) {
+                menuContinue.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    window.location.href = '../true-detective/index.html';
+                });
+            }
+            var continueBtn = document.getElementById('continue-btn');
+            if (continueBtn) {
+                continueBtn.addEventListener('click', function () {
+                    window.location.href = '../true-detective/index.html';
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

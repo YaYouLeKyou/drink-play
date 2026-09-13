@@ -136,9 +136,17 @@
             ctx.fillRect(cw - paddleW / 2, aiY, paddleW, paddleH);
 
             ctx.fillStyle = '#ffd600';
+            ctx.shadowColor = '#ffd600';
+            ctx.shadowBlur = 8;
             ctx.beginPath();
             ctx.arc(ballX, ballY, 6, 0, Math.PI * 2);
             ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            for (var y = 0; y < ch; y += 4) {
+                ctx.fillRect(0, y, cw, 1);
+            }
         }
 
         function loop() {

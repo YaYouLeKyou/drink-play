@@ -346,13 +346,41 @@
         if (backBtn) {
             backBtn.addEventListener('click', function () {
                 cleanup();
-                if (fromStory && storyReturn && storyReturn.returnUrl) {
-                    window.location.href = storyReturn.returnUrl;
-                } else {
-                    window.location.href = '../true-detective/index.html';
+                window.location.href = '../true-detective/index.html';
+            });
+        }
+
+        var hamburgerBtn = document.getElementById('hamburger-btn');
+        var menu = document.getElementById('hamburger-menu');
+        if (hamburgerBtn && menu) {
+            hamburgerBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                menu.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
+                    menu.classList.remove('open');
                 }
             });
         }
+
+        var menuBack = document.getElementById('menu-back');
+        if (menuBack) {
+            menuBack.addEventListener('click', function () {
+                if (menu) menu.classList.remove('open');
+                if (backBtn) backBtn.click();
+            });
+        }
+
+        var menuHome = document.getElementById('menu-home');
+        if (menuHome) {
+            menuHome.addEventListener('click', function () {
+                if (menu) menu.classList.remove('open');
+                cleanup();
+                window.location.href = '../true-detective/index.html';
+            });
+        }
+
 
         var victoryBtn = document.getElementById('victory-continue-btn');
         if (victoryBtn) {

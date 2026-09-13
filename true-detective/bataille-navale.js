@@ -1,7 +1,7 @@
 /* =====================================================================
-   TRUE DETECTIVE - BATAILLE NAVALE (Standalone)
-   Simple Battleship game. Find 5 hidden ships.
-   ===================================================================== */
+    TRUE DETECTIVE - BATAILLE NAVALE (Standalone 1v1)
+    Two boards: player places ships, then turn-based duel vs AI suspect.
+    ===================================================================== */
 (function (global) {
     'use strict';
 
@@ -16,105 +16,316 @@
         var params = new URLSearchParams(window.location.search);
         var lang = params.get('lang') || 'fr';
 
-        var $board = document.getElementById('battleship-board');
+        var $playerBoard = document.getElementById('player-board');
+        var $enemyBoard = document.getElementById('enemy-board');
         var $status = document.getElementById('battleship-status');
+        var $turnIndicator = document.getElementById('turn-indicator');
+        var $shipSelector = document.getElementById('ship-selector');
+        var $rotateBtn = document.getElementById('rotate-btn');
+        var $resetBtn = document.getElementById('reset-btn');
 
-        var grid = [];
-        for (var r = 0; r < SIZE; r++) {
-            grid[r] = [];
-            for (var c = 0; c < SIZE; c++) {
-                grid[r][c] = EMPTY;
+        var playerGrid = createEmptyGrid();
+        var enemyGrid = createEmptyGrid();
+        var playerShots = createEmptyGrid();
+        var enemyShots = createEmptyGrid();
+
+        var phase = 'placement'; // placement | battle | gameover
+        var currentPlayer = 'player'; // player | enemy
+        var selectedShipIndex = 0;
+        var horizontal = true;
+        var playerShipsPlaced = 0;
+        var enemyShipsPlaced = 0;
+        var playerHits = 0;
+        var enemyHits = 0;
+        var totalShipCells = SHIPS.reduce(function (a, b) { return a + b; }, 0);
+
+        function createEmptyGrid() {
+            var grid = [];
+            for (var r = 0; r < SIZE; r++) {
+                grid[r] = [];
+                for (var c = 0; c < SIZE; c++) {
+                    grid[r][c] = EMPTY;
+                }
+            }
+            return grid;
+        }
+
+        function canPlace(grid, row, col, length, horiz) {
+            for (var i = 0; i < length; i++) {
+                var r = horiz ? row : row + i;
+                var c = horiz ? col + i : col;
+                if (r < 0 || r >= SIZE || c < 0 || c >= SIZE) return false;
+                if (grid[r][c] !== EMPTY) return false;
+            }
+            return true;
+        }
+
+        function placeShip(grid, row, col, length, horiz) {
+            for (var i = 0; i < length; i++) {
+                var r = horiz ? row : row + i;
+                var c = horiz ? col + i : col;
+                grid[r][c] = SHIP;
             }
         }
 
-        function placeShips() {
+        function placeShipsRandomly(grid) {
             for (var s = 0; s < SHIPS.length; s++) {
                 var placed = false;
                 while (!placed) {
-                    var horizontal = Math.random() < 0.5;
+                    var horiz = Math.random() < 0.5;
                     var row = Math.floor(Math.random() * SIZE);
                     var col = Math.floor(Math.random() * SIZE);
-                    if (horizontal && col + SHIPS[s] <= SIZE) {
-                        var ok = true;
-                        for (var i = 0; i < SHIPS[s]; i++) {
-                            if (grid[row][col + i] !== EMPTY) { ok = false; break; }
-                        }
-                        if (ok) {
-                            for (var i = 0; i < SHIPS[s]; i++) grid[row][col + i] = SHIP;
-                            placed = true;
-                        }
-                    } else if (!horizontal && row + SHIPS[s] <= SIZE) {
-                        var ok = true;
-                        for (var i = 0; i < SHIPS[s]; i++) {
-                            if (grid[row + i][col] !== EMPTY) { ok = false; break; }
-                        }
-                        if (ok) {
-                            for (var i = 0; i < SHIPS[s]; i++) grid[row + i][col] = SHIP;
-                            placed = true;
-                        }
+                    if (canPlace(grid, row, col, SHIPS[s], horiz)) {
+                        placeShip(grid, row, col, SHIPS[s], horiz);
+                        placed = true;
                     }
                 }
             }
         }
 
-        placeShips();
+        placeShipsRandomly(enemyGrid);
 
-        var hits = 0;
-        var totalShipCells = SHIPS.reduce(function (a, b) { return a + b; }, 0);
-        var gameOver = false;
-
-        function render() {
-            if (!$board) return;
-            $board.innerHTML = '';
+        function renderBoard(boardEl, grid, showShips) {
+            if (!boardEl) return;
+            boardEl.innerHTML = '';
             for (var r = 0; r < SIZE; r++) {
                 for (var c = 0; c < SIZE; c++) {
                     var cell = document.createElement('div');
                     cell.className = 'battleship-cell';
-                    if (grid[r][c] === HIT) cell.classList.add('hit');
-                    if (grid[r][c] === MISS) cell.classList.add('miss');
                     cell.dataset.row = r;
                     cell.dataset.col = c;
-                    cell.addEventListener('click', function () {
-                        var row = parseInt(this.dataset.row, 10);
-                        var col = parseInt(this.dataset.col, 10);
-                        fire(row, col);
-                    });
-                    $board.appendChild(cell);
+                    if (grid[r][c] === HIT) cell.classList.add('hit');
+                    else if (grid[r][c] === MISS) cell.classList.add('miss');
+                    else if (showShips && grid[r][c] === SHIP) cell.classList.add('ship');
+                    boardEl.appendChild(cell);
                 }
             }
         }
 
-        function fire(row, col) {
-            if (gameOver) return;
-            if (grid[row][col] === HIT || grid[row][col] === MISS) return;
+        function renderPlayerBoard() {
+            renderBoard($playerBoard, playerGrid, true);
+        }
 
-            if (grid[row][col] === SHIP) {
-                grid[row][col] = HIT;
-                hits++;
-                if ($status) $status.textContent = (lang === 'fr' ? 'Touché ! ' : 'Hit! ') + hits + '/' + totalShipCells;
-                render();
-                if (hits >= totalShipCells) {
-                    gameOver = true;
-                    if ($status) $status.textContent = lang === 'fr' ? 'Victoire ! Tous les navires coulés.' : 'Victory! All ships sunk.';
-                    setTimeout(function () {
-                        try {
-                            localStorage.setItem('td_standalone_game_result', JSON.stringify({
-                                type: 'bataille-navale',
-                                won: true,
-                                ts: Date.now()
-                            }));
-                        } catch (e) {}
-                        window.location.href = '../true-detective/index.html?standalone=bataille-navale';
-                    }, 1000);
+        function renderEnemyBoard() {
+            renderBoard($enemyBoard, playerShots, false);
+        }
+
+        function updateShipSelector() {
+            if (!$shipSelector) return;
+            $shipSelector.innerHTML = '';
+            SHIPS.forEach(function (len, idx) {
+                var btn = document.createElement('button');
+                btn.className = 'battleship-ship-btn';
+                if (idx === selectedShipIndex) btn.classList.add('selected');
+                if (idx < playerShipsPlaced) btn.classList.add('placed');
+                btn.textContent = (lang === 'fr' ? 'Navire ' : 'Ship ') + (idx + 1) + ' (' + len + ')';
+                btn.addEventListener('click', function () {
+                    if (idx >= playerShipsPlaced) {
+                        selectedShipIndex = idx;
+                        updateShipSelector();
+                    }
+                });
+                $shipSelector.appendChild(btn);
+            });
+        }
+
+        function getPreviewCells(row, col, length, horiz) {
+            var cells = [];
+            for (var i = 0; i < length; i++) {
+                var r = horiz ? row : row + i;
+                var c = horiz ? col + i : col;
+                if (r >= 0 && r < SIZE && c >= 0 && c < SIZE) {
+                    cells.push({ row: r, col: c, valid: playerGrid[r][c] === EMPTY });
                 }
+            }
+            return cells;
+        }
+
+        function clearPreviews() {
+            document.querySelectorAll('.battleship-cell.preview, .battleship-cell.blocked').forEach(function (cell) {
+                cell.classList.remove('preview', 'blocked');
+            });
+        }
+
+        function showPreview(row, col, length, horiz) {
+            clearPreviews();
+            var cells = getPreviewCells(row, col, length, horiz);
+            cells.forEach(function (cell) {
+                var boardCell = $playerBoard.querySelector('[data-row="' + cell.row + '"][data-col="' + cell.col + '"]');
+                if (boardCell) {
+                    boardCell.classList.add(cell.valid ? 'preview' : 'blocked');
+                }
+            });
+        }
+
+        function handlePlayerBoardClick(e) {
+            if (phase !== 'placement') return;
+            var cell = e.target.closest('.battleship-cell');
+            if (!cell) return;
+            var row = parseInt(cell.dataset.row, 10);
+            var col = parseInt(cell.dataset.col, 10);
+            if (isNaN(row) || isNaN(col)) return;
+
+            var len = SHIPS[selectedShipIndex];
+            if (!canPlace(playerGrid, row, col, len, horizontal)) return;
+
+            placeShip(playerGrid, row, col, len, horizontal);
+            playerShipsPlaced++;
+            if (playerShipsPlaced >= SHIPS.length) {
+                phase = 'battle';
+                if ($shipSelector) $shipSelector.style.display = 'none';
+                if ($rotateBtn) $rotateBtn.style.display = 'none';
+                if ($resetBtn) $resetBtn.style.display = 'none';
+                if ($status) $status.textContent = lang === 'fr' ? 'La bataille commence !' : 'The battle begins!';
+                currentPlayer = 'player';
+                updateTurnIndicator();
+                renderPlayerBoard();
+                renderEnemyBoard();
             } else {
-                grid[row][col] = MISS;
-                if ($status) $status.textContent = lang === 'fr' ? 'Manqué...' : 'Miss...';
-                render();
+                selectedShipIndex = playerShipsPlaced;
+                updateShipSelector();
+                renderPlayerBoard();
             }
         }
 
-        render();
+        function handleEnemyBoardClick(e) {
+            if (phase !== 'battle' || currentPlayer !== 'player') return;
+            var cell = e.target.closest('.battleship-cell');
+            if (!cell) return;
+            var row = parseInt(cell.dataset.row, 10);
+            var col = parseInt(cell.dataset.col, 10);
+            if (isNaN(row) || isNaN(col)) return;
+            if (playerShots[row][col] === HIT || playerShots[row][col] === MISS) return;
+
+            if (enemyGrid[row][col] === SHIP) {
+                playerShots[row][col] = HIT;
+                playerHits++;
+            } else {
+                playerShots[row][col] = MISS;
+            }
+
+            renderEnemyBoard();
+
+            if (playerHits >= totalShipCells) {
+                phase = 'gameover';
+                if ($status) $status.textContent = lang === 'fr' ? 'Victoire ! Vous avez coulé la flotte ennemie.' : 'Victory! You sank the enemy fleet.';
+                if ($turnIndicator) $turnIndicator.style.display = 'none';
+                setTimeout(function () {
+                    try {
+                        localStorage.setItem('td_standalone_game_result', JSON.stringify({
+                            type: 'bataille-navale',
+                            won: true,
+                            ts: Date.now()
+                        }));
+                    } catch (e) {}
+                    window.location.href = '../true-detective/index.html?standalone=bataille-navale';
+                }, 1500);
+                return;
+            }
+
+            currentPlayer = 'enemy';
+            updateTurnIndicator();
+            setTimeout(enemyTurn, 800);
+        }
+
+        function enemyTurn() {
+            if (phase !== 'battle') return;
+
+            var row, col;
+            var attempts = 0;
+            do {
+                row = Math.floor(Math.random() * SIZE);
+                col = Math.floor(Math.random() * SIZE);
+                attempts++;
+            } while ((enemyShots[row][col] === HIT || enemyShots[row][col] === MISS) && attempts < 1000);
+
+            if (playerGrid[row][col] === SHIP) {
+                enemyShots[row][col] = HIT;
+                enemyHits++;
+            } else {
+                enemyShots[row][col] = MISS;
+            }
+
+            renderPlayerBoard();
+
+            if (enemyHits >= totalShipCells) {
+                phase = 'gameover';
+                if ($status) $status.textContent = lang === 'fr' ? 'Défaite... Votre flotte a été coulée.' : 'Defeat... Your fleet has been sunk.';
+                if ($turnIndicator) $turnIndicator.style.display = 'none';
+                setTimeout(function () {
+                    try {
+                        localStorage.setItem('td_standalone_game_result', JSON.stringify({
+                            type: 'bataille-navale',
+                            won: false,
+                            ts: Date.now()
+                        }));
+                    } catch (e) {}
+                    window.location.href = '../true-detective/index.html?standalone=bataille-navale';
+                }, 1500);
+                return;
+            }
+
+            currentPlayer = 'player';
+            updateTurnIndicator();
+        }
+
+        function updateTurnIndicator() {
+            if (!$turnIndicator) return;
+            if (phase === 'gameover') {
+                $turnIndicator.style.display = 'none';
+                return;
+            }
+            $turnIndicator.style.display = 'block';
+            if (currentPlayer === 'player') {
+                $turnIndicator.textContent = lang === 'fr' ? 'À vous de jouer' : 'Your turn';
+                $turnIndicator.className = 'turn-indicator player';
+            } else {
+                $turnIndicator.textContent = lang === 'fr' ? 'Tour de l\'ennemi...' : 'Enemy turn...';
+                $turnIndicator.className = 'turn-indicator enemy';
+            }
+        }
+
+        function resetGame() {
+            playerGrid = createEmptyGrid();
+            enemyGrid = createEmptyGrid();
+            playerShots = createEmptyGrid();
+            enemyShots = createEmptyGrid();
+            phase = 'placement';
+            currentPlayer = 'player';
+            selectedShipIndex = 0;
+            playerShipsPlaced = 0;
+            enemyShipsPlaced = 0;
+            playerHits = 0;
+            enemyHits = 0;
+            placeShipsRandomly(enemyGrid);
+            if ($shipSelector) $shipSelector.style.display = 'flex';
+            if ($rotateBtn) $rotateBtn.style.display = 'inline-flex';
+            if ($resetBtn) $resetBtn.style.display = 'inline-flex';
+            if ($status) $status.textContent = lang === 'fr' ? 'Placez vos navires' : 'Place your ships';
+            updateTurnIndicator();
+            updateShipSelector();
+            renderPlayerBoard();
+            renderEnemyBoard();
+        }
+
+        if ($playerBoard) {
+            $playerBoard.addEventListener('click', handlePlayerBoardClick);
+        }
+        if ($enemyBoard) {
+            $enemyBoard.addEventListener('click', handleEnemyBoardClick);
+        }
+        if ($rotateBtn) {
+            $rotateBtn.addEventListener('click', function () {
+                horizontal = !horizontal;
+            });
+        }
+        if ($resetBtn) {
+            $resetBtn.addEventListener('click', resetGame);
+        }
+
+        updateShipSelector();
+        renderPlayerBoard();
+        renderEnemyBoard();
     }
 
     if (document.readyState === 'loading') {

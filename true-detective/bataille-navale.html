@@ -15,8 +15,15 @@
             gap: 16px;
             padding: 24px;
             width: 100%;
-            max-width: 500px;
+            max-width: 900px;
             margin: 0 auto;
+        }
+        .battleship-boards {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
         }
         .battleship-board {
             display: grid;
@@ -49,21 +56,234 @@
             background: #4a5e72;
             border-color: #4a5e72;
         }
+        .battleship-cell.ship {
+            background: rgba(0, 212, 255, 0.25);
+            border-color: rgba(0, 212, 255, 0.5);
+        }
+        .battleship-cell.preview {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: rgba(0, 212, 255, 0.4);
+        }
+        .battleship-cell.blocked {
+            background: rgba(255, 0, 110, 0.15);
+            border-color: rgba(255, 0, 110, 0.3);
+        }
         .battleship-info {
             text-align: center;
             color: #e8f4ff;
             font-size: 1rem;
             font-weight: 600;
         }
+        .battleship-panel {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .battleship-btn {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: rgba(0, 212, 255, 0.15);
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            color: #00d4ff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .battleship-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+        .battleship-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .battleship-btn.secondary {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.12);
+            color: #8aa3b8;
+        }
+        .battleship-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: none;
+        }
+        .battleship-legend {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #8aa3b8;
+        }
+        .battleship-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .battleship-legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .battleship-ship-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .battleship-ship-btn {
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            background: rgba(0, 212, 255, 0.1);
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            border-radius: 8px;
+            color: #00d4ff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .battleship-ship-btn:hover {
+            background: rgba(0, 212, 255, 0.25);
+        }
+        .battleship-ship-btn.selected {
+            background: rgba(0, 212, 255, 0.3);
+            border-color: #00d4ff;
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.4);
+        }
+        .battleship-ship-btn.placed {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .turn-indicator {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .turn-indicator.player {
+            background: rgba(0, 212, 255, 0.15);
+            border: 1px solid rgba(0, 212, 255, 0.4);
+            color: #00d4ff;
+        }
+        .turn-indicator.enemy {
+            background: rgba(255, 0, 110, 0.15);
+            border: 1px solid rgba(255, 0, 110, 0.4);
+            color: #ff006e;
+        }
+        @media (max-width: 768px) {
+            .battleship-boards {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="battleship-wrap">
+    <header class="sg-header" style="position:relative;">
+        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
         <h2 class="sg-title" style="color:#00d4ff;font-family:'Playfair Display',serif;">Bataille navale</h2>
-        <div class="battleship-info" id="battleship-status">Trouvez les 5 navires ennemis</div>
-        <div class="battleship-board" id="battleship-board"></div>
-    </div>
+        <button id="continue-btn" class="btn btn-primary always-active">Continuer</button>
+    </header>
+    <nav id="hamburger-menu" class="sg-menu">
+        <button class="sg-menu-item" id="menu-back">
+            <span class="menu-icon">←</span>
+            <span>Retour à l'enquête</span>
+        </button>
+        <button class="sg-menu-item" id="menu-home">
+            <span class="menu-icon">🏠</span>
+            <span>Menu principal</span>
+        </button>
+        <div class="sg-menu-divider"></div>
+        </nav>
+    <main class="sg-main">
+        <div class="battleship-wrap">
+            <div class="battleship-info" id="battleship-status">Placez vos navires</div>
+            <div class="turn-indicator player" id="turn-indicator" style="display:none;">À vous de jouer</div>
+            <div class="battleship-ship-selector" id="ship-selector"></div>
+            <div class="battleship-boards">
+                <div>
+                    <div class="battleship-info" id="player-board-title">Votre flotte</div>
+                    <div class="battleship-board" id="player-board"></div>
+                </div>
+                <div>
+                    <div class="battleship-info" id="enemy-board-title">Flotte ennemie</div>
+                    <div class="battleship-board" id="enemy-board"></div>
+                </div>
+            </div>
+            <div class="battleship-panel">
+                <button class="battleship-btn" id="rotate-btn">🔄 Rotation</button>
+                <button class="battleship-btn secondary" id="reset-btn">🔄 Recommencer</button>
+            </div>
+            <div class="battleship-legend">
+                <div class="battleship-legend-item">
+                    <div class="battleship-legend-color" style="background:rgba(0,212,255,0.25);border-color:rgba(0,212,255,0.5);"></div>
+                    <span>Navire</span>
+                </div>
+                <div class="battleship-legend-item">
+                    <div class="battleship-legend-color" style="background:#ff006e;"></div>
+                    <span>Touché</span>
+                </div>
+                <div class="battleship-legend-item">
+                    <div class="battleship-legend-color" style="background:#4a5e72;"></div>
+                    <span>Manqué</span>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <script src="bataille-navale.js"></script>
+    <script>
+        (function () {
+            'use strict';
+            var hamburgerBtn = document.getElementById('hamburger-btn');
+            var menu = document.getElementById('hamburger-menu');
+            if (hamburgerBtn && menu) {
+                hamburgerBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    menu.classList.toggle('open');
+                });
+                document.addEventListener('click', function (e) {
+                    if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
+                        menu.classList.remove('open');
+                    }
+                });
+            }
+            var menuBack = document.getElementById('menu-back');
+            if (menuBack) {
+                menuBack.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    window.location.href = '../true-detective/index.html';
+                });
+            }
+            var menuHome = document.getElementById('menu-home');
+            if (menuHome) {
+                menuHome.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    window.location.href = '../true-detective/index.html';
+                });
+            }
+            var menuContinue = document.getElementById('menu-continue');
+            if (menuContinue) {
+                menuContinue.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    window.location.href = '../true-detective/index.html';
+                });
+            }
+            var continueBtn = document.getElementById('continue-btn');
+            if (continueBtn) {
+                continueBtn.addEventListener('click', function () {
+                    window.location.href = '../true-detective/index.html';
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

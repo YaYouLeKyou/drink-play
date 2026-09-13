@@ -201,29 +201,22 @@
                         }
                         if (page.interrogation && window.TDNarration && window.TDNarration.interrogations) {
                             var interro = window.TDNarration.interrogations[page.interrogation];
-                            // Page dynamique (révélation) : toujours vert (pas de mini-jeu)
-                            if (page.interrogation === 'dynamic') {
-                                isInterro = true;
-                                pageBtn.classList.add('dev-page-btn-interro');
-                            } else if (interro && interro.minigame) {
-                                // Vérifier si le mini-jeu est autorisé à cette page précise
-                                // Uniquement si l'ID d'interrogation figure dans MINIGAME_LOCATIONS
-                                // et que la phase/page correspondent
-                                var minigameHere = false;
-                                if (window.MINIGAME_LOCATIONS && window.MINIGAME_LOCATIONS[page.interrogation]) {
-                                    var loc = window.MINIGAME_LOCATIONS[page.interrogation];
-                                    if (loc.phase === phase.id && loc.pageIdx === pageIdx) {
-                                        minigameHere = true;
-                                    }
+                            // Liste des pages interrogatoires ayant un mini-jeu (standalone)
+                            var interroMinigamePages = {
+                                'femme-fatale': { phase: 'act1_1', pageIdx: 1 },  // Acte 1, P2 : échecs
+                                'seducteur':   { phase: 'act2_3', pageIdx: 2 }   // Acte 2, P3 : jackpot
+                            };
+                            var hasMinigameHere = false;
+                            if (interroMinigamePages[page.interrogation]) {
+                                var loc = interroMinigamePages[page.interrogation];
+                                if (loc.phase === phase.id && loc.pageIdx === pageIdx) {
+                                    hasMinigameHere = true;
                                 }
-                                if (minigameHere) {
-                                    isInterroMinigame = true;
-                                    pageBtn.classList.add('dev-page-btn-interro-mg');
-                                } else {
-                                    isInterro = true;
-                                    pageBtn.classList.add('dev-page-btn-interro');
-                                }
-                            } else if (interro) {
+                            }
+                            if (hasMinigameHere) {
+                                isInterroMinigame = true;
+                                pageBtn.classList.add('dev-page-btn-interro-mg');
+                            } else {
                                 isInterro = true;
                                 pageBtn.classList.add('dev-page-btn-interro');
                             }

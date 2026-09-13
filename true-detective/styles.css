@@ -4320,6 +4320,20 @@ html {
   color: #ff7070;
   box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.45);
 }
+/* Pages d'interrogatoire sans mini-jeu : mise en évidence en vert */
+.dev-page-btn.dev-page-btn-interro {
+  background: rgba(40, 160, 70, 0.18);
+  border-color: rgba(50, 200, 90, 0.85);
+  color: #3dd97a;
+  font-weight: 600;
+  box-shadow: 0 0 0 1px rgba(30, 180, 60, 0.2);
+}
+.dev-page-btn.dev-page-btn-interro:hover {
+  background: rgba(50, 190, 80, 0.32);
+  border-color: rgba(60, 220, 100, 1);
+  color: #5eec94;
+  box-shadow: 0 0 0 2px rgba(30, 180, 60, 0.4);
+}
 /* Pages avec énigme / fouille / montre / coffre / réseau alibi : mise en évidence en orange */
 .dev-page-btn.dev-page-btn-puzzle {
   background: rgba(255, 160, 40, 0.22);

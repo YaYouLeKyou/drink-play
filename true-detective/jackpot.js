@@ -1,21 +1,36 @@
 /* =====================================================================
-   TRUE DETECTIVE - JACKPOT (Standalone)
-   Simple slot machine. Match 2 or 3 symbols to win.
-   ===================================================================== */
+    TRUE DETECTIVE - JACKPOT (Standalone)
+    Enhanced slot machine with staggered reels, win celebration, and neon effects.
+    ===================================================================== */
 (function (global) {
     'use strict';
 
-    var SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '🔔', '💎', '7️⃣'];
-    var WEIGHTS = [30, 25, 20, 15, 7, 2, 1];
+    var SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '🔔', '💎', '7️⃣', '⭐'];
+    var WEIGHTS = [25, 22, 18, 14, 10, 5, 3, 3];
+    var PAYOUTS = {
+        '7️⃣7️⃣7️⃣': 10,
+        '💎💎💎': 8,
+        '⭐⭐⭐': 7,
+        '🔔🔔🔔': 5,
+        '🍇🍇🍇': 4,
+        '🍊🍊🍊': 3,
+        '🍋🍋🍋': 2,
+        '🍒🍒': 1,
+        '🍒🍒🍒': 2
+    };
 
     var PHRASES = {
         fr: [
             "La chance est un mensonge... mais essayez quand même.",
-            "Pembrooke sourit : « Faites tourner les rouleaux. »"
+            "Pembrooke sourit : « Faites tourner les rouleaux. »",
+            "Les rouleaux tournent... le destin aussi.",
+            "Un petit tour, et puis s'en va ? Pas si sûr."
         ],
         en: [
             "Luck is a lie... but try anyway.",
-            "Pembrooke smiles: \"Spin the reels.\""
+            "Pembrooke smiles: \"Spin the reels.\"",
+            "The reels spin... and so does fate.",
+            "Just a little spin, and then gone? Not so sure."
         ]
     };
 
@@ -32,7 +47,7 @@
     function init() {
         var params = new URLSearchParams(window.location.search);
         var lang = params.get('lang') || 'fr';
-        var spins = 6;
+        var spins = 8;
         var spinsLeft = spins;
         var gameOver = false;
 
@@ -41,52 +56,76 @@
         var $reel3 = document.getElementById('reel3');
         var $spins = document.getElementById('jackpot-spins');
         var $btn = document.getElementById('jackpot-btn');
+        var $machine = document.querySelector('.jackpot-machine');
 
         function updateSpins() {
             if ($spins) $spins.textContent = (lang === 'fr' ? 'Tours: ' : 'Spins: ') + spinsLeft;
         }
 
-        function spin() {
+        function spinReel(reel, delay) {
+            return new Promise(function (resolve) {
+                var interval = setInterval(function () {
+                    reel.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+                }, 80);
+                setTimeout(function () {
+                    clearInterval(interval);
+                    reel.textContent = weightedRandom();
+                    resolve();
+                }, delay);
+            });
+        }
+
+        function flashMachine(win) {
+            if (!$machine) return;
+            var color = win ? 'rgba(0, 212, 255, 0.4)' : 'rgba(255, 0, 110, 0.2)';
+            $machine.style.boxShadow = '0 0 60px ' + color;
+            setTimeout(function () {
+                $machine.style.boxShadow = '0 0 30px rgba(0, 212, 255, 0.2)';
+            }, 500);
+        }
+
+        async function spin() {
             if (gameOver || spinsLeft <= 0) return;
             spinsLeft--;
             updateSpins();
             $btn.disabled = true;
 
-            var reels = [$reel1, $reel2, $reel3];
-            reels.forEach(function (r) { if (r) r.classList.add('spinning'); });
+            var results = await Promise.all([
+                spinReel($reel1, 600),
+                spinReel($reel2, 900),
+                spinReel($reel3, 1200)
+            ]);
 
-            setTimeout(function () {
-                var results = [weightedRandom(), weightedRandom(), weightedRandom()];
-                if ($reel1) $reel1.textContent = results[0];
-                if ($reel2) $reel2.textContent = results[1];
-                if ($reel3) $reel3.textContent = results[2];
-                reels.forEach(function (r) { if (r) r.classList.remove('spinning'); });
+            var combo = results.join('');
+            var won = false;
+            var payout = 0;
 
-                var won = results[0] === results[1] || results[1] === results[2] || results[0] === results[2];
-                if (won && results[0] === results[1] && results[1] === results[2]) {
-                    won = true;
-                } else if (won) {
-                    won = true;
-                } else {
-                    won = false;
-                }
+            if (results[0] === results[1] && results[1] === results[2]) {
+                won = true;
+                payout = PAYOUTS[combo] || 5;
+            } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
+                won = true;
+                payout = 1;
+            }
 
-                if (spinsLeft <= 0) {
-                    gameOver = true;
-                    setTimeout(function () {
-                        try {
-                            localStorage.setItem('td_standalone_game_result', JSON.stringify({
-                                type: 'jackpot',
-                                won: !!won,
-                                ts: Date.now()
-                            }));
-                        } catch (e) {}
-                        window.location.href = '../true-detective/index.html?standalone=jackpot';
-                    }, 1000);
-                } else {
-                    $btn.disabled = false;
-                }
-            }, 1000);
+            flashMachine(won);
+
+            if (spinsLeft <= 0) {
+                gameOver = true;
+                setTimeout(function () {
+                    try {
+                        localStorage.setItem('td_standalone_game_result', JSON.stringify({
+                            type: 'jackpot',
+                            won: !!won,
+                            payout: payout,
+                            ts: Date.now()
+                        }));
+                    } catch (e) {}
+                    window.location.href = '../true-detective/index.html?standalone=jackpot';
+                }, 1500);
+            } else {
+                $btn.disabled = false;
+            }
         }
 
         if ($btn) {
@@ -102,3 +141,4 @@
     }
 
 })(typeof globalThis !== 'undefined' ? globalThis : this);
+

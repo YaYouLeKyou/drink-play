@@ -254,6 +254,35 @@
             window.location.href = '../true-detective/index.html';
         });
 
+        /* Hamburger menu */
+        var hamburgerBtn = document.getElementById('hamburger-btn');
+        var menu = document.getElementById('hamburger-menu');
+        if (hamburgerBtn && menu) {
+            hamburgerBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                menu.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
+                    menu.classList.remove('open');
+                }
+            });
+        }
+        var menuBack = document.getElementById('menu-back');
+        if (menuBack) {
+            menuBack.addEventListener('click', function () {
+                if (menu) menu.classList.remove('open');
+                window.location.href = '../true-detective/index.html';
+            });
+        }
+        var menuHome = document.getElementById('menu-home');
+        if (menuHome) {
+            menuHome.addEventListener('click', function () {
+                if (menu) menu.classList.remove('open');
+                window.location.href = '../true-detective/index.html';
+            });
+        }
+
         /* Save notes */
         saveNotesBtn.addEventListener('click', function () {
             saveNotes();

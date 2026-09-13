@@ -1,7 +1,7 @@
 /* =====================================================================
-   TRUE DETECTIVE - BREAKOUT (Standalone)
-   Simple Breakout clone.
-   ===================================================================== */
+    TRUE DETECTIVE - BREAKOUT (Standalone)
+    Enhanced with particles, trails, and neon effects.
+    ===================================================================== */
 (function (global) {
     'use strict';
 
@@ -41,6 +41,9 @@
         var brickW = (cw - 40) / brickCols;
         var brickH = 16;
         var bricks = [];
+        var particles = [];
+        var shakeTimer = 0;
+        var shakeIntensity = 0;
         for (var r = 0; r < brickRows; r++) {
             for (var c = 0; c < brickCols; c++) {
                 bricks.push({ x: 20 + c * brickW, y: 30 + r * (brickH + 4), alive: true, color: ['#00d4ff', '#ff006e', '#ffd600'][r % 3] });
@@ -55,6 +58,25 @@
             paddleX = Math.max(paddleW / 2, Math.min(cw - paddleW / 2, paddleX));
         });
 
+        function spawnParticles(x, y, color, count) {
+            for (var i = 0; i < count; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8,
+                    life: 25 + Math.random() * 15,
+                    color: color,
+                    size: Math.random() * 4 + 2
+                });
+            }
+        }
+
+        function triggerShake(intensity) {
+            shakeTimer = 8;
+            shakeIntensity = intensity;
+        }
+
         function update() {
             if (gameOver) return;
             ballX += ballVX;
@@ -67,10 +89,12 @@
                 ballVY = -Math.abs(ballVY);
                 var dx = (ballX - paddleX) / (paddleW / 2);
                 ballVX = dx * 5;
+                spawnParticles(ballX, ballY - 5, '#00d4ff', 5);
             }
 
             if (ballY > ch) {
                 gameOver = true;
+                triggerShake(10);
                 if ($info) $info.textContent = lang === 'fr' ? 'Perdu !' : 'Game Over!';
                 setTimeout(function () {
                     try {
@@ -87,10 +111,21 @@
                     ballY >= bricks[i].y && ballY <= bricks[i].y + brickH) {
                     bricks[i].alive = false;
                     ballVY *= -1;
+                    spawnParticles(bricks[i].x + brickW / 2, bricks[i].y + brickH / 2, bricks[i].color, 10);
+                    triggerShake(3);
                     score += 10;
                     break;
                 }
             }
+
+            for (var i = particles.length - 1; i >= 0; i--) {
+                particles[i].x += particles[i].vx;
+                particles[i].y += particles[i].vy;
+                particles[i].life--;
+                if (particles[i].life <= 0) particles.splice(i, 1);
+            }
+
+            if (shakeTimer > 0) shakeTimer--;
 
             var allDead = bricks.every(function (b) { return !b.alive; });
             if (allDead) {
@@ -108,22 +143,48 @@
         }
 
         function draw() {
+            ctx.save();
+            if (shakeTimer > 0) {
+                var sx = (Math.random() - 0.5) * shakeIntensity;
+                var sy = (Math.random() - 0.5) * shakeIntensity;
+                ctx.translate(sx, sy);
+            }
+
             ctx.fillStyle = '#0a0a1a';
-            ctx.fillRect(0, 0, cw, ch);
-
-            ctx.fillStyle = '#00d4ff';
-            ctx.fillRect(paddleX - paddleW / 2, ch - 20, paddleW, paddleH);
-
-            ctx.fillStyle = '#ffd600';
-            ctx.beginPath();
-            ctx.arc(ballX, ballY, 6, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.fillRect(-10, -10, cw + 20, ch + 20);
 
             for (var i = 0; i < bricks.length; i++) {
                 if (!bricks[i].alive) continue;
                 ctx.fillStyle = bricks[i].color;
+                ctx.shadowColor = bricks[i].color;
+                ctx.shadowBlur = 8;
                 ctx.fillRect(bricks[i].x, bricks[i].y, brickW - 2, brickH);
             }
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#00d4ff';
+            ctx.shadowColor = '#00d4ff';
+            ctx.shadowBlur = 12;
+            ctx.fillRect(paddleX - paddleW / 2, ch - 20, paddleW, paddleH);
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#ffd600';
+            ctx.shadowColor = '#ffd600';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            for (var p = 0; p < particles.length; p++) {
+                var particle = particles[p];
+                ctx.globalAlpha = particle.life / 40;
+                ctx.fillStyle = particle.color;
+                ctx.fillRect(particle.x - particle.size / 2, particle.y - particle.size / 2, particle.size, particle.size);
+            }
+            ctx.globalAlpha = 1;
+
+            ctx.restore();
         }
 
         function loop() {
