@@ -156,7 +156,7 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 8. **Whitmore conclusion** : « Six profils. Zéro certitude. L'ADN place tout le monde sur scène. C'est à vous de choisir qui a tiré. »
 
 ### ACTE III, Phase 1 « Tension » (dialogue, musique tension)
-1. **MINI-JEU `cryptogramme` (QG)**, décoder la note chiffrée de Victor Krane :
+1. **MINI-JEU `puzzle` (QG)**, assembler les formes géométriques de Victor Krane :
    - **« HALE ENGAGE KRANE »**, la complicité est établie.
    - **INDICE MAJEUR** : le contrat a été payé par un proche de l'intérieur.
 2. *(residence, Lady Vivienne)* Les fichiers du coffre : Vivienne trompait la victime avec Hale.
@@ -206,7 +206,7 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 **Placement narratif** :
 - **Acte 1** (Manoir + scène de crime) : fouille + montre = indices matériels directs
 - **Acte 2** (QG + bar + ruelle) : Réseaux d'Alibis (2e et 3e cartographie) puis preuves scientifiques (ADN, alarme)
-- **Acte 3** (Confrontations) : cryptogramme = preuve textuelle avant l'accusation
+- **Acte 3** (Confrontations) : puzzle = preuve textuelle avant l'accusation
 
 **Règle d'or** : aucune énigme n'est bloquante (bouton « Passer »). Chaque réussite :
 - Affiche un panneau « 🔎 INDICE MAJEUR »
@@ -222,7 +222,7 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 | Réseau d'Alibis 1 | act1_1 (3/4) | `reseau_alibis` | Identifier le mensonge parmi 2 dépositions | aucun | Point d'entrée dans le réseau |
 | Réseau d'Alibis 2 | act2_1 (1/3) | `reseau_alibis` | Identifier 2 menteurs parmi 4 dépositions croisées | aucun | Deux menteurs isolés, complicité |
 | Réseau d'Alibis 3 | act2_1 (3/3) | `reseau_alibis` | Identifier 3 menteurs parmi 6 dépositions croisées | aucun | Trois menteurs se couvrent, commanditaire identifié |
-| Cryptogramme | 2 (bar) | `cryptogramme` | Substitution de César à décoder | `krane-coded-note.png.jfif` | Confirme Hale→Krane |
+| Puzzle | 2 (bar) | `puzzle` | Emboîter des formes géométriques | aucun | Confirme Hale→Krane |
 | Câblage alarme | 3B (labo) | `cablage_alarme` | SVG : pivoter segments pour boucle intacte | `alarm-circuit-blueprint.png.jfif` | Intrusion non forcée |
 | Roue des alibis | 4A (QG) | `roue_alibis` | Aligner 3 cadrans (montre, alibi, horloge-mère) | `pocket-watch-dial.png.jfif` | Pulvérise l'alibi de Hale |
 

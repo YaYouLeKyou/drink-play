@@ -112,6 +112,14 @@
             max-width: 400px;
             line-height: 1.5;
         }
+        .coffre-status {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            color: var(--neon-cyan);
+            text-align: center;
+            max-width: 400px;
+            min-height: 24px;
+        }
         .coffre-btn {
             padding: 10px 20px;
             font-size: 0.9rem;
@@ -161,9 +169,10 @@
                     <div class="coffre-handle" id="handle"></div>
                 </div>
             </div>
-            <div class="coffre-hint">
+            <div class="coffre-hint" id="coffre-hint">
                 Faites tourner le cadran pour trouver le bon code. Le cadran affiche le chiffre actuel.
             </div>
+            <div class="coffre-status" id="coffre-status" style="display:none;"></div>
             <button class="coffre-btn" id="validate-safe">Ouvrir</button>
         </div>
     </main>
@@ -175,12 +184,51 @@
             var CODE = '1981';
             var currentCode = '----';
             var dialValue = 0;
-            var $dial, $marker, $display;
+            var $dial, $marker, $display, $hint, $validateBtn, $status;
+
+            function getUrlParam(name) {
+                var m = new RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+                return m ? decodeURIComponent(m[1]) : null;
+            }
+
+            var safeState = getUrlParam('state') || 'clue';
+            var suspectId = getUrlParam('suspect') || '';
+
+            var STATE_MESSAGES = {
+                empty: {
+                    fr: 'Le coffre est vide. Quelqu\'un est passé avant vous.',
+                    en: 'The safe is empty. Someone got here before you.'
+                },
+                clue: {
+                    fr: 'Le coffre contient des documents compromettants.',
+                    en: 'The safe contains compromising documents.'
+                },
+                forced: {
+                    fr: 'Le coffre a été forcé. L\'intrus a tout emporté.',
+                    en: 'The safe was forced open. The intruder took everything.'
+                }
+            };
+
+            var SUSPECT_STATES = {
+                protecteur: 'clue',
+                'femme-fatale': 'empty',
+                seducteur: 'clue',
+                suspect: 'forced',
+                marginal: 'empty',
+                criminel: 'clue'
+            };
 
             function init() {
+                if (SUSPECT_STATES[suspectId]) {
+                    safeState = SUSPECT_STATES[suspectId];
+                }
+
                 $dial = document.getElementById('dial');
                 $marker = document.getElementById('dial-marker');
                 $display = document.getElementById('code-display');
+                $hint = document.querySelector('.coffre-hint');
+                $validateBtn = document.getElementById('validate-safe');
+                $status = document.getElementById('coffre-status');
 
                 if ($dial) {
                     $dial.addEventListener('click', function () {
@@ -189,18 +237,15 @@
                     });
                 }
 
-                var validateBtn = document.getElementById('validate-safe');
-                if (validateBtn) {
-                    validateBtn.addEventListener('click', function () {
+                var msg = STATE_MESSAGES[safeState] || STATE_MESSAGES.clue;
+                if ($hint) {
+                    $hint.textContent = msg[safeState === 'empty' ? 'fr' : 'fr'];
+                }
+
+                if ($validateBtn) {
+                    $validateBtn.addEventListener('click', function () {
                         if (currentCode === CODE) {
-                            try {
-                                localStorage.setItem('td_standalone_game_result', JSON.stringify({
-                                    type: 'coffre_code',
-                                    won: true,
-                                    ts: Date.now()
-                                }));
-                            } catch (e) {}
-                            window.location.href = '../true-detective/index.html?standalone=coffre_code';
+                            openSafe();
                         } else {
                             if ($display) {
                                 $display.style.color = '#ff006e';
@@ -215,6 +260,44 @@
                 }
 
                 setupControls();
+            }
+
+            function openSafe() {
+                var result = {
+                    type: 'coffre_code',
+                    won: true,
+                    state: safeState,
+                    suspect: suspectId,
+                    ts: Date.now()
+                };
+                try {
+                    localStorage.setItem('td_standalone_game_result', JSON.stringify(result));
+                    var journal = JSON.parse(localStorage.getItem('td_journal') || '{}');
+                    journal.coffreState = safeState;
+                    journal.coffreSuspect = suspectId;
+                    journal.coffreOpened = true;
+                    localStorage.setItem('td_journal', JSON.stringify(journal));
+                } catch (e) {}
+
+                if ($display) {
+                    $display.textContent = 'OPEN';
+                    $display.style.color = '#00d4ff';
+                }
+                if ($status) {
+                    var openMsg = STATE_MESSAGES[safeState] || STATE_MESSAGES.clue;
+                    $status.textContent = openMsg.fr;
+                }
+                if ($validateBtn) {
+                    $validateBtn.disabled = true;
+                    $validateBtn.textContent = 'Terminé';
+                }
+                if ($dial) {
+                    $dial.style.pointerEvents = 'none';
+                }
+
+                setTimeout(function () {
+                    window.location.href = '../true-detective/index.html?standalone=coffre_code';
+                }, 2000);
             }
 
             function updateDial() {

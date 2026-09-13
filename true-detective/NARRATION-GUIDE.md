@@ -72,7 +72,7 @@ Les traductions anglaises sont maintenues à côté des textes français. Lorsqu
 - Clés de phase : `intro1`, `intro2`, `act1_1`, `act1_2`, `act2_1`, `act2_2`, `act3_1`, `act3_2`, `act3_3`
 - Clés de page : `page1`, `page2`, `page3`
 - Clés de suspect : `protecteur`, `femme-fatale`, `seducteur`, `suspect`, `marginal`, `criminel`
-- Clés de minigame : `scene_fouille`, `carnet_dechire`, `cryptogramme`, `coffre_fort`, `cablage_alarme`, `montre_code`, `adn_match`
+- Clés de minigame : `scene_fouille`, `carnet_dechire`, `puzzle`, `coffre_fort`, `cablage_alarme`, `montre_code`, `adn_match`
 
 ## Bonnes pratiques
 

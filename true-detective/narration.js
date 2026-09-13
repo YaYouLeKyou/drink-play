@@ -67,7 +67,7 @@
     };
 
     N.act2_4 = {
-        page1: { fr: "Dans la voiture banalisée, votre partenaire frappe le volant : « Tous les suspects ont mentionné ce fichu coffre ! Et cette montre gousset... l'aiguille est bloquée sur une combinaison numérique. Ce n'est pas l'heure de sa mort... c'est la combinaison du coffre ! Foncez à la scène de crime ! »", en: "In the unmarked car, your partner strikes the wheel: \"Every suspect mentioned that damned safe! And that pocket watch... the hand is stuck on a numerical combination. It's not the time of death... it's the combination to the safe! Get to the crime scene!\"" }
+        page1: { fr: "Dans la voiture banalisée, votre partenaire frappe le volant : « Tous les suspects ont mentionné ce fichu coffre ! Et cette montre gousset... l'aiguille est bloquée sur 22h09. Ce n'est pas l'heure de sa mort... c'est la combinaison du coffre ! Foncez à la scène de crime ! »", en: "In the unmarked car, your partner strikes the wheel: \"Every suspect mentioned that damned safe! And that pocket watch... the hand is stuck at 10:09 PM. It's not the time of death... it's the combination to the safe! Get to the crime scene!\"" }
     };
 
     N.act3_1 = {
@@ -198,10 +198,10 @@
             desc: { fr: "[Mobile / Argent] Reconstituez les pages arrachées du livre de comptes pour révéler un versement à « V.K. ».", en: "[Motive / Money] Reassemble the torn ledger pages to reveal a payment to V.K.." },
             clue: { fr: "Des versements réguliers à Victor Krane et les empreintes du Major Hale, garde du corps et majordome en chef, sur la mention V.K.", en: "Regular payments to Victor Krane and the fingerprints of Major Hale, bodyguard and chief butler, on the V.K. mention." }
         },
-        cryptogramme: {
-            title: { fr: "Le Cryptogramme", en: "The Cryptogram" },
-            desc: { fr: "[Mobile / Complicité] Décodez le message crypté pour révéler une connexion entre les suspects.", en: "[Motive / Collusion] Decode the cryptic message to reveal a connection between suspects." },
-            clue: { fr: "La note de Krane révèle : HALE ENGAGE KRANE. La complicité est établie.", en: "Krane's note reveals: HALE HIRES KRANE. The collusion is proven." }
+        puzzle: {
+            title: { fr: "Le Puzzle", en: "The Puzzle" },
+            desc: { fr: "[Mobile / Complicité] Emboîtez les formes géométriques pour révéler la complicité entre les suspects.", en: "[Motive / Collusion] Fit the geometric shapes to reveal collusion between suspects." },
+            clue: { fr: "Le puzzle assemblé révèle : HALE ENGAGE KRANE. La complicité est établie.", en: "The assembled puzzle reveals: HALE HIRES KRANE. The collusion is proven." }
         },
         coffre_fort: {
             title: { fr: "Le Coffre-fort", en: "The Safe" },

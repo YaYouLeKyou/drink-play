@@ -191,7 +191,7 @@
                         var isInterro = false;
                         var isPuzzle = false;
                         if (page.minigame) {
-                            var puzzleTypes = ['scene_fouille', 'montre_code', 'coffre_code', 'reseau_alibis', 'cryptogramme', 'marginal-tower'];
+                            var puzzleTypes = ['scene_fouille', 'montre_code', 'coffre_code', 'reseau_alibis', 'puzzle', 'marginal-tower'];
                             if (puzzleTypes.indexOf(page.minigame.type) !== -1) {
                                 isPuzzle = true;
                                 pageBtn.classList.add('dev-page-btn-puzzle');

@@ -67,6 +67,25 @@
     function play(cfg, lang, onDone, target) {
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
 
+        // Read level from URL for standalone mode (used by standalone-game.html)
+        var params = new URLSearchParams(window.location.search);
+        var level = parseInt(params.get('level') || '1', 10);
+        if (isNaN(level) || level < 1) level = 1;
+        if (level > 3) level = 3;
+        
+        // Use cfg parameters (from applyDifficultyToCfg in app.js for story mode)
+        // or level-based parameters for standalone mode
+        var winScore = cfg.winScore || 10;
+        var aiSpeed = cfg.aiSpeed || (0.02 + level * 0.03);      // 0.05..0.14
+        var rows = cfg.rows || Math.min(2 + level, 6);           // 3..6 rows of aliens
+        var cols = cfg.cols || 4 + level;                        // 5..8 columns
+        var brickCount = cfg.bricks || Math.min(5 + level * 2, 15); // 7..11 bricks per row
+        var ballSpeed = cfg.ballSpeed || (0.05 + level * 0.02);
+        var maxAsteroids = cfg.maxAsteroids || Math.min(4 + level, 8);
+        var spawnRate = cfg.spawnRate || (1000 - level * 150);   // 850..550ms
+        var ghostSpeed = cfg.ghostSpeed || (0.03 + level * 0.015);
+        var pelletCount = cfg.pelletCount || (10 + level * 5);
+
         var overlay = document.getElementById('minigame-overlay');
         var overlayContent = overlay ? overlay.querySelector('#minigame-screen-content') : null;
         if (overlay) overlay.classList.add('retro-layout');

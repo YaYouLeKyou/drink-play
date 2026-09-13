@@ -157,20 +157,33 @@
                 loupe.style.backgroundImage = 'url("' + sceneImageUrl + '")';
                 $container.appendChild(loupe);
 
+                var journal = {};
+                try {
+                    journal = JSON.parse(localStorage.getItem('td_journal') || '{}');
+                    var sceneEvidence = journal.sceneFouilleEvidence || [];
+                } catch (e) {
+                    journal = {};
+                }
+
                 hotspots.forEach(function (spot, idx) {
                     var btn = document.createElement('button');
                     btn.className = 'fouille-hotspot';
                     btn.textContent = spot.label;
                     btn.style.left = spot.x + '%';
                     btn.style.top = spot.y + '%';
+                    if (journal.sceneFouilleEvidence && journal.sceneFouilleEvidence.indexOf(spot.label) !== -1) {
+                        btn.classList.add('found');
+                    }
                     btn.addEventListener('mouseenter', function () {
                         showEvidence(spot);
+                        saveEvidenceToJournal(spot);
                     });
                     btn.addEventListener('mouseleave', function () {
                         hideEvidence();
                     });
                     btn.addEventListener('click', function () {
                         btn.classList.toggle('found');
+                        saveEvidenceToJournal(spot);
                     });
                     $container.appendChild(btn);
                 });
@@ -192,6 +205,23 @@
                 });
 
                 setupControls();
+            }
+
+            function saveEvidenceToJournal(spot) {
+                try {
+                    var journal = JSON.parse(localStorage.getItem('td_journal') || '{}');
+                    journal.sceneFouilleEvidence = journal.sceneFouilleEvidence || [];
+                    if (journal.sceneFouilleEvidence.indexOf(spot.label) === -1) {
+                        journal.sceneFouilleEvidence.push(spot.label);
+                        journal['evidence_' + spot.label] = {
+                            title: spot.title && spot.title.fr ? spot.title.fr : spot.label,
+                            info: spot.info && spot.info.fr ? spot.info.fr : ''
+                        };
+                        localStorage.setItem('td_journal', JSON.stringify(journal));
+                    }
+                } catch (e) {
+                    console.warn('Failed to save evidence to journal:', e);
+                }
             }
 
             function showEvidence(spot) {

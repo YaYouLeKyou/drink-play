@@ -4338,9 +4338,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             cfg.hotspotCount = 5 + tier; // 6..8 hotspots
         } else if (minigameType === 'coffre_code') {
             cfg.time = 25 + tier * 10; // 35..55 seconds
-        } else if (minigameType === 'cryptogramme') {
+        } else if (minigameType === 'puzzle') {
             cfg.time = 30 + tier * 10; // 40..60 seconds
-            cfg.wordCount = 3 + tier; // 4..6 words
+            cfg.shapeCount = 3 + tier; // 4..6 shapes
         } else if (minigameType === 'reseau_alibis') {
             cfg.time = 20 + tier * 5; // 25..40 seconds
             cfg.nodeCount = 4 + tier;
@@ -4363,7 +4363,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             'asteroids': 'asteroids.html',
             'montre_code': 'montre-code.html',
             'scene_fouille': 'scene-fouille.html',
-            'cryptogramme': 'cryptogramme.html',
+            'puzzle': 'puzzle.html',
             'coffre_code': 'coffre-code.html'
         };
 
@@ -4371,6 +4371,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             return standalonePages[type] + '?difficulty=' + diff + '&lang=' + lang;
         }
 
+        if (['pong', 'pacman', 'space-invaders', 'breakout', 'asteroids'].indexOf(type) >= 0) {
+            return 'standalone-game.html?game=' + type + '&level=' + diff + '&lang=' + lang + (mode ? ('&mode=' + mode) : '');
+        }
         return 'standalone-game.html?game=' + type + '&difficulty=' + diff + '&lang=' + lang + (mode ? ('&mode=' + mode) : '');
     }
 
@@ -4382,10 +4385,8 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             connect4: 'TDConnect4Game',
             chemistry: 'TDChemistryGame',
             coffre_code: 'TDMiniGames',
-            cryptogramme: 'TDMiniGames',
-            confrontation_ultime: 'TDMiniGames',
-            jackpot: 'TDMiniGames',
-            puzzle: 'TDPuzzleGame',
+            puzzle: 'TDMiniGames',
+            'sliding-puzzle': 'TDPuzzleGame',
             reseau_alibis: 'TDMiniGames',
             shooting: 'TDShootingGallery',
             pong: 'TDPongGame',
@@ -4407,7 +4408,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             scene_fouille: { fr: 'Fouille de la scène', en: 'Scene Search' },
             montre_code: { fr: 'La Montre du Duc', en: "The Duke's Watch" },
             reseau_alibis: { fr: 'Réseau d\'alibis', en: 'Alibi Network' },
-            cryptogramme: { fr: 'Cryptogramme', en: 'Cryptogram' },
+            puzzle: { fr: 'Le Puzzle', en: 'The Puzzle' },
             coffre_code: { fr: 'Coffre-fort', en: 'Safe' },
             chess: { fr: 'Échecs', en: 'Chess' },
             'marginal-tower': { fr: 'Tour de Silas', en: "Silas' Tower" },
@@ -4433,7 +4434,12 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             return;
         }
 
-        window.location.href = getMinigameStandaloneUrl(minigameType, 1, (ui.language === 'en' ? 'en' : 'fr'), 'selection');
+        // Retro games use level (1-3) instead of difficulty number
+        if (['pong', 'pacman', 'space-invaders', 'breakout', 'asteroids'].indexOf(minigameType) >= 0) {
+            window.location.href = getMinigameStandaloneUrl(minigameType, 1, (ui.language === 'en' ? 'en' : 'fr'), 'selection');
+        } else {
+            window.location.href = getMinigameStandaloneUrl(minigameType, 2, (ui.language === 'en' ? 'en' : 'fr'), 'selection');
+        }
     }
 
     function startSelectedMinigame(minigameType, cfg) {

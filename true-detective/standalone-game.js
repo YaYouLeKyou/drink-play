@@ -20,7 +20,7 @@
         'scene_fouille': 'minigames.js',
         'montre_code': 'minigames.js',
         'reseau_alibis': 'minigames.js',
-        'cryptogramme': 'minigames.js',
+        'puzzle': 'minigames.js',
         'coffre_code': 'minigames.js',
         'chess': 'chess-game.js',
         'jackpot': 'minigames.js',
@@ -37,7 +37,7 @@
     var GAME_STYLES = {
         'chess': 'echecs-duel.css',
         'scene_fouille': 'styles.css',
-        'cryptogramme': 'styles.css',
+        'puzzle': 'styles.css',
         'coffre_code': 'styles.css'
     };
 
@@ -124,7 +124,7 @@
             'scene_fouille': { fr: 'Fouille de la scène', en: 'Scene Search' },
             'montre_code': { fr: 'La Montre du Duc', en: "The Duke's Watch" },
             'reseau_alibis': { fr: 'Le Réseau d\'alibis', en: 'The Alibi Network' },
-            'cryptogramme': { fr: 'Le Cryptogramme', en: 'The Cryptogram' },
+            'puzzle': { fr: 'Le Puzzle', en: 'The Puzzle' },
             'coffre_code': { fr: 'Le Coffre-fort', en: 'The Safe' },
             'chess': { fr: 'Échecs', en: 'Chess' },
             'marginal-tower': { fr: 'La Tour de Silas', en: "Silas' Tower" },
@@ -150,6 +150,12 @@
             return;
         }
 
+        // Retro games use level parameter (1-3) instead of difficulty
+        if (isRetroGame(gameType)) {
+            window.location.href = STANDALONE_REDIRECT[gameType] + '?level=' + getRetroLevel() + '&lang=' + lang;
+            return;
+        }
+        
         if (STANDALONE_REDIRECT[gameType]) {
             window.location.href = STANDALONE_REDIRECT[gameType] + '?difficulty=' + difficulty + '&lang=' + lang;
             return;
@@ -184,8 +190,8 @@
             loadReseauAlibis();
             return;
         }
-        if (gameType === 'cryptogramme') {
-            loadCryptogramme();
+        if (gameType === 'puzzle') {
+            window.location.href = 'puzzle.html?difficulty=' + difficulty + '&lang=' + lang;
             return;
         }
         if (gameType === 'coffre_code') {
@@ -297,35 +303,6 @@
             }, function () {
                 // hint
             })['reseau_alibis'];
-            var wrap = builder($content);
-        } catch (e) {
-            showPlaceholder();
-        }
-    }
-
-    function loadCryptogramme() {
-        if (!global.TDMiniGames || !global.TDMiniGames.createBuilder) {
-            showPlaceholder();
-            return;
-        }
-        var cfg = {
-            type: 'cryptogramme',
-            time: 90,
-            evidence: 'mobile',
-            title: { fr: 'Le Cryptogramme', en: 'The Cryptogram' },
-            desc: { fr: 'Décodez la note.', en: 'Decode the note.' },
-            clue: { fr: 'HALE ENGAGE KRANE', en: 'HALE HIRES KRANE' }
-        };
-        try {
-            var builder = global.TDMiniGames.createBuilder(cfg, lang, function (result) {
-                if (result && result.won) {
-                    showVictory(cfg.clue);
-                } else {
-                    showDefeat(cfg.clue);
-                }
-            }, function () {
-                // hint
-            })['cryptogramme'];
             var wrap = builder($content);
         } catch (e) {
             showPlaceholder();

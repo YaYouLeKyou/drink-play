@@ -120,15 +120,15 @@
 
             sincerityModal.classList.remove('hidden');
 
-            sincerityYes.onclick = function () {
-                sincerityYes.classList.add('correct');
-                sincerityModal.classList.add('hidden');
-                status.textContent = 'Heure du crime établie : ' + TIME + ' (à confirmer). Ce détail sera décisif, et ' + codeStr + ' servira.';
-                solved = true;
-                continueBtn.disabled = false;
-                continueBtn.textContent = 'Continuer l\'enquête';
-                saveNotes();
-            };
+        sincerityYes.onclick = function () {
+            sincerityYes.classList.add('correct');
+            sincerityModal.classList.add('hidden');
+            status.textContent = 'Heure du crime établie : ' + TIME + ' (à confirmer). Ce détail sera décisif, et ' + CODE.join('') + ' servira.';
+            solved = true;
+            continueBtn.disabled = false;
+            continueBtn.textContent = 'Continuer l\'enquête';
+            saveJournal();
+        };
 
             sincerityNo.onclick = function () {
                 sincerityNo.classList.add('wrong');
@@ -136,10 +136,15 @@
             };
         }
 
-        function saveNotes() {
-            var notes = notesArea.value.trim();
-            if (notes) {
-                localStorage.setItem('td_montre_notes', notes);
+        function saveJournal() {
+            try {
+                var journal = JSON.parse(localStorage.getItem('td_journal') || '{}');
+                journal.montreCode = CODE.join('');
+                journal.montreTime = TIME;
+                journal.montreSolved = true;
+                localStorage.setItem('td_journal', JSON.stringify(journal));
+            } catch (e) {
+                console.warn('Failed to save journal:', e);
             }
         }
 
@@ -283,9 +288,10 @@
             });
         }
 
-        /* Save notes */
+        /* Save notes / journal */
         saveNotesBtn.addEventListener('click', function () {
             saveNotes();
+            saveJournal();
             saveNotesBtn.textContent = '✅ Notes sauvegardées';
             setTimeout(function () {
                 saveNotesBtn.textContent = '💾 Consigner dans le carnet';
@@ -296,6 +302,25 @@
         var savedNotes = localStorage.getItem('td_montre_notes');
         if (savedNotes) {
             notesArea.value = savedNotes;
+        }
+
+        /* Load saved journal */
+        try {
+            var journal = JSON.parse(localStorage.getItem('td_journal') || '{}');
+            if (journal.montreSolved) {
+                codeCells.forEach(function (c, i) {
+                    if (c.value === String(CODE[i])) c.classList.add('correct');
+                });
+                timeCell.value = journal.montreTime || '';
+                timeCell.disabled = false;
+                validateBtn.disabled = false;
+                solved = true;
+                continueBtn.disabled = false;
+                continueBtn.textContent = 'Continuer l\'enquête';
+                status.textContent = 'Données déjà consignées au carnet : code ' + CODE.join('') + ', heure ' + (journal.montreTime || TIME) + '.';
+            }
+        } catch (e) {
+            console.warn('Failed to load journal:', e);
         }
 
         /* Load saved state */

@@ -1215,31 +1215,8 @@ var dos = document.createElement('img');
             });
         },
 
-        'cryptogramme': function (body, registerHint) {
-            var wrap = document.createElement('div');
-            wrap.className = 'mg-scene crypto-scene';
-            wrap.style.backgroundImage = 'url(mini-games/puzzle/krane-coded-note.png.png)';
-            body.appendChild(wrap);
-            var message = { fr: 'HALE ENGAGE KRANE', en: 'HALE HIRES KRANE' };
-            var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            var shift = 0; while (shift === 0 || shift === 13) shift = Math.floor(Math.random() * 24) + 1;
-            var encoded = '', plain = t(message, lang).toUpperCase();
-            for (var i = 0; i < plain.length; i++) { var idx = alphabet.indexOf(plain[i]); encoded += idx === -1 ? plain[i] : alphabet[(idx + shift) % 26]; }
-            var keyBox = document.createElement('div'); keyBox.className = 'crypto-key';
-            keyBox.textContent = (lang === 'fr' ? 'Clé de lecture : +' : 'Cipher key: +') + shift;
-            body.appendChild(keyBox);
-            var encodedEl = document.createElement('div'); encodedEl.className = 'crypto-encoded'; encodedEl.textContent = encoded;
-            body.appendChild(encodedEl);
-            var input = document.createElement('input'); input.className = 'crypto-input';
-            input.placeholder = lang === 'fr' ? 'Décodez le message…' : 'Decode the message…'; input.maxLength = 30;
-            body.appendChild(input);
-            var submit = document.createElement('button'); submit.className = 'btn';
-            submit.textContent = lang === 'fr' ? 'Vérifier' : 'Check'; body.appendChild(submit);
-            submit.addEventListener('click', function () {
-                if (input.value.trim().toUpperCase() === plain) complete(true);
-                else { input.classList.add('wrong'); setTimeout(function () { input.classList.remove('wrong'); }, 400); }
-            });
-            registerHint(function () { input.value = plain.substring(0, 3); });
+        'puzzle': function (body, registerHint) {
+            window.location.href = 'puzzle.html';
         },
 
         'cablage_alarme': function (body, registerHint) {

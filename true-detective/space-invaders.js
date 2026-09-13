@@ -8,7 +8,10 @@
     function init() {
         var params = new URLSearchParams(window.location.search);
         var lang = params.get('lang') || 'fr';
-        var diff = parseInt(params.get('difficulty'), 10);
+        var level = parseInt(params.get('level') || '1', 10);
+        if (isNaN(level) || level < 1) level = 1;
+        if (level > 3) level = 3;
+        var diff = level;
         if (diff < 1 || diff > 3) diff = 1;
 
         var canvas = document.getElementById('si-canvas');
