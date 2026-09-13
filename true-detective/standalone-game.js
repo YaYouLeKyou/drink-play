@@ -102,7 +102,7 @@
         }
         
         try {
-            var raw = sessionStorage.getItem('td_story_return');
+            var raw = localStorage.getItem('td_standalone_game_return');
             if (raw) storyReturn = JSON.parse(raw);
         } catch (e) {}
 
@@ -146,18 +146,26 @@
         }
 
         if (gameType === 'marginal-tower') {
-            window.location.href = 'marginal-tower.html?difficulty=' + difficulty + '&lang=' + lang;
+            if (window.location.pathname.indexOf('marginal-tower.html') === -1) {
+                window.location.href = 'marginal-tower.html?difficulty=' + difficulty + '&lang=' + lang;
+            }
             return;
         }
 
         // Retro games use level parameter (1-3) instead of difficulty
         if (isRetroGame(gameType)) {
-            window.location.href = STANDALONE_REDIRECT[gameType] + '?level=' + getRetroLevel() + '&lang=' + lang;
+            var retroTarget = STANDALONE_REDIRECT[gameType];
+            if (retroTarget && window.location.pathname.indexOf(retroTarget) === -1) {
+                window.location.href = retroTarget + '?level=' + getRetroLevel() + '&lang=' + lang;
+            }
             return;
         }
         
         if (STANDALONE_REDIRECT[gameType]) {
-            window.location.href = STANDALONE_REDIRECT[gameType] + '?difficulty=' + difficulty + '&lang=' + lang;
+            var redirectTarget = STANDALONE_REDIRECT[gameType];
+            if (window.location.pathname.indexOf(redirectTarget) === -1) {
+                window.location.href = redirectTarget + '?difficulty=' + difficulty + '&lang=' + lang;
+            }
             return;
         }
 
@@ -469,6 +477,8 @@
 
         if (fromStory && storyReturn && storyReturn.returnUrl) {
             window.location.href = storyReturn.returnUrl;
+        } else if (fromStory) {
+            window.location.href = '../true-detective/index.html?standalone=' + gameType;
         } else {
             window.location.href = '../true-detective/index.html?standalone=' + gameType;
         }
@@ -491,11 +501,16 @@
 
         var backBtn = document.getElementById('back-to-minigame-btn');
         if (backBtn) {
-            backBtn.addEventListener('click', function () {
-                if (menu) menu.classList.remove('open');
-                cleanup();
-                window.location.href = '../true-detective/index.html';
-            });
+            if (fromStory) {
+                backBtn.style.display = 'none';
+            } else {
+                backBtn.textContent = 'Accueil';
+                backBtn.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    cleanup();
+                    window.location.href = '../true-detective/index.html#minigames';
+                });
+            }
         }
 
         var menuHome = document.getElementById('menu-home');
@@ -503,7 +518,7 @@
             menuHome.addEventListener('click', function () {
                 if (menu) menu.classList.remove('open');
                 cleanup();
-                window.location.href = '../true-detective/index.html';
+                window.location.href = fromStory ? (storyReturn && storyReturn.returnUrl ? storyReturn.returnUrl : '../true-detective/index.html?standalone=' + gameType) : '../true-detective/index.html#minigames';
             });
         }
 
@@ -513,6 +528,25 @@
                 if (menu) menu.classList.remove('open');
                 alert('Paramètres : aucun réglage pour l\'instant.');
             });
+        }
+
+        if (fromStory) {
+            var storyBtn = document.getElementById('story-continue-btn');
+            if (!storyBtn) {
+                storyBtn = document.createElement('button');
+                storyBtn.id = 'story-continue-btn';
+                storyBtn.className = 'btn btn-continue';
+                storyBtn.textContent = 'Continuer';
+                storyBtn.style.cssText = 'display:none;margin-left:8px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
+                var header = document.querySelector('.sg-header');
+                if (header) header.appendChild(storyBtn);
+            }
+            if (storyBtn) {
+                storyBtn.style.display = 'inline-block';
+                storyBtn.addEventListener('click', function () {
+                    returnToStory(true);
+                });
+            }
         }
     }
 

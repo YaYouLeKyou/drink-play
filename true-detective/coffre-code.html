@@ -219,7 +219,7 @@
             };
 
             function init() {
-                if (SUSPECT_STATES[suspectId]) {
+                if (typeof SUSPECT_STATES[suspectId] !== 'undefined') {
                     safeState = SUSPECT_STATES[suspectId];
                 }
 
@@ -229,6 +229,20 @@
                 $hint = document.querySelector('.coffre-hint');
                 $validateBtn = document.getElementById('validate-safe');
                 $status = document.getElementById('coffre-status');
+
+                var urlParams = new URLSearchParams(window.location.search);
+                var fromStory = urlParams.get('story') === '1';
+                if (fromStory) {
+                    var backBtn = document.getElementById('back-to-minigame-btn');
+                    if (backBtn) backBtn.style.display = 'none';
+                    var storyContinueBtn = document.getElementById('story-continue-btn');
+                    if (storyContinueBtn) {
+                        storyContinueBtn.style.display = 'inline-block';
+                        storyContinueBtn.addEventListener('click', function () {
+                            window.location.href = '../true-detective/index.html?standalone=coffre_code';
+                        });
+                    }
+                }
 
                 if ($dial) {
                     $dial.addEventListener('click', function () {
@@ -324,18 +338,24 @@
                         }
                     });
                 }
+                var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
                 var backBtn = document.getElementById('back-to-minigame-btn');
                 if (backBtn) {
-                    backBtn.addEventListener('click', function () {
-                        if (menu) menu.classList.remove('open');
-                        window.location.href = '../true-detective/index.html';
-                    });
+                    if (fromStory) {
+                        backBtn.style.display = 'none';
+                    } else {
+                        backBtn.textContent = 'Accueil';
+                        backBtn.addEventListener('click', function () {
+                            if (menu) menu.classList.remove('open');
+                            window.location.href = '../true-detective/index.html#minigames';
+                        });
+                    }
                 }
                 var menuHome = document.getElementById('menu-home');
                 if (menuHome) {
                     menuHome.addEventListener('click', function () {
                         if (menu) menu.classList.remove('open');
-                        window.location.href = '../true-detective/index.html';
+                        window.location.href = fromStory ? '../true-detective/index.html?standalone=coffre_code' : '../true-detective/index.html#minigames';
                     });
                 }
                 var menuSettings = document.getElementById('menu-settings');
@@ -344,6 +364,28 @@
                         if (menu) menu.classList.remove('open');
                         alert('Paramètres : aucun réglage pour l\'instant.');
                     });
+                }
+                if (fromStory) {
+                    var continueBtn = document.createElement('button');
+                    continueBtn.id = 'story-continue-btn';
+                    continueBtn.className = 'btn btn-continue';
+                    continueBtn.textContent = 'Continuer';
+                    continueBtn.style.cssText = 'margin-top:16px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
+                    continueBtn.addEventListener('click', function () {
+                        try {
+                            var returnRaw = localStorage.getItem('td_standalone_game_return');
+                            if (returnRaw) {
+                                var rp = JSON.parse(returnRaw);
+                                if (rp && rp.returnUrl) {
+                                    window.location.href = rp.returnUrl;
+                                    return;
+                                }
+                            }
+                        } catch (e) {}
+                        window.location.href = '../true-detective/index.html?standalone=coffre_code';
+                    });
+                    var main = document.querySelector('.sg-main');
+                    if (main) main.appendChild(continueBtn);
                 }
             }
 

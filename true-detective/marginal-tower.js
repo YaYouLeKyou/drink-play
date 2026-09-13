@@ -308,12 +308,19 @@
             handlePlace(pos.x, pos.y);
         }, { passive: false });
 
+        var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+
         var backBtn = document.getElementById('back-to-minigame-btn');
         if (backBtn) {
-            backBtn.addEventListener('click', function() {
-                cleanup();
-                window.location.href = '../true-detective/index.html';
-            });
+            if (fromStory) {
+                backBtn.style.display = 'none';
+            } else {
+                backBtn.textContent = 'Accueil';
+                backBtn.addEventListener('click', function() {
+                    cleanup();
+                    window.location.href = '../true-detective/index.html#minigames';
+                });
+            }
         }
 
         var hamburgerBtn = document.getElementById('hamburger-btn');
@@ -334,7 +341,7 @@
             menuHome.addEventListener('click', function () {
                 if (menu) menu.classList.remove('open');
                 cleanup();
-                window.location.href = '../true-detective/index.html';
+                window.location.href = fromStory ? '../true-detective/index.html?marginalTower=complete' : '../true-detective/index.html#minigames';
             });
         }
         var menuSettings = document.getElementById('menu-settings');
@@ -345,12 +352,31 @@
             });
         }
 
+        if (fromStory) {
+            var storyBtn = document.createElement('button');
+            storyBtn.id = 'story-continue-btn';
+            storyBtn.className = 'btn btn-continue';
+            storyBtn.textContent = 'Continuer';
+            storyBtn.style.cssText = 'display:inline-block;margin-left:8px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
+            storyBtn.addEventListener('click', function () {
+                try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: false, ts: Date.now() })); } catch (e) {}
+                cleanup();
+                window.location.href = '../true-detective/index.html?marginalTower=complete';
+            });
+            var header = document.querySelector('.tower-header');
+            if (header) header.appendChild(storyBtn);
+        }
+
         var victoryBtn = document.getElementById('victory-continue-btn');
         if (victoryBtn) {
             victoryBtn.addEventListener('click', function() {
                 try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: true, ts: Date.now() })); } catch (e) {}
                 cleanup();
-                window.location.href = '../true-detective/index.html?marginalTower=complete';
+                if (fromStory) {
+                    window.location.href = '../true-detective/index.html?marginalTower=complete';
+                } else {
+                    window.location.href = '../true-detective/index.html#minigames';
+                }
             });
         }
 
@@ -366,7 +392,11 @@
             defeatContinueBtn.addEventListener('click', function() {
                 try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: false, ts: Date.now() })); } catch (e) {}
                 cleanup();
-                window.location.href = '../true-detective/index.html?marginalTower=complete';
+                if (fromStory) {
+                    window.location.href = '../true-detective/index.html?marginalTower=complete';
+                } else {
+                    window.location.href = '../true-detective/index.html#minigames';
+                }
             });
         }
     }

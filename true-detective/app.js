@@ -4368,7 +4368,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         };
 
         if (standalonePages[type]) {
-            return standalonePages[type] + '?difficulty=' + diff + '&lang=' + lang;
+            var url = standalonePages[type] + '?difficulty=' + diff + '&lang=' + lang;
+            if (mode === 'story') url += '&story=1';
+            return url;
         }
 
         if (['pong', 'pacman', 'space-invaders', 'breakout', 'asteroids'].indexOf(type) >= 0) {

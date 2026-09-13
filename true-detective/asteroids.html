@@ -80,17 +80,43 @@
                 });
             }
             var backBtn = document.getElementById('back-to-minigame-btn');
-            if (backBtn) {
-                backBtn.addEventListener('click', function () {
-                    if (menu) menu.classList.remove('open');
-                    window.location.href = '../true-detective/index.html';
+            var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+            if (fromStory) {
+                if (backBtn) backBtn.style.display = 'none';
+                var continueBtn = document.createElement('button');
+                continueBtn.id = 'story-continue-btn';
+                continueBtn.className = 'btn btn-continue';
+                continueBtn.textContent = 'Continuer';
+                continueBtn.style.cssText = 'margin-left:8px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
+                continueBtn.addEventListener('click', function () {
+                    try {
+                        var returnRaw = localStorage.getItem('td_standalone_game_return');
+                        if (returnRaw) {
+                            var rp = JSON.parse(returnRaw);
+                            if (rp && rp.returnUrl) {
+                                window.location.href = rp.returnUrl;
+                                return;
+                            }
+                        }
+                    } catch (e) {}
+                    window.location.href = '../true-detective/index.html?standalone=asteroids';
                 });
+                var header = document.querySelector('.sg-header');
+                if (header) header.appendChild(continueBtn);
+            } else {
+                if (backBtn) {
+                    backBtn.textContent = 'Accueil';
+                    backBtn.addEventListener('click', function () {
+                        if (menu) menu.classList.remove('open');
+                        window.location.href = '../true-detective/index.html#minigames';
+                    });
+                }
             }
             var menuHome = document.getElementById('menu-home');
             if (menuHome) {
                 menuHome.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    window.location.href = '../true-detective/index.html';
+                    window.location.href = fromStory ? '../true-detective/index.html?standalone=asteroids' : '../true-detective/index.html#minigames';
                 });
             }
             var menuSettings = document.getElementById('menu-settings');
