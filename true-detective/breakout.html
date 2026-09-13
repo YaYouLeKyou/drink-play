@@ -89,6 +89,7 @@
                 continueBtn.textContent = 'Continuer';
                 continueBtn.style.cssText = 'margin-left:8px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
                 continueBtn.addEventListener('click', function () {
+                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'breakout', won: true, ts: Date.now() })); } catch (e) {}
                     try {
                         var returnRaw = localStorage.getItem('td_standalone_game_return');
                         if (returnRaw) {
@@ -130,3 +131,5 @@
     </script>
 </body>
 </html>
+
+

@@ -360,6 +360,10 @@
             storyBtn.style.cssText = 'display:inline-block;margin-left:8px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
             storyBtn.addEventListener('click', function () {
                 try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: false, ts: Date.now() })); } catch (e) {}
+                try {
+                    var returnRaw = localStorage.getItem('td_standalone_game_return');
+                    if (returnRaw) localStorage.setItem('td_marginal_tower_return', returnRaw);
+                } catch (e) {}
                 cleanup();
                 window.location.href = '../true-detective/index.html?marginalTower=complete';
             });
@@ -371,6 +375,10 @@
         if (victoryBtn) {
             victoryBtn.addEventListener('click', function() {
                 try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: true, ts: Date.now() })); } catch (e) {}
+                try {
+                    var returnRaw = localStorage.getItem('td_standalone_game_return');
+                    if (returnRaw) localStorage.setItem('td_marginal_tower_return', returnRaw);
+                } catch (e) {}
                 cleanup();
                 if (fromStory) {
                     window.location.href = '../true-detective/index.html?marginalTower=complete';
@@ -391,6 +399,10 @@
         if (defeatContinueBtn) {
             defeatContinueBtn.addEventListener('click', function() {
                 try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: false, ts: Date.now() })); } catch (e) {}
+                try {
+                    var returnRaw = localStorage.getItem('td_standalone_game_return');
+                    if (returnRaw) localStorage.setItem('td_marginal_tower_return', returnRaw);
+                } catch (e) {}
                 cleanup();
                 if (fromStory) {
                     window.location.href = '../true-detective/index.html?marginalTower=complete';
