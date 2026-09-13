@@ -188,6 +188,7 @@
                         var pageBtn = document.createElement('button');
                         pageBtn.className = 'dev-page-btn';
                         var isInterroMinigame = false;
+                        var isInterro = false;
                         var isPuzzle = false;
                         if (page.minigame) {
                             var puzzleTypes = ['scene_fouille', 'montre_code', 'coffre_code', 'reseau_alibis', 'cryptogramme', 'marginal-tower'];
@@ -203,6 +204,9 @@
                             if (interro && interro.minigame) {
                                 isInterroMinigame = true;
                                 pageBtn.classList.add('dev-page-btn-interro-mg');
+                            } else if (interro) {
+                                isInterro = true;
+                                pageBtn.classList.add('dev-page-btn-interro');
                             }
                         }
                         var pageText = '';

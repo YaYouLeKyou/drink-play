@@ -4334,6 +4334,20 @@ html {
   color: #ffb84d;
   box-shadow: 0 0 0 2px rgba(255, 140, 0, 0.45);
 }
+/* Pages d'interrogatoire simple : mise en évidence en vert */
+.dev-page-btn.dev-page-btn-interro {
+  background: rgba(40, 180, 90, 0.18);
+  border-color: rgba(60, 220, 110, 0.85);
+  color: #3ddc84;
+  font-weight: 600;
+  box-shadow: 0 0 0 1px rgba(40, 180, 90, 0.25);
+}
+.dev-page-btn.dev-page-btn-interro:hover {
+  background: rgba(40, 200, 100, 0.32);
+  border-color: rgba(80, 240, 130, 1);
+  color: #6fffa0;
+  box-shadow: 0 0 0 2px rgba(40, 200, 100, 0.45);
+}
 
 /* ===== Act Page Overlay ===== */
 

@@ -408,6 +408,62 @@
             }
         },
 
+        marginal2: {
+            intro: { fr: "Silas Crane vous reconnaît à peine. Il grelotte encore plus que la première fois. Choisissez votre question avec douceur.", en: "Silas Crane barely recognizes you. He shivers even more than the first time. Choose your question gently." },
+            questions: [
+                {
+                    id: 'sls2_q1',
+                    label: { fr: "« Vous étiez près du manoir, cette nuit-là. Que s'est-il passé ? »", en: "\"You were near the manor that night. What happened?\"" },
+                    response: { fr: "Silas baisse la tête. « J'ai vu des lumières. Des voix. Puis une voiture est partie en trombe. Je ne peux pas dire qui c'était. »\n\n[Témoin] Témoignage indirect. Silas a vu et entendu, mais pas identifié.", en: "Silas lowers his head. \"I saw lights. Voices. Then a car sped away. I can't say who it was.\"\n\n[Témoin] Indirect testimony. Silas saw and heard, but didn't identify." },
+                    evidence: 'witness'
+                },
+                {
+                    id: 'sls2_q2',
+                    label: { fr: "« Krane vous a-t-il menacé, après notre première conversation ? »", en: "\"Did Krane threaten you, after our first conversation?\"" },
+                    response: { fr: "Silas détourne les yeux. « Il a passé près de mon coin. Il a souri. Je ne l'ai pas revu depuis. Mais j'ai trouvé un billet dans ma canette ce matin. »\n\n[Mobile] Krane a intimidé Silas après qu'il ait parlé.", en: "Silas looks away. \"He passed by my corner. He smiled. I haven't seen him since. But I found a banknote in my tin can this morning.\"\n\n[Mobile] Krane intimidated Silas after he talked." },
+                    evidence: 'mobile'
+                },
+                {
+                    id: 'sls2_q3',
+                    label: { fr: "« La montre en or que vous avez vue... elle appartenait à qui ? »", en: "\"That gold watch you saw... who did it belong to?\"" },
+                    response: { fr: "« Je ne sais pas. Mais je l'ai revue. Au poignet du rôdeur, cette fois. Il la serrait fort, comme s'il avait peur de la perdre. »\n\n[Chronologie] La montre en or est un lien entre le rôdeur et la scène.", en: "\"I don't know. But I saw it again. On the prowler's wrist this time. He was clutching it tight, like he was afraid of losing it.\"\n\n[Chronologie] The gold watch links the prowler to the scene." },
+                    evidence: 'timeline'
+                }
+            ]
+        },
+
+        suspect: {
+            intro: { fr: "Dans l'étude notariale austère de Blackwood, les piles de dossiers poussiéreux s'entassent. Le notaire transpire, desserrant frénétiquement son col.\n\n« Mes registres sont en règle ! S'il y a des anomalies, c'est que... bon, d'accord, le magnat conservait ses actes de fiducie et ses contrats originaux dans son coffre privé. Si ce coffre a été vidé, je suis ruiné, mais je n'y suis pour rien, je vous dis ! »\n\nBlackwood vous défie avec une grille. Ses mains tremblent.", en: "In Blackwood's austere notary office, dusty piles of files stack up. The notary sweats, frantically loosening his collar.\n\n\"My records are in order! If there are anomalies, it's because... well, alright, the magnate kept his trust deeds and original contracts in his private safe. If that safe was emptied, I'm ruined, but I had nothing to do with it, I tell you!\"\n\nBlackwood challenges you with a grid. His hands tremble." },
+            questions: [
+                {
+                    id: 'blk_q1',
+                    label: { fr: "« Les actes de fiducie du coffre ont disparu. Un audit était prévu. Vous étiez le seul à le savoir. »", en: "\"The trust deeds from the safe have vanished. An audit was due. You were the only one who knew.\"" },
+                    response: { fr: "Blackwood essuie son front. « Je gère les affaires de moitié de la ville. Si chaque défalcation était un meurtre, le pendu ne suffirait plus. »\n\n[Mobile] Blackwood renvoie vers l'ampleur de ses affaires.", en: "Blackwood wipes his forehead. \"I manage half the city's affairs. If every embezzlement were a murder, the gallows wouldn't suffice.\"\n\n[Mobile] Blackwood redirects to the scope of his business." },
+                    evidence: 'mobile'
+                },
+                {
+                    id: 'blk_q2',
+                    label: { fr: "« Votre relation avec la victime était-elle strictement professionnelle ? »", en: "\"Was your relationship with the victim strictly professional?\"" },
+                    response: { fr: "« Le Duc était mon client depuis dix ans. Nous avions... des accords. Rien de plus. » Son regard fuit.\n\n[Témoin] Blackwood cache une relation plus personnelle.", en: "\"The Duke was my client for ten years. We had... arrangements. Nothing more.\" His gaze darts away.\n\n[Témoin] Blackwood hides a more personal relationship." },
+                    evidence: 'witness'
+                },
+                {
+                    id: 'blk_q3',
+                    label: { fr: "« Des versements réguliers à V.K. figurent dans vos registres. »", en: "\"Regular payments to V.K. appear in your ledgers.\"" },
+                    response: { fr: "Blackwood pâlit. « Ces versements... c'était pour des services. Des honoraires. Je ne peux pas divulguer la nature des contrats. »\n\n[Forensique] Blackwood reconnaît les versements mais refuse de s'expliquer.", en: "Blackwood pales. \"Those payments... they were for services. Fees. I cannot disclose the nature of the contracts.\"\n\n[Forensique] Blackwood acknowledges the payments but refuses to explain." },
+                    evidence: 'forensic'
+                }
+            ],
+            minigame: {
+                type: 'connect4',
+                difficulty: [
+                    { clue: { fr: "Blackwood craque : « Les versements venaient de Hale. Il payait pour des informations. Je n'ai pas tué, mais j'ai fermé les yeux. »", en: "Blackwood cracks: \"The payments came from Hale. He paid for information. I didn't kill, but I turned a blind eye.\"" }, failClue: { fr: "Blackwood se renfrogne : « Mes affaires sont légales. Cherchez ailleurs. »", en: "Blackwood scowls: \"My business is legal. Look elsewhere.\"" }, rounds: [{ title: { fr: 'Puissance 4', en: 'Connect 4' } }] },
+                    { clue: { fr: "Blackwood avoue : « Hale me versait pour fermer les yeux sur ses détournements. Le meurtre était pas prévu, mais il a paniqué. »", en: "Blackwood confess: \"Hale paid me to turn a blind eye to his embezzlement. The murder wasn't planned, but he panicked.\"" }, failClue: { fr: "Blackwood garde le silence : « Je ne dis rien sans mon avocat. »", en: "Blackwood stays silent: \"I'm not saying anything without my lawyer.\"" }, rounds: [{ title: { fr: 'Puissance 4', en: 'Connect 4' } }] },
+                    { clue: { fr: "Blackwood dit tout : « Hale a donné le code du coffre. C'est lui le commanditaire. Je l'ai couvert par peur. »", en: "Blackwood tells all: \"Hale gave the safe code. He's the mastermind. I covered for him out of fear.\"" }, failClue: { fr: "Blackwood regarde ailleurs : « Le notariat est une affaire de confiance. La mienne est brisée. »", en: "Blackwood looks away: \"Notary work is a trust business. Mine is broken.\"" }, rounds: [{ title: { fr: 'Puissance 4', en: 'Connect 4' } }] }
+                ]
+            }
+        },
+
         criminel: {
             intro: { fr: "Victor Krane se retourne lentement. Il mâche un curedent. Il n'a pas l'air pressé. Posez votre question.", en: "Victor Krane turns slowly. He chews a toothpick. He doesn't look in a hurry. Ask your question." },
             questions: [

@@ -511,6 +511,57 @@ function saveSettings() {
                 }
             }
         } catch (e) {}
+        /* Retour generique d'un mini-jeu/énigme standalone (?standalone=gameType) */
+        try {
+            var qs3 = new URLSearchParams(window.location.search);
+            var standaloneType = qs3.get('standalone');
+            if (standaloneType) {
+                var resultRaw = localStorage.getItem('td_standalone_game_result');
+                var returnRaw = localStorage.getItem('td_standalone_game_return');
+                if (resultRaw) {
+                    var result = JSON.parse(resultRaw);
+                    localStorage.removeItem('td_standalone_game_result');
+                    if (result && result.type === standaloneType) {
+                        if (window.history && window.history.replaceState) window.history.replaceState({}, '', window.location.pathname);
+                        if (returnRaw) {
+                            try {
+                                var rp = JSON.parse(returnRaw);
+                                localStorage.removeItem('td_standalone_game_return');
+                                if (rp && typeof rp.phaseIdx === 'number') {
+                                    if (rp.lang === 'en' || rp.lang === 'fr') { ui.language = rp.lang; try { if (TDScenario && TDScenario.getState) TDScenario.getState().lang = rp.lang; } catch (eA) {} }
+                                    if (rp.theme && typeof setThemeId === 'function') { try { setThemeId(rp.theme); } catch (eB) {} }
+                                    if (rp.culprit && TDScenario && TDScenario.getState) { try { TDScenario.getState().culprit = rp.culprit; } catch (eC) {} }
+                                    scr.active = true; scr.awaitingChoice = false;
+                                    scr.phaseIdx = rp.phaseIdx; scr.pageIdx = rp.pageIdx || 0;
+                                    scr.interro = { id: rp.interroId || 'standalone', questionRound: 99, minigameRound: 0, done: false, questionsDone: true, fromDuel: true };
+                                    scrEnsureThemeMusic();
+                                    if ($.homeScreen) { $.homeScreen.classList.remove('active'); $.homeScreen.classList.add('hidden'); }
+                                    if ($.themeScreen) { $.themeScreen.classList.remove('active'); $.themeScreen.classList.add('hidden'); }
+                                    if ($.gameScreen) { $.gameScreen.classList.remove('hidden'); $.gameScreen.classList.add('active'); }
+                                    if ($.endScreen) { $.endScreen.classList.add('hidden'); $.endScreen.classList.remove('active'); }
+                                    hideLoading();
+                                    updateLanguageUI(); updateLanguageButtons();
+                                    animateDots();
+                                    renderScenarioPage();
+                                    return;
+                                }
+                            } catch (eR) {}
+                        }
+                        /* Fallback : retour au choix des mini-jeux. */
+                        scrEnsureThemeMusic();
+                        if ($.homeScreen) { $.homeScreen.classList.remove('active'); $.homeScreen.classList.add('hidden'); }
+                        if ($.themeScreen) { $.themeScreen.classList.remove('active'); $.themeScreen.classList.add('hidden'); }
+                        if ($.gameScreen) { $.gameScreen.classList.remove('hidden'); $.gameScreen.classList.add('active'); }
+                        if ($.endScreen) { $.endScreen.classList.add('hidden'); $.endScreen.classList.remove('active'); }
+                        hideLoading();
+                        updateLanguageUI(); updateLanguageButtons();
+                        animateDots();
+                        renderScenarioPage();
+                        return;
+                    }
+                }
+            }
+        } catch (e) {}
         updateVolumeButton();
         updateTypingSoundButton();
         // Initialize orientation from saved settings
@@ -3737,15 +3788,42 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
        afin qu'un échec silencieux ne bloque jamais l'aventure. */
     function scrShowMinigameGate(page) {
         var lang = ui.language;
+        var mgCfg = page.minigame || {};
+        var standaloneType = mgCfg.type || '';
+        var langParam = ui.language === 'en' ? 'en' : 'fr';
+        var diff = 1;
+        if (mgCfg.difficulty && mgCfg.difficulty.length > 1) {
+            diff = 1;
+        }
+
+        /* Sauvegarde du contexte de retour pour le mini-jeu standalone. */
+        try {
+            var st = scrGetState();
+            var returnData = {
+                phaseIdx: scr.phaseIdx,
+                pageIdx: scr.pageIdx,
+                interroId: 'page',
+                questionRound: 0,
+                lang: langParam,
+                theme: (typeof getThemeId === 'function' ? getThemeId() : null) || 'agatha-christie',
+                culprit: (st && st.culprit) ? st.culprit : null,
+                ts: Date.now()
+            };
+            localStorage.setItem('td_standalone_game_return', JSON.stringify(returnData));
+        } catch (e) {}
+
         $.continueBtn.classList.remove('hidden');
         $.continueBtn.disabled = false;
         $.continueBtn.textContent = getText('continue') || 'Continuer';
         $.continueBtn.onclick = function () {
             $.continueBtn.disabled = true;
-            scrLaunchMinigame(page);
+            if (standaloneType) {
+                window.location.href = standaloneType + '.html?difficulty=' + diff + '&lang=' + langParam;
+            } else {
+                scrLaunchMinigame(page);
+            }
         };
         $.conversationInput.classList.add('hidden');
-        // Petit rappel discret tant que le texte est affiché
     }
 
 
@@ -3955,41 +4033,45 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         }
 
         if (minigameCfg) {
-            /* Duel d'echecs femme-fatale : page standalone (plus de fenetre overlay). */
-            if (minigameCfg.type === 'chess') {
-                scrChessRedirect(it, minigameCfg);
-                return;
+            /* Tous les mini-jeux sont maintenant des pages standalone. */
+            var standaloneType = minigameCfg.type;
+            var langParam = ui.language === 'en' ? 'en' : 'fr';
+            var themeId = (typeof getThemeId === 'function' ? getThemeId() : null) || 'agatha-christie';
+            var diffIdx = 0;
+            if (minigameCfg.difficulty && minigameCfg.difficulty.length > 1) {
+                diffIdx = (it.minigameRound || 0);
+                if (diffIdx >= minigameCfg.difficulty.length) diffIdx = minigameCfg.difficulty.length - 1;
             }
-            /* Tour de Silas (marginal) : page standalone. */
-            if (minigameCfg.type === 'marginal-tower') {
-                scrMarginalTowerRedirect(it, minigameCfg);
-                return;
-            }
-            scr.awaitingChoice = true;
+            var diff = diffIdx + 1;
+
+            /* Sauvegarde du contexte de retour pour le mini-jeu standalone. */
+            try {
+                var st = scrGetState();
+                var returnData = {
+                    phaseIdx: scr.phaseIdx,
+                    pageIdx: scr.pageIdx,
+                    interroId: (it && it.id) || 'standalone',
+                    questionRound: (it && it.questionRound) || 0,
+                    lang: langParam,
+                    theme: themeId,
+                    culprit: (st && st.culprit) ? st.culprit : null,
+                    ts: Date.now()
+                };
+                localStorage.setItem('td_standalone_game_return', JSON.stringify(returnData));
+            } catch (e) {}
+
+            scr.awaitingChoice = false;
             $.choicesContainer.innerHTML = '';
-            it.pendingMinigameCfg = minigameCfg;
-            var mgLabel = minigameCfg.title
-                ? (minigameCfg.title[lang] || minigameCfg.title.fr || minigameCfg.title.en || '')
-                : '';
-            var btnText = mgLabel
-                ? (lang === 'fr' ? '🎮 ' + mgLabel : '🎮 ' + mgLabel)
-                : (lang === 'fr' ? '🎮 Lancer le défi' : '🎮 Launch challenge');
-            var btn = document.createElement('button');
-            btn.className = 'btn btn-choice interrogation-ask';
-            btn.textContent = btnText;
-            btn.addEventListener('click', function () {
-                if (!scr.awaitingChoice || ui.isTyping) return;
-                scr.awaitingChoice = false;
-                $.choicesContainer.innerHTML = '';
-                scrShowMinigameRound(0, it.pendingMinigameCfg);
-            });
-            $.choicesContainer.appendChild(btn);
+            $.dialogueText.textContent = lang === 'fr'
+                ? 'Le défi commence. Appuyez sur Continuer pour y faire face.'
+                : 'The challenge begins. Press Continue to face it.';
+            if ($.typeCursor) $.typeCursor.classList.add('hidden');
             $.continueBtn.classList.remove('hidden');
-            $.continueBtn.disabled = !isMobile();
+            $.continueBtn.disabled = false;
             $.continueBtn.textContent = getText('continue') || 'Continuer';
-            if (!isMobile()) {
-                $.continueBtn.onclick = null;
-            }
+            $.continueBtn.onclick = function () {
+                window.location.href = standaloneType + '.html?difficulty=' + diff + '&lang=' + langParam;
+            };
             return;
         }
 
@@ -4258,59 +4340,44 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.minigameSelectScreen.classList.remove('active');
         $.minigameSelectScreen.classList.add('hidden');
 
+        var titles = {
+            scene_fouille: { fr: 'Fouille de la scène', en: 'Scene Search' },
+            montre_code: { fr: 'La Montre du Duc', en: "The Duke's Watch" },
+            reseau_alibis: { fr: 'Réseau d\'alibis', en: 'Alibi Network' },
+            cryptogramme: { fr: 'Cryptogramme', en: 'Cryptogram' },
+            coffre_code: { fr: 'Coffre-fort', en: 'Safe' },
+            chess: { fr: 'Échecs', en: 'Chess' },
+            'marginal-tower': { fr: 'Tour de Silas', en: "Silas' Tower" },
+            memory: { fr: 'Mémoire', en: 'Memory' },
+            shooting: { fr: 'Tir forain', en: 'Shooting Gallery' },
+            jackpot: { fr: 'Jackpot', en: 'Jackpot' },
+            connect4: { fr: 'Puissance 4', en: 'Connect 4' },
+            pong: { fr: 'Pong', en: 'Pong' },
+            pacman: { fr: 'Pacman', en: 'Pacman' },
+            'space-invaders': { fr: 'Space Invaders', en: 'Space Invaders' },
+            breakout: { fr: 'Breakout', en: 'Breakout' },
+            asteroids: { fr: 'Astéroïdes', en: 'Asteroids' },
+            'bataille-navale': { fr: 'Bataille navale', en: 'Naval Battle' }
+        };
+
+        var title = titles[minigameType] || { fr: 'Mini-jeu', en: 'Mini-game' };
+        $.minigameTitle.textContent = title[ui.language] || title.en || minigameType;
+
+        var standaloneUrl = 'standalone-game.html?game=' + minigameType + '&lang=' + (ui.language === 'en' ? 'en' : 'fr') + '&mode=selection';
+
+        if (minigameType === 'marginal-tower') {
+            showDifficultySelection({ type: 'marginal-tower', title: title }, function (selectedDifficulty) {
+                window.location.href = 'marginal-tower.html?difficulty=' + selectedDifficulty + '&lang=' + (ui.language === 'en' ? 'en' : 'fr');
+            });
+            return;
+        }
+
         if (minigameType === 'montre_code') {
             window.location.href = 'montre-code.html';
             return;
         }
 
-        if (minigameType === 'marginal-tower') {
-            var towerCfg = { type: 'marginal-tower', act: 1, title: { fr: 'La Tour de Silas', en: "Silas' Tower" } };
-            $.minigameTitle.textContent = (towerCfg.title[ui.language] || towerCfg.title.en || 'Tour de Silas');
-            showDifficultySelection(towerCfg, function (selectedDifficulty) {
-                var langParam = ui.language === 'en' ? 'en' : 'fr';
-                window.location.href = 'marginal-tower.html?difficulty=' + selectedDifficulty + '&lang=' + langParam;
-            });
-            return;
-        }
-
-        var gameMap = getGlobalGameMap();
-
-        var gameNS = gameMap[minigameType];
-        if (!gameNS || !window[gameNS]) {
-            showToast('Minigame not available: ' + minigameType, true);
-            $.minigameSelectScreen.classList.remove('hidden');
-            $.minigameSelectScreen.classList.add('active');
-            return;
-        }
-
-        var cfg = { type: minigameType, act: 1 };
-        if (minigameType === 'chess') {
-            cfg.depth = 1;
-            cfg.title = { fr: 'Échec', en: 'Chess' };
-        } else if (minigameType === 'memory') {
-            cfg.title = { fr: 'Mémoire', en: 'Memory' };
-        } else if (minigameType === 'sudoku') {
-            cfg.title = { fr: 'Sudoku', en: 'Sudoku' };
-        } else if (minigameType === 'jackpot') {
-            cfg.spins = 6;
-            cfg.title = { fr: 'Jackpot', en: 'Jackpot' };
-        } else if (minigameType === 'reseau_alibis') {
-            cfg.title = { fr: 'Réseau d\'alibis', en: 'Alibi Network' };
-        } else if (minigameType === 'puzzle') {
-            cfg.title = { fr: 'Casse-tête', en: 'Sliding Puzzle' };
-        }
-
-        $.minigameTitle.textContent = cfg.title[ui.language] || cfg.title.en || minigameType;
-        $.minigameContent.innerHTML = '';
-
-        if (minigameType !== 'reseau_alibis') {
-            showDifficultySelection(cfg, function (selectedDifficulty) {
-                applyDifficultyToCfg(minigameType, cfg, selectedDifficulty);
-                startSelectedMinigame(minigameType, cfg);
-            });
-        } else {
-            startSelectedMinigame(minigameType, cfg);
-        }
+        window.location.href = standaloneUrl;
     }
 
     function startSelectedMinigame(minigameType, cfg) {
