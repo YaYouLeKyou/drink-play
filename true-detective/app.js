@@ -4325,7 +4325,10 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             'space-invaders': 'space-invaders.html',
             'breakout': 'breakout.html',
             'asteroids': 'asteroids.html',
-            'montre_code': 'montre-code.html'
+            'montre_code': 'montre-code.html',
+            'scene_fouille': 'scene-fouille.html',
+            'cryptogramme': 'cryptogramme.html',
+            'coffre_code': 'coffre-code.html'
         };
 
         if (standalonePages[type]) {

@@ -14,9 +14,7 @@
     var gameResult = null;
     var currentGame = null;
 
-    var $title, $hud, $container, $content;
-    var $victoryOverlay, $defeatOverlay;
-    var $victoryText, $defeatText;
+    var $title, $container, $content;
 
     var GAME_SCRIPTS = {
         'scene_fouille': 'minigames.js',
@@ -35,6 +33,24 @@
         'asteroids': 'asteroids-game.js',
         'marginal-tower': null
     };
+
+    var GAME_STYLES = {
+        'chess': 'echecs-duel.css',
+        'scene_fouille': 'styles.css',
+        'cryptogramme': 'styles.css',
+        'coffre_code': 'styles.css'
+    };
+
+    function loadStyle(href) {
+        return new Promise(function (resolve, reject) {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = href;
+            link.onload = resolve;
+            link.onerror = reject;
+            document.head.appendChild(link);
+        });
+    }
 
     var STANDALONE_REDIRECT = {
         'memory': 'memory.html',
@@ -61,13 +77,8 @@
 
     function init() {
         $title = document.getElementById('sg-title');
-        $hud = document.getElementById('sg-hud');
         $container = document.getElementById('game-container');
         $content = document.getElementById('game-content');
-        $victoryOverlay = document.getElementById('victory-overlay');
-        $defeatOverlay = document.getElementById('defeat-overlay');
-        $victoryText = document.getElementById('victory-text');
-        $defeatText = document.getElementById('defeat-text');
 
         parseParams();
         loadGame();
@@ -130,13 +141,20 @@
             return;
         }
 
+        var styleHref = GAME_STYLES[gameType];
         var scriptSrc = GAME_SCRIPTS[gameType];
         if (!scriptSrc) {
             showPlaceholder();
             return;
         }
 
-        loadScript('../true-detective/' + scriptSrc).then(function () {
+        var promises = [];
+        if (styleHref) {
+            promises.push(loadStyle('../true-detective/' + styleHref).catch(function () {}));
+        }
+        promises.push(loadScript('../true-detective/' + scriptSrc).catch(function () {}));
+
+        Promise.all(promises).then(function () {
             onGameScriptLoaded();
         }).catch(function () {
             showPlaceholder();
@@ -162,6 +180,30 @@
         }
         if (gameType === 'connect4' && global.Connect4Game) {
             loadConnect4();
+            return;
+        }
+        if (gameType === 'chess' && global.TDChessGame) {
+            loadChess();
+            return;
+        }
+        if (gameType === 'pong' && global.TDPongGame) {
+            loadPong();
+            return;
+        }
+        if (gameType === 'pacman' && global.TDPacmanGame) {
+            loadPacman();
+            return;
+        }
+        if (gameType === 'space-invaders' && global.TDSpaceInvaders) {
+            loadSpaceInvaders();
+            return;
+        }
+        if (gameType === 'breakout' && global.TDBreakoutGame) {
+            loadBreakout();
+            return;
+        }
+        if (gameType === 'asteroids' && global.TDAsteroids) {
+            loadAsteroids();
             return;
         }
         if (global.TDMiniGames && global.TDMiniGames.play) {
@@ -337,20 +379,92 @@
         }
     }
 
+    function loadChess() {
+        try {
+            global.TDChessGame.play({
+                depth: difficulty,
+                lang: lang,
+                clue: '',
+                failClue: ''
+            }, lang, function (res) {
+                onGameComplete(res);
+            }, $content);
+        } catch (e) {
+            showPlaceholder();
+        }
+    }
+
+    function loadPong() {
+        try {
+            global.TDPongGame.play({
+                difficulty: difficulty,
+                lang: lang
+            }, lang, function (res) {
+                onGameComplete(res);
+            }, $content);
+        } catch (e) {
+            showPlaceholder();
+        }
+    }
+
+    function loadPacman() {
+        try {
+            global.TDPacmanGame.play({
+                difficulty: difficulty,
+                lang: lang
+            }, lang, function (res) {
+                onGameComplete(res);
+            }, $content);
+        } catch (e) {
+            showPlaceholder();
+        }
+    }
+
+    function loadSpaceInvaders() {
+        try {
+            global.TDSpaceInvaders.play({
+                difficulty: difficulty,
+                lang: lang
+            }, lang, function (res) {
+                onGameComplete(res);
+            }, $content);
+        } catch (e) {
+            showPlaceholder();
+        }
+    }
+
+    function loadBreakout() {
+        try {
+            global.TDBreakoutGame.play({
+                difficulty: difficulty,
+                lang: lang
+            }, lang, function (res) {
+                onGameComplete(res);
+            }, $content);
+        } catch (e) {
+            showPlaceholder();
+        }
+    }
+
+    function loadAsteroids() {
+        try {
+            global.TDAsteroids.play({
+                difficulty: difficulty,
+                lang: lang
+            }, lang, function (res) {
+                onGameComplete(res);
+            }, $content);
+        } catch (e) {
+            showPlaceholder();
+        }
+    }
+
     function showPlaceholder() {
         $content.innerHTML = '<div style="text-align:center;padding:40px;color:#8aa3b8;"><p>Mini-jeu en cours de développement...</p></div>';
     }
 
     function onGameComplete(res) {
         gameResult = res || {};
-        var won = !!gameResult.won;
-        if (won) {
-            if ($victoryText) $victoryText.textContent = gameResult.clue || 'Énigme résolue !';
-            if ($victoryOverlay) $victoryOverlay.classList.remove('hidden');
-        } else {
-            if ($defeatText) $defeatText.textContent = gameResult.clue || 'Échec...';
-            if ($defeatOverlay) $defeatOverlay.classList.remove('hidden');
-        }
     }
 
     function returnToStory(won) {
@@ -370,14 +484,6 @@
     }
 
     function setupControls() {
-        var backBtn = document.getElementById('back-to-game-btn');
-        if (backBtn) {
-            backBtn.addEventListener('click', function () {
-                cleanup();
-                window.location.href = '../true-detective/index.html';
-            });
-        }
-
         var hamburgerBtn = document.getElementById('hamburger-btn');
         var menu = document.getElementById('hamburger-menu');
         if (hamburgerBtn && menu) {
@@ -392,14 +498,6 @@
             });
         }
 
-        var menuBack = document.getElementById('menu-back');
-        if (menuBack) {
-            menuBack.addEventListener('click', function () {
-                if (menu) menu.classList.remove('open');
-                if (backBtn) backBtn.click();
-            });
-        }
-
         var menuHome = document.getElementById('menu-home');
         if (menuHome) {
             menuHome.addEventListener('click', function () {
@@ -409,33 +507,16 @@
             });
         }
 
-
-        var victoryBtn = document.getElementById('victory-continue-btn');
-        if (victoryBtn) {
-            victoryBtn.addEventListener('click', function () {
-                returnToStory(true);
-            });
-        }
-
-        var defeatRetryBtn = document.getElementById('defeat-retry-btn');
-        if (defeatRetryBtn) {
-            defeatRetryBtn.addEventListener('click', function () {
-                cleanup();
-                loadGame();
-            });
-        }
-
-        var defeatContinueBtn = document.getElementById('defeat-continue-btn');
-        if (defeatContinueBtn) {
-            defeatContinueBtn.addEventListener('click', function () {
-                returnToStory(false);
+        var menuSettings = document.getElementById('menu-settings');
+        if (menuSettings) {
+            menuSettings.addEventListener('click', function () {
+                if (menu) menu.classList.remove('open');
+                alert('Paramètres : aucun réglage pour l\'instant.');
             });
         }
     }
 
     function hideOverlays() {
-        if ($victoryOverlay) $victoryOverlay.classList.add('hidden');
-        if ($defeatOverlay) $defeatOverlay.classList.add('hidden');
     }
 
     function cleanup() {
@@ -477,9 +558,7 @@
 
     global.TDStandaloneGame = {
         setSuspectChrome: setSuspectChrome,
-        cleanup: cleanup,
-        showVictory: showVictory,
-        showDefeat: showDefeat
+        cleanup: cleanup
     };
 
     if (document.readyState === 'loading') {

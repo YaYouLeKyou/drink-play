@@ -7,60 +7,32 @@
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="standalone-game-app">
-        <header class="sg-header">
-            <button id="back-to-game-btn" class="btn btn-back">← Retour</button>
+        <header class="sg-header" style="position:relative;">
             <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
             <h1 class="sg-title" id="sg-title">Mini-jeu</h1>
-            <div class="sg-hud" id="sg-hud"></div>
-
         </header>
 
         <nav id="hamburger-menu" class="sg-menu">
-            <button class="sg-menu-item" id="menu-back">
-                <span class="menu-icon">←</span>
-                <span>Retour à l'enquête</span>
-            </button>
             <button class="sg-menu-item" id="menu-home">
                 <span class="menu-icon">🏠</span>
                 <span>Menu principal</span>
             </button>
             <div class="sg-menu-divider"></div>
-            </nav>
+            <button class="sg-menu-item" id="menu-settings">
+                <span class="menu-icon">⚙</span>
+                <span>Paramètres</span>
+            </button>
+        </nav>
 
         <main class="sg-main">
-            <div id="suspect-chrome" class="suspect-chrome hidden">
-                <div class="suspect-portrait-wrap">
-                    <img id="suspect-portrait" class="suspect-portrait" src="" alt="Suspect">
-                </div>
-                <div class="suspect-dialogue-box">
-                    <div class="suspect-name" id="suspect-name"></div>
-                    <div class="suspect-dialogue" id="suspect-dialogue"></div>
-                </div>
-            </div>
             <div id="game-container" class="game-container">
                 <div id="game-content"></div>
             </div>
         </main>
-
-        <div id="victory-overlay" class="overlay victory-overlay hidden">
-            <div class="overlay-content">
-                <h2 class="overlay-title">Victoire !</h2>
-                <p class="overlay-text" id="victory-text">Vous avez résolu l'énigme.</p>
-                <button id="victory-continue-btn" class="btn btn-primary">Continuer</button>
-            </div>
-        </div>
-
-        <div id="defeat-overlay" class="overlay defeat-overlay hidden">
-            <div class="overlay-content">
-                <h2 class="overlay-title">Échec</h2>
-                <p class="overlay-text" id="defeat-text">L'énigme reste insoluble.</p>
-                <button id="defeat-retry-btn" class="btn btn-primary">Réessayer</button>
-                <button id="defeat-continue-btn" class="btn btn-secondary">Continuer</button>
-            </div>
-        </div>
     </div>
 
     <script src="standalone-game.js"></script>
