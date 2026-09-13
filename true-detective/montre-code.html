@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>True Detective - La Montre du Duc</title>
+    <link rel="icon" href="../icon/Logo%20d%26p.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Special+Elite&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="montre-code.css">
+</head>
+<body>
+    <div id="montre-app">
+        <header class="montre-header">
+            <button id="back-to-game-btn" class="btn btn-back">← Retour à l'enquête</button>
+            <h1 class="montre-title">La Montre du Duc</h1>
+            <div class="montre-progress">
+                <span id="engrave-counter">0</span>/4 gravures décryptées
+            </div>
+        </header>
+
+        <main class="montre-main">
+            <div class="montre-scene" id="montre-scene">
+                <div class="montre-face-wrap" id="face-wrap">
+                    <img id="watch-face" class="watch-face" src="mini-games/montre/montre-du-duc-face.png" alt="Face de la montre">
+                    <div id="face-loupe" class="face-loupe"></div>
+                </div>
+                <div class="montre-dos-wrap hidden-dos" id="dos-wrap">
+                    <img id="watch-dos" class="watch-dos" src="mini-games/montre/montre-du-duc-dos.png" alt="Dos de la montre">
+                    <div id="dos-loupe" class="dos-loupe">
+                        <div class="loupe-inner" id="loupe-inner">
+                            <img id="loupe-img" class="loupe-img" src="mini-games/montre/montre-du-duc-dos.png" alt="Dos de la montre">
+                            <div class="engrave-zone engrave-zone-loupe" id="engrave-loupe-zone"></div>
+                        </div>
+                    </div>
+                    <div class="engrave-zone" id="engrave-box"></div>
+                </div>
+                <div class="montre-status" id="montre-status">Approchez la loupe de la face. Une aiguille s'y est figée…</div>
+                <button id="flip-btn" class="btn flip-btn">🔄 Retourner la montre</button>
+            </div>
+
+            <aside class="montre-panel">
+                <h2 class="montre-panel-title">Indices</h2>
+                <div class="montre-answers" id="montre-answers">
+                    <div class="montre-answers-label">Code gravé (dos de la montre) :</div>
+                    <div class="code-row" id="code-row"></div>
+                    <div class="time-row">
+                        <input type="text" class="time-cell" id="time-cell" placeholder="Heure relevée (ex: 20h45)" maxlength="5" disabled>
+                        <button id="validate-btn" class="btn btn-primary" disabled>Valider</button>
+                    </div>
+                </div>
+                <div class="montre-notes">
+                    <h3>Notes d'observation</h3>
+                    <textarea id="montre-notes" placeholder="Notez vos observations ici..."></textarea>
+                    <button id="save-notes-btn" class="btn btn-secondary">💾 Consigner dans le carnet</button>
+                </div>
+                <button id="continue-btn" class="btn btn-primary" disabled>Continuer l'enquête</button>
+            </aside>
+        </main>
+
+        <div id="sincerity-modal" class="sincerity-modal hidden">
+            <div class="sincerity-modal-content">
+                <h2 class="sincerity-modal-title">Question décisive</h2>
+                <p class="sincerity-q" id="sincerity-question"></p>
+                <div class="sincerity-choices">
+                    <button id="sincerity-yes" class="btn btn-primary"></button>
+                    <button id="sincerity-no" class="btn btn-secondary"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="montre-code.js"></script>
+</body>
+</html>

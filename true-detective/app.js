@@ -4071,13 +4071,24 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             'space-invaders': 'TDSpaceInvaders',
             breakout: 'TDBreakoutGame',
             asteroids: 'TDAsteroids',
-            'bataille-navale': 'TDBatailleNavale'
+            'bataille-navale': 'TDBatailleNavale',
+            scene_fouille: 'TDSF',
         };
     }
 
     function launchMinigameFromSelection(minigameType) {
         $.minigameSelectScreen.classList.remove('active');
         $.minigameSelectScreen.classList.add('hidden');
+
+        if (minigameType === 'scene_fouille') {
+            window.location.href = 'scene-fouille.html';
+            return;
+        }
+
+        if (minigameType === 'montre_code') {
+            window.location.href = 'montre-code.html';
+            return;
+        }
 
         var gameMap = getGlobalGameMap();
 

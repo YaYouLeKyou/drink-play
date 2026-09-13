@@ -1,0 +1,392 @@
+/* =====================================================================
+   TRUE DETECTIVE - FOUILLE DE SCÈNE (page standalone)
+   ===================================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: #0a0a0a;
+    color: #e0e0e0;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+#scene-fouille-app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* ===== HEADER ===== */
+.scene-fouille-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 100%);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    z-index: 10;
+}
+
+.scene-fouille-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: #d4af37;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+.scene-fouille-progress {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+#evidence-counter {
+    color: #d4af37;
+    font-weight: 600;
+}
+
+/* ===== MAIN LAYOUT ===== */
+.scene-fouille-main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.scene-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+}
+
+.scene-image {
+    width: 100%;
+    height: 100%;
+    background-image: url('../true-detective/assets/image true detective/lieux/classic/scene de crime manoir.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* ===== LOUPE ===== */
+.scene-loupe {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 3px solid #d4af37;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5), inset 0 0 20px rgba(0,0,0,0.5);
+    pointer-events: none;
+    display: none;
+    z-index: 5;
+    background-repeat: no-repeat;
+}
+
+/* ===== HOTSPOTS ===== */
+.hotspots-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.fouille-zone {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.3);
+    border: 2px solid #d4af37;
+    color: #d4af37;
+    font-family: 'Special Elite', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    pointer-events: auto;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+.fouille-zone:hover {
+    background: rgba(212, 175, 55, 0.6);
+    transform: translate(-50%, -50%) scale(1.2);
+}
+
+.fouille-zone.fouille-zone-found {
+    background: rgba(0, 200, 150, 0.4);
+    border-color: #00c896;
+    color: #00c896;
+    cursor: default;
+}
+
+/* ===== EVIDENCE DOCK ===== */
+.evidence-dock {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid #d4af37;
+    border-radius: 8px;
+    padding: 1rem;
+    max-width: 300px;
+    z-index: 6;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.evidence-dock.visible {
+    opacity: 1;
+}
+
+.evidence-dock-head {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: #d4af37;
+    margin-bottom: 0.5rem;
+}
+
+.evidence-dock-text {
+    font-size: 0.85rem;
+    color: #ccc;
+    line-height: 1.4;
+}
+
+/* ===== EVIDENCE PANEL ===== */
+.evidence-panel {
+    width: 320px;
+    background: linear-gradient(180deg, rgba(20,20,20,0.95) 0%, rgba(10,10,10,0.98) 100%);
+    border-left: 1px solid rgba(255,255,255,0.1);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    overflow-y: auto;
+}
+
+.evidence-panel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: #d4af37;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    padding-bottom: 0.5rem;
+}
+
+.evidence-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.evidence-empty {
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.evidence-item {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.evidence-item:hover {
+    border-color: #d4af37;
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.evidence-item-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.evidence-item-label {
+    font-family: 'Special Elite', monospace;
+    font-size: 0.85rem;
+    color: #d4af37;
+    font-weight: 700;
+}
+
+.evidence-item-text {
+    font-size: 0.8rem;
+    color: #aaa;
+    line-height: 1.4;
+}
+
+/* ===== CLUE MODAL ===== */
+.clue-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+}
+
+.clue-modal.hidden {
+    display: none;
+}
+
+.clue-modal-content {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+    border: 2px solid #d4af37;
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+}
+
+.clue-modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: #d4af37;
+    margin-bottom: 1rem;
+}
+
+.clue-modal-text {
+    font-size: 0.95rem;
+    color: #ccc;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #d4af37 0%, #b8960c 100%);
+    color: #000;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+}
+
+.btn-primary:disabled {
+    background: #444;
+    color: #888;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-back {
+    background: transparent;
+    color: #d4af37;
+    border: 1px solid #d4af37;
+}
+
+.btn-back:hover {
+    background: rgba(212, 175, 55, 0.1);
+}
+
+/* ===== LOADING ===== */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+}
+
+.loading-overlay.hidden {
+    display: none;
+}
+
+.loading-content {
+    text-align: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(212, 175, 55, 0.3);
+    border-top-color: #d4af37;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    color: #d4af37;
+    font-size: 0.9rem;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .scene-fouille-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .scene-fouille-title {
+        font-size: 1.2rem;
+    }
+
+    .scene-fouille-main {
+        flex-direction: column;
+    }
+
+    .evidence-panel {
+        width: 100%;
+        height: 200px;
+        border-left: none;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .scene-loupe {
+        width: 120px;
+        height: 120px;
+    }
+
+    .fouille-zone {
+        width: 30px;
+        height: 30px;
+        font-size: 0.75rem;
+    }
+}

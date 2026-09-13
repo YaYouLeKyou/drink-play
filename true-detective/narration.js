@@ -23,9 +23,9 @@
     ================================================================= */
 
     N.intro1 = {
-        page0: { fr: "Le brouillard descend sur la ville, la nuit. Les becs de gaz dessinent des halos orange sur le pavé mouillé, les fiacres claquent sur les ponts, et dans les ruelles, les chamarrures des enseignes se devinent à peine. Une cité de cheminées et de secrets, où chaque fenêtre éclairée cache une affaire, et où l'on ne compte plus les affaires qui attendent un regard lucide. Ce soir, c'est la vôtre.", en: "Fog settles over the city, night has fallen. Gas lamps draw orange halos on the wet cobblestones, cabs clatter across the bridges, and in the alleys the painted shop signs are barely visible. A city of chimneys and secrets, where every lit window hides a case, and where the cases waiting for a clear eye are countless. Tonight, one of them is yours." },
+        page0: { fr: "La ville respire sous la pluie. Les réverbères percent la brume de leurs halos jaunes, les fiacres glissent sur les pavés mouillés, et dans les ruelles, les ombres sont plus longues que les visages. Une cité qui ne pardonne pas l'erreur. Ce soir, elle vous attend.", en: "The city breathes under the rain. Streetlamps pierce the fog with yellow halos, cabs slide on wet cobblestones, and in the alleys, shadows are longer than faces. A city that does not forgive mistakes. Tonight, it waits for you." },
         page1: { fr: "La ville murmure sous la pluie. Dans un appartement cossu, un magnat de l'immobilier a été retrouvé sans vie. On vous a confié l'enquête : la plus délicate de votre carrière.", en: "The city whispers under the rain. In a lavish flat, a real-estate magnate was found dead. You have been assigned the case: the most delicate of your career." },
-        page2: { fr: "Vous poussez la porte de la scène de crime. Le sang a séché sur le parquet, le coffre est béant, et sur une table gît une montre de poche brisée. Personne ne sait encore quand le magnat est mort : aucune heure n'est établie. C'est à vous de la trouver.", en: "You push open the door of the crime scene. Blood has dried on the floor, the safe gapes open, and on a table lies a broken pocket watch. No one knows yet when the magnate died: no time of death is established. Finding it is your job." },
+        page2: { fr: "Vous poussez la porte de la scène de crime. Le sang a séché sur le parquet, le coffre est béant, et sur une table gît une montre de poche brisée. Personne ne sait encore quand le magnat est mort : aucune heure n'est établie. C'est à vous de la trouver.", en: "You push open the door of the crime scene. Blood has dried on the floor, the safe gapes open, and on a table lies a broken pocket watch. No one knows yet when the magnat died: no time of death is established. Finding it is your job." },
         page3: { fr: "Votre partenaire vous rejoint, l'air grave : « La victime, un magnat, n'avait qu'un seul domestique : son garde du corps, le Major Hale. C'est lui qui a découvert le corps. L'affaire commence ici. »", en: "Your partner joins you, looking grave: \"The victim, a tycoon, had one servant: his bodyguard, Major Hale. He found the body. The case begins here.\"" }
     };
 
@@ -36,21 +36,21 @@
     };
 
     N.act1_1 = {
-        page1: { fr: "Le Major Hale, garde du corps et majordome en chef, vous accueille dans le salon du manoir avec un mélange de nervosité et d'arrogance. « Je vous ai attendu. La maison est en deuil, faites vite. »\n\nVous l'observez. Hale se tient droit, mais ses yeux vous fuient. Choisissez votre angle d'attaque.", en: "Major Hale, bodyguard and chief butler, greets you in the manor lounge with a mix of nervousness and arrogance. \"I've been expecting you. The house is in mourning, make it quick.\"\n\nYou observe him. Hale stands straight, but his eyes avoid yours. Pick your angle of attack." },
-        page2: { fr: "Lady Vivienne, d'une voix posée dans le boudoir : « Mon mari avait des ennemis, certes. Mais l'auteur de ce crime… c'est quelqu'un de la maison. »\n\nElle reste de marbre, une tasse de thé à la main. Elle attend votre première question.", en: "Lady Vivienne, in a calm voice in the boudoir: \"My husband had enemies, certainly. But the perpetrator… it's someone from the house.\"\n\nShe remains stone-faced, a teacup in hand. She waits for your first question." },
-        page3: { fr: "Deux témoignages, deux visages du manoir. Wexford range ses notes. « Hale est trop nerveux, Vivienne trop froide. L'un des deux cache quelque chose, ou tous les deux. Le notaire du Duc tenait les cordons de la bourse, et un témoin a vu une ombre dans la ruelle. Allons les découvrir. »", en: "Two testimonies, two faces of the manor. Wexford files away his notes. \"Hale is too nervous, Vivienne too cold. One of them is hiding something, or both. Notary Blackwood held the Duke's purse strings, and the homeless man saw a shadow in the alley. Let's go find out.\"" },
+        page1: { fr: "Le Major Hale vous accueille dans le salon du manoir. Son uniforme est impeccable, mais une goutte de sueur perle à sa tempe. Il se tient droit, les mains croisées derrière le dos.\n\n« Je vous ai attendu, inspecteur. La maison est en deuil, faites vite. »\n\nVous sentez un mélange d'arrogance et de contrôle. Hale se maîtrise, mais ses yeux vous fuient. Choisissez votre angle d'attaque.", en: "Major Hale greets you in the manor lounge. His uniform is impeccable, but a drop of sweat beads at his temple. He stands straight, hands clasped behind his back.\n\n\"I've been expecting you, inspector. The house is in mourning, make it quick.\"\n\nYou sense a mix of arrogance and control. Hale keeps his composure, but his eyes avoid yours. Pick your angle of attack." },
+        page2: { fr: "Lady Vivienne vous reçoit dans le boudoir aux rideaux de velours rouge. Elle ne se lève pas. Une tasse de thé fume entre ses doigts gantés.\n\n« Mon mari avait des ennemis, certes. Mais l'auteur de ce crime… c'est quelqu'un de la maison. Quelqu'un qui connaissait ses habitudes. »\n\nElle vous défie du regard. Lady Vivienne attend votre première question.", en: "Lady Vivienne receives you in the boudoir with blood-red velvet curtains. She does not rise. A teacup smokes between her gloved fingers.\n\n\"My husband had enemies, certainly. But the perpetrator… it's someone from the house. Someone who knew his habits.\"\n\nShe challenges you with her gaze. Lady Vivienne waits for your first question." },
+        page3: { fr: "Deux témoignages, deux visages du manoir. Wexford range ses notes. « Hale est trop nerveux, Vivienne trop froide. L'un des deux cache quelque chose, ou tous les deux. Le notaire du Duc tenait les cordons de la bourse, et un témoin a vu une ombre dans la ruelle. Allons les découvrir. »", en: "Two testimonies, two faces of the manor. Wexford files away his notes. \"Hale is too nervous, Vivienne too cold. One of them is hiding something, or both. Notary Blackwood held the Duke's purse strings, and a witness saw a shadow in the alley. Let's go find out.\"" }
     };
 
     N.act1_2 = {
-        page1: { fr: "Avant de partir, vous revoyez vos notes avec Wexford dans le vestibule du manoir. « Un témoin dans la ruelle a vu quelque chose cette nuit-là. Mais passons d'abord chez le notaire du Duc, il gérait les affaires du Duc. Et le témoin, on l'interceptera au retour. »", en: "Before leaving, you review your notes with Wexford in the manor vestibule. \"The homeless man in the alley saw something that night. But let's stop by Blackwood's, the notary, he handled the Duke's affairs. We'll catch the homeless man on the way back.\"" },
+        page1: { fr: "Dans le vestibule du manoir, Wexford allume une cigarette. Sa main ne tremble pas, mais sa voix est plus basse.\n\n« Le clochard de la ruelle a vu quelque chose cette nuit-là. Mais passons d'abord chez Blackwood, le notaire. Il gérait les affaires du Duc. Et le témoin, on l'interceptera au retour. »", en: "In the manor vestibule, Wexford lights a cigarette. His hand doesn't shake, but his voice is lower.\n\n\"The homeless man in the alley saw something that night. But let's stop by Blackwood's, the notary. He handled the Duke's affairs. We'll catch the witness on the way back.\"" },
         page2: { fr: "Chez Rupert Blackwood, dans son appartement cossu. Il vous ouvre, l'air nerveux.\n\n« Entrez, inspecteur. Je ne sais pas ce que trafique le Duc ces derniers temps, mais les tensions sur le testament se multiplient. J'ai peur que tout cela finisse mal. »\n\nDerrière son bureau de notaire, il paraît fatigué. Il vous fait signe de vous asseoir.", en: "At Rupert Blackwood's place, in his lavish apartment. He opens the door, looking uneasy.\n\n\"Come in, inspector. I don't know what the Duke has been up to lately, but the tensions around the will keep growing. I'm afraid this will end badly.\"\n\nBehind his notary desk, he looks tired. He gestures for you to sit." },
         page3: { fr: "Sur le chemin du retour, à la sortie du manoir, dans la ruelle adjacente, Silas Crane grelotte dans un coin. Vous l'abordez doucement.\n\n« T'as une pièce, inspecteur ? »\n\nVous lui glissez une monnaie. Il se détend, prêt à parler.", en: "On the way back, at the manor exit, in the adjacent alley, Silas Crane is shivering in a corner. You approach him gently.\n\n\"Got a coin, inspector?\"\n\nYou slip him some change. He relaxes, ready to talk." }
     };
 
     N.act2_1 = {
-        page1: { fr: "Au quartier général, votre partenaire recompte les indices. « Les analyses ADN parleront d'elles-mêmes. Filons au bar. »", en: "At headquarters, your partner tallies the clues. \"The DNA analyses will speak for themselves. Let's go to the bar.\"" },
-        page2: { fr: "À l'intérieur du bar, la fumée stagne sous les néons. Vous vous installez au comptoir, à côté de Julian Pembrooke.\n\n« Monsieur Pembrooke. On vous a vu avec la victime la veille de sa mort. Comment l'expliquez-vous ?\n\nPembrooke fait tourner son verre sans y porter les lèvres. Il vous regarde par-dessous, un sourire en coin.", en: "Inside the bar, smoke lingers under the neon lights. You sit at the counter, next to Julian Pembrooke.\n\n“Mr. Pembrooke. You were seen with the victim the day before his death. How do you explain that ?\n\nPembrooke spins his glass without raising it to his lips. He glances at you from under his brow, a wry smile.”" },
-        page3: { fr: "Dehors, devant le bar, votre partenaire note : « Pembrooke est nerveux. Il a quelque chose à cacher, mais quoi ? On n'a pas encore toutes les pièces du puzzle. »", en: "Outside, in front of the bar, your partner notes: \"Pembrooke is nervous. He's hiding something, but what? We don't have all the pieces yet.\"" }
+        page1: { fr: "Au quartier général, votre partenaire recompte les indices. « Les versements à V.K. et les empreintes de Hale sur la mention V.K. sont notre fil conducteur. Mais il nous manque une clé à quatre chiffres. Allons interroger Pembrooke et Krane au bar, capter leur réaction. »", en: "At headquarters, your partner tallies the clues. \"The payments to V.K. and Hale's fingerprints on the V.K. entry are our thread. But we lack a four-digit key. Let's head to the bar and watch Pembrooke and Krane react.\"" },
+        page2: { fr: "À l'intérieur du bar, la fumée stagne sous les néons. Vous vous installez au comptoir, à côté de Julian Pembrooke.\n\n- Monsieur Pembrooke. On vous a vu avec la victime la veille de sa mort. Comment l'expliquez-vous ?\n\nPembrooke fait tourner son verre sans y porter les lèvres. Il vous regarde par-dessus, un sourire en coin.\n\n- Je lui devais de l'argent, c'est vrai. Mais je ne l'ai pas tué. Je vous le jure.", en: "Inside the bar, smoke lingers under the neon lights. You sit at the counter, next to Julian Pembrooke.\n\n- Mr. Pembrooke. You were seen with the victim the day before his death. How do you explain that ?\n\nPembrooke spins his glass without raising it to his lips. He glances at you from under his brow, a wry smile.\n\n- I owed him money, that's true. But I didn't kill him. I swear it." },
+        page3: { fr: "Dehors, sous la lumière crue des réverbères, Victor Krane se tient devant l'entrée du bar, le curedent entre les dents. L'air frais de la nuit lui redonne un peu de nervosité.\n\n- Monsieur Krane. Vous étiez dans le quartier cette nuit-là. Dites-moi tout.\n\nKrane ricane, mais son regard fuit brièvement.", en: "Outside, under the harsh light of the streetlamps, Victor Krane stands by the bar entrance, a toothpick between his teeth. The cool night air makes him a little nervous.\n\n- Mr. Krane. You were in the neighborhood that night. Tell me everything.\n\nKrane snorts, but his gaze darts away briefly." }
     };
 
     N.act2_2 = {
@@ -74,14 +74,18 @@
         page1: { fr: "Pénombre lugubre au manoir. Vous vous approchez du panneau de boiserie dissimulant le coffre-fort. « Allez, inspecteur. La combinaison de la montre... et ouvrez-moi ce coffre. »", en: "A gloomy half-light at the manor. You approach the wood panel concealing the safe. \"Go on, inspector. The watch's combination... and open me that safe.\"" }
     };
 
+    N.act3_1 = {
+        page1: { fr: "Pénombre lugubre au manoir. Vous vous approchez du panneau de boiserie dissimulant le coffre-fort. « Allez, inspecteur. La combinaison de la montre... et ouvrez-moi ce coffre. »", en: "A gloomy half-light at the manor. You approach the wood panel concealing the safe. \"Go on, inspector. The watch's combination... and open me that safe.\"" }
+    };
+
     N.act3_2 = {
         page1: { fr: "De retour au quartier général, la pression monte d'un cran. Votre partenaire étale les documents du coffre sur la table. « Voilà qui change tout, inspecteur. Convoquons-les un par un au parloir. »", en: "Back at headquarters, the pressure rises. Your partner spreads the safe's documents on the table. \"This changes everything, inspector. Let's summon them one by one.\"" },
-        page2: { fr: "Au parloir, Hale, regard fixe : « Des versements occultes à un certain V.K., Major Hale. Vous aviez bien des raisons de vouloir ces papiers disparus. », « Vous inventez, inspecteur. Je servais mon maître. Rien de plus. »", en: "In the interrogation room, Hale, gaze fixed: \"Secret payments to a certain V.K., Major Hale. You had every reason to want those vanished papers.\", \"You're inventing things, inspector. I served my master. Nothing more.\"" },
-        page3: { fr: "Lady Vivienne, le sourire effacé : « Des lettres intimes de votre main dormaient dans ce coffre. », « Mon époux changeait de cachette tous les mois. Sa paranoïa l'a perdu, pas moi. »", en: "Lady Vivienne, smile gone: \"Intimate letters in your hand were resting in that safe.\", \"My husband changed his hiding place every month. His paranoia undid him, not I.\"" },
-        page4: { fr: "Pembrooke, le teint pâle : « Des reconnaissances de dettes signées de votre main... et leur disparition vous arrange. », « Si j'avais tué pour des papiers, on ne les retrouverait pas au fond d'un coffre. Je les aurais brûlés. »", en: "Pembrooke, pale: \"Debt notes signed by your hand... and their disappearance suits you.\", \"If I had killed for papers, they wouldn't be found at the bottom of a safe. I'd have burned them.\"" },
-        page5: { fr: "Blackwood ne regarde pas le dossier : « Les actes de fiducie ont disparu, et un audit était prévu dès le lendemain. », « Si chaque défalcation était un meurtre, inspecteur, le pendu ne suffirait plus. »", en: "Blackwood doesn't look at the file: \"The trust deeds have vanished, and an audit was due the very next day.\", \"If every embezzlement were a murder, inspector, the gallows wouldn't suffice.\"" },
-        page6: { fr: "Silas Crane, menotté mais l'œil brillant : « Des fibres de toile et de la boue du jardin dans le coffre vidé. », « Je cambriole les cuisines, monsieur l'inspecteur, pas les coffres. Mais j'ai vu une ombre repartir du bureau les mains pleines. »", en: "Silas Crane, cuffed but bright-eyed: \"Cloth fibers and garden mud inside the emptied safe.\", \"I burgle kitchens, Mr. Inspector, not safes. But I saw a shadow leave the office with full hands.\"" },
-        page7: { fr: "Krane, bras croisés : « Des contrats de commandite et une liasse en acompte ont disparu. Votre trace est dessus. », « Mon trace est partout, inspecteur. C'est le métier. Mais je ne vole jamais mes propres employeurs. »", en: "Krane, arms crossed: \"Retainer contracts and an advance bundle have vanished. Your trace is on them.\", \"My trace is everywhere, inspector. It's the trade. But I never rob my own employers.\"" },
+        page2: { fr: "Au parloir, Hale se tient droit, mais ses yeux vous fuient. « Major Hale. Des versements occultes à un certain V.K. figurent dans le coffre. Votre passé militaire, vos dettes de jeu... Vous aviez bien des raisons de vouloir ces papiers disparus. » « Vous inventez, inspecteur. Je servais mon maître. Rien de plus. »", en: "In the interrogation room, Hale sits, hands crossed, gaze fixed ahead. \"Major Hale. Secret payments to a certain V.K. appear in the safe. Your military past, your gambling debts... You had every reason to want those vanished papers.\" \"You're inventing things, inspector. I served my master. Nothing more.\"" },
+        page3: { fr: "Lady Vivienne entre au parloir, le dos droit, le sourire effacé. « Lady Vivienne. Des lettres intimes de votre main dormaient dans ce coffre. Vous saviez donc mieux que quiconque ce qu'il renfermait. » « Un coffre, inspecteur ? Mon époux changeait de cachette tous les mois. Sa paranoïa l'a perdu - pas moi. »", en: "Lady Vivienne enters the interrogation room, back straight, smile gone. \"Lady Vivienne. Intimate letters in your hand were resting in that safe. You knew better than anyone what it held.\" \"A safe, inspector? My husband changed his hiding place every month. His paranoia undid him - not I.\"" },
+        page4: { fr: "Pembrooke s'assoit lourdement, le teint pâle. « Monsieur Pembrooke. Des reconnaissances de dettes signées de votre main... et leur disparition vous arrange passablement. » « Si j'avais tué pour des papiers, inspecteur, croyez-moi, on ne les retrouverait pas au fond d'un coffre. Je les aurais brûlés. »", en: "Pembrooke sits heavily, his complexion pale. \"Mr. Pembrooke. Debt notes signed by your hand... and their disappearance suits you rather well.\" \"If I had killed for papers, inspector, believe me, they wouldn't be found at the bottom of a safe. I'd have burned them.\"" },
+        page5: { fr: "Blackwood ne regarde pas le dossier qu'on lui tend. « Maître Blackwood. Les actes de fiducie du coffre ont disparu. Un audit de ses comptes était prévu dès le lendemain. Vous étiez le seul à le savoir. » « Je gère les affaires de moitié de la ville, inspecteur. Si chaque défalcation était un meurtre, le pendu ne suffirait plus. »", en: "Blackwood doesn't look at the file handed to him. \"Master Blackwood. The trust deeds from the safe have vanished. An audit of his accounts was due the very next day. You were the only one who knew.\" \"I manage half the city's affairs, inspector. If every embezzlement were a murder, the gallows wouldn't suffice.\"" },
+        page6: { fr: "Silas Crane est amené au parloir, les menottes aux poings, mais l'œil brillant. « Crane. Des fibres de toile grossière et de la boue du jardin, dans le coffre vidé. Vous êtes bien monté en gentilhomme depuis peu. » « Moi ? Je cambriole les cuisines, monsieur l'inspecteur, pas les coffres. Mais j'ai vu, cette nuit-là, une ombre repartir du bureau les mains pleines. »", en: "Silas Crane is brought to the interrogation room, cuffed at the wrists, but with a gleam in his eye. \"Crane. Coarse cloth fibers and garden mud, inside the emptied safe. You've moved up in the world lately.\" \"Me? I burgle kitchens, Mr. Inspector, not safes. But that night I saw a shadow leave the office with full hands.\"" },
+        page7: { fr: "Krane sourit, les bras croisés. « Krane. Des contrats de commandite et une liasse de billets en acompte ont disparu du coffre. Votre trace est dessus. » « Mon trace est partout, inspecteur. C'est le métier. Mais je ne vole jamais mes propres employeurs. Question de survie. »", en: "Krane smiles, arms crossed. \"Krane. Retainer contracts and a bundle of banknotes as advance payment have vanished from the safe. Your trace is on them.\" \"My trace is everywhere, inspector. It's the trade. But I never rob my own employers. A matter of survival.\"" },
         page8: { fr: "Wexford épingle les six dépositions sur le grand tableau de liège. « Les interrogatoires, les analyses, les preuves du coffre... tout est là. Mais chacun accuse quelqu'un d'autre. À vous de démêler qui ment, qui dit vrai. Trois menteurs se dessinent. »", en: "Wexford pins the six depositions on the big cork board. \"The interrogations, the analyses, the safe's evidence... it's all there. But each one accuses someone else. Sort out who lies, who tells the truth. Three liars emerge.\"" }
     };
 
@@ -325,250 +329,9 @@
             minigame: {
                 type: 'shooting',
                 difficulty: [
-                    { clue: { fr: "Hale finit par avouer : « J'ai payé Krane pour effacer les dettes. Le meurtre... c'était un accident. »", en: "Hale finally confesses: \"I paid Krane to erase the debts. The murder... it was an accident.\"" }, failClue: { fr: "Hale reste muet : « Je ne sais rien. Interrogez les autres. »", en: "Hale remains silent: \"I know nothing. Question the others.\"" }, rounds: [{ title: { fr: 'Tir 1', en: 'Shoot 1' } }, { title: { fr: 'Tir 2', en: 'Shoot 2' } }, { title: { fr: 'Tir 3', en: 'Shoot 3' } }] }
-                ]
-            }
-        },
-
-        'femme-fatale': {
-            intro: { fr: "Lady Vivienne reste de marbre, une tasse de thé à la main. Elle attend votre première question.", en: "Lady Vivienne remains stone-faced, a teacup in hand. She waits for your first question." },
-            questions: [
-                {
-                    id: 'viv_q1',
-                    label: { fr: "« Votre mari vous entretenait richement. Héritiez-vous seulement ? »", en: "\"Your husband kept you in luxury. Were you only inheriting?\"" },
-                    response: { fr: "Vivienne sourit. « Rupert Blackwood, le notaire, gérait les comptes. Il a fait modifier le testament la semaine dernière. À mon détriment, paraît-il. »\n\n[Mobile] Blackwood a modifié le testament. Pourquoi ? À creuser.", en: "Vivienne smiles. \"Rupert Blackwood, the notary, managed the accounts. He had the will changed last week. To my detriment, apparently.\"\n\n[Mobile] Blackwood changed the will. Why? To dig further." },
-                    evidence: 'mobile'
-                },
-                {
-                    id: 'viv_q2',
-                    label: { fr: "« Pembrooke était souvent ici. Quel rôle jouait-il ? »", en: "\"Pembrooke was often here. What role did he play?\"" },
-                    response: { fr: "Vivienne reste impassible. « Un ami fidèle de mon mari. Je ne suis pas dupe de ses sourires. »\n\n[Témoin] Vivienne élude sans accuser. Elle connaît quelque chose.", en: "Vivienne stays unmoved. \"A loyal friend of my husband. I'm not fooled by his smiles.\"\n\n[Témoin] Vivienne dodges without accusing. She knows something." },
-                    evidence: 'witness'
-                },
-                {
-                    id: 'viv_q3',
-                    label: { fr: "« Votre mari devait-il de l'argent à quelqu'un ? »", en: "\"Did your husband owe money to anyone?\"" },
-                    response: { fr: "Vivienne pose sa tasse. « Blackwood, le notaire, lui a prêté une grosse somme. Je l'ai lu dans un registre. Mais Blackwood ne l'aurait jamais tué : il dépendait aussi de lui. »\n\n[Mobile] Blackwood avait un intérêt financier direct dans la victime.", en: "Vivienne sets her cup down. \"Blackwood, the notary, lent him a large sum. I read it in a ledger. But Blackwood would never have killed him: he also depended on him.\"\n\n[Mobile] Blackwood had a direct financial interest in the victim." },
-                    evidence: 'mobile'
-                }
-            ],
-            redirect: { target: 'suspect', reason: 'argent_dû' },
-            rounds2: [
-                {
-                    id: 'viv_r2q1',
-                    label: { fr: "« On dit que vous fréquentez le notaire plus souvent que de raison. »", en: "\"They say you visit the notary more often than necessary.\"" },
-                    response: { fr: "Vivienne hausse un sourcil. « Pour le testament. Blackwood me tenait au courant, il devait beaucoup d'argent à mon mari, et son poste dépendait de moi. »\n\n[Mobile] Vivienne rejette tout sur Blackwood : argent dû au mari, position fragile.", en: "Vivienne raises an eyebrow. \"About the will. Blackwood kept me informed, he owed my husband a lot of money, and his position depended on me.\"\n\n[Mobile] Vivienne pins it all on Blackwood : money owed to her husband, a fragile position." },
-                    evidence: 'mobile'
-                },
-                {
-                    id: 'viv_r2q2',
-                    label: { fr: "« Votre assurance-vie : qui en bénéficie ? »", en: "\"Your life insurance : who benefits?\"" },
-                    response: { fr: "Elle sourit froidement. « L'assurance ? Vous posez des questions de commis voyageur, inspecteur. Mon mari valait bien plus vivant. »\n\n[Mobile] Elle esquive la question de l'argent. Trop vite.", en: "She smiles coldly. \"Insurance? You ask an accountant's questions, inspector. My husband was worth far more alive.\"\n\n[Mobile] She dodges the money question. Too quickly." },
-                    evidence: 'mobile'
-                },
-                {
-                    id: 'viv_r2q3',
-                    label: { fr: "« Les lettres de menace. Votre écriture ? »", en: "\"The threat letters. Your handwriting?\"" },
-                    response: { fr: "Sa main frémit au-dessus de la tasse. « Élégante, n'est-ce pas ? Beaucoup de femmes de ce monde écrivent bien. » Elle ne nie plus.\n\n[Forensique] Vivienne ne dément plus son écriture sur les menaces.", en: "Her hand trembles above the cup. \"Elegant, isn't it? Many women of this world write well.\" She no longer denies it.\n\n[Forensique] Vivienne no longer denies her handwriting on the threats." },
-                    evidence: 'forensic'
-                }
-            ],
-            rounds3: [
-                {
-                    id: 'viv_r3q1',
-                    label: { fr: "« La lettre à moitié brûlée. Pourquoi la brûler si elle était innocente ? »", en: "\"The half-burned letter. Why burn it if it was innocent?\"" },
-                    response: { fr: "« On brûle ce qui fait souffrir, inspecteur. Pas ce qui condamne. » Elle croise les jambes, parfaitement calme.\n\n[Témoin] Une réponse de complaisance. Elle esquive la question sans y répondre.", en: "\"One burns what hurts, inspector. Not what convicts.\" She crosses her legs, perfectly calm.\n\n[Témoin] A polished answer. She sidesteps the question without answering it." },
-                    evidence: 'witness'
-                },
-                {
-                    id: 'viv_r3q2',
-                    label: { fr: "« Où étiez-vous cette nuit-là, exactement ? »", en: "\"Where were you that night, exactly?\"" },
-                    response: { fr: "« Au théâtre, avec des amies. Puis ici, seule. Personne ne peut le confirmer, les domestiques avaient congé. Sauf un. »\n\n[Alibi] Un alibi invérifiable. Et elle connaît les allées et venues de Hale.", en: "\"At the theatre, with friends. Then here, alone. No one can confirm it, the servants had the evening off. Except one.\"\n\n[Alibi] An unverifiable alibi. And she knows Hale's comings and goings." },
-                    evidence: 'alibi'
-                },
-                {
-                    id: 'viv_r3q3',
-                    label: { fr: "« Et votre liaison avec le Major Hale ? »", en: "\"And your affair with Major Hale?\"" },
-                    response: { fr: "Pour la première fois, la tasse tremble vraiment. « Que Hale m'épie ne fait pas de nous des amants. C'est un homme… dévoué. Trop dévoué, peut-être. »\n\n[Témoin] Vivienne confirme que Hale l'observe de près. Elle sait qu'il est dangereux.", en: "For the first time, the cup truly trembles. \"Hale watching me doesn't make us lovers. He is a… devoted man. Perhaps too devoted.\"\n\n[Témoin] Vivienne confirms Hale watches her closely. She knows he is dangerous." },
-                    evidence: 'witness'
-                }
-            ],
-            minigame: {
-                type: 'chess',
-                difficulty: [
-                    { depth: 1, clue: { fr: "Vivienne lâche un indice : « Blackwood a modifié le testament la semaine dernière. Mon mari le savait. »", en: "Vivienne slips a clue: \"Blackwood changed the will last week. My husband knew about it.\"" }, failClue: { fr: "Vivienne esquisse un sourire énigmatique. « Blackwood gérait les comptes. Cherchez de ce côté. »", en: "Vivienne sketches an enigmatic smile. \"Blackwood managed the accounts. Look that way.\"" }, rounds: [{ depth: 1, title: { fr: 'Échec tactique', en: 'Tactical Chess' } }, { depth: 1, title: { fr: 'Échec stratégique', en: 'Strategic Chess' } }, { depth: 1, title: { fr: 'Échec final', en: 'Final Chess' } }] },
-                    { depth: 2, clue: { fr: "Vivienne avoue sous la pression : « L'assurance-vie me nommait bénéficiaire. Mon mari l'a changée. »", en: "Vivienne confess under pressure: \"The life insurance named me as beneficiary. My husband changed it.\"" }, failClue: { fr: "Vivienne se dérobe : « L'assurance ? Mon mari valait bien plus vivant, inspecteur. »", en: "Vivienne dodges: \"Insurance? My husband was worth far more alive, inspector.\"" }, rounds: [{ depth: 2, title: { fr: 'Échec tactique', en: 'Tactical Chess' } }, { depth: 2, title: { fr: 'Échec stratégique', en: 'Strategic Chess' } }, { depth: 2, title: { fr: 'Échec final', en: 'Final Chess' } }] },
-                    { depth: 3, clue: { fr: "Vivienne craque : « Je voulais sa fortune. Hale n'était que mon instrument. »", en: "Vivienne cracks: \"I wanted his fortune. Hale was merely my tool.\"" }, failClue: { fr: "Vivienne garde son sang-froid : « Cherchez plutôt du côté de Hale. Il avait accès à tout. »", en: "Vivienne keeps her cool: \"Look instead at Hale. He had access to everything.\"" }, rounds: [{ depth: 3, title: { fr: 'Échec tactique', en: 'Tactical Chess' } }, { depth: 3, title: { fr: 'Échec stratégique', en: 'Strategic Chess' } }, { depth: 3, title: { fr: 'Échec final', en: 'Final Chess' } }] }
-                ]
-            }
-        },
-
-        seducteur: {
-            intro: { fr: "Julian Pembrooke, accoudé au comptoir, vous regarde par-dessous. Il a son verre à la main. Choisissez votre question.", en: "Julian Pembrooke, leaning on the counter, glances at you from under his brow. He holds his drink. Choose your question." },
-            questions: [
-                {
-                    id: 'pem_q1',
-                    label: { fr: "« Votre voiture est tombée en panne ce soir-là. Vraiment ? »", en: "\"Your car broke down that night. Really?\"" },
-                    response: { fr: "Pembrooke hausse les épaules. « La durite a cédé, c'est mécanique. Hale est venu me dépanner, mais quand on est arrivés au manoir, il était trop tard. »\n\n[Alibi] Pembrooke confirme l'aide de Hale. Mais pourquoi Hale avait-il les outils et le temps ?", en: "Pembrooke shrugs. \"The hose broke, it's mechanical. Hale came to help, but when we got to the manor, it was too late.\"\n\n[Alibi] Pembrooke confirms Hale's help. But why did Hale have the tools and the time?" },
-                    evidence: 'alibi'
-                },
-                {
-                    id: 'pem_q2',
-                    label: { fr: "« Vous connaissiez Lady Vivienne, n'est-ce pas ? »", en: "\"You knew Lady Vivienne, didn't you?\"" },
-                    response: { fr: "Pembrooke hésite une fraction de seconde. « C'est une femme séduisante. Mais je ne suis pas du genre à… Elle ne m'intéresse pas. »\n\n[Témoin] Démenti trop rapide. Hale et Vivienne ont peut-être une autre version.", en: "Pembrooke hesitates for a split second. \"She's a seductive woman. But I'm not the kind to… She doesn't interest me.\"\n\n[Témoin] Denial too quick. Hale and Vivienne may have another version." },
-                    evidence: 'witness'
-                },
-                {
-                    id: 'pem_q3',
-                    label: { fr: "« Qui avait les clés du manoir cette nuit-là ? »", en: "\"Who had the keys to the manor that night?\"" },
-                    response: { fr: "Pembrooke réfléchit. « Hale, bien sûr. Blackwood, le notaire, pour les affaires. Moi, j'en avais une copie, le Duc me l'avait donnée. »\n\n[Accès] Trois personnes avaient les clés. L'une d'elles est peut-être de trop.", en: "Pembrooke thinks. \"Hale, of course. Blackwood, the notary, for business. I had a copy, the Duke gave it to me.\"\n\n[Accès] Three people had keys. One of them might be one too many." },
-                    evidence: 'opportunity'
-                }
-            ],
-            redirect: { target: 'protecteur', reason: 'meilleur_placé' },
-            rounds2: [
-                {
-                    id: 'pem_r2q1',
-                    label: { fr: "« Votre durite n'a pas cédé : elle a été sectionnée. »", en: "\"Your hose didn't fail : it was cut.\"" },
-                    response: { fr: "Pembrooke pose son verre. « Sectionnée ? Alors quelqu'un voulait me tenir loin du manoir, ou me fabriquer un alibi de paille. Je ne me sabote pas moi-même, inspecteur. »\n\n[Alibi] Si la panne est fausse, l'alibi de Pembrooke est fabriqué. Par qui ?", en: "Pembrooke sets his glass down. \"Cut? Then someone wanted to keep me away from the manor, or build me a straw alibi. I don't sabotage myself, inspector.\"\n\n[Alibi] If the breakdown is fake, Pembrooke's alibi is manufactured. By whom?" },
-                    evidence: 'alibi'
-                },
-                {
-                    id: 'pem_r2q2',
-                    label: { fr: "« Vous aviez une copie des clés. Pourquoi pas vous ? »", en: "\"You had a copy of the keys. Why not you?\"" },
-                    response: { fr: "« Le Duc m'aimait, c'est vrai. Mais Hale vit là, inspecteur. Lui connaît chaque verrou, chaque chien d'arrêt, chaque fissure. Moi, je loge en ville. »\n\n[Accès] Pembrooke accuse Hale : le mieux placé, celui qui vit sur place.", en: "\"The Duke loved me, true. But Hale lives there, inspector. He knows every lock, every guard dog, every crack. I lodge in town.\"\n\n[Accès] Pembrooke accuses Hale : the best placed, the one who lives on site." },
-                    evidence: 'opportunity'
-                },
-                {
-                    id: 'pem_r2q3',
-                    label: { fr: "« La liaison avec Lady Vivienne. Confirmez. »", en: "\"The affair with Lady Vivienne. Confirm it.\"" },
-                    response: { fr: "Il sourit tristement. « Si j'étais son amant, serais-je au bar ce soir-là, sous les yeux de dix témoins ? Hale, lui, passerait par la porte de service. Personne ne l'aurait vu. »\n\n[Témoin] Pembrooke retourne l'accusation vers Hale. Jalousie contre jalousie.", en: "He smiles sadly. \"If I were her lover, would I be at the bar that night, in front of ten witnesses? Hale, though, would come through the service door. No one would have seen him.\"\n\n[Témoin] Pembrooke turns the accusation toward Hale. Jealousy against jealousy." },
-                    evidence: 'witness'
-                }
-            ],
-            rounds3: [
-                {
-                    id: 'pem_r3q1',
-                    label: { fr: "« L'écriture sur le câble d'alarme est élégante. La vôtre ? »", en: "\"The writing on the alarm cable is elegant. Yours?\"" },
-                    response: { fr: "La main de Pembrooke s'arrête au-dessus du comptoir. « Élégante ? Beaucoup le sont. Demandez donc à Lady Vivienne. »\n\n[Forensique] Il ne nie pas. Vivienne aussi écrit avec élégance.", en: "Pembrooke's hand stops above the counter. \"Elegant? Many hands are. Ask Lady Vivienne.\"\n\n[Forensique] He doesn't deny it. Vivienne also writes elegantly." },
-                    evidence: 'forensic'
-                },
-                {
-                    id: 'pem_r3q2',
-                    label: { fr: "« Qui vous a suggéré d'être au bar ce soir-là ? »", en: "\"Who suggested you be at the bar that night?\"" },
-                    response: { fr: "Un long silence. « Personne ne me « suggère » rien. On m'a proposé une soirée entre amis. La proposition venait… du manoir. »\n\n[Témoin] Quelqu'un du manoir a poussé Pembrooke à s'éloigner.", en: "A long silence. \"No one 'suggests' anything to me. I was offered a night among friends. The offer came… from the manor.\"\n\n[Témoin] Someone from the manor pushed Pembrooke to stay away." },
-                    evidence: 'witness'
-                },
-                {
-                    id: 'pem_r3q3',
-                    label: { fr: "« Les dettes du Major Hale : 12 000 £. Vous le saviez ? »", en: "\"Major Hale's debts : £12,000. Did you know?\"" },
-                    response: { fr: "« Tout le bar le sait, inspecteur. Demandez au barman qui servait Hale, cette nuit-là, après ma « panne ». Il buvait. Beaucoup. »\n\n[Mobile] Le barman confirme : Hale buvait ce soir-là, près du manoir.", en: "\"The whole bar knows, inspector. Ask the bartender who served Hale that night, after my 'breakdown'. He was drinking. A lot.\"\n\n[Mobile] The bartender confirms : Hale was drinking that night, near the manor." },
-                    evidence: 'mobile'
-                }
-            ],
-            minigame: {
-                type: 'jackpot',
-                difficulty: [
-                    {
-                        spins: 9,
-                        clue: { fr: "Pembrooke craque : « Le manoir m'a proposé la soirée au bar. C'était un piège pour éloigner les témoins. »", en: "Pembrooke cracks: \"The manor offered me the evening at the bar. It was a trap to remove witnesses.\"" },
-                        failClue: { fr: "Pembrooke reste insaisissable : « Hale ? Vivienne ? Peu importe. Je n'étais pas au manoir cette nuit-là. »", en: "Pembrooke remains elusive: \"Hale? Vivienne? Doesn't matter. I wasn't at the manor that night.\"" },
-                        dialogues: {
-                            intro: { fr: "Pembrooke fait tourner son verre. « Alors, inspecteur, on veut savoir qui a coupé la durite ? Faites tourner la machine, je répondrai à chaque tour. »", en: "Pembrooke spins his glass. \"So, inspector, you want to know who cut the hose? Spin the machine, I'll answer after each round.\"" },
-                            beforeSpin: [
-                                { fr: "« Je n'ai rien à cacher. Tournez. »", en: "\"I have nothing to hide. Spin.\"" },
-                                { fr: "« Vous perdez votre temps, inspecteur. »", en: "\"You're wasting your time, inspector.\"" },
-                                { fr: "« La vérité est dans les symboles, paraît-il. »", en: "\"The truth is in the symbols, they say.\"" },
-                                { fr: "« Tournez. Je ne fuis pas. »", en: "\"Spin. I'm not running.\"" },
-                                { fr: "« Encore ? Vous êtes têtu. »", en: "\"Again? You're stubborn.\"" },
-                                { fr: "« Dernier tour. Faites-vous plaisir. »", en: "\"Last spin. Make your move.\"" }
-                            ],
-                            afterWinHearts: { fr: "Pembrooke blêmit. « Vivienne et moi… c'était avant. Je ne savais pas qu'elle était mariée. Mais elle manipulait déjà Hale. C'est elle qui le guidait. »\n\n[Témoin] Pembrooke avoue la liaison avec Vivienne. Vivienne manipulait Hale.", en: "Pembrooke turns pale. \"Vivienne and I… it was before. I didn't know she was married. But she was already manipulating Hale. She was guiding him.\"\n\n[Témoin] Pembrooke confesses the affair with Vivienne. Vivienne was manipulating Hale." },
-                            afterWinDollars: { fr: "Pembrooke baisse les yeux. « Des versements… Hale recevait de l'argent de Krane. Pas moi. Mais Hale les cachait dans des comptes offshore. Blackwood peut confirmer. »\n\n[Mobile] Hale recevait des paiements de Krane. Mobile financier.", en: "Pembrooke lowers his eyes. \"Payments… Hale was receiving money from Krane. Not me. But Hale was hiding them in offshore accounts. Blackwood can confirm.\"\n\n[Mobile] Hale was receiving payments from Krane. Financial motive." },
-                            afterLose: [
-                                { fr: "Pembrooke sourit. « Rien. Juste la mécanique. Je vous l'ai dit : une panne, c'est tout. »", en: "Pembrooke smiles. \"Nothing. Just mechanics. I told you: a breakdown, that's all.\"" },
-                                { fr: "« Les symboles ne disent rien, inspecteur. Seuls les faits comptent. »", en: "\"The symbols say nothing, inspector. Only facts matter.\"" },
-                                { fr: "« Toujours rien. Vous cherchez un coupable qui n'existe pas. »", en: "\"Still nothing. You're looking for a culprit that doesn't exist.\"" },
-                                { fr: "« La chance n'est pas de votre côté aujourd'hui. »", en: "\"Luck is not on your side today.\"" },
-                                { fr: "« Les reels parlent, et elles ne vous aiment pas. »", en: "\"The reels speak, and they don't like you.\"" },
-                                { fr: "« Dernier tour. Toujours pas. Vous l'avez mérité. »", en: "\"Last spin. Still nothing. You earned it.\"" }
-                            ]
-                        },
-                        rounds: [{ spins: 6, title: { fr: 'Machine à sous', en: 'Slot Machine' } }]
-                    }
-                ]
-            }
-        },
-
-        suspect: {
-            intro: { fr: "Rupert Blackwood, derrière son bureau de notaire, paraît fatigué. Il vous fait signe de vous asseoir. Posez votre question.", en: "Rupert Blackwood, behind his notary desk, looks tired. He gestures for you to sit. Ask your question." },
-            questions: [
-                {
-                    id: 'blw_q1',
-                    label: { fr: "« Le testament a été modifié la semaine dernière. Par qui ? »", en: "\"The will was changed last week. By whom?\"" },
-                    response: { fr: "Blackwood soupire. « Par la victime, sur ma recommandation. Il voulait déshériter son épouse. Je n'étais pas d'accord, mais c'était mon client. »\n\n[Mobile] Blackwood confirme la déshérence. Un mobile pour Vivienne.", en: "Blackwood sighs. \"By the victim, on my recommendation. He wanted to disinherit his wife. I didn't agree, but he was my client.\"\n\n[Mobile] Blackwood confirms the disinheritance. A motive for Vivienne." },
-                    evidence: 'mobile'
-                },
-                {
-                    id: 'blw_q2',
-                    label: { fr: "« Combien d'argent circulait entre vous et la victime ? »", en: "\"How much money was flowing between you and the victim?\"" },
-                    response: { fr: "Blackwood hésite. « Quelques milliers de livres, à titre de prêts personnels. Rien d'illégal. C'est Lady Vivienne qui héritait, mais le Duc a tout changé. »\n\n[Témoin] L'argent était une source de tension.", en: "Blackwood hesitates. \"A few thousand pounds, as personal loans. Nothing illegal. Lady Vivienne was the heir, but the Duke changed everything.\"\n\n[Témoin] Money was a source of tension." },
-                    evidence: 'mobile'
-                },
-                {
-                    id: 'blw_q3',
-                    label: { fr: "« Qui d'autre s'intéressait à la fortune de la victime ? »", en: "\"Who else was interested in the victim's fortune?\"" },
-                    response: { fr: "Blackwood baisse la voix. « Lady Vivienne. Elle ne supportait pas d'être mise à l'écart. Elle venait me voir plusieurs fois par semaine, ces derniers temps. »\n\n[Témoin] Vivienne était très présente chez le notaire.", en: "Blackwood lowers his voice. \"Lady Vivienne. She couldn't stand being pushed aside. She came to see me several times a week, lately.\"\n\n[Témoin] Vivienne was very present at the notary's." },
-                    evidence: 'witness'
-                }
-            ],
-            redirect: { target: 'femme-fatale', reason: 'assurance' },
-            rounds2: [
-                {
-                    id: 'blw_r2q1',
-                    label: { fr: "« 19h00 : vous dînez avec la victime. De quoi avez-vous parlé ? »", en: "\"7:00pm : you dine with the victim. What did you talk about?\"" },
-                    response: { fr: "Blackwood s'essuie les lèvres. « D'argent, forcément. Il voulait retirer des fonds. Je lui ai déconseillé. Il était… pressé, ces derniers temps. »\n\n[Chronologie] Dernier à l'avoir vu vivant avant la soirée. À creuser.", en: "Blackwood wipes his lips. \"Money, inevitably. He wanted to withdraw funds. I advised against it. He was… in a hurry, lately.\"\n\n[Chronologie] The last to see him alive before the evening. To dig into." },
-                    evidence: 'timeline'
-                },
-                {
-                    id: 'blw_r2q2',
-                    label: { fr: "« Vous avez quitté le manoir à 21h30. Qui peut le confirmer ? »", en: "\"You left the manor at 9:30pm. Who can confirm it?\"" },
-                    response: { fr: "« Le portail était gardé. Et Silas Crane, le clochard, m'a vu passer. Interrogez-le, il ne ment jamais. »\n\n[Alibi] Blackwood s'appuie sur le marginal. Un alibi fragile.", en: "\"The gate was watched. And Silas Crane, the homeless man, saw me pass. Question him, he never lies.\"\n\n[Alibi] Blackwood leans on the marginal. A fragile alibi." },
-                    evidence: 'alibi'
-                },
-                {
-                    id: 'blw_r2q3',
-                    label: { fr: "« Si le testament est invalidé, Lady Vivienne hérite de l'assurance. Vous le saviez ? »", en: "\"If the will is voided, Lady Vivienne inherits the insurance. Did you know?\"" },
-                    response: { fr: "Il ouvre les mains. « Chacun attend quelque chose d'un héritage, inspecteur. Mais c'est elle qui perdait au nouveau testament. Moi, je ne perdais qu'un client. »\n\n[Mobile] Blackwood renvoie à l'argent de l'assurance et à Vivienne. Sans qu'on le lui demande.", en: "He spreads his hands. \"Everyone expects something from an inheritance, inspector. But she is the one losing under the new will. I was only losing a client.\"\n\n[Mobile] Blackwood points back to the insurance money and Vivienne. Unprompted." },
-                    evidence: 'mobile'
-                }
-            ],
-            rounds3: [
-                {
-                    id: 'blw_r3q1',
-                    label: { fr: "« Qui a commandé le codicille déshéritant Lady Vivienne ? »", en: "\"Who ordered the codicil disinheriting Lady Vivienne?\"" },
-                    response: { fr: "« Le Duc lui-même. Une nuit d'ivresse, un caprice. Je devais le rédiger… je l'ai reporté. Reporté, entendez-vous ? »\n\n[Témoin] Le codicille n'a jamais été signé. Blackwood temporisait.", en: "\"The Duke himself. A drunken night, a whim. I was to draft it… I kept postponing. Postponing, you hear me?\"\n\n[Témoin] The codicil was never signed. Blackwood was stalling." },
-                    evidence: 'witness'
-                },
-                {
-                    id: 'blw_r3q2',
-                    label: { fr: "« Vos dettes de jeu : 8 000 £, il y a un mois. »", en: "\"Your gambling debts : £8,000, a month ago.\"" },
-                    response: { fr: "Blackwood blêmit. « Des rumeurs de club. Ma situation est saine. » Sa main referme le registre trop vite.\n\n[Mobile] Les dettes de Blackwood sont réelles. Mobile, ou appât ?", en: "Blackwood pales. \"Club rumors. My situation is sound.\" His hand closes the ledger too quickly.\n\n[Mobile] Blackwood's debts are real. Motive, or bait?" },
-                    evidence: 'mobile'
-                },
-                {
-                    id: 'blw_r3q3',
-                    label: { fr: "« Vos empreintes sont sur les papiers du bureau. Vous prétendiez être parti. »", en: "\"Your prints are on the study papers. You claimed you had left.\"" },
-                    response: { fr: "« J'ai signé des documents à 19h30, inspecteur. Avant le dîner. Vérifiez l'encre. »\n\n[Forensique] Explication plausible. Et l'ADN, lui, parlera de tout le monde.", en: "\"I signed documents at 7:30pm, inspector. Before dinner. Check the ink.\"\n\n[Forensique] A plausible explanation. And the DNA, for its part, speaks of everyone." },
-                    evidence: 'forensic'
-                }
-            ],
-            minigame: {
-                type: 'sudoku',
-                difficulty: [
-                    { clue: { fr: "Blackwood lâche : « Le codicille déshéritant Vivienne n'a jamais été signé. Le Duc a changé d'avis. »", en: "Blackwood slips: \"The codicil disinheriting Vivienne was never signed. The Duke changed his mind.\"" }, failClue: { fr: "Blackwood reste vague : « Le testament ? J'ai fait mon devoir. Le Duc était libre de disposer de ses biens. »", en: "Blackwood remains vague: \"The will? I did my duty. The Duke was free to dispose of his property.\"" }, rounds: [{ title: { fr: 'Sudoku 4×4', en: 'Sudoku 4×4' } }, { title: { fr: 'Sudoku 4×4', en: 'Sudoku 4×4' } }, { title: { fr: 'Sudoku 4×4', en: 'Sudoku 4×4' } }] },
-                    { clue: { fr: "Blackwood se décompose : « Mes dettes de jeu : 8 000 £. Mais je n'ai pas tué pour ça. »", en: "Blackwood breaks down: \"My gambling debts: £8,000. But I didn't kill for that.\"" }, failClue: { fr: "Blackwood se reprend : « Des rumeurs de club. Ma situation est saine, inspecteur. »", en: "Blackwood recovers: \"Club rumors. My situation is sound, inspector.\"" }, rounds: [{ title: { fr: 'Sudoku 6×6', en: 'Sudoku 6×6' } }, { title: { fr: 'Sudoku 6×6', en: 'Sudoku 6×6' } }, { title: { fr: 'Sudoku 6×6', en: 'Sudoku 6×6' } }] },
-                    { clue: { fr: "Blackwood avoue tout : « J'ai falsifié les registres. Le Duc m'a découvert. Je l'ai tué pour me couvrir. »", en: "Blackwood confesses all: \"I falsified the records. The Duke discovered it. I killed him to cover my tracks.\"" }, failClue: { fr: "Blackwood se renfrogne : « L'ADN sur les papiers ? J'ai signé à 19h30, avant le dîner. Vérifiez l'encre. »", en: "Blackwood scowls: \"DNA on the papers? I signed at 7:30pm, before dinner. Check the ink.\"" }, rounds: [{ title: { fr: 'Sudoku 9×9', en: 'Sudoku 9×9' } }, { title: { fr: 'Sudoku 9×9', en: 'Sudoku 9×9' } }, { title: { fr: 'Sudoku 9×9', en: 'Sudoku 9×9' } }] }
+                    { clue: { fr: "Hale finit par avouer : « J'ai payé Krane pour effacer les dettes. Le meurtre... c'était un accident. »", en: "Hale finally confesses: \"I paid Krane to erase the debts. The murder... it was an accident.\"" }, failClue: { fr: "Hale reste muet : « Je ne sais rien. Interrogez les autres. »", en: "Hale remains silent: \"I know nothing. Question the others.\"" }, rounds: [{ title: { fr: 'Sudoku 4×4', en: 'Sudoku 4×4' } }] },
+                    { clue: { fr: "Blackwood se décompose : « Mes dettes de jeu : 8 000 £. Mais je n'ai pas tué pour ça. »", en: "Blackwood breaks down: \"My gambling debts: £8,000. But I didn't kill for that.\"" }, failClue: { fr: "Blackwood se reprend : « Des rumeurs de club. Ma situation est saine, inspecteur. »", en: "Blackwood recovers: \"Club rumors. My situation is sound, inspector.\"" }, rounds: [{ title: { fr: 'Sudoku 6×6', en: 'Sudoku 6×6' } }] },
+                    { clue: { fr: "Blackwood avoue tout : « J'ai falsifié les registres. Le Duc m'a découvert. Je l'ai tué pour me couvrir. »", en: "Blackwood confesses all: \"I falsified the records. The Duke discovered it. I killed him to cover my tracks.\"" }, failClue: { fr: "Blackwood se renfrogne : « L'ADN sur les papiers ? J'ai signé à 19h30, avant le dîner. Vérifiez l'encre. »", en: "Blackwood scowls: \"DNA on the papers? I signed at 7:30pm, before dinner. Check the ink.\"" }, rounds: [{ title: { fr: 'Sudoku 9×9', en: 'Sudoku 9×9' } }] }
                 ]
             }
         },
@@ -639,9 +402,9 @@
                 type: 'domino',
                 variant: 'card-castle',
                 difficulty: [
-                    { clue: { fr: "Silas crache le morceau : « J'ai vu Krane dans la ruelle, cette nuit-là. Il avait une clef du manoir. »", en: "Silas spills: \"I saw Krane in the alley that night. He had a manor key.\"" }, failClue: { fr: "Silas se tait : « Krane sait où je dors. Je ne dis rien de plus. »", en: "Silas goes silent: \"Krane knows where I sleep. I'm saying nothing more.\"" },                     rounds: [{ title: { fr: 'Maison de cartes (5)', en: 'Card Tower (5)' } }, { title: { fr: 'Maison de cartes (5)', en: 'Card Tower (5)' } }, { title: { fr: 'Maison de cartes (5)', en: 'Card Tower (5)' } }] },
-                    { clue: { fr: "Silas révèle : « Krane travaille pour Hale. On me paie pour surveiller la ruelle depuis le manoir. »", en: "Silas reveals: \"Krane works for Hale. I'm paid to watch the alley from the manor.\"" }, failClue: { fr: "Silas se dérobe : « Des billets dans ma canette. Je ne sais pas d'où ils viennent. »", en: "Silas dodges: \"Banknotes in my tin can. I don't know where they come from.\"" }, rounds: [{ title: { fr: 'Maison de cartes (8)', en: 'Card Tower (8)' } }, { title: { fr: 'Maison de cartes (8)', en: 'Card Tower (8)' } }, { title: { fr: 'Maison de cartes (8)', en: 'Card Tower (8)' } }] },
-                    { clue: { fr: "Silas dit tout : « J'ai vu Hale donner les clés à Krane. C'est Hale qui a tout organisé. »", en: "Silas tells all: \"I saw Hale give the keys to Krane. Hale organized everything.\"" }, failClue: { fr: "Silas regarde ailleurs : « La pluie efface les heures. Je ne peux pas confirmer l'heure pour personne. »", en: "Silas looks away: \"The rain washes away the hours. I can't confirm the time for anyone.\"" }, rounds: [{ title: { fr: 'Maison de cartes (12)', en: 'Card Tower (12)' } }, { title: { fr: 'Maison de cartes (12)', en: 'Card Tower (12)' } }, { title: { fr: 'Maison de cartes (12)', en: 'Card Tower (12)' } }] }
+                    { clue: { fr: "Silas crache le morceau : « J'ai vu Krane dans la ruelle, cette nuit-là. Il avait une clef du manoir. »", en: "Silas spills: \"I saw Krane in the alley that night. He had a manor key.\"" }, failClue: { fr: "Silas se tait : « Krane sait où je dors. Je ne dis rien de plus. »", en: "Silas goes silent: \"Krane knows where I sleep. I'm saying nothing more.\"" },                     rounds: [{ title: { fr: 'Maison de cartes (5)', en: 'Card Tower (5)' } }] },
+                    { clue: { fr: "Silas révèle : « Krane travaille pour Hale. On me paie pour surveiller la ruelle depuis le manoir. »", en: "Silas reveals: \"Krane works for Hale. I'm paid to watch the alley from the manor.\"" }, failClue: { fr: "Silas se dérobe : « Des billets dans ma canette. Je ne sais pas d'où ils viennent. »", en: "Silas dodges: \"Banknotes in my tin can. I don't know where they come from.\"" }, rounds: [{ title: { fr: 'Maison de cartes (8)', en: 'Card Tower (8)' } }] },
+                    { clue: { fr: "Silas dit tout : « J'ai vu Hale donner les clés à Krane. C'est Hale qui a tout organisé. »", en: "Silas tells all: \"I saw Hale give the keys to Krane. Hale organized everything.\"" }, failClue: { fr: "Silas regarde ailleurs : « La pluie efface les heures. Je ne peux pas confirmer l'heure pour personne. »", en: "Silas looks away: \"The rain washes away the hours. I can't confirm the time for anyone.\"" }, rounds: [{ title: { fr: 'Maison de cartes (12)', en: 'Card Tower (12)' } }] }
                 ]
             }
         },
@@ -712,9 +475,9 @@
             minigame: {
                 type: 'memory',
                 difficulty: [
-                    { clue: { fr: "Krane murmure : « Le paiement venait d'un compte du manoir. Hale avait les codes. »", en: "Krane murmurs: \"The payment came from a manor account. Hale had the codes.\"" }, failClue: { fr: "Krane ricane : « Je travaille pour qui paye. Rien de plus à dire. »", en: "Krane laughs: \"I work for whoever pays. Nothing more to say.\"" }, rounds: [{ title: { fr: 'Mémoire 4×4', en: 'Memory 4×4' } }, { title: { fr: 'Mémoire 4×4', en: 'Memory 4×4' } }, { title: { fr: 'Mémoire 4×4', en: 'Memory 4×4' } }] },
-                    { clue: { fr: "Krane avoue : « Hale m'a engagé pour le vol. Le meurtre était pas au programme, mais il a paniqué. »", en: "Krane confess: \"Hale hired me for the robbery. The murder wasn't in the plan, but he panicked.\"" }, failClue: { fr: "Krane se tait : « Mon avocat vous dira ce qu'il faut. Je ne parle pas sans lui. »", en: "Krane goes silent: \"My lawyer will tell you what's needed. I'm not talking without him.\"" }, rounds: [{ title: { fr: 'Mémoire 6×4', en: 'Memory 6×4' } }, { title: { fr: 'Mémoire 6×4', en: 'Memory 6×4' } }, { title: { fr: 'Mémoire 6×4', en: 'Memory 6×4' } }] },
-                    { clue: { fr: "Krane crache le morceau : « Hale a donné le code du coffre. C'est lui le commanditaire. Tout. »", en: "Krane spills: \"Hale gave the safe code. He's the mastermind. Everything.\"" }, failClue: { fr: "Krane se renfrogne : « Les versements ? Hale gérait les comptes. Cherchez les registres. »", en: "Krane scowls: \"The payments? Hale managed the accounts. Look at the ledgers.\"" }, rounds: [{ title: { fr: 'Mémoire 6×6', en: 'Memory 6×6' } }, { title: { fr: 'Mémoire 6×6', en: 'Memory 6×6' } }, { title: { fr: 'Mémoire 6×6', en: 'Memory 6×6' } }] }
+                    { clue: { fr: "Krane murmure : « Le paiement venait d'un compte du manoir. Hale avait les codes. »", en: "Krane murmurs: \"The payment came from a manor account. Hale had the codes.\"" }, failClue: { fr: "Krane ricane : « Je travaille pour qui paye. Rien de plus à dire. »", en: "Krane laughs: \"I work for whoever pays. Nothing more to say.\"" }, rounds: [{ title: { fr: 'Mémoire 4×4', en: 'Memory 4×4' } }] },
+                    { clue: { fr: "Krane avoue : « Hale m'a engagé pour le vol. Le meurtre était pas au programme, mais il a paniqué. »", en: "Krane confess: \"Hale hired me for the robbery. The murder wasn't in the plan, but he panicked.\"" }, failClue: { fr: "Krane se tait : « Mon avocat vous dira ce qu'il faut. Je ne parle pas sans lui. »", en: "Krane goes silent: \"My lawyer will tell you what's needed. I'm not talking without him.\"" }, rounds: [{ title: { fr: 'Mémoire 6×4', en: 'Memory 6×4' } }] },
+                    { clue: { fr: "Krane crache le morceau : « Hale a donné le code du coffre. C'est lui le commanditaire. Tout. »", en: "Krane spills: \"Hale gave the safe code. He's the mastermind. Everything.\"" }, failClue: { fr: "Krane se renfrogne : « Les versements ? Hale gérait les comptes. Cherchez les registres. »", en: "Krane scowls: \"The payments? Hale managed the accounts. Look at the ledgers.\"" }, rounds: [{ title: { fr: 'Mémoire 6×6', en: 'Memory 6×6' } }] }
                 ]
             }
         },
@@ -768,7 +531,7 @@
             minigame: {
                 type: 'asteroids',
                 difficulty: [
-                    { clue: { fr: "Whitmore confirme : « L'ADN inconnu correspond à Victor Krane. Il a été en contact direct avec la victime. »", en: "Whitmore confirms: \"The unknown DNA matches Victor Krane. He had direct contact with the victim.\"" }, failClue: { fr: "Whitmore hausse les épaules. « L'ADN ne ment pas, mais il ne dit pas tout. Continuez l'enquête. »", en: "Whitmore shrugs. \"DNA doesn't lie, but it doesn't tell everything. Continue the investigation.\"" }, rounds: [{ title: { fr: 'Astéroïdes 1', en: 'Asteroids 1' } }, { title: { fr: 'Astéroïdes 2', en: 'Asteroids 2' } }, { title: { fr: 'Astéroïdes 3', en: 'Asteroids 3' } }] }
+                    { clue: { fr: "Whitmore confirme : « L'ADN inconnu correspond à Victor Krane. Il a été en contact direct avec la victime. »", en: "Whitmore confirms: \"The unknown DNA matches Victor Krane. He had direct contact with the victim.\"" }, failClue: { fr: "Whitmore hausse les épaules. « L'ADN ne ment pas, mais il ne dit pas tout. Continuez l'enquête. »", en: "Whitmore shrugs. \"DNA doesn't lie, but it doesn't tell everything. Continue the investigation.\"" }, rounds: [{ title: { fr: 'Astéroïdes 1', en: 'Asteroids 1' } }] }
                 ]
             }
         },
@@ -798,7 +561,7 @@
             minigame: {
                 type: 'asteroids',
                 difficulty: [
-                    { clue: { fr: "Wexford désigne un nom sur le tableau : « Regardez plutôt du côté de Hale. Ses dettes, ses versements... tout est là. »", en: "Wexford points to a name on the board: \"Look instead at Hale. His debts, his payments... it's all there.\"" }, failClue: { fr: "Wexford souffle : « Continuez l'enquête, inspecteur. La vérité éclatera bien assez tôt. »", en: "Wexford sighs: \"Continue the investigation, inspector. The truth will emerge soon enough.\"" }, rounds: [{ title: { fr: 'Astéroïdes 1', en: 'Asteroids 1' } }, { title: { fr: 'Astéroïdes 2', en: 'Asteroids 2' } }, { title: { fr: 'Astéroïdes 3', en: 'Asteroids 3' } }] }
+                    { clue: { fr: "Wexford désigne un nom sur le tableau : « Regardez plutôt du côté de Hale. Ses dettes, ses versements... tout est là. »", en: "Wexford points to a name on the board: \"Look instead at Hale. His debts, his payments... it's all there.\"" }, failClue: { fr: "Wexford souffle : « Continuez l'enquête, inspecteur. La vérité éclatera bien assez tôt. »", en: "Wexford sighs: \"Continue the investigation, inspector. The truth will emerge soon enough.\"" }, rounds: [{ title: { fr: 'Astéroïdes 1', en: 'Asteroids 1' } }] }
                 ]
             }
         }

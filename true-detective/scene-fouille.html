@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>True Detective - Fouille de la scène de crime</title>
+    <link rel="icon" href="../icon/Logo%20d%26p.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Special+Elite&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="scene-fouille.css">
+</head>
+<body>
+    <div id="scene-fouille-app">
+        <header class="scene-fouille-header">
+            <button id="back-to-game-btn" class="btn btn-back">← Retour à l'enquête</button>
+            <h1 class="scene-fouille-title">Fouille de la scène de crime</h1>
+            <div class="scene-fouille-progress">
+                <span id="evidence-counter">0</span>/8 indices découverts
+            </div>
+        </header>
+
+        <main class="scene-fouille-main">
+            <div id="scene-container" class="scene-container">
+                <div id="scene-image" class="scene-image"></div>
+                <div id="loupe" class="scene-loupe"></div>
+                <div id="evidence-dock" class="evidence-dock"></div>
+                <div id="hotspots-layer" class="hotspots-layer"></div>
+            </div>
+
+            <aside id="evidence-panel" class="evidence-panel">
+                <h2 class="evidence-panel-title">Pièces à conviction</h2>
+                <div id="evidence-list" class="evidence-list">
+                    <div class="evidence-empty">Aucun indices découvert pour le moment. Explorez la scène avec la loupe.</div>
+                </div>
+                <button id="continue-btn" class="btn btn-primary" disabled>Continuer l'enquête</button>
+            </aside>
+        </main>
+
+        <div id="clue-modal" class="clue-modal hidden">
+            <div class="clue-modal-content">
+                <h2 class="clue-modal-title">🔎 Pièce à conviction <span id="clue-label"></span></h2>
+                <p id="clue-text" class="clue-modal-text"></p>
+                <button id="clue-close-btn" class="btn btn-primary">Consigner dans le carnet</button>
+            </div>
+        </div>
+
+        <div id="loading-overlay" class="loading-overlay hidden">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p class="loading-text">Chargement de la scène...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="scene-fouille.js"></script>
+</body>
+</html>
