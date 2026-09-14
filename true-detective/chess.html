@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>True Detective - Échecs de Rivalité</title>
+    <link rel="icon" href="../icon/Logo%20d%26p.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="standalone-game.css">
+    <style>
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        .sg-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            min-height: 0;
+        }
+        #game-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #game-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chess-fullscreen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chess-board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            width: min(90vw, 90vh);
+            height: min(90vw, 90vh);
+            background: #2a1d0e;
+            border: 4px solid #5c3a21;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+        }
+        .chess-sq {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(24px, 6vw, 64px);
+            cursor: pointer;
+            user-select: none;
+        }
+        .chess-sq.light {
+            background: #f0d9b5;
+        }
+        .chess-sq.dark {
+            background: #b58863;
+        }
+        .chess-sq.selected {
+            background: #7b61ff !important;
+        }
+        .chess-sq.possible {
+            box-shadow: inset 0 0 0 4px rgba(0, 212, 255, 0.6);
+        }
+        .white-piece {
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        .black-piece {
+            color: #1a1a1a;
+            text-shadow: 0 2px 4px rgba(255,255,255,0.3);
+        }
+        .chess-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .chess-overlay-msg {
+            background: #1a1a2e;
+            border: 2px solid #00d4ff;
+            border-radius: 12px;
+            padding: 24px 32px;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2rem;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+        }
+        .btn-continue {
+            margin-top: 16px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: rgba(0, 255, 136, 0.15);
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            color: #00ff88;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .btn-continue:hover {
+            background: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <header class="sg-header" style="position:relative;">
+        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
+        <h2 class="sg-title" style="color:#d4af37;font-family:'Playfair Display',serif;">Échecs de Rivalité</h2>
+        <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
+        <button id="story-continue-btn" class="btn btn-continue" style="display:none;margin-left:8px;">Continuer</button>
+    </header>
+    <nav id="hamburger-menu" class="sg-menu">
+        <button class="sg-menu-item" id="menu-home">
+            <span class="menu-icon">🏠</span>
+            <span>Menu principal</span>
+        </button>
+        <div class="sg-menu-divider"></div>
+        <button class="sg-menu-item" id="menu-settings">
+            <span class="menu-icon">⚙</span>
+            <span>Paramètres</span>
+        </button>
+    </nav>
+    <main class="sg-main">
+        <div id="game-container">
+            <div id="game-content"></div>
+        </div>
+    </main>
+
+    <script src="minigames.js"></script>
+    <script src="chess-game.js"></script>
+    <script>
+        (function () {
+            'use strict';
+            var $content = document.getElementById('game-content');
+            var $backBtn = document.getElementById('back-to-minigame-btn');
+            var $continueBtn = document.getElementById('story-continue-btn');
+            var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+
+            if (fromStory) {
+                $backBtn.style.display = 'none';
+                $continueBtn.style.display = 'inline-block';
+            } else {
+                $backBtn.textContent = 'Accueil';
+                $backBtn.addEventListener('click', function () {
+                    window.location.href = '../true-detective/index.html#minigames';
+                });
+            }
+
+            $continueBtn.addEventListener('click', function () {
+                try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'chess', won: true, ts: Date.now() })); } catch (e) {}
+                try {
+                    var returnRaw = localStorage.getItem('td_standalone_game_return');
+                    if (returnRaw) {
+                        var rp = JSON.parse(returnRaw);
+                        if (rp && rp.returnUrl) {
+                            window.location.href = rp.returnUrl;
+                            return;
+                        }
+                    }
+                } catch (e) {}
+                window.location.href = '../true-detective/index.html?standalone=chess';
+            });
+
+            var menuHome = document.getElementById('menu-home');
+            if (menuHome) {
+                menuHome.addEventListener('click', function () {
+                    window.location.href = fromStory ? '../true-detective/index.html?standalone=chess' : '../true-detective/index.html#minigames';
+                });
+            }
+            var menuSettings = document.getElementById('menu-settings');
+            if (menuSettings) {
+                menuSettings.addEventListener('click', function () {
+                    alert('Paramètres : aucun réglage pour l\'instant.');
+                });
+            }
+
+            var hamburgerBtn = document.getElementById('hamburger-btn');
+            var menu = document.getElementById('hamburger-menu');
+            if (hamburgerBtn && menu) {
+                hamburgerBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    menu.classList.toggle('open');
+                });
+                document.addEventListener('click', function (e) {
+                    if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
+                        menu.classList.remove('open');
+                    }
+                });
+            }
+
+            var cfg = {
+                type: 'chess',
+                time: 90,
+                evidence: 'psychological',
+                title: { fr: 'Échecs de Rivalité', en: 'Chess Duel' },
+                desc: { fr: 'Gagnez la partie d\'échecs.', en: 'Win the chess game.' },
+                clue: { fr: "Vivienne montre une nervosité inhabituelle.", en: "Vivienne shows unusual nervousness." }
+            };
+
+            if (global.TDChessGame && global.TDChessGame.play) {
+                global.TDChessGame.play(cfg, 'fr', function (result) {
+                    if (result && result.won) {
+                        $continueBtn.disabled = false;
+                        $continueBtn.style.display = 'inline-block';
+                    }
+                }, $content);
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -63,7 +63,8 @@
         'pacman': 'pacman.html',
         'space-invaders': 'space-invaders.html',
         'breakout': 'breakout.html',
-        'asteroids': 'asteroids.html'
+        'asteroids': 'asteroids.html',
+        'chess': 'chess.html'
     };
 
     function loadScript(src) {

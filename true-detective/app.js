@@ -2117,7 +2117,7 @@ applyMusicHidden(true);
 
         function typeChar() {
             if (ui.skipPending) {
-                // Already handled by skipTypeWriter — do nothing to avoid double-callback
+                // Already handled by skipTypeWriter - do nothing to avoid double-callback
                 return;
             }
 
@@ -4357,24 +4357,25 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         return cfg;
     }
 
-    function getMinigameStandaloneUrl(type, diff, lang, mode) {
-        var standalonePages = {
-            'marginal-tower': 'marginal-tower.html',
-            'memory': 'memory.html',
-            'shooting': 'shooting.html',
-            'jackpot': 'jackpot.html',
-            'connect4': 'connect4.html',
-            'bataille-navale': 'bataille-navale.html',
-            'pong': 'pong.html',
-            'pacman': 'pacman.html',
-            'space-invaders': 'space-invaders.html',
-            'breakout': 'breakout.html',
-            'asteroids': 'asteroids.html',
-            'montre_code': 'montre-code.html',
-            'scene_fouille': 'scene-fouille.html',
-            'puzzle': 'puzzle.html',
-            'coffre_code': 'coffre-code.html'
-        };
+     function getMinigameStandaloneUrl(type, diff, lang, mode) {
+         var standalonePages = {
+             'marginal-tower': 'marginal-tower.html',
+             'memory': 'memory.html',
+             'shooting': 'shooting.html',
+             'jackpot': 'jackpot.html',
+             'connect4': 'connect4.html',
+             'bataille-navale': 'bataille-navale.html',
+             'pong': 'pong.html',
+             'pacman': 'pacman.html',
+             'space-invaders': 'space-invaders.html',
+             'breakout': 'breakout.html',
+             'asteroids': 'asteroids.html',
+             'chess': 'chess.html',
+             'montre_code': 'montre-code.html',
+             'scene_fouille': 'scene-fouille.html',
+             'puzzle': 'puzzle.html',
+             'coffre_code': 'coffre-code.html'
+         };
 
         if (standalonePages[type]) {
             var url = standalonePages[type] + '?difficulty=' + diff + '&lang=' + lang;
@@ -4890,7 +4891,7 @@ function scrApplyChoice(choiceKey, choiceId) {
 
         var pages = [];
         if (good) {
-            /* Fin 1 — Accusation juste : 3 pages (prison → QG extérieur → photo univers) */
+            /* Fin 1 - Accusation juste : 3 pages (prison → QG extérieur → photo univers) */
             pages.push({
                 decor: 'prison', npc: null,
                 text: {
@@ -4913,7 +4914,7 @@ function scrApplyChoice(choiceKey, choiceId) {
                 }
             });
         } else if (evalResult.indirectConviction) {
-            /* Fin 2b — Accusation erronée MAIS faisceau d'indices suffisant :
+            /* Fin 2b - Accusation erronée MAIS faisceau d'indices suffisant :
                le vrai coupable est piégé par les preuves et arrete */
             pages.push({
                 decor: 'exile', npc: null,
@@ -4937,7 +4938,7 @@ function scrApplyChoice(choiceKey, choiceId) {
                 }
             });
         } else {
-            /* Fin 2 — Accusation erronée : 3 pages (île paradisiaque → prison innocent → photo univers) */
+            /* Fin 2 - Accusation erronée : 3 pages (île paradisiaque → prison innocent → photo univers) */
             pages.push({
                 decor: 'exile', npc: null,
                 text: {
