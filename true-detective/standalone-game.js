@@ -13,6 +13,7 @@
     var storyReturn = null;
     var gameResult = null;
     var currentGame = null;
+    var storyConfig = null;
 
     var $title, $container, $content;
 
@@ -104,6 +105,11 @@
         try {
             var raw = localStorage.getItem('td_standalone_game_return');
             if (raw) storyReturn = JSON.parse(raw);
+        } catch (e) {}
+
+        try {
+            var cfgRaw = localStorage.getItem('td_standalone_game_config');
+            if (cfgRaw) storyConfig = JSON.parse(cfgRaw);
         } catch (e) {}
 
         if (!gameType) {
@@ -287,7 +293,7 @@
             showPlaceholder();
             return;
         }
-        var cfg = {
+        var defaultCfg = {
             type: 'reseau_alibis',
             time: 90,
             evidence: 'witness',
@@ -301,6 +307,7 @@
                 { id: 'silas', witness: { fr: 'Silas Crane', en: 'Silas Crane' }, statement: { fr: "J'ai vu Blackwood passer à 20h.", en: 'I saw Blackwood pass at 8pm.' }, isLie: false }
             ]
         };
+        var cfg = storyConfig && storyConfig.type === 'reseau_alibis' ? storyConfig : defaultCfg;
         try {
             var builder = global.TDMiniGames.createBuilder(cfg, lang, function (result) {
                 if (result && result.won) {
@@ -312,6 +319,32 @@
                 // hint
             })['reseau_alibis'];
             var wrap = builder($content);
+        } catch (e) {
+            showPlaceholder();
+        }
+    }
+
+    function loadChess() {
+        if (!global.TDChessGame || !global.TDChessGame.play) {
+            showPlaceholder();
+            return;
+        }
+        var cfg = storyConfig && storyConfig.type === 'echecs_duel' ? storyConfig : {
+            type: 'echecs_duel',
+            time: 90,
+            evidence: 'psychological',
+            title: { fr: 'Échecs de Rivalité', en: 'Chess Duel' },
+            desc: { fr: 'Gagnez la partie d\'échecs pour observer la réaction des suspects.', en: 'Win the chess game to observe the suspects\' reactions.' },
+            clue: { fr: "La partie d'échecs révèle que Vivienne joue avec une précision chirurgicale, mais Hale montre une nervosité inhabituelle.", en: "The chess game reveals that Vivienne plays with surgical precision, but Hale shows unusual nervousness." }
+        };
+        try {
+            global.TDChessGame.play(cfg, lang, function (result) {
+                if (result && result.won) {
+                    showVictory(cfg.clue);
+                } else {
+                    showDefeat(cfg.clue);
+                }
+            }, $content);
         } catch (e) {
             showPlaceholder();
         }

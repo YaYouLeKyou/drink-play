@@ -3813,6 +3813,13 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             localStorage.setItem('td_standalone_game_return', JSON.stringify(returnData));
         } catch (e) {}
 
+        /* Store story minigame config so standalone pages can use exact story settings. */
+        try {
+            if (page.minigame && standaloneType) {
+                localStorage.setItem('td_standalone_game_config', JSON.stringify(page.minigame));
+            }
+        } catch (e) {}
+
         $.continueBtn.classList.remove('hidden');
         $.continueBtn.disabled = false;
         $.continueBtn.textContent = getText('continue') || 'Continuer';
