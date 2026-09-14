@@ -94,7 +94,7 @@
         var diff = params.get('difficulty') || '2'; // default = medium (2)
         difficulty = diff;
         themeId = params.get('theme') || 'agatha-christie';
-        fromStory = params.get('story') === '1';
+        fromStory = params.get('story') === '1' || params.get('mode') === 'story';
         
         // For retro games, support level param (1-3) instead of difficulty number
         var level = parseInt(params.get('level'), 10);
