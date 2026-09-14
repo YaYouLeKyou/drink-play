@@ -125,8 +125,6 @@
                 sincerityModal.classList.add('hidden');
                 status.textContent = 'Heure du crime établie : ' + TIME + ' (à confirmer). Ce détail sera décisif, et ' + codeStr + ' servira.';
                 solved = true;
-                continueBtn.disabled = false;
-                continueBtn.textContent = 'Continuer l\'enquête';
                 saveNotes();
             };
 
@@ -243,21 +241,21 @@
         validateBtn.addEventListener('click', validateAnswer);
 
         /* Continue button */
+        continueBtn.disabled = false;
+        continueBtn.textContent = 'Continuer l\'enquête';
         continueBtn.addEventListener('click', function () {
-            if (solved) {
-                try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'montre_code', won: true, ts: Date.now() })); } catch (e) {}
-                try {
-                    var returnRaw = localStorage.getItem('td_standalone_game_return');
-                    if (returnRaw) {
-                        var rp = JSON.parse(returnRaw);
-                        if (rp && rp.returnUrl) {
-                            window.location.href = rp.returnUrl;
-                            return;
-                        }
+            try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'montre_code', won: true, ts: Date.now() })); } catch (e) {}
+            try {
+                var returnRaw = localStorage.getItem('td_standalone_game_return');
+                if (returnRaw) {
+                    var rp = JSON.parse(returnRaw);
+                    if (rp && rp.returnUrl) {
+                        window.location.href = rp.returnUrl;
+                        return;
                     }
-                } catch (e) {}
-                window.location.href = '../true-detective/index.html?standalone=montre_code';
-            }
+                }
+            } catch (e) {}
+            window.location.href = '../true-detective/index.html?standalone=montre_code';
         });
 
         /* Back button */
@@ -333,6 +331,16 @@
         setInterval(function () {
             localStorage.setItem('td_montre_revealed', revealed.toString());
         }, 2000);
+
+        /* Story mode: hide Retour, show Continuer */
+        var urlParams = new URLSearchParams(window.location.search);
+        var fromStory = urlParams.get('story') === '1';
+        if (fromStory) {
+            if (backBtn) backBtn.style.display = 'none';
+            if (storyContinueBtn) {
+                storyContinueBtn.style.display = 'inline-block';
+            }
+        }
     }
 
     document.addEventListener('DOMContentLoaded', init);
