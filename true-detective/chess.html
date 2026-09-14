@@ -130,7 +130,6 @@
             box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
         }
         .btn-continue {
-            margin-top: 16px;
             padding: 10px 20px;
             font-size: 0.9rem;
             font-weight: 700;
@@ -148,6 +147,32 @@
             background: rgba(0, 255, 136, 0.3);
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
         }
+        .story-continue-wrap {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            display: none;
+        }
+        #game-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .chess-board {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            width: min(80vw, 80vh);
+            height: min(80vw, 80vh);
+            background: #2a1d0e;
+            border: 4px solid #5c3a21;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+        }
     </style>
 </head>
 <body>
@@ -155,7 +180,6 @@
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
         <h2 class="sg-title" style="color:#d4af37;font-family:'Playfair Display',serif;">Échecs de Rivalité</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
-        <button id="story-continue-btn" class="btn btn-continue" style="display:none;margin-left:8px;">Continuer</button>
     </header>
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
@@ -173,6 +197,9 @@
             <div id="game-content" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"></div>
         </div>
     </main>
+    <div id="story-continue-wrap" class="story-continue-wrap">
+        <button id="story-continue-btn" class="btn btn-continue">Continuer</button>
+    </div>
 
     <script src="chess-game.js"></script>
     <script>
@@ -185,7 +212,8 @@
 
             if (fromStory) {
                 $backBtn.style.display = 'none';
-                $continueBtn.style.display = 'inline-block';
+                var wrap = document.getElementById('story-continue-wrap');
+                if (wrap) wrap.style.display = 'block';
             } else {
                 $backBtn.textContent = 'Accueil';
                 $backBtn.addEventListener('click', function () {
@@ -247,8 +275,8 @@
             if (global.TDChessGame && global.TDChessGame.play) {
                 global.TDChessGame.play(cfg, 'fr', function (result) {
                     if (result && result.won) {
-                        $continueBtn.disabled = false;
-                        $continueBtn.style.display = 'inline-block';
+                        var wrap = document.getElementById('story-continue-wrap');
+                        if (wrap) wrap.style.display = 'block';
                     }
                 }, $content);
             } else {

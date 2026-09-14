@@ -802,16 +802,32 @@ function showEvidence(h) {
                 : 'Liars found : 0 / ' + lieCount);
             board.appendChild(counter);
 
-            var grid = document.createElement('div');
-            grid.className = 'reseau-alibis-grid';
-            board.appendChild(grid);
+            var carouselWrap = document.createElement('div');
+            carouselWrap.className = 'reseau-alibis-carousel-wrap';
+            var carouselTrack = document.createElement('div');
+            carouselTrack.className = 'reseau-alibis-carousel-track';
+            carouselWrap.appendChild(carouselTrack);
+            var prevBtn = document.createElement('button');
+            prevBtn.className = 'reseau-alibis-carousel-btn';
+            prevBtn.textContent = '◀';
+            prevBtn.setAttribute('aria-label', 'Previous');
+            var nextBtn = document.createElement('button');
+            nextBtn.className = 'reseau-alibis-carousel-btn';
+            nextBtn.textContent = '▶';
+            nextBtn.setAttribute('aria-label', 'Next');
+            carouselWrap.appendChild(prevBtn);
+            carouselWrap.appendChild(nextBtn);
+            board.appendChild(carouselWrap);
 
             var cardEls = [];
-            cards.forEach(function (c) {
+            var currentIndex = 0;
+            cards.forEach(function (c, idx) {
                 var card = document.createElement('button');
                 card.className = 'reseau-alibis-card';
                 card.type = 'button';
                 card.dataset.witnessId = c.id;
+                card.style.minWidth = '220px';
+                card.style.marginRight = '12px';
 
                 var photoWrap = document.createElement('div');
                 photoWrap.className = 'reseau-alibis-photo';
@@ -854,7 +870,7 @@ function showEvidence(h) {
                             : 'Liars found : ' + foundLies + ' / ' + lieCount);
                         if (foundLies >= lieCount) {
                             locked = true;
-                            grid.querySelectorAll('.reseau-alibis-card').forEach(function (other) {
+                            carouselTrack.querySelectorAll('.reseau-alibis-card').forEach(function (other) {
                                 if (other !== card && !other.classList.contains('lie-found')) {
                                     other.classList.add('confirmed-true');
                                     var t2 = other.querySelector('.reseau-alibis-tag');
@@ -871,7 +887,6 @@ function showEvidence(h) {
                                 showEndMessage(lang === 'fr' ? 'Vous avez identifié les mensonges mais avez fait des erreurs. Pas d\'indice.' : 'You found the lies but made errors. No clue.');
                                 complete(false);
                             }
-                            addContinueButton();
                             addContinueButton();
                         }
                     } else {
@@ -890,22 +905,43 @@ function showEvidence(h) {
                             card.classList.add('confirmed-true');
                             tag.textContent = (lang === 'fr' ? 'Vrai' : 'True');
                             tag.classList.add('tag-true');
-                                locked = true;
-                                showEndMessage(lang === 'fr' ? 'Trop d\'erreurs. Pas d\'indice.' : 'Too many errors. No clue.');
-                                complete(false);
-                                addContinueButton();
+                            locked = true;
+                            showEndMessage(lang === 'fr' ? 'Trop d\'erreurs. Pas d\'indice.' : 'Too many errors. No clue.');
+                            complete(false);
+                            addContinueButton();
                         }
                     }
                 });
-                grid.appendChild(card);
+                carouselTrack.appendChild(card);
                 cardEls.push(card);
             });
 
+            function updateCarousel() {
+                var cardWidth = cardEls[0] ? cardEls[0].offsetWidth + 12 : 232;
+                carouselTrack.style.transform = 'translateX(' + (-currentIndex * cardWidth) + 'px)';
+                prevBtn.style.display = currentIndex === 0 ? 'none' : 'block';
+                nextBtn.style.display = currentIndex >= cardEls.length - 1 ? 'none' : 'block';
+            }
+            prevBtn.addEventListener('click', function () {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateCarousel();
+                }
+            });
+            nextBtn.addEventListener('click', function () {
+                if (currentIndex < cardEls.length - 1) {
+                    currentIndex++;
+                    updateCarousel();
+                }
+            });
+            updateCarousel();
+
             function addContinueButton() {
+                if (board.querySelector('.reseau-alibis-continue')) return;
                 var btn = document.createElement('button');
-                btn.className = 'btn';
+                btn.className = 'btn reseau-alibis-continue';
                 btn.textContent = lang === 'fr' ? 'Continuer' : 'Continue';
-                btn.style.cssText = 'margin-top:16px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
+                btn.style.cssText = 'margin-top:16px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;width:100%;max-width:320px;';
                 btn.addEventListener('click', function () {
                     try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau_alibis', won: true, ts: Date.now() })); } catch (e) {}
                     try {
