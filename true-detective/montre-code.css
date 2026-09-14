@@ -90,6 +90,26 @@ body {
     display: none !important;
 }
 
+.montre-face-wrap.hidden-face {
+    display: none !important;
+}
+
+.dos-overlay-number {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Special Elite', cursive;
+    font-size: 1.6rem;
+    color: #5c3a21;
+    background: rgba(255,255,255,0.25);
+    padding: 6px 14px;
+    border-radius: 8px;
+    letter-spacing: 0.25em;
+    z-index: 2;
+    pointer-events: none;
+}
+
 .watch-face,
 .watch-dos {
     max-width: 90%;
