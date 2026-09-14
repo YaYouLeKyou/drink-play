@@ -25,7 +25,7 @@
         var timeCell = document.getElementById('time-cell');
         var validateBtn = document.getElementById('validate-btn');
         var continueBtn = document.getElementById('continue-btn');
-        var backBtn = document.getElementById('back-to-game-btn');
+        var backBtn = document.getElementById('back-to-minigame-btn');
         var saveNotesBtn = document.getElementById('save-notes-btn');
         var notesArea = document.getElementById('montre-notes');
         var engraveCounter = document.getElementById('engrave-counter');
@@ -120,15 +120,15 @@
 
             sincerityModal.classList.remove('hidden');
 
-        sincerityYes.onclick = function () {
-            sincerityYes.classList.add('correct');
-            sincerityModal.classList.add('hidden');
-            status.textContent = 'Heure du crime établie : ' + TIME + ' (à confirmer). Ce détail sera décisif, et ' + CODE.join('') + ' servira.';
-            solved = true;
-            continueBtn.disabled = false;
-            continueBtn.textContent = 'Continuer l\'enquête';
-            saveJournal();
-        };
+            sincerityYes.onclick = function () {
+                sincerityYes.classList.add('correct');
+                sincerityModal.classList.add('hidden');
+                status.textContent = 'Heure du crime établie : ' + TIME + ' (à confirmer). Ce détail sera décisif, et ' + codeStr + ' servira.';
+                solved = true;
+                continueBtn.disabled = false;
+                continueBtn.textContent = 'Continuer l\'enquête';
+                saveNotes();
+            };
 
             sincerityNo.onclick = function () {
                 sincerityNo.classList.add('wrong');
@@ -136,15 +136,10 @@
             };
         }
 
-        function saveJournal() {
-            try {
-                var journal = JSON.parse(localStorage.getItem('td_journal') || '{}');
-                journal.montreCode = CODE.join('');
-                journal.montreTime = TIME;
-                journal.montreSolved = true;
-                localStorage.setItem('td_journal', JSON.stringify(journal));
-            } catch (e) {
-                console.warn('Failed to save journal:', e);
+        function saveNotes() {
+            var notes = notesArea.value.trim();
+            if (notes) {
+                localStorage.setItem('td_montre_notes', notes);
             }
         }
 
@@ -250,48 +245,53 @@
         /* Continue button */
         continueBtn.addEventListener('click', function () {
             if (solved) {
-                window.location.href = '../true-detective/index.html?montre=complete';
+                try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'montre_code', won: true, ts: Date.now() })); } catch (e) {}
+                try {
+                    var returnRaw = localStorage.getItem('td_standalone_game_return');
+                    if (returnRaw) {
+                        var rp = JSON.parse(returnRaw);
+                        if (rp && rp.returnUrl) {
+                            window.location.href = rp.returnUrl;
+                            return;
+                        }
+                    }
+                } catch (e) {}
+                window.location.href = '../true-detective/index.html?standalone=montre_code';
             }
         });
 
         /* Back button */
-        backBtn.addEventListener('click', function () {
-            window.location.href = '../true-detective/index.html';
-        });
-
-        /* Hamburger menu */
-        var hamburgerBtn = document.getElementById('hamburger-btn');
-        var menu = document.getElementById('hamburger-menu');
-        if (hamburgerBtn && menu) {
-            hamburgerBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                menu.classList.toggle('open');
-            });
-            document.addEventListener('click', function (e) {
-                if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
-                    menu.classList.remove('open');
-                }
-            });
-        }
-        var menuBack = document.getElementById('menu-back');
-        if (menuBack) {
-            menuBack.addEventListener('click', function () {
-                if (menu) menu.classList.remove('open');
-                window.location.href = '../true-detective/index.html';
-            });
-        }
-        var menuHome = document.getElementById('menu-home');
-        if (menuHome) {
-            menuHome.addEventListener('click', function () {
-                if (menu) menu.classList.remove('open');
-                window.location.href = '../true-detective/index.html';
+        var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+        if (fromStory) {
+            backBtn.style.display = 'none';
+        } else {
+            backBtn.addEventListener('click', function () {
+                window.location.href = '../true-detective/index.html#minigames';
             });
         }
 
-        /* Save notes / journal */
+        /* Story continue button */
+        var storyContinueBtn = document.getElementById('story-continue-btn');
+        if (storyContinueBtn) {
+            storyContinueBtn.addEventListener('click', function () {
+                try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'montre_code', won: true, ts: Date.now() })); } catch (e) {}
+                try {
+                    var returnRaw = localStorage.getItem('td_standalone_game_return');
+                    if (returnRaw) {
+                        var rp = JSON.parse(returnRaw);
+                        if (rp && rp.returnUrl) {
+                            window.location.href = rp.returnUrl;
+                            return;
+                        }
+                    }
+                } catch (e) {}
+                window.location.href = '../true-detective/index.html?standalone=montre_code';
+            });
+        }
+
+        /* Save notes */
         saveNotesBtn.addEventListener('click', function () {
             saveNotes();
-            saveJournal();
             saveNotesBtn.textContent = '✅ Notes sauvegardées';
             setTimeout(function () {
                 saveNotesBtn.textContent = '💾 Consigner dans le carnet';
@@ -302,25 +302,6 @@
         var savedNotes = localStorage.getItem('td_montre_notes');
         if (savedNotes) {
             notesArea.value = savedNotes;
-        }
-
-        /* Load saved journal */
-        try {
-            var journal = JSON.parse(localStorage.getItem('td_journal') || '{}');
-            if (journal.montreSolved) {
-                codeCells.forEach(function (c, i) {
-                    if (c.value === String(CODE[i])) c.classList.add('correct');
-                });
-                timeCell.value = journal.montreTime || '';
-                timeCell.disabled = false;
-                validateBtn.disabled = false;
-                solved = true;
-                continueBtn.disabled = false;
-                continueBtn.textContent = 'Continuer l\'enquête';
-                status.textContent = 'Données déjà consignées au carnet : code ' + CODE.join('') + ', heure ' + (journal.montreTime || TIME) + '.';
-            }
-        } catch (e) {
-            console.warn('Failed to load journal:', e);
         }
 
         /* Load saved state */
