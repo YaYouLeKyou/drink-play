@@ -7,6 +7,7 @@
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
+    <link rel="stylesheet" href="styles.css">
     <style>
         html, body {
             height: 100%;
@@ -78,6 +79,35 @@
         .black-piece {
             color: #1a1a1a;
             text-shadow: 0 2px 4px rgba(255,255,255,0.3);
+        }
+        .chess-piece {
+            font-size: min(5vw, 48px);
+            line-height: 1;
+            pointer-events: none;
+            animation: pieceEnter 0.35s ease-out;
+        }
+        .chess-interro-history {
+            font-size: 0.85rem;
+            color: #a0c0d0;
+            border-top: 1px solid rgba(0, 255, 255, 0.15);
+            padding-top: 4px;
+            margin-top: 4px;
+        }
+        .chess-interro-question {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(0, 255, 255, 0.25);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #e0f7ff;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+        .chess-interro-question:hover {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: rgba(0, 255, 255, 0.5);
         }
         .chess-overlay {
             position: fixed;
