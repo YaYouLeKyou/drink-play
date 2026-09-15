@@ -144,7 +144,8 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
    - **INDICE MAJEUR** : le réseau complet révèle trois menteurs (Vivienne + Pembrooke + Krane) qui se couvrent mutuellement. Le commanditaire se dessine.
 
 ### ACTE II, Phase 2 « Laboratoire » (dialogue, musique énigme)
-**6 interrogatoires ADN** *(laboratoire, Dr Whitmore, scientifique)*, un par suspect, ordre imposé : Protecteur → Femme-fatale → Séducteur → Marginal → Suspect → Criminel.
+1. *(laboratoire, Whitmore + partenaire)* Intro ADN, puis **MINI-JEU `chemistry` (analyse toxico, éprouvettes)** : transvasez les réactifs mélangés pour isoler chaque fluide pur dans son éprouvette (45 s). Réussite = **INDICE MAJEUR** (forensique) : le poison rare et coûteux, administré avec précision, prouve un meurtre prémédité commandité par un initié qui connaissait la maison. Échec = perte de l'indice, jamais de game over (le joueur peut toujours « Passer »).
+2. **6 interrogatoires ADN** *(laboratoire, Dr Whitmore, scientifique)*, un par suspect, ordre imposé : Protecteur → Femme-fatale → Séducteur → Marginal → Suspect → Criminel.
 
 1. **Whitmore intro** : « L'ADN sur l'arme, les poignées, le corps… a des traces de TOUS. Chaque suspect a approché la victime. La science ne tranchera pas. » (Tolérance zéro certitude.)
 2. **Protecteur (Hale)** : interrogatoire + commentaire Whitmore. Hale nie, l'ADN confirme sa présence (garde du corps, vie sur place).

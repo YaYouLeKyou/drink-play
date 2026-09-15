@@ -350,8 +350,9 @@ langEnBtn: document.getElementById('lang-en'),
         fallbackCurrentScene: 0,
         usingFallback: false,
         narrationTimer: null,
-        narrationSeconds: 30,
-        narrationRemaining: 30,
+          narrationSeconds: 30,
+          narrationRemaining: 30,
+          _narrationCallback: null,
         voiceInputEnabled: (function () {
             try {
                 var raw = localStorage.getItem('trueDetective_settings');
@@ -1530,6 +1531,53 @@ applyMusicHidden(true);
         });
     }
 
+    function showNarrationSequence(pages, callback, musicPhase) {
+        if (!pages || pages.length === 0) {
+            if (callback) callback();
+            return;
+        }
+
+        stopNarrationTimer();
+        clearTypeWriter();
+
+        ui.currentSceneType = 'narration';
+        ui._narrationCallback = callback || null;
+
+        var firstPage = pages[0] || {};
+        var sceneData = {
+            type: 'narration',
+            dialogue: firstPage.text || '...',
+            location: firstPage.location || 'narrative',
+            npcId: firstPage.npcId || null,
+            choices: [],
+            clue: null,
+            event: null,
+            puzzle: null,
+            objective: '',
+            musicPhase: musicPhase || 'narration',
+            nextActTransition: null,
+            gameComplete: false,
+            solution: null,
+            pages: pages,
+        };
+
+        $.choicesContainer.innerHTML = '';
+        $.conversationInput.classList.add('hidden');
+        $.npcName.textContent = '';
+        hideNPC();
+        clearDialogueHistory();
+
+        ui.currentSceneData = sceneData;
+        ui.currentPage = 1;
+        ui.totalPages = pages.length;
+        updateMusicInfo(sceneData.musicPhase, ui.theme);
+        showPageNav();
+        updatePageDots();
+
+        hideLoading();
+        renderCurrentPage();
+    }
+
     function resumeGame() {
         if (!TDNarrativeEngine) return;
 
@@ -1834,18 +1882,18 @@ applyMusicHidden(true);
         ];
     }
 
-     function buildTransitionPages(sceneData) {
-        var themeId = getThemeId();
-        var theme = THEMES.find(function (t) { return t.id === themeId; }) || THEMES[0];
-        var themeName = theme ? theme.name : themeId;
-        var assets = THEME_ASSETS[themeId] || THEME_ASSETS['agatha-christie'];
-        var npc = getNPCById(sceneData.npcId) || null;
-        var npcName = npc ? npc.name : '';
-        var npcAsset = assets.marginal;
-        if (sceneData.npcId === 'femme-fatale') { npcAsset = assets.femmeFatale; npcAsset = assets.femmeFatale; }
-        if (sceneData.npcId === 'seducteur') npcAsset = assets.seducteur;
-        if (sceneData.npcId === 'suspect') npcAsset = assets.suspect;
-        if (npcAsset === assets.marginal && sceneData.npcId === 'detective-partner') npcAsset = assets.detective;
+function buildTransitionPages(sceneData) {
+          var themeId = getThemeId();
+          var theme = THEMES.find(function (t) { return t.id === themeId; }) || THEMES[0];
+          var themeName = theme ? theme.name : themeId;
+          var assets = THEME_ASSETS[themeId] || THEME_ASSETS['agatha-christie'];
+          var npc = getNPCById(sceneData.npcId) || null;
+          var npcName = npc ? npc.name : '';
+          var npcAsset = assets.marginal;
+          if (sceneData.npcId === 'femme-fatale') { npcAsset = assets.femmeFatale; }
+          if (sceneData.npcId === 'seducteur') npcAsset = assets.seducteur;
+          if (sceneData.npcId === 'suspect') npcAsset = assets.suspect;
+          if (npcAsset === assets.marginal && sceneData.npcId === 'detective-partner') npcAsset = assets.detective;
 
         var transText = {
             en: [
@@ -2131,12 +2179,60 @@ applyMusicHidden(true);
             } else {
                 ui.isTyping = false;
                 $.typeCursor.classList.add('hidden');
+                if (text.indexOf('<') >= 0) {
+                    $.dialogueText.innerHTML = text;
+                }
                 _typeWriterCallback = null;
                 if (onComplete) { onComplete(); }
             }
         }
 
         typeChar();
+    }
+
+    function onPageComplete(pageNumber, sceneData) {
+        stopNarrationTimer();
+        ui.isTyping = false;
+        ui.skipPending = false;
+        ui.isWaiting = false;
+
+        var isNarration = sceneData.type === 'narration';
+
+        if (pageNumber < ui.totalPages) {
+            $.continueBtn.classList.remove('hidden');
+            $.continueBtn.textContent = getText('nextPage') || 'Next';
+            $.continueBtn.disabled = false;
+            $.continueBtn.onclick = handleContinue;
+        } else {
+            if (isNarration) {
+                $.continueBtn.classList.remove('hidden');
+                $.continueBtn.textContent = getText('continue') || 'Continue';
+                $.continueBtn.disabled = false;
+                $.continueBtn.onclick = function () {
+                    hidePageNav();
+                    if (ui._narrationCallback) {
+                        var cb = ui._narrationCallback;
+                        ui._narrationCallback = null;
+                        cb();
+                    }
+                };
+            } else if (sceneData.type === 'revelation') {
+                $.continueBtn.classList.remove('hidden');
+                $.continueBtn.textContent = getText('continue') || 'Continue';
+                $.continueBtn.disabled = false;
+                $.continueBtn.onclick = handleContinue;
+            } else if (sceneData.type === 'credits') {
+                $.continueBtn.classList.remove('hidden');
+                $.continueBtn.textContent = getText('credits') || 'Credits';
+                $.continueBtn.disabled = false;
+                $.continueBtn.onclick = handleContinue;
+            } else if (sceneData.type === 'puzzle' && sceneData.puzzle) {
+                renderPuzzle(sceneData.puzzle);
+            } else if (sceneData.choices && sceneData.choices.length) {
+                _currentChoices = sceneData.choices;
+                showChoices();
+            }
+        }
     }
 
     function getCurrentSceneText() {
@@ -3456,9 +3552,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         scr.awaitingChoice = false;
         $.choicesContainer.innerHTML = '';
         $.conversationInput.classList.add('hidden');
-        if (!isMobile()) {
-            $.continueBtn.classList.add('hidden');
-        }
+        $.continueBtn.classList.remove('hidden');
         $.continueBtn.disabled = false;
         $.continueBtn.onclick = null;
         $.npcName.textContent = '';
@@ -4203,7 +4297,13 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             if (s.prochainSuspect) {
                 s.prochainSuspect = null;
             }
-            scrNext();
+            var phase = scrCurrentPhase();
+            if (phase && phase.id === 'act3_3') {
+                scr.pageIdx = 0;
+                renderScenarioPage();
+            } else {
+                scrNext();
+            }
         };
     }
     // ===== LOCALISATION DES MINI-JEUX D'INTERROGATOIRE =====
@@ -4733,6 +4833,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             var choices = page.choices || [];
             scr.awaitingChoice = true;
             $.choicesContainer.innerHTML = '';
+            var s = scrGetState();
+            var reinterroges = s.reinterroges || [];
+            var isConfrontation = scrCurrentPhase() && scrCurrentPhase().id === 'act3_3';
             choices.forEach(function (choiceItem) {
                 var choiceId, label;
                 if (typeof choiceItem === 'string') {
@@ -4740,6 +4843,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 } else {
                     choiceId = choiceItem.id;
                     label = choiceItem.label;
+                }
+                if (isConfrontation && page.choiceKey === 'choisirSuspect' && reinterroges.indexOf(choiceId) >= 0) {
+                    return;
                 }
                 var btn = document.createElement('button');
                 btn.className = 'btn btn-choice';
@@ -4752,18 +4858,18 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 $.choicesContainer.appendChild(btn);
             });
             if (page.choiceKey === 'accuser') {
-                var s = scrGetState();
-                var reinterroges = s.reinterroges || [];
+                var s2 = scrGetState();
+                var reinterroges2 = s2.reinterroges || [];
                 var suspects = ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel'];
                 suspects.forEach(function (suspectId) {
-                    if (reinterroges.indexOf(suspectId) >= 0) return;
+                    if (reinterroges2.indexOf(suspectId) >= 0) return;
                     var btn = document.createElement('button');
                     btn.className = 'btn btn-choice';
                     btn.textContent = (ui.language === 'fr' ? 'Réinterroger ' : 'Re-interrogate ') + scrChoiceLabel(suspectId);
                     btn.addEventListener('click', function () {
                         if (!scr.awaitingChoice) return;
                         scr.awaitingChoice = false;
-                        s.prochainSuspect = suspectId;
+                        s2.prochainSuspect = suspectId;
                         scr.interro = { id: suspectId, questionRound: 0, minigameRound: 0, done: false, questionsDone: false };
                         $.continueBtn.classList.remove('hidden');
                         $.continueBtn.disabled = !isMobile();
@@ -4820,11 +4926,22 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     }
 function scrApplyChoice(choiceKey, choiceId) {
         var s = scrGetState();
-        if (choiceKey === 'choisirSuspect') {
+        if (choiceKey === 'choisirMode') {
+            if (choiceId === 'interroger') {
+                scrNext();
+            } else if (choiceId === 'accuser_mode') {
+                scr.pageIdx = 3;
+                renderScenarioPage();
+            }
+        } else if (choiceKey === 'choisirSuspect') {
             s.prochainSuspect = choiceId;
-            var all = ['femme-fatale', 'seducteur', 'suspect'];
+            var all = ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel'];
             var others = all.filter(function (x) { return x !== choiceId; });
             s.suspectOrdre = [choiceId].concat(others);
+            if (!s.reinterroges) s.reinterroges = [];
+            if (s.reinterroges.indexOf(choiceId) === -1) {
+                s.reinterroges.push(choiceId);
+            }
             scrNext();
         } else if (choiceKey === 'reinterroger') {
             if (!s.reinterroges) s.reinterroges = [];

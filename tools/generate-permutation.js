@@ -91,6 +91,7 @@ replaceClueFor('scene_fouille', PERM.fouilleClue);
 
 const clueMap = {
     carnet_dechire: PERM.clues.carnet_dechire,
+    chemistry: PERM.clues.chemistry,
     pression: PERM.clues.pression,
     labo_verrou: PERM.clues.labo_verrou,
     montre_code: PERM.clues.montre_code,

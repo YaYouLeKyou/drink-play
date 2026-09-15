@@ -13,6 +13,8 @@
     function init() {
         var faceWrap = document.getElementById('face-wrap');
         var dosWrap = document.getElementById('dos-wrap');
+        var faceImage = document.getElementById('watch-face');
+        var watchDos = document.getElementById('watch-dos');
         var faceLoupe = document.getElementById('face-loupe');
         var dosLoupe = document.getElementById('dos-loupe');
         var loupeInner = document.getElementById('loupe-inner');
@@ -36,6 +38,7 @@
 
         var ZOOM = 2.5;
         var LOUPE_R = 90;
+        var FACE_ZOOM = 2.2;
 
         /* Create code cells */
         var codeCells = [];
@@ -141,17 +144,28 @@
             }
         }
 
-        /* Face loupe */
+        /* Face loupe : le verre grossit la face de la montre sous le curseur */
         function moveFaceLoupe(clientX, clientY) {
-            var fr = faceWrap.getBoundingClientRect();
-            var cx = clientX - fr.left, cy = clientY - fr.top;
-            if (cx < 0 || cy < 0 || cx > fr.width || cy > fr.height) {
+            var wrapRect = faceWrap.getBoundingClientRect();
+            var imgRect = faceImage.getBoundingClientRect();
+            var cx = clientX - imgRect.left, cy = clientY - imgRect.top;
+            if (cx < 0 || cy < 0 || cx > imgRect.width || cy > imgRect.height) {
                 faceLoupe.style.display = 'none';
                 return;
             }
             faceLoupe.style.display = 'block';
-            faceLoupe.style.left = (cx - 80) + 'px';
-            faceLoupe.style.top = (cy - 80) + 'px';
+            var loupeR = faceLoupe.offsetWidth / 2;
+            faceLoupe.style.left = (clientX - wrapRect.left - loupeR) + 'px';
+            faceLoupe.style.top = (clientY - wrapRect.top - loupeR) + 'px';
+            /* Effet zoom : la face agrandie suit le curseur à l'intérieur du cercle */
+            if (faceImage && faceImage.src) {
+                faceLoupe.style.backgroundImage = 'url("' + faceImage.src + '")';
+                // Use natural image dimensions for correct zoom
+                var nw = faceImage.naturalWidth || imgRect.width;
+                var nh = faceImage.naturalHeight || imgRect.height;
+                faceLoupe.style.backgroundSize = (nw * FACE_ZOOM) + 'px ' + (nh * FACE_ZOOM) + 'px';
+                faceLoupe.style.backgroundPosition = (loupeR - cx * FACE_ZOOM) + 'px ' + (loupeR - cy * FACE_ZOOM) + 'px';
+            }
         }
 
         faceWrap.addEventListener('mousemove', function (e) { moveFaceLoupe(e.clientX, e.clientY); });
@@ -173,16 +187,17 @@
         /* Dos loupe */
         function moveDosLoupe(clientX, clientY) {
             var r = dosWrap.getBoundingClientRect();
-            var cx = clientX - r.left, cy = clientY - r.top;
-            if (cx < 0 || cy < 0 || cx > r.width || cy > r.height) {
+            var imgRect = watchDos.getBoundingClientRect();
+            var cx = clientX - imgRect.left, cy = clientY - imgRect.top;
+            if (cx < 0 || cy < 0 || cx > imgRect.width || cy > imgRect.height) {
                 dosLoupe.style.display = 'none';
                 return;
             }
             dosLoupe.style.display = 'block';
-            dosLoupe.style.left = (cx - LOUPE_R) + 'px';
-            dosLoupe.style.top = (cy - LOUPE_R) + 'px';
-            loupeInner.style.width = (r.width * ZOOM) + 'px';
-            loupeInner.style.height = (r.height * ZOOM) + 'px';
+            dosLoupe.style.left = (clientX - r.left - LOUPE_R) + 'px';
+            dosLoupe.style.top = (clientY - r.top - LOUPE_R) + 'px';
+            loupeInner.style.width = (imgRect.width * ZOOM) + 'px';
+            loupeInner.style.height = (imgRect.height * ZOOM) + 'px';
             loupeInner.style.left = (LOUPE_R - cx * ZOOM) + 'px';
             loupeInner.style.top = (LOUPE_R - cy * ZOOM) + 'px';
 

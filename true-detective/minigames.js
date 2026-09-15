@@ -941,7 +941,7 @@ function showEvidence(h) {
                 var btn = document.createElement('button');
                 btn.className = 'btn reseau-alibis-continue';
                 btn.textContent = lang === 'fr' ? 'Continuer' : 'Continue';
-                btn.style.cssText = 'margin-top:16px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;width:100%;max-width:320px;';
+                btn.style.cssText = 'padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;width:auto;max-width:320px;margin-top:16px;display:block;margin-left:auto;margin-right:auto;';
                 btn.addEventListener('click', function () {
                     try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau_alibis', won: true, ts: Date.now() })); } catch (e) {}
                     try {
@@ -1035,10 +1035,12 @@ var dos = document.createElement('img');
             body.appendChild(wrap);
 
             /* Loupe qui couvre toute la face au début, pour repérer l'aiguille figée.
-               Quand on clique sur la face, on révèle le dos, où se trouve la gravure. */
+               Quand on clique sur la face, on révèle le dos, où se trouve la gravure.
+               La loupe est rattachée à la scène de la montre (position: relative) pour
+               que ses coordonnées se calent sur celles de la face. */
             var faceLoupe = document.createElement('div');
             faceLoupe.className = 'face-loupe';
-            body.appendChild(faceLoupe);
+            wrap.appendChild(faceLoupe);
 
             /* Gravures cachées sur le dos de la montre (lisibles à la loupe) */
             var answer = (cfg.code || [1, 9, 8, 1]).slice();
@@ -1100,7 +1102,8 @@ var dos = document.createElement('img');
             });
             body.appendChild(flipBtn);
 
-            /* Loupe qui magnifie la face pour repérer l'aiguille figéee */
+            /* Loupe qui magnifie la face pour repérer l'aiguille figée */
+            var FACE_ZOOM = 2.2;
             function moveFaceLoupe(clientX, clientY) {
                 var fr = face.getBoundingClientRect();
                 var cx = clientX - fr.left, cy = clientY - fr.top;
@@ -1109,8 +1112,16 @@ var dos = document.createElement('img');
                     return;
                 }
                 faceLoupe.style.display = 'block';
-                faceLoupe.style.left = cx + 'px';
-                faceLoupe.style.top = cy + 'px';
+                /* Coordonnées de la face ramenées dans la scène de la montre
+                   (bordure de la scène déduite) : le cercle suit le curseur. */
+                var sceneRect = wrap.getBoundingClientRect();
+                var loupeR = faceLoupe.offsetWidth / 2;
+                faceLoupe.style.left = (fr.left - sceneRect.left - (wrap.clientLeft || 0) + cx) + 'px';
+                faceLoupe.style.top = (fr.top - sceneRect.top - (wrap.clientTop || 0) + cy) + 'px';
+                /* Effet zoom : la face est agrandie sous le cercle de la loupe */
+                faceLoupe.style.backgroundImage = 'url("' + face.src + '")';
+                faceLoupe.style.backgroundSize = (fr.width * FACE_ZOOM) + 'px ' + (fr.height * FACE_ZOOM) + 'px';
+                faceLoupe.style.backgroundPosition = (loupeR - cx * FACE_ZOOM) + 'px ' + (loupeR - cy * FACE_ZOOM) + 'px';
             }
             face.addEventListener('mousemove', function (e) { moveFaceLoupe(e.clientX, e.clientY); });
             face.addEventListener('mouseleave', function () { faceLoupe.style.display = 'none'; });

@@ -79,7 +79,19 @@ background: radial-gradient(ellipse at 50% 35%, rgba(0,0,0,0) 30%, rgba(0,0,0,.6
 .end-card h2 { font-family: 'Playfair Display', serif; color: #d4af37; margin-bottom: .6rem; }
 .end-card p { color: #e5d5a8; line-height: 1.6; font-size: .92rem; white-space: pre-line; }
 .end-clue { margin: .9rem 0; padding: .7rem; border-radius: 8px; background: rgba(212,175,55,.12); border: 1px solid rgba(212,175,55,.5); font-size: .85rem; line-height: 1.55; }
-.end-actions { display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; margin-top: .6rem; }
+.end-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+    padding: 0 1rem;
+}
+
+.end-actions .btn {
+    flex: 0 1 auto;
+    min-width: 140px;
+}
 .board-controls { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; }
 .history-strip { display: flex; gap: .3rem; flex-wrap: wrap; justify-content: center; max-width: 560px; font-family: 'Special Elite', monospace; font-size: .75rem; color: #c9b183; }
 .story-panel h3, .story-panel h4 { font-family: 'Playfair Display', serif; color: #d4af37; margin-bottom: .5rem; }

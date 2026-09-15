@@ -26,6 +26,7 @@
         'chess': 'chess-game.js',
         'jackpot': 'minigames.js',
         'connect4': 'connect4-game.js',
+        'chemistry': 'chemistry-game.js',
         'bataille-navale': 'bataille-navale.js',
         'pong': 'pong-game.js',
         'pacman': 'pacman-game.js',
@@ -39,7 +40,8 @@
         'chess': 'echecs-duel.css',
         'scene_fouille': 'styles.css',
         'puzzle': 'styles.css',
-        'coffre_code': 'styles.css'
+        'coffre_code': 'styles.css',
+        'chemistry': 'styles.css'
     };
 
     function loadStyle(href) {
