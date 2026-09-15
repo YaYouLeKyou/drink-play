@@ -15,16 +15,16 @@
             gap: 16px;
             padding: 24px;
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
         .puzzle-canvas-wrap {
             position: relative;
             width: 100%;
-            max-width: 700px;
+            max-width: 800px;
             aspect-ratio: 4/3;
-            background: var(--bg-panel);
-            border: 2px solid var(--border-color);
+            background: #0d0d1a;
+            border: 2px solid rgba(255,255,255,0.15);
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
@@ -75,6 +75,28 @@
             cursor: not-allowed;
             box-shadow: none;
         }
+        .btn-continue {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: rgba(0, 255, 136, 0.15);
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            color: #00ff88;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            z-index: 100;
+        }
+        .btn-continue:hover {
+            background: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -82,8 +104,8 @@
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
         <h2 class="sg-title" style="color:#ff6b00;font-family:'Playfair Display',serif;">Le Puzzle</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
-        <button id="story-continue-btn" class="btn btn-continue" style="display:none;margin-left:8px;">Continuer</button>
     </header>
+    <button id="story-continue-btn" class="btn btn-continue" style="display:none;">Continuer</button>
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
             <span class="menu-icon">🏠</span>
@@ -100,10 +122,10 @@
             <div class="puzzle-canvas-wrap">
                 <canvas id="puzzle-canvas"></canvas>
             </div>
-            <div class="puzzle-status" id="puzzle-status">Faites glisser les formes dans les alvéoles correspondantes.</div>
+            <div class="puzzle-status" id="puzzle-status">Assemblez les pièces pour reconstituer la forme finale.</div>
             <button class="puzzle-btn" id="reset-puzzle-btn" disabled>Réinitialiser</button>
             <div class="puzzle-hint">
-                Chaque forme possède une alvéole unique. Faites glisser une forme vers son emplacement : elle s\'y encastre quand elle est bien placée.
+                Faites glisser et pivoter les pièces. Quand une pièce est proche de sa place, elle se snap automatiquement. Reconstruisez la forme complète.
             </div>
         </div>
     </main>
@@ -124,8 +146,8 @@
             var statusEl = document.getElementById('puzzle-status');
             var resetBtn = document.getElementById('reset-puzzle-btn');
 
-            var W = 700;
-            var H = 525;
+            var W = 800;
+            var H = 600;
             canvas.width = W;
             canvas.height = H;
 
@@ -140,82 +162,70 @@
                 MouseConstraint = Matter.MouseConstraint,
                 Vector = Matter.Vector;
 
-            var engine = Engine.create({ gravity: { x: 0, y: 0.8 } });
+            var engine = Engine.create({ gravity: { x: 0, y: 0.6 } });
             var world = engine.world;
 
-            var containerX = W / 2;
-            var containerY = H / 2;
-            var containerW = 460;
-            var containerH = 340;
-            var containerTop = containerY - containerH / 2;
-            var containerLeft = containerX - containerW / 2;
-
-            var shapes = [];
+            var pieces = [];
             var slots = [];
             var fitted = {};
             var solved = false;
+            var snapDistance = 25;
+            var snapAngle = Math.PI / 8;
 
-            var slotDefs = [
-                { id: 'circle', type: 'circle', x: containerLeft + 100, y: containerTop + 80, size: 42, color: '#ff006e' },
-                { id: 'square', type: 'square', x: containerLeft + 220, y: containerTop + 80, size: 44, color: '#ffbe0b' },
-                { id: 'triangle', type: 'triangle', x: containerLeft + 340, y: containerTop + 80, size: 48, color: '#00d4ff' },
-                { id: 'rect', type: 'rect', x: containerLeft + 100, y: containerTop + 200, w: 80, h: 50, color: '#8338ec' },
-                { id: 'pentagon', type: 'polygon', x: containerLeft + 240, y: containerTop + 200, sides: 5, size: 44, color: '#06d6a0' },
-                { id: 'hexagon', type: 'polygon', x: containerLeft + 380, y: containerTop + 200, sides: 6, size: 44, color: '#ef476f' }
-            ];
-
-            var paletteY = containerTop + containerH + 70;
-            var paletteX = containerLeft + 40;
-            var paletteGap = 110;
-
-            function createSlotBody(def) {
-                var body;
-                if (def.type === 'circle') {
-                    body = Bodies.circle(def.x, def.y, def.size, { isStatic: true, isSensor: true, label: 'slot-' + def.id, plugin: { slotId: def.id } });
-                } else if (def.type === 'square') {
-                    body = Bodies.rectangle(def.x, def.y, def.size * 2, def.size * 2, { isStatic: true, isSensor: true, label: 'slot-' + def.id, plugin: { slotId: def.id } });
-                } else if (def.type === 'rect') {
-                    body = Bodies.rectangle(def.x, def.y, def.w, def.h, { isStatic: true, isSensor: true, label: 'slot-' + def.id, plugin: { slotId: def.id } });
-                } else if (def.type === 'triangle') {
-                    body = Bodies.polygon(def.x, def.y, 3, def.size, { isStatic: true, isSensor: true, label: 'slot-' + def.id, plugin: { slotId: def.id } });
-                } else if (def.type === 'polygon') {
-                    body = Bodies.polygon(def.x, def.y, def.sides, def.size, { isStatic: true, isSensor: true, label: 'slot-' + def.id, plugin: { slotId: def.id } });
-                }
-                if (body) {
-                    body.plugin = body.plugin || {};
-                    body.plugin.slotId = def.id;
-                    body.plugin.slotColor = def.color;
-                }
-                return body;
+            function createFinalShape() {
+                var cx = W / 2;
+                var cy = H / 2;
+                var w = 320;
+                var h = 240;
+                var parts = [
+                    Bodies.rectangle(cx, cy, w, h, { isStatic: true, isSensor: true, label: 'final-shape', plugin: { partOfFinal: true } }),
+                    Bodies.rectangle(cx - w/2 - 20, cy, 40, h, { isStatic: true, isSensor: true, label: 'final-left', plugin: { partOfFinal: true } }),
+                    Bodies.rectangle(cx + w/2 + 20, cy, 40, h, { isStatic: true, isSensor: true, label: 'final-right', plugin: { partOfFinal: true } }),
+                    Bodies.rectangle(cx, cy - h/2 - 20, w + 80, 40, { isStatic: true, isSensor: true, label: 'final-top', plugin: { partOfFinal: true } }),
+                    Bodies.rectangle(cx, cy + h/2 + 20, w + 80, 40, { isStatic: true, isSensor: true, label: 'final-bottom', plugin: { partOfFinal: true } })
+                ];
+                return parts;
             }
 
-            function createShapeBody(def, index) {
-                var x = paletteX + index * paletteGap;
+            var pieceDefs = [
+                { id: 'rect1', type: 'rect', x: 180, y: 150, w: 120, h: 80, color: '#ff006e', targetX: W/2 - 100, targetY: H/2 - 60, targetAngle: 0 },
+                { id: 'rect2', type: 'rect', x: 340, y: 150, w: 120, h: 80, color: '#ffbe0b', targetX: W/2 + 100, targetY: H/2 - 60, targetAngle: 0 },
+                { id: 'rect3', type: 'rect', x: 180, y: 300, w: 120, h: 80, color: '#00d4ff', targetX: W/2 - 100, targetY: H/2 + 60, targetAngle: 0 },
+                { id: 'rect4', type: 'rect', x: 340, y: 300, w: 120, h: 80, color: '#8338ec', targetX: W/2 + 100, targetY: H/2 + 60, targetAngle: 0 },
+                { id: 'center', type: 'square', x: 500, y: 220, size: 50, color: '#06d6a0', targetX: W/2, targetY: H/2, targetAngle: 0 },
+                { id: 'top', type: 'rect', x: 600, y: 120, w: 140, h: 40, color: '#ef476f', targetX: W/2, targetY: H/2 - 100, targetAngle: 0 },
+                { id: 'bottom', type: 'rect', x: 600, y: 380, w: 140, h: 40, color: '#ffd600', targetX: W/2, targetY: H/2 + 100, targetAngle: 0 }
+            ];
+
+            function createPieceBody(def, index) {
+                var x = 100 + (index % 4) * 160;
+                var y = 80 + Math.floor(index / 4) * 140;
                 var body;
                 if (def.type === 'circle') {
-                    body = Bodies.circle(x, paletteY, def.size, { restitution: 0.2, friction: 0.5, density: 0.002, label: 'shape-' + def.id, plugin: { shapeId: def.id, color: def.color } });
+                    body = Bodies.circle(x, y, def.size, { restitution: 0.2, friction: 0.5, density: 0.002, label: 'piece-' + def.id, plugin: { pieceId: def.id, color: def.color, targetX: def.targetX, targetY: def.targetY, targetAngle: def.targetAngle } });
                 } else if (def.type === 'square') {
-                    body = Bodies.rectangle(x, paletteY, def.size * 2, def.size * 2, { restitution: 0.2, friction: 0.5, density: 0.002, label: 'shape-' + def.id, plugin: { shapeId: def.id, color: def.color } });
+                    body = Bodies.rectangle(x, y, def.size * 2, def.size * 2, { restitution: 0.2, friction: 0.5, density: 0.002, label: 'piece-' + def.id, plugin: { pieceId: def.id, color: def.color, targetX: def.targetX, targetY: def.targetY, targetAngle: def.targetAngle } });
                 } else if (def.type === 'rect') {
-                    body = Bodies.rectangle(x, paletteY, def.w, def.h, { restitution: 0.2, friction: 0.5, density: 0.002, label: 'shape-' + def.id, plugin: { shapeId: def.id, color: def.color } });
+                    body = Bodies.rectangle(x, y, def.w, def.h, { restitution: 0.2, friction: 0.5, density: 0.002, label: 'piece-' + def.id, plugin: { pieceId: def.id, color: def.color, targetX: def.targetX, targetY: def.targetY, targetAngle: def.targetAngle } });
                 } else if (def.type === 'triangle') {
-                    body = Bodies.polygon(x, paletteY, 3, def.size, { restitution: 0.2, friction: 0.5, density: 0.002, label: 'shape-' + def.id, plugin: { shapeId: def.id, color: def.color } });
+                    body = Bodies.polygon(x, y, 3, def.size, { restitution: 0.2, friction: 0.5, density: 0.002, label: 'piece-' + def.id, plugin: { pieceId: def.id, color: def.color, targetX: def.targetX, targetY: def.targetY, targetAngle: def.targetAngle } });
                 } else if (def.type === 'polygon') {
-                    body = Bodies.polygon(x, paletteY, def.sides, def.size, { restitution: 0.2, friction: 0.5, density: 0.002, label: 'shape-' + def.id, plugin: { shapeId: def.id, color: def.color } });
+                    body = Bodies.polygon(x, y, def.sides, def.size, { restitution: 0.2, friction: 0.5, density: 0.002, label: 'piece-' + def.id, plugin: { pieceId: def.id, color: def.color, targetX: def.targetX, targetY: def.targetY, targetAngle: def.targetAngle } });
                 }
                 if (body) {
                     body.plugin = body.plugin || {};
-                    body.plugin.shapeId = def.id;
+                    body.plugin.pieceId = def.id;
                     body.plugin.color = def.color;
-                    body.plugin.origX = x;
-                    body.plugin.origY = paletteY;
+                    body.plugin.targetX = def.targetX;
+                    body.plugin.targetY = def.targetY;
+                    body.plugin.targetAngle = def.targetAngle || 0;
                 }
                 return body;
             }
 
             function initPuzzle() {
                 Composite.clear(world);
-                shapes = [];
+                pieces = [];
                 slots = [];
                 fitted = {};
                 solved = false;
@@ -227,19 +237,16 @@
                     Bodies.rectangle(W + 25, H / 2, 50, H, wallOpts)
                 ]);
 
-                slotDefs.forEach(function (def) {
-                    var slot = createSlotBody(def);
-                    if (slot) {
-                        slots.push(slot);
-                        Composite.add(world, slot);
-                    }
+                var finalParts = createFinalShape();
+                finalParts.forEach(function (part) {
+                    Composite.add(world, part);
                 });
 
-                slotDefs.forEach(function (def, i) {
-                    var shape = createShapeBody(def, i);
-                    if (shape) {
-                        shapes.push(shape);
-                        Composite.add(world, shape);
+                pieceDefs.forEach(function (def, i) {
+                    var piece = createPieceBody(def, i);
+                    if (piece) {
+                        pieces.push(piece);
+                        Composite.add(world, piece);
                     }
                 });
 
@@ -255,41 +262,41 @@
 
                 Events.on(engine, 'afterUpdate', function () {
                     if (solved) return;
-                    shapes.forEach(function (shape) {
-                        if (!shape || !shape.plugin) return;
-                        if (fitted[shape.plugin.shapeId]) return;
-                        slots.forEach(function (slot) {
-                            if (!slot || !slot.plugin) return;
-                            if (shape.plugin.shapeId !== slot.plugin.slotId) return;
-                            var dx = shape.position.x - slot.position.x;
-                            var dy = shape.position.y - slot.position.y;
-                            var dist = Math.sqrt(dx * dx + dy * dy);
-                            if (dist < 18) {
-                                Body.setPosition(shape, { x: slot.position.x, y: slot.position.y });
-                                Body.setAngle(shape, slot.angle || 0);
-                                Body.setVelocity(shape, { x: 0, y: 0 });
-                                Body.setAngularVelocity(shape, 0);
-                                shape.isSensor = true;
-                                fitted[shape.plugin.shapeId] = true;
-                                statusEl.textContent = 'Forme encastrée : ' + shape.plugin.shapeId + '. Reste : ' + (slotDefs.length - Object.keys(fitted).length);
-                                if (Object.keys(fitted).length === slotDefs.length) {
-                                    solved = true;
-                                    statusEl.innerHTML = '<span style="color:#00ff88">Puzzle résolu ! Le message caché est révélé : HALE ENGAGE KRANE.</span>';
-                                    resetBtn.disabled = false;
-                                    try {
-                                        localStorage.setItem('td_standalone_game_result', JSON.stringify({
-                                            type: 'puzzle',
-                                            won: true,
-                                            ts: Date.now()
-                                        }));
-                                    } catch (e) {}
-                                }
+                    pieces.forEach(function (piece) {
+                        if (!piece || !piece.plugin) return;
+                        if (fitted[piece.plugin.pieceId]) return;
+                        var tx = piece.plugin.targetX;
+                        var ty = piece.plugin.targetY;
+                        var dx = piece.position.x - tx;
+                        var dy = piece.position.y - ty;
+                        var dist = Math.sqrt(dx * dx + dy * dy);
+                        var angleDiff = Math.abs(piece.angle - (piece.plugin.targetAngle || 0));
+                        if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
+                        if (dist < snapDistance && angleDiff < snapAngle) {
+                            Body.setPosition(piece, { x: tx, y: ty });
+                            Body.setAngle(piece, piece.plugin.targetAngle || 0);
+                            Body.setVelocity(piece, { x: 0, y: 0 });
+                            Body.setAngularVelocity(piece, 0);
+                            piece.isSensor = true;
+                            fitted[piece.plugin.pieceId] = true;
+                            statusEl.textContent = 'Pièce assemblée : ' + piece.plugin.pieceId + '. Reste : ' + (pieceDefs.length - Object.keys(fitted).length);
+                            if (Object.keys(fitted).length === pieceDefs.length) {
+                                solved = true;
+                                statusEl.innerHTML = '<span style="color:#00ff88">Puzzle résolu ! La forme est reconstituée.</span>';
+                                resetBtn.disabled = false;
+                                try {
+                                    localStorage.setItem('td_standalone_game_result', JSON.stringify({
+                                        type: 'puzzle',
+                                        won: true,
+                                        ts: Date.now()
+                                    }));
+                                } catch (e) {}
                             }
-                        });
+                        }
                     });
                 });
 
-                statusEl.textContent = 'Faites glisser les formes dans les alvéoles correspondantes.';
+                statusEl.textContent = 'Assemblez les pièces pour reconstituer la forme finale.';
                 resetBtn.disabled = true;
             }
 
@@ -299,61 +306,23 @@
 
                 ctx.strokeStyle = '#1f1f3a';
                 ctx.lineWidth = 2;
-                ctx.strokeRect(containerLeft, containerTop, containerW, containerH);
+                ctx.strokeRect(20, 20, W - 40, H - 40);
 
-                ctx.fillStyle = 'rgba(255,255,255,0.03)';
-                ctx.fillRect(containerLeft, containerTop, containerW, containerH);
+                ctx.fillStyle = 'rgba(255,255,255,0.02)';
+                ctx.fillRect(20, 20, W - 40, H - 40);
 
-                slotDefs.forEach(function (def) {
-                    ctx.save();
-                    ctx.translate(def.x, def.y);
-                    ctx.fillStyle = 'rgba(255,255,255,0.06)';
-                    ctx.strokeStyle = def.color;
-                    ctx.lineWidth = 2;
-                    ctx.setLineDash([4, 4]);
-                    if (def.type === 'circle') {
-                        ctx.beginPath();
-                        ctx.arc(0, 0, def.size, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.stroke();
-                    } else if (def.type === 'square') {
-                        ctx.fillRect(-def.size, -def.size, def.size * 2, def.size * 2);
-                        ctx.strokeRect(-def.size, -def.size, def.size * 2, def.size * 2);
-                    } else if (def.type === 'rect') {
-                        ctx.fillRect(-def.w / 2, -def.h / 2, def.w, def.h);
-                        ctx.strokeRect(-def.w / 2, -def.h / 2, def.w, def.h);
-                    } else if (def.type === 'triangle') {
-                        ctx.beginPath();
-                        for (var i = 0; i < 3; i++) {
-                            var angle = (i * 2 * Math.PI / 3) - Math.PI / 2;
-                            var px = Math.cos(angle) * def.size;
-                            var py = Math.sin(angle) * def.size;
-                            if (i === 0) ctx.moveTo(px, py);
-                            else ctx.lineTo(px, py);
-                        }
-                        ctx.closePath();
-                        ctx.fill();
-                        ctx.stroke();
-                    } else if (def.type === 'polygon') {
-                        ctx.beginPath();
-                        for (var j = 0; j < def.sides; j++) {
-                            var a = (j * 2 * Math.PI / def.sides) - Math.PI / 2;
-                            var sx = Math.cos(a) * def.size;
-                            var sy = Math.sin(a) * def.size;
-                            if (j === 0) ctx.moveTo(sx, sy);
-                            else ctx.lineTo(sx, sy);
-                        }
-                        ctx.closePath();
-                        ctx.fill();
-                        ctx.stroke();
-                    }
-                    ctx.restore();
-                });
+                ctx.save();
+                ctx.translate(W/2, H/2);
+                ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 4]);
+                ctx.strokeRect(-160, -120, 320, 240);
+                ctx.restore();
 
                 ctx.fillStyle = '#a0c0d0';
                 ctx.font = '12px Montserrat, sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('Palette', W / 2, paletteY - 30);
+                ctx.fillText('Zone cible', W/2, H/2 - 140);
             }
 
             function renderLoop() {
@@ -361,7 +330,7 @@
                 ctx.clearRect(0, 0, W, H);
                 drawBackground(ctx);
 
-                shapes.forEach(function (body) {
+                pieces.forEach(function (body) {
                     if (!body) return;
                     var pos = body.position;
                     var angle = body.angle;

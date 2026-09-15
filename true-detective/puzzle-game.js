@@ -472,6 +472,19 @@
                     (lang === 'fr' ? '✅ Résolu en ' + moves + ' coups et ' + elapsed + 's !' : '✅ Solved in ' + moves + ' moves and ' + elapsed + 's!') +
                     '</span>';
                 clearIntervalSafe();
+                
+                var continueBtn = document.createElement('button');
+                continueBtn.className = 'btn btn-continue';
+                continueBtn.textContent = lang === 'fr' ? 'Continuer' : 'Continue';
+                continueBtn.style.cssText = 'position:fixed;top:20px;right:20px;z-index:100;';
+                continueBtn.addEventListener('click', function () {
+                    cleanupSidePanel();
+                    if (onDone) onDone({ won: true, clue: cfg.clue });
+                });
+                if (wrap && wrap.parentNode) {
+                    wrap.appendChild(continueBtn);
+                }
+                
                 setTimeout(function () {
                     if (interroState) return;
                     cleanupSidePanel();

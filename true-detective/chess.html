@@ -12,6 +12,8 @@
         html, body {
             height: 100%;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         .sg-main {
             flex: 1;
@@ -130,6 +132,9 @@
             box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
         }
         .btn-continue {
+            position: fixed;
+            top: 20px;
+            right: 20px;
             padding: 10px 20px;
             font-size: 0.9rem;
             font-weight: 700;
@@ -142,18 +147,24 @@
             font-family: 'Montserrat', sans-serif;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            z-index: 100;
         }
         .btn-continue:hover {
             background: rgba(0, 255, 136, 0.3);
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
         }
         .story-continue-wrap {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 50;
             display: none;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-align: center;
+            flex-shrink: 0;
+            margin-top: 16px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
         }
         #game-content {
             width: 100%;
@@ -211,9 +222,8 @@
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
 
             if (fromStory) {
-                $backBtn.style.display = 'none';
-                var wrap = document.getElementById('story-continue-wrap');
-                if (wrap) wrap.style.display = 'block';
+            var wrap = document.getElementById('story-continue-wrap');
+            if (wrap) wrap.style.display = 'flex';
             } else {
                 $backBtn.textContent = 'Accueil';
                 $backBtn.addEventListener('click', function () {
@@ -272,11 +282,11 @@
                 clue: { fr: "Vivienne montre une nervosité inhabituelle.", en: "Vivienne shows unusual nervousness." }
             };
 
-            if (global.TDChessGame && global.TDChessGame.play) {
-                global.TDChessGame.play(cfg, 'fr', function (result) {
+            if (window.TDChessGame && window.TDChessGame.play) {
+                window.TDChessGame.play(cfg, 'fr', function (result) {
                     if (result && result.won) {
                         var wrap = document.getElementById('story-continue-wrap');
-                        if (wrap) wrap.style.display = 'block';
+                        if (wrap) wrap.style.display = 'flex';
                     }
                 }, $content);
             } else {

@@ -1166,15 +1166,15 @@ html {
     cursor: pointer;
     transition: box-shadow 0.2s ease, opacity 0.2s ease;
     position: fixed;
-    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-    left: 50%;
-    transform: translateX(-50%);
+    top: calc(20px + env(safe-area-inset-top, 0px));
+    right: calc(20px + env(safe-area-inset-right, 0px));
+    transform: none;
     z-index: 11002;
     width: auto;
     max-width: 500px;
     text-align: center;
     box-sizing: border-box;
-    margin: 0 0 20px 0;
+    margin: 0;
     flex-shrink: 0;
 }
 
@@ -1545,6 +1545,23 @@ html {
 .interrogation-ask {
     text-align: center;
     border: 1px solid rgba(255, 0, 255, 0.5);
+}
+
+/* Positionnement fixe du bouton Interroger à gauche du bouton Continuer */
+#game-screen .interrogation-ask {
+    position: fixed;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    left: calc(50% - 180px); /* Décalage vers la gauche du bouton Continuer (largeur ~160px) */
+    transform: translateX(-50%);
+    z-index: 11001;
+    margin: 0;
+    /* Taille réduite : le bouton héritait de width:100% via .btn-choice */
+    width: auto;
+    max-width: 190px;
+    min-height: 0;
+    padding: 10px 16px;
+    font-size: 0.92em;
+    white-space: nowrap;
 }
 
 .interrogation-question {
@@ -3572,6 +3589,12 @@ html {
 
 /* Réseau d'Alibis (Crime Investigation Board) */
 .reseau-alibis-board { position: relative; width: 100%; max-width: 800px; margin: 0 auto; }
+.reseau-alibis-carousel-wrap { position: relative; width: 100%; overflow: hidden; padding: 8px 0 8px 0; z-index: 1; }
+.reseau-alibis-carousel-track { display: flex; transition: transform 0.3s ease; width: 100%; }
+.reseau-alibis-carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; border: 2px solid rgba(240,216,144,0.5); background: rgba(20,14,10,0.85); color: #f0d890; border-radius: 50%; font-size: 1.2rem; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-family: 'Montserrat', sans-serif; }
+.reseau-alibis-carousel-btn:hover { background: rgba(240,216,144,0.15); border-color: rgba(240,216,144,0.9); }
+.reseau-alibis-carousel-btn.prev { left: 8px; }
+.reseau-alibis-carousel-btn.next { right: 8px; }
 .reseau-alibis-board-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(60,35,20,0.15) 0%, rgba(40,22,12,0.18) 100%); border: 2px dashed rgba(240,216,144,0.15); border-radius: 12px; pointer-events: none; }
 .reseau-alibis-intro { position: relative; font-size: 0.95rem; color: #f0d890; margin: 0 0 8px 0; font-style: italic; text-align: center; z-index: 1; line-height: 1.4; }
 .reseau-alibis-counter { position: relative; font-size: 0.85rem; color: #d8c8a0; margin: 0 0 16px 0; padding: 6px 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(240,216,144,0.3); border-radius: 6px; display: inline-block; z-index: 1; }
@@ -3587,6 +3610,39 @@ html {
 .reseau-alibis-card .tag-wrong { background: rgba(216,87,74,0.25); color: #f2c1ba; border-color: #d8574a; }
 .reseau-alibis-card.lie-found { border-color: #d8574a; background: linear-gradient(180deg, rgba(70,20,20,0.85) 0%, rgba(40,16,16,0.85) 100%); box-shadow: 0 0 20px rgba(216,87,74,0.6); }
 .reseau-alibis-card.lie-found .reseau-alibis-tag { background: rgba(216,87,74,0.4); color: #fff; border-color: #d8574a; }
+
+/* Bouton Continuer pour réseau d'alibis - ancré en bas de l'écran */
+.reseau-alibis-continue {
+    position: fixed;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    display: block;
+    width: auto !important;
+    max-width: 320px !important;
+    z-index: 11001;
+}
+@media (max-width: 600px) {
+    .reseau-alibis-continue {
+        padding: 10px 16px !important;
+        font-size: 0.85rem !important;
+    }
+}
+/* Marge basse pour dégager le bouton Continuer fixé en bas + message de fin */
+.reseau-alibis-board { padding-bottom: 72px; }
+.reseau-alibis-message {
+    position: relative;
+    margin: 14px auto 0;
+    padding: 10px 16px;
+    max-width: 480px;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #f0d890;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(240, 216, 144, 0.4);
+    border-radius: 8px;
+    z-index: 1;
+}
 .reseau-alibis-card.lie-found .tag-lie { background: rgba(216,87,74,0.5); color: #fff; border-color: #d8574a; }
 .reseau-alibis-card.confirmed-true { border-color: rgba(127,212,138,0.6); opacity: 0.85; }
 .reseau-alibis-card.confirmed-true .reseau-alibis-tag { background: rgba(127,212,138,0.3); color: #c9f2d2; }
@@ -3631,7 +3687,7 @@ html {
 /* ===== Mini-jeu « Le Cadette trahi » (montre_code) ===== */
 .mg-status { font-size: 0.9rem; color: #f0d890; margin: 4px 0 8px; min-height: 1.3em; font-family: 'Special Elite', monospace; }
 .mg-montre { height: 240px; cursor: none; touch-action: none; }
-.mg-montre .mg-montre-face { left: 6px; right: auto; }
+.mg-montre .mg-montre-face { left: 6px; right: auto; height: 92%; width: auto; object-fit: contain; }
 .mg-dos-wrap { position: absolute; right: 6px; bottom: 6px; width: 40%; height: 92%; z-index: 2; cursor: none; }
 .mg-montre-dos { position: relative !important; right: auto !important; bottom: auto !important; width: 100%; height: 100%; object-fit: contain; }
 .mg-montre .mg-item { max-width: 40%; max-height: 92%; }
@@ -3641,10 +3697,18 @@ html {
 /* Loupe qui magnifie la face de la montre */
 .face-loupe {
   position: absolute; width: 180px; height: 180px; border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,235,180,0.4), rgba(10,12,16,0.85) 70%);
+  /* Le verre grossit la face de la montre : le cercle coupe l'image agrandie */
+  background-color: #0b0f18; background-repeat: no-repeat;
   border: 4px solid #c9a227; pointer-events: none; display: none; z-index: 6;
   transform: translate(-50%, -50%);
   box-shadow: 0 0 22px rgba(255,215,120,0.5), inset 0 0 20px rgba(0,0,0,0.5);
+}
+/* Reflet du verre, posé par-dessus la face agrandie */
+.face-loupe::after {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, rgba(255,235,180,0.4), rgba(255,255,255,0.05) 42%, rgba(10,12,16,0.35) 100%);
+  pointer-events: none;
 }
 
 /* Bouton pour retourner la montre */
@@ -4813,20 +4877,20 @@ html {
     }
 
     /* Bouton Continuer: fixe en bas avec marge de sécurité */
-    #game-screen .btn-continue {
-        position: fixed;
-        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-        left: 50%;
-        transform: translateX(-50%);
-        width: calc(100vw - 24px);
-        max-width: 500px;
-        border-radius: 50px;
-        padding: 14px;
-        font-size: 1em;
-        z-index: 11002;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
-        order: 6;
-    }
+#game-screen .btn-continue {
+    position: fixed;
+    top: calc(20px + env(safe-area-inset-top, 0px));
+    right: calc(20px + env(safe-area-inset-right, 0px));
+    transform: none;
+    width: auto;
+    max-width: 500px;
+    border-radius: 50px;
+    padding: 14px;
+    font-size: 1em;
+    z-index: 11002;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+    order: 6;
+}
 
     #game-screen .btn-continue:hover,
     #game-screen .btn-continue:active {
