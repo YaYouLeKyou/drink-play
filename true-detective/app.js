@@ -4514,7 +4514,6 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
               'scene_fouille': 'scene-fouille.html',
               'puzzle': 'puzzle.html',
               'coffre_code': 'coffre-code.html',
-              'reseau_alibis': 'reseau-alibis.html',
               'chemistry': 'chemistry.html'
           };
 
@@ -4522,6 +4521,14 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
              var url = standalonePages[type] + '?difficulty=' + diff + '&lang=' + lang;
              if (mode === 'story') url += '&story=1';
              return url;
+         }
+
+         if (type === 'reseau_alibis') {
+             var page = 'reseau-alibis-1.html';
+             if (diff === 'medium') page = 'reseau-alibis-2.html';
+             else if (diff === 'hard') page = 'reseau-alibis-3.html';
+             else if (diff === 'extreme') page = 'reseau-alibis-4.html';
+             return page + '?difficulty=' + diff + '&lang=' + lang + (mode === 'story' ? '&story=1' : '');
          }
 
          if (['pong', 'pacman', 'space-invaders', 'breakout', 'asteroids'].indexOf(type) >= 0) {
@@ -4814,51 +4821,25 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         if (mgCfg.difficulty) applyDifficultyToCfg(mgCfg.type, mgCfg, mgCfg.difficulty);
 
         try {
-            if (roundCfg.type === 'reseau_alibis') {
-                var testimonies = mgCfg.dialogues || [];
-                if (!testimonies.length && roundCfg.testimonies) testimonies = roundCfg.testimonies;
-                if (!testimonies.length && roundCfg.cards) testimonies = roundCfg.cards;
-                var nodes = [];
-                if (testimonies.length) {
-                    nodes = testimonies.map(function (t, idx) {
-                        var id = (t.id || ('node_' + idx));
-                        var witness = (typeof t === 'string') ? t : (t.witness || t.name || ('Témoin ' + (idx + 1)));
-                        var statement = (typeof t === 'string') ? t : (t.statement || t.text || '');
-                        var isLie = !!(t.isLie || t.lie || t.false);
-                        return { id: id, witness: witness, statement: statement, isLie: isLie };
-                    });
-                }
-                if (!nodes.length) {
-                    nodes = [
-                        { id: 'hale', witness: 'Marcus Hale', statement: ui.language === 'fr' ? 'J\'étais chez moi, je regardais la télévision.' : 'I was at home watching television.', isLie: true },
-                        { id: 'vivienne', witness: 'Vivienne', statement: ui.language === 'fr' ? 'Je n\'ai pas vu la victime ce soir-là.' : 'I did not see the victim that night.', isLie: false },
-                        { id: 'pembrooke', witness: 'Pembrooke', statement: ui.language === 'fr' ? 'Nous étions ensemble au restaurant.' : 'We were together at the restaurant.', isLie: true },
-                        { id: 'blackwood', witness: 'Blackwood', statement: ui.language === 'fr' ? 'Je suis rentré directement après le travail.' : 'I came straight home after work.', isLie: false }
-                    ];
-                }
-                mgCfg.testimonies = nodes;
-                if (window.TDMiniGames && typeof window.TDMiniGames.play === 'function') {
-                    window.TDMiniGames.play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
-                } else if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.createMinigame === 'function') {
-                    var minigame = window.TDNarrativeEngine.createMinigame('reseau_alibis', mgCfg);
-                    if (minigame && typeof minigame.onComplete === 'function') {
-                        minigame.onComplete(onMinigameDone);
-                    } else {
-                        setTimeout(function () { onMinigameDone({ won: false }); }, 100);
+            if (roundCfg.type === 'reseau_alibis' || roundCfg.type === 'chemistry') {
+                var standaloneUrl = getMinigameStandaloneUrl(roundCfg.type, mgCfg.difficulty || 'medium', ui.language, 'story');
+                var iframe = document.createElement('iframe');
+                iframe.src = standaloneUrl;
+                iframe.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:none;background:#05050a;z-index:11050;';
+                iframe.allow = 'fullscreen';
+                document.body.appendChild(iframe);
+                window._storyMinigameIframe = iframe;
+                window._minigameSkipHandler = function () {
+                    if (window._storyMinigameIframe) {
+                        window._storyMinigameIframe.remove();
+                        window._storyMinigameIframe = null;
                     }
-                } else {
-                    setTimeout(function () { onMinigameDone({ won: false }); }, 100);
-                }
-            } else if (roundCfg.type === 'chemistry') {
-                if (window.TDChemistryGame && typeof window.TDChemistryGame.play === 'function') {
-                    window.TDChemistryGame.play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
-                } else {
-                    setTimeout(function () { onMinigameDone({ won: false }); }, 100);
-                }
+                    onMinigameDone({ won: true });
+                };
             } else if (gameNS && window[gameNS]) {
                 window[gameNS].play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
             } else {
-                setTimeout(function () { onMinigameDone({ won: false }); }, 100);
+                setTimeout(function () { scrHandleMinigameResult(roundIndex, { won: false }); }, 100);
             }
         } catch (e) {
             console.error('[True Detective] Minigame error "' + roundCfg.type + '" :', e);
