@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>True Detective - reseau-alibis</title>
+    <link rel="icon" href="../icon/Logo%20d%26p.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="standalone-game.css">
+    <style>
+        :root {
+            --bg-deep: #05050a;
+            --bg-gradient: radial-gradient(circle at 50% 20%, #171426 0%, #05050a 100%);
+            --accent-gold: #f0d890;
+            --accent-blue: #00d4ff;
+            --accent-green: #00ff88;
+            --accent-pink: #ff00ff;
+            --text-main: #f0f4f8;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-deep);
+            background-image: var(--bg-gradient);
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* En-tête stylisé type enquête */
+        .sg-header {
+            background: rgba(10, 10, 18, 0.9) !important;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .sg-title {
+            text-shadow: 0 2px 10px rgba(240, 216, 144, 0.3);
+            letter-spacing: 0.05em;
+        }
+
+        .sg-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            box-sizing: border-box;
+            transform: translateZ(0);
+        }
+
+        #reseau-alibis-app {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .reseau-alibis-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .reseau-alibis-header {
+            width: 100%;
+            text-align: center;
+            background: rgba(12, 16, 24, 0.85);
+            border: 1px solid rgba(0, 212, 255, 0.25);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+        }
+
+        .reseau-alibis-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--accent-gold);
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+            margin: 0;
+            letter-spacing: 0.03em;
+        }
+
+        .reseau-alibis-stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .reseau-alibis-stat {
+            font-size: 0.9rem;
+            color: var(--accent-blue);
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .reseau-alibis-grid {
+            display: grid;
+            gap: 10px;
+            justify-content: center;
+            align-content: center;
+            width: 100%;
+        }
+
+        /* --- CARTES HAUT DE GAMME --- */
+        .reseau-alibis-card {
+            aspect-ratio: 3 / 4;
+            background: linear-gradient(135deg, #1f1f3a 0%, #101026 100%);
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            position: relative;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s ease, box-shadow 0.2s ease;
+            transform-style: preserve-3d;
+            min-height: 70px;
+            will-change: transform;
+        }
+
+        .reseau-alibis-card:hover {
+            border-color: var(--accent-blue);
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.25);
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .reseau-alibis-card.flipped {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #121225 0%, #080814 100%);
+            border-color: var(--accent-pink);
+            box-shadow: 0 8px 24px rgba(255, 0, 255, 0.2);
+        }
+
+        .reseau-alibis-card.matched {
+            opacity: 0.45;
+            cursor: default;
+            border-color: var(--accent-green);
+            box-shadow: none;
+            transform: rotateY(180deg);
+        }
+
+        .reseau-alibis-card-front,
+        .reseau-alibis-card-back {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 8px;
+        }
+
+        .reseau-alibis-card-front {
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.08) 0%, transparent 70%);
+            color: var(--accent-blue);
+            font-size: 1.6rem;
+            font-weight: 700;
+            transform: rotateY(0deg);
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .reseau-alibis-card-back {
+            flex-direction: column;
+            gap: 4px;
+            padding: 6px;
+            transform: rotateY(180deg);
+            background: #0d0d1c;
+        }
+
+        .reseau-alibis-card-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+        }
+
+        .reseau-alibis-card-label {
+            font-size: 0.65rem;
+            color: #b0d0e0;
+            text-align: center;
+            line-height: 1.1;
+            margin-top: 2px;
+            font-weight: 500;
+        }
+
+        .reseau-alibis-dialogue {
+            width: 100%;
+            background: rgba(12, 16, 24, 0.85);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            font-style: italic;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            box-sizing: border-box;
+        }
+
+        /* Bouton Continuer ultra fluide */
+        #story-continue-btn {
+            margin-left: 8px;
+            padding: 8px 18px !important;
+            font-size: 0.85rem !important;
+            font-weight: 700 !important;
+            background: rgba(0, 255, 136, 0.12) !important;
+            border: 2px solid var(--accent-green) !important;
+            border-radius: 8px !important;
+            color: var(--accent-green) !important;
+            cursor: pointer !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            font-family: 'Montserrat', sans-serif !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+            will-change: transform, box-shadow;
+        }
+
+        #story-continue-btn:hover {
+            background: rgba(0, 255, 136, 0.25) !important;
+            box-shadow: 0 0 25px rgba(0, 255, 136, 0.5) !important;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 480px) {
+            .reseau-alibis-grid {
+                gap: 6px;
+            }
+            .reseau-alibis-card {
+                font-size: 1.4rem;
+                border-radius: 6px;
+            }
+            .reseau-alibis-title {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="sg-header" style="position:relative;">
+        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
+        <h2 class="sg-title" style="color:#f0d890;font-family:'Playfair Display',serif;">Mémoire</h2>
+        <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
+    </header>
+
+    <nav id="hamburger-menu" class="sg-menu">
+        <button class="sg-menu-item" id="menu-home">
+            <span class="menu-icon">🏠</span>
+            <span>Menu principal</span>
+        </button>
+        <div class="sg-menu-divider"></div>
+        <button class="sg-menu-item" id="menu-settings">
+            <span class="menu-icon">⚙</span>
+            <span>Paramètres</span>
+        </button>
+    </nav>
+
+    <main class="sg-main">
+        <div id="reseau-alibis-app">
+            <div class="reseau-alibis-wrap">
+                <div class="reseau-alibis-header">
+                    <h2 class="reseau-alibis-title" id="reseau-alibis-title">Jeu de mémoire</h2>
+                    <div class="reseau-alibis-stats">
+                        <div class="reseau-alibis-stat" id="reseau-alibis-timer">00:00</div>
+                        <div class="reseau-alibis-stat" id="reseau-alibis-pairs">Paires: 0/0</div>
+                    </div>
+                </div>
+                <div class="reseau-alibis-grid" id="reseau-alibis-grid"></div>
+                <div class="reseau-alibis-dialogue" id="reseau-alibis-dialogue"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="reseau-alibis.js"></script>
+    <script src="../settings-menu.js"></script>
+    <script>
+        (function () {
+            'use strict';
+
+            if (window.DPSettings && window.DPSettings.init) {
+                window.DPSettings.init({
+                    showMusicToggle: true,
+                    showMusicVolume: true,
+                    showNarrationVolume: false,
+                    showMuteToggle: false,
+                    showGameSection: true,
+                    showBackToHub: false,
+                    showRestart: false,
+                    showRules: false,
+                    customButtons: [],
+                    onBackToHub: function () {
+                        window.location.href = '../true-detective/index.html#minigames';
+                    }
+                });
+            }
+
+            var hamburgerBtn = document.getElementById('hamburger-btn');
+            var menu = document.getElementById('hamburger-menu');
+            if (hamburgerBtn && menu) {
+                hamburgerBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    menu.classList.toggle('open');
+                });
+                document.addEventListener('click', function (e) {
+                    if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
+                        menu.classList.remove('open');
+                    }
+                });
+            }
+
+            var backBtn = document.getElementById('back-to-minigame-btn');
+            var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+
+            if (fromStory) {
+                if (backBtn) backBtn.style.display = 'none';
+                var continueBtn = document.createElement('button');
+                continueBtn.id = 'story-continue-btn';
+                continueBtn.className = 'btn btn-continue';
+                continueBtn.textContent = 'Continuer';
+                continueBtn.addEventListener('click', function () {
+                    try { 
+                        localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau-alibis', won: true, ts: Date.now() })); 
+                    } catch (e) {}
+                    
+                    try {
+                        var returnRaw = localStorage.getItem('td_standalone_game_return');
+                        if (returnRaw) {
+                            var rp = JSON.parse(returnRaw);
+                            if (rp && rp.returnUrl) {
+                                window.location.href = rp.returnUrl;
+                                return;
+                            }
+                        }
+                    } catch (e) {}
+                    
+                    window.location.href = '../true-detective/index.html?standalone=reseau-alibis';
+                });
+                var header = document.querySelector('.sg-header');
+                if (header) header.appendChild(continueBtn);
+            } else {
+                if (backBtn) {
+                    backBtn.textContent = 'Accueil';
+                    backBtn.addEventListener('click', function () {
+                        if (menu) menu.classList.remove('open');
+                        window.location.href = '../true-detective/index.html#minigames';
+                    });
+                }
+            }
+
+            var menuHome = document.getElementById('menu-home');
+            if (menuHome) {
+                menuHome.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    window.location.href = fromStory ? '../true-detective/index.html?standalone=reseau-alibis' : '../true-detective/index.html#minigames';
+                });
+            }
+
+            var menuSettings = document.getElementById('menu-settings');
+            if (menuSettings) {
+                menuSettings.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    if (window.DPSettings && window.DPSettings.open) { 
+                        window.DPSettings.open(); 
+                    } else { 
+                        alert('Paramètres : aucun réglage pour l\'instant.'); 
+                    }
+                });
+            }
+
+            // Chargement ultra-fluide synchronisé avec le rendu graphique
+            function initreseau-alibisGame() {
+                // S'assure que reseau-alibis.js est bien initialisé s'il possède une méthode d'appel globale (selon votre structure existante)
+                if (typeof window.initreseau-alibis === 'function') {
+                    window.initreseau-alibis();
+                }
+            }
+
+            requestAnimationFrame(initreseau-alibisGame);
+        })();
+    </script>
+</body>
+</html>
