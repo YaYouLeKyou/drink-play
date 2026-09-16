@@ -2062,6 +2062,11 @@ html {
     scroll-padding-top: 32px;
 }
 
+/* Masquer les énigmes de la page mini-jeux */
+#minigame-select-screen .minigame-category.puzzles {
+    display: none !important;
+}
+
 .minigame-select-content {
     text-align: center;
     max-width: 1200px;

@@ -12,7 +12,7 @@
             --bg-dark: #070712;
             --accent-blue: #00d4ff;
             --accent-green: #00ff88;
-            --accent-orange: #ff6b00;
+            --accent-orange: #ff3333;
             --accent-gold: #f0d890;
             --text-main: #e8f4ff;
             --text-secondary: #a0c0d0;
@@ -51,7 +51,7 @@
             padding: 12px 16px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
@@ -63,11 +63,38 @@
             margin: 0;
         }
 
+        .color-legend {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        .legend-dot.green { background-color: var(--accent-green); color: var(--accent-green); }
+        .legend-dot.red { background-color: var(--accent-orange); color: var(--accent-orange); }
+
         .shooting-stats {
             display: flex;
             justify-content: center;
             gap: 20px;
             flex-wrap: wrap;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 6px;
         }
 
         .shooting-stat {
@@ -161,7 +188,11 @@
     <main class="sg-main">
         <div class="shooting-wrap">
             <div class="shooting-header">
-                <h2 class="shooting-title" id="target-banner">Éliminez les criminels, épargnez la Femme Fatale et les civils !</h2>
+                <h2 class="shooting-title">Blackwood Manor - Stand de Tir</h2>
+                <div class="color-legend">
+                    <div class="legend-item"><span class="legend-dot green"></span><span style="color:var(--accent-green)">Cibles à abattre</span></div>
+                    <div class="legend-item"><span class="legend-dot red"></span><span style="color:var(--accent-orange)">Femme Fatale (À épargner)</span></div>
+                </div>
                 <div class="shooting-stats">
                     <div class="shooting-stat" id="shooting-score">Score: 0</div>
                     <div class="shooting-stat" id="shooting-targets">Cibles abattues: 0 / 10</div>
@@ -169,7 +200,7 @@
                 </div>
             </div>
             <canvas id="shooting-canvas"></canvas>
-            <div class="shooting-dialogue" id="shooting-dialogue">Restez vigilants. Ne touchez surtout pas la Femme Fatale.</div>
+            <div class="shooting-dialogue" id="shooting-dialogue">Sécurisez le domaine de Blackwood Manor, mais épargnez la Femme Fatale !</div>
         </div>
     </main>
 
@@ -188,20 +219,22 @@
             canvas.width = 800;
             canvas.height = 420;
 
-            // Définition des assets personnages (Femme Fatale basculée en innocent, Le Protecteur retiré)
+            // Chargement de l'image de fond (Manoir)
+            var manorBg = new Image();
+            manorBg.src = 'assets/image true detective/lieux/classic/manoir.jpg';
+
             var characterData = [
                 { name: "Le Criminel", file: "le-criminel.png", type: "criminal", points: 100, quote: "Vous ne m'aurez pas si facilement..." },
-                { name: "Femme Fatale", file: "femme-fatal.png", type: "innocent", points: -200, quote: "Vous venez de faire une grave erreur..." },
+                { name: "Femme Fatale", file: "femme-fatal.png", type: "innocent", points: -300, quote: "Vous avez tiré sur la Femme Fatale... Erreur fatale !" },
                 { name: "Le Suspect", file: "Le-suspect.png", type: "criminal", points: 100, quote: "Je n'ai rien à voir avec cette histoire." },
                 { name: "Le Marginal", file: "Le-marginal.png", type: "criminal", points: 120, quote: "Les ombres parlent si on sait écouter." },
-                { name: "Détective Partenaire", file: "detective-partenaire.png", type: "innocent", points: -150, quote: "T'es fou ? C'est moi, abats pas ton coéquipier !" },
-                { name: "Le Scientifique", file: "le-scientific.png", type: "innocent", points: -100, quote: "Attention aux échantillons de scène de crime !" },
-                { name: "Le Séducteur", file: "le-seducteur.png", type: "innocent", points: -100, quote: "Calmez-vous, inspecteur, on peut s'entendre." }
+                { name: "Détective Partenaire", file: "detective-partenaire.png", type: "criminal", points: 80, quote: "Aïe ! T'as pas le bon timing inspecteur !" },
+                { name: "Le Scientifique", file: "le-scientific.png", type: "criminal", points: 90, quote: "Attention au matériel !" },
+                { name: "Le Séducteur", file: "le-seducteur.png", type: "criminal", points: 90, quote: "Pas de quartier visiblement..." }
             ];
 
             var loadedImages = {};
 
-            // Préchargement des images depuis le dossier de vos assets
             characterData.forEach(function(char) {
                 var img = new Image();
                 img.src = 'assets/image true detective/characteres/classic/' + char.file;
@@ -246,9 +279,9 @@
                             dialogueEl.innerHTML = '<span style="color:var(--accent-green);">Cible neutralisée (' + t.name + ') : "' + t.quote + '"</span>';
                             activeTargets.splice(i, 1);
                         } else {
-                            score += t.points; // Points négatifs importants
+                            score += t.points;
                             misses++;
-                            dialogueEl.innerHTML = '<span style="color:var(--accent-orange);">ERREUR ! Vous avez touché ' + t.name + ' ! "' + t.quote + '"</span>';
+                            dialogueEl.innerHTML = '<span style="color:var(--accent-orange);">ERREUR ! Vous avez touché la Femme Fatale ! "' + t.quote + '"</span>';
                             activeTargets.splice(i, 1);
                         }
                         updateUI();
@@ -283,10 +316,21 @@
                 if (activeTargets.length >= 4 || gameOver) return;
 
                 var randomChar = characterData[Math.floor(Math.random() * characterData.length)];
-                var w = 90;
-                var h = 110;
-                var x = Math.random() * (canvas.width - w - 60) + 30;
-                var y = canvas.height - h - 45;
+                var img = loadedImages[randomChar.file];
+                
+                var targetHeight = 130; 
+                var targetWidth = targetHeight; 
+                
+                if (img && img.complete && img.naturalWidth && img.naturalHeight) {
+                    var naturalRatio = img.naturalWidth / img.naturalHeight;
+                    targetWidth = targetHeight * naturalRatio;
+                } else {
+                    targetWidth = 90;
+                }
+
+                var startX = -targetWidth - 20; 
+                var floorY = canvas.height - targetHeight - 45;
+                var speed = 1.2 + Math.random() * 1.5;
 
                 activeTargets.push({
                     name: randomChar.name,
@@ -294,11 +338,11 @@
                     type: randomChar.type,
                     points: randomChar.points,
                     quote: randomChar.quote,
-                    x: x,
-                    y: y,
-                    width: w,
-                    height: h,
-                    lifeTimer: 120
+                    x: startX,
+                    y: floorY,
+                    width: targetWidth,
+                    height: targetHeight,
+                    speed: speed
                 });
             }
 
@@ -311,7 +355,7 @@
             function checkGameStatus() {
                 if (targetsHit >= targetGoal) {
                     gameOver = true;
-                    dialogueEl.innerHTML = '<strong style="color:var(--accent-green);">Enquête réussie ! Vous avez nettoyé le secteur.</strong>';
+                    dialogueEl.innerHTML = '<strong style="color:var(--accent-green);">Enquête réussie ! Le domaine est sécurisé.</strong>';
                     saveResult(true);
                 } else if (misses >= 3) {
                     gameOver = true;
@@ -335,14 +379,15 @@
                 if (gameOver) return;
 
                 spawnTimer++;
-                if (spawnTimer > 75) {
+                if (spawnTimer > 90) {
                     spawnTarget();
                     spawnTimer = 0;
                 }
 
                 for (var i = activeTargets.length - 1; i >= 0; i--) {
-                    activeTargets[i].lifeTimer--;
-                    if (activeTargets[i].lifeTimer <= 0) {
+                    var t = activeTargets[i];
+                    t.x += t.speed;
+                    if (t.x > canvas.width) {
                         activeTargets.splice(i, 1);
                     }
                 }
@@ -357,19 +402,18 @@
             }
 
             function draw() {
-                ctx.fillStyle = '#050510';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.strokeStyle = 'rgba(0, 212, 255, 0.08)';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                for (var i = 0; i < canvas.width; i += 80) {
-                    ctx.moveTo(i, 0);
-                    ctx.lineTo(i, canvas.height);
+                // 1. Dessin de l'arrière-plan (Manoir) avec un léger assombrissement pour le contraste
+                if (manorBg.complete && manorBg.naturalWidth !== 0) {
+                    ctx.drawImage(manorBg, 0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = 'rgba(5, 5, 16, 0.4)'; // Voile sombre pour intégrer les éléments
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                } else {
+                    ctx.fillStyle = '#050510';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
                 }
-                ctx.stroke();
 
-                ctx.fillStyle = '#0e1222';
+                // 2. Le rail horizontal
+                ctx.fillStyle = 'rgba(14, 18, 34, 0.85)';
                 ctx.fillRect(0, canvas.height - 45, canvas.width, 45);
                 ctx.strokeStyle = 'var(--accent-blue)';
                 ctx.lineWidth = 2;
@@ -378,27 +422,32 @@
                 ctx.lineTo(canvas.width, canvas.height - 45);
                 ctx.stroke();
 
+                // 3. Dessin des cibles mouvantes et leurs contours colorés
                 for (var i = 0; i < activeTargets.length; i++) {
                     var t = activeTargets[i];
                     var img = loadedImages[t.file];
 
                     ctx.save();
-                    ctx.shadowBlur = 10;
-                    ctx.shadowColor = t.type === 'criminal' ? 'rgba(0, 255, 136, 0.3)' : 'rgba(255, 107, 0, 0.3)';
+                    var isCriminal = (t.type === 'criminal');
+                    var themeColor = isCriminal ? '#00ff88' : '#ff3333';
+
+                    ctx.shadowBlur = 12;
+                    ctx.shadowColor = isCriminal ? 'rgba(0, 255, 136, 0.4)' : 'rgba(255, 51, 51, 0.5)';
 
                     if (img && img.complete && img.naturalWidth !== 0) {
                         ctx.drawImage(img, t.x, t.y, t.width, t.height);
                     } else {
-                        ctx.fillStyle = t.type === 'criminal' ? '#00ff88' : '#ff6b00';
+                        ctx.fillStyle = themeColor;
                         ctx.fillRect(t.x, t.y, t.width, t.height);
                     }
 
-                    ctx.strokeStyle = t.type === 'criminal' ? 'rgba(0,255,136,0.6)' : 'rgba(255,107,0,0.6)';
-                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = themeColor;
+                    ctx.lineWidth = 3;
                     ctx.strokeRect(t.x, t.y, t.width, t.height);
                     ctx.restore();
                 }
 
+                // 4. Effets de particules (tirs)
                 for (var i = 0; i < particleEffects.length; i++) {
                     var p = particleEffects[i];
                     ctx.fillStyle = p.color;
@@ -409,8 +458,9 @@
                 }
                 ctx.globalAlpha = 1;
 
+                // 5. Écran de fin
                 if (gameOver) {
-                    ctx.fillStyle = 'rgba(5, 5, 16, 0.82)';
+                    ctx.fillStyle = 'rgba(5, 5, 16, 0.85)';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                     ctx.fillStyle = '#e8f4ff';
                     ctx.font = 'bold 1.5rem "Playfair Display", serif';

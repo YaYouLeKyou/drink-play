@@ -8,73 +8,178 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
     <style>
+        :root {
+            --bg-dark: #070712;
+            --accent-gold: #ffd600;
+            --accent-blue: #00d4ff;
+            --accent-green: #00ff88;
+            --accent-pink: #ff006e;
+            --text-main: #e8f4ff;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% 10%, #1a162b 0%, var(--bg-dark) 100%);
+            color: var(--text-main);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
         .connect4-wrap {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
-            padding: 24px;
+            gap: 14px;
+            padding: 16px;
             width: 100%;
             max-width: 500px;
             margin: 0 auto;
+            box-sizing: border-box;
         }
+
+        .connect4-header {
+            width: 100%;
+            text-align: center;
+            background: rgba(12, 16, 24, 0.85);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            padding: 10px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .connect4-title-game {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--accent-blue);
+            margin: 0;
+        }
+
+        .connect4-info {
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .mode-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
         .connect4-board {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 6px;
-            background: #00d4ff;
-            padding: 8px;
+            gap: 8px;
+            background: #0088cc;
+            padding: 12px;
             border-radius: 12px;
             width: 100%;
             max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0, 136, 204, 0.3), inset 0 4px 10px rgba(0,0,0,0.4);
+            box-sizing: border-box;
         }
+
         .connect4-cell {
             aspect-ratio: 1;
-            background: #0c1018;
+            background: #070712;
             border-radius: 50%;
             cursor: pointer;
-            transition: background 0.2s ease;
-            min-width: 36px;
-            min-height: 36px;
+            position: relative;
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.8);
+            transition: transform 0.1s ease;
         }
+
         .connect4-cell:hover {
-            background: #1a2030;
+            transform: scale(1.05);
         }
+
         .connect4-cell.red {
-            background: #ff006e;
+            background: radial-gradient(circle at 35% 35%, #ff5c9d, #ff006e);
+            box-shadow: 0 0 10px rgba(255, 0, 110, 0.6), inset 0 2px 4px rgba(255,255,255,0.4);
         }
+
         .connect4-cell.yellow {
-            background: #ffd600;
+            background: radial-gradient(circle at 35% 35%, #ffea66, #ffd600);
+            box-shadow: 0 0 10px rgba(255, 214, 0, 0.6), inset 0 2px 4px rgba(255,255,255,0.4);
         }
-        .connect4-info {
-            text-align: center;
-            color: #e8f4ff;
-            font-size: 1rem;
-            font-weight: 600;
-        }
+
         .connect4-btn {
             padding: 10px 24px;
             font-size: 0.9rem;
             font-weight: 700;
             background: rgba(0, 212, 255, 0.15);
-            border: 2px solid #00d4ff;
+            border: 2px solid var(--accent-blue);
             border-radius: 8px;
-            color: #00d4ff;
+            color: var(--accent-blue);
             cursor: pointer;
             font-family: 'Montserrat', sans-serif;
             text-transform: uppercase;
+            transition: all 0.2s;
         }
         .connect4-btn:hover {
             background: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-continue {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            background: rgba(0, 255, 136, 0.15);
+            border: 2px solid var(--accent-green);
+            border-radius: 8px;
+            color: var(--accent-green);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            z-index: 100;
+        }
+        .btn-continue:hover {
+            background: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
         }
     </style>
 </head>
 <body>
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
-        <h2 class="sg-title" style="color:#00d4ff;font-family:'Playfair Display',serif;">Puissance 4</h2>
+        <h2 class="sg-title" style="color:var(--accent-blue);font-family:'Playfair Display',serif;">Puissance 4</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
+
+    <button id="story-continue-btn" class="btn-continue" style="display:none;">Continuer</button>
+
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
             <span class="menu-icon">🏠</span>
@@ -86,36 +191,245 @@
             <span>Paramètres</span>
         </button>
     </nav>
+
     <main class="sg-main">
         <div class="connect4-wrap">
-            <div class="connect4-info" id="connect4-status">Tour: Rouge</div>
+            <div class="connect4-header">
+                <h2 class="connect4-title-game">Confrontation d'Indices</h2>
+                <div style="display:flex; justify-content:center; align-items:center;">
+                    <div class="mode-selector">
+                        <button class="mode-btn active" id="mode-ai">vs IA</button>
+                        <button class="mode-btn" id="mode-pvp">2 Joueurs</button>
+                    </div>
+                </div>
+                <div class="connect4-info" id="connect4-status">Tour : Enquêteur (Rouge)</div>
+            </div>
             <div class="connect4-board" id="connect4-board"></div>
             <button class="connect4-btn" id="connect4-reset">Nouvelle partie</button>
         </div>
     </main>
 
-    <script src="connect4.js"></script>
     <script src="../settings-menu.js"></script>
     <script>
         (function () {
             'use strict';
 
+            const ROWS = 6;
+            const COLS = 7;
+            let board = [];
+            let currentPlayer = 'red'; // 'red' = Joueur 1, 'yellow' = Joueur 2 / IA
+            let gameActive = true;
+            let playAgainstAI = true;
+
+            const boardEl = document.getElementById('connect4-board');
+            const statusEl = document.getElementById('connect4-status');
+            const resetBtn = document.getElementById('connect4-reset');
+            const modeAiBtn = document.getElementById('mode-ai');
+            const modePvpBtn = document.getElementById('mode-pvp');
+
+            function initBoard() {
+                board = Array(ROWS).fill(null).map(() => Array(COLS).fill(null));
+                gameActive = true;
+                currentPlayer = 'red';
+                statusEl.textContent = "Tour : Enquêteur (Rouge)";
+                renderBoard();
+            }
+
+            function renderBoard() {
+                boardEl.innerHTML = '';
+                for (let r = 0; r < ROWS; r++) {
+                    for (let c = 0; c < COLS; c++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'connect4-cell';
+                        if (board[r][c] === 'red') cell.classList.add('red');
+                        if (board[r][c] === 'yellow') cell.classList.add('yellow');
+                        
+                        cell.dataset.column = c;
+                        cell.addEventListener('click', () => handleCellClick(c));
+                        boardEl.appendChild(cell);
+                    }
+                }
+            }
+
+            function handleCellClick(col) {
+                if (!gameActive) return;
+                if (playAgainstAI && currentPlayer === 'yellow') return; // Bloquer si c'est le tour de l'IA
+
+                if (makeMove(col)) {
+                    if (checkWin(currentPlayer)) {
+                        endGame(false); // Victoire joueur rouge
+                        return;
+                    }
+                    if (checkDraw()) {
+                        statusEl.textContent = "Match nul !";
+                        gameActive = false;
+                        return;
+                    }
+
+                    currentPlayer = currentPlayer === 'red' ? 'yellow' : 'red';
+                    updateStatus();
+
+                    if (playAgainstAI && currentPlayer === 'yellow' && gameActive) {
+                        statusEl.textContent = "L'IA réfléchit...";
+                        setTimeout(aiMove, 600);
+                    }
+                }
+            }
+
+            function makeMove(col) {
+                for (let r = ROWS - 1; r >= 0; r--) {
+                    if (!board[r][col]) {
+                        board[r][col] = currentPlayer;
+                        renderBoard();
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            function aiMove() {
+                if (!gameActive) return;
+                
+                // IA simple : Tente de gagner ou de bloquer, sinon choisit une colonne valide au hasard
+                let col = findBestMove('yellow') ?? findBestMove('red') ?? getRandomValidColumn();
+                
+                if (col !== null) {
+                    board[getAvailableRow(col)][col] = 'yellow';
+                    renderBoard();
+
+                    if (checkWin('yellow')) {
+                        statusEl.textContent = "L'IA a gagné l'enquête !";
+                        gameActive = false;
+                        handleEndGame(false);
+                        return;
+                    }
+                    if (checkDraw()) {
+                        statusEl.textContent = "Match nul !";
+                        gameActive = false;
+                        return;
+                    }
+
+                    currentPlayer = 'red';
+                    updateStatus();
+                }
+            }
+
+            function getAvailableRow(col) {
+                for (let r = ROWS - 1; r >= 0; r--) {
+                    if (!board[r][col]) return r;
+                }
+                return -1;
+            }
+
+            function getRandomValidColumn() {
+                const validCols = [];
+                for (let c = 0; c < COLS; c++) {
+                    if (!board[0][c]) validCols.push(c);
+                }
+                if (validCols.length === 0) return null;
+                return validCols[Math.floor(Math.random() * validCols.length)];
+            }
+
+            function findBestMove(player) {
+                for (let c = 0; c < COLS; c++) {
+                    let r = getAvailableRow(c);
+                    if (r !== -1) {
+                        board[r][c] = player;
+                        let winning = checkWin(player);
+                        board[r][c] = null;
+                        if (winning) return c;
+                    }
+                }
+                return null;
+            }
+
+            function updateStatus() {
+                if (currentPlayer === 'red') {
+                    statusEl.textContent = "Tour : Enquêteur (Rouge)";
+                } else {
+                    statusEl.textContent = playAgainstAI ? "Tour : IA (Jaune)" : "Tour : Adversaire (Jaune)";
+                }
+            }
+
+            function checkWin(player) {
+                // Horizontal
+                for (let r = 0; r < ROWS; r++) {
+                    for (let c = 0; c < COLS - 3; c++) {
+                        if (board[r][c] === player && board[r][c+1] === player && board[r][c+2] === player && board[r][c+3] === player) return true;
+                    }
+                }
+                // Vertical
+                for (let r = 0; r < ROWS - 3; r++) {
+                    for (let c = 0; c < COLS; c++) {
+                        if (board[r][c] === player && board[r+1][c] === player && board[r+2][c] === player && board[r+3][c] === player) return true;
+                    }
+                }
+                // Diagonale descendante
+                for (let r = 0; r < ROWS - 3; r++) {
+                    for (let c = 0; c < COLS - 3; c++) {
+                        if (board[r][c] === player && board[r+1][c+1] === player && board[r+2][c+2] === player && board[r+3][c+3] === player) return true;
+                    }
+                }
+                // Diagonale montante
+                for (let r = 3; r < ROWS; r++) {
+                    for (let c = 0; c < COLS - 3; c++) {
+                        if (board[r][c] === player && board[r-1][c+1] === player && board[r-2][c+2] === player && board[r-3][c+3] === player) return true;
+                    }
+                }
+                return false;
+            }
+
+            function checkDraw() {
+                return board[0].every(cell => cell !== null);
+            }
+
+            function endGame(isAiWin) {
+                gameActive = false;
+                if (isAiWin) {
+                    statusEl.textContent = "L'IA l'emporte !";
+                } else {
+                    statusEl.textContent = "Victoire ! Indice validé.";
+                    handleEndGame(true);
+                }
+            }
+
+            function handleEndGame(won) {
+                try {
+                    localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'connect4', won: won, ts: Date.now() }));
+                } catch (e) {}
+
+                var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                if (won && fromStory) {
+                    var continueBtn = document.getElementById('story-continue-btn');
+                    if (continueBtn) continueBtn.style.display = 'inline-block';
+                }
+            }
+
+            resetBtn.addEventListener('click', initBoard);
+
+            modeAiBtn.addEventListener('click', () => {
+                playAgainstAI = true;
+                modeAiBtn.classList.add('active');
+                modePvpBtn.classList.remove('active');
+                initBoard();
+            });
+
+            modePvpBtn.addEventListener('click', () => {
+                playAgainstAI = false;
+                modePvpBtn.classList.add('active');
+                modeAiBtn.classList.remove('active');
+                initBoard();
+            });
+
+            // Initialisation de l'affichage de l'histoire / navigation
             if (window.DPSettings && window.DPSettings.init) {
                 window.DPSettings.init({
-                    showMusicToggle: true,
-                    showMusicVolume: true,
-                    showNarrationVolume: false,
-                    showMuteToggle: false,
-                    showGameSection: true,
-                    showBackToHub: false,
-                    showRestart: false,
-                    showRules: false,
-                    customButtons: [],
-                    onBackToHub: function () {
-                        window.location.href = '../true-detective/index.html#minigames';
-                    }
+                    showMusicToggle: true, showMusicVolume: true, showNarrationVolume: false,
+                    showMuteToggle: false, showGameSection: true, showBackToHub: false, showRestart: false, showRules: false,
+                    onBackToHub: function () { window.location.href = '../true-detective/index.html#minigames'; }
                 });
             }
+
             var hamburgerBtn = document.getElementById('hamburger-btn');
             var menu = document.getElementById('hamburger-menu');
             if (hamburgerBtn && menu) {
@@ -129,32 +443,28 @@
                     }
                 });
             }
+
             var backBtn = document.getElementById('back-to-minigame-btn');
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+            
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
-                var continueBtn = document.createElement('button');
-                continueBtn.id = 'story-continue-btn';
-                continueBtn.className = 'btn btn-continue';
-                continueBtn.textContent = 'Continuer';
-                continueBtn.style.cssText = 'margin-left:8px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
-                continueBtn.addEventListener('click', function () {
-                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'connect4', won: true, ts: Date.now() })); } catch (e) {}
-                    try {
-                        var returnRaw = localStorage.getItem('td_standalone_game_return');
-                        if (returnRaw) {
-                            var rp = JSON.parse(returnRaw);
-                            if (rp && rp.returnUrl) {
-                                window.location.href = rp.returnUrl;
-                                return;
+                var storyContinueBtn = document.getElementById('story-continue-btn');
+                if (storyContinueBtn) {
+                    storyContinueBtn.addEventListener('click', function () {
+                        try {
+                            var returnRaw = localStorage.getItem('td_standalone_game_return');
+                            if (returnRaw) {
+                                var rp = JSON.parse(returnRaw);
+                                if (rp && rp.returnUrl) {
+                                    window.location.href = rp.returnUrl;
+                                    return;
+                                }
                             }
-                        }
-                    } catch (e) {}
-                    var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
-                    window.location.href = fromStory ? '../true-detective/index.html?standalone=connect4' : '../true-detective/index.html#minigames';
-                });
-                var header = document.querySelector('.sg-header');
-                if (header) header.appendChild(continueBtn);
+                        } catch (e) {}
+                        window.location.href = '../true-detective/index.html?standalone=connect4';
+                    });
+                }
             } else {
                 if (backBtn) {
                     backBtn.textContent = 'Accueil';
@@ -164,6 +474,7 @@
                     });
                 }
             }
+
             var menuHome = document.getElementById('menu-home');
             if (menuHome) {
                 menuHome.addEventListener('click', function () {
@@ -171,16 +482,17 @@
                     window.location.href = fromStory ? '../true-detective/index.html?standalone=connect4' : '../true-detective/index.html#minigames';
                 });
             }
+
             var menuSettings = document.getElementById('menu-settings');
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres : aucun réglage pour l\'instant.'); }
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres'); }
                 });
             }
+
+            initBoard();
         })();
     </script>
 </body>
 </html>
-
-

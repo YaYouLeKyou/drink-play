@@ -8,34 +8,138 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
     <style>
+        :root {
+            --bg-dark: #070712;
+            --accent-gold: #ffd600;
+            --accent-blue: #00d4ff;
+            --accent-green: #00ff88;
+            --accent-pink: #ff006e;
+            --text-main: #e8f4ff;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% 10%, #1a162b 0%, var(--bg-dark) 100%);
+            color: var(--text-main);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
         .breakout-wrap {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 12px;
             padding: 16px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            box-sizing: border-box;
         }
+
+        .breakout-header {
+            width: 100%;
+            text-align: center;
+            background: rgba(12, 16, 24, 0.85);
+            border: 1px solid rgba(255, 214, 0, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .breakout-title-game {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+            margin: 0;
+        }
+
+        .breakout-info {
+            color: var(--accent-blue);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
         #breakout-canvas {
             display: block;
             width: 100%;
             max-width: 600px;
             height: 400px;
-            background: #0a0a1a;
-            border: 2px solid #ffd600;
+            background: #050510;
+            border: 3px solid var(--accent-gold);
             border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(255, 214, 0, 0.2), inset 0 0 30px rgba(0, 0, 0, 0.9);
+            touch-action: none;
         }
-        .breakout-info {
-            color: #e8f4ff;
-            font-weight: 600;
+
+        .touch-controls {
+            display: flex;
+            gap: 20px;
+            margin-top: 5px;
+        }
+
+        .ctrl-btn {
+            background: rgba(255, 214, 0, 0.15);
+            border: 2px solid var(--accent-gold);
+            color: var(--text-main);
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .ctrl-btn:active {
+            background: rgba(255, 214, 0, 0.4);
+        }
+
+        .btn-continue {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            background: rgba(0, 255, 136, 0.15);
+            border: 2px solid var(--accent-green);
+            border-radius: 8px;
+            color: var(--accent-green);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            z-index: 100;
+        }
+        .btn-continue:hover {
+            background: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            #breakout-canvas {
+                height: 320px;
+            }
         }
     </style>
 </head>
 <body>
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
-        <h2 class="sg-title" style="color:#ffd600;font-family:'Playfair Display',serif;">Breakout</h2>
+        <h2 class="sg-title" style="color:var(--accent-gold);font-family:'Playfair Display',serif;">Déchiffrage</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
+
+    <button id="story-continue-btn" class="btn-continue" style="display:none;">Continuer</button>
+
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
             <span class="menu-icon">🏠</span>
@@ -47,43 +151,290 @@
             <span>Paramètres</span>
         </button>
     </nav>
+
     <main class="sg-main">
         <div class="breakout-wrap">
-            <div class="breakout-info" id="breakout-info">Score: 0</div>
+            <div class="breakout-header">
+                <h2 class="breakout-title-game">Destruction des indices verrouillés</h2>
+                <div class="breakout-info" id="breakout-info">Score: 0 | Vies: 3</div>
+            </div>
             <canvas id="breakout-canvas"></canvas>
+            <div class="touch-controls">
+                <button class="ctrl-btn" id="btn-left">◀</button>
+                <button class="ctrl-btn" id="btn-right">▶</button>
+            </div>
         </div>
     </main>
 
-    <script src="breakout.js">
-        // Helper function to get retro game level (1-3)
+    <script src="../settings-menu.js"></script>
+    <script>
         function getLevel() {
             var level = parseInt(new URLSearchParams(window.location.search).get('level') || '1', 10);
             if (isNaN(level) || level < 1) level = 1;
             if (level > 3) level = 3;
             return level;
         }
-</script>
-    <script src="../settings-menu.js"></script>
-    <script>
+
         (function () {
             'use strict';
 
+            var canvas = document.getElementById('breakout-canvas');
+            var ctx = canvas.getContext('2d');
+            var infoEl = document.getElementById('breakout-info');
+
+            canvas.width = 600;
+            canvas.height = 400;
+
+            var score = 0;
+            var lives = 3;
+            var gameOver = false;
+            var gameWon = false;
+
+            // Paramètres de la raquette
+            var paddle = {
+                width: 90,
+                height: 12,
+                x: canvas.width / 2 - 45,
+                y: canvas.height - 25,
+                dx: 7,
+                isMovingLeft: false,
+                isMovingRight: false
+            };
+
+            // Paramètres de la balle
+            var ball = {
+                x: canvas.width / 2,
+                y: canvas.height - 40,
+                radius: 7,
+                speed: 4 + getLevel(),
+                dx: 3 + getLevel(),
+                dy: -(3 + getLevel())
+            };
+
+            // Paramètres des briques
+            var brickRowCount = 4 + getLevel();
+            var brickColumnCount = 7;
+            var brickWidth = 72;
+            var brickHeight = 18;
+            var brickPadding = 10;
+            var brickOffsetTop = 40;
+            var brickOffsetLeft = 35;
+
+            var bricks = [];
+            function initBricks() {
+                bricks = [];
+                for (var c = 0; c < brickColumnCount; c++) {
+                    bricks[c] = [];
+                    for (var r = 0; r < brickRowCount; r++) {
+                        bricks[c][r] = { x: 0, y: 0, status: 1, colorIndex: r };
+                    }
+                }
+            }
+            initBricks();
+
+            var brickColors = ['#ff006e', '#ffd600', '#00d4ff', '#00ff88', '#b088ff'];
+
+            // Gestionnaires clavier
+            window.addEventListener('keydown', function(e) {
+                if (e.code === 'ArrowLeft' || e.code === 'KeyA') paddle.isMovingLeft = true;
+                if (e.code === 'ArrowRight' || e.code === 'KeyD') paddle.isMovingRight = true;
+            });
+
+            window.addEventListener('keyup', function(e) {
+                if (e.code === 'ArrowLeft' || e.code === 'KeyA') paddle.isMovingLeft = false;
+                if (e.code === 'ArrowRight' || e.code === 'KeyD') paddle.isMovingRight = false;
+            });
+
+            // Gestionnaires tactiles / boutons virtuels
+            var btnLeft = document.getElementById('btn-left');
+            var btnRight = document.getElementById('btn-right');
+
+            btnLeft.addEventListener('touchstart', function(e) { e.preventDefault(); paddle.isMovingLeft = true; });
+            btnLeft.addEventListener('touchend', function() { paddle.isMovingLeft = false; });
+            btnLeft.addEventListener('mousedown', function() { paddle.isMovingLeft = true; });
+            btnLeft.addEventListener('mouseup', function() { paddle.isMovingLeft = false; });
+
+            btnRight.addEventListener('touchstart', function(e) { e.preventDefault(); paddle.isMovingRight = true; });
+            btnRight.addEventListener('touchend', function() { paddle.isMovingRight = false; });
+            btnRight.addEventListener('mousedown', function() { paddle.isMovingRight = true; });
+            btnRight.addEventListener('mouseup', function() { paddle.isMovingRight = false; });
+
+            // Contrôle à la souris sur le canvas
+            canvas.addEventListener('mousemove', function(e) {
+                var rect = canvas.getBoundingClientRect();
+                var relativeX = e.clientX - rect.left;
+                if (relativeX > 0 && relativeX < canvas.width) {
+                    paddle.x = relativeX - paddle.width / 2;
+                }
+            });
+
+            function collisionDetection() {
+                var totalBricks = 0;
+                var brokenBricksCount = 0;
+
+                for (var c = 0; c < brickColumnCount; c++) {
+                    for (var r = 0; r < brickRowCount; r++) {
+                        var b = bricks[c][r];
+                        if (b.status === 1) {
+                            totalBricks++;
+                            if (
+                                ball.x > b.x &&
+                                ball.x < b.x + brickWidth &&
+                                ball.y > b.y &&
+                                ball.y < b.y + brickHeight
+                            ) {
+                                ball.dy = -ball.dy;
+                                b.status = 0;
+                                score += 50;
+
+                                // Vérifier si toutes les briques sont détruites
+                                checkWinCondition();
+                            }
+                        }
+                    }
+                }
+            }
+
+            function checkWinCondition() {
+                var won = true;
+                for (var c = 0; c < brickColumnCount; c++) {
+                    for (var r = 0; r < brickRowCount; r++) {
+                        if (bricks[c][r].status === 1) {
+                            won = false;
+                        }
+                    }
+                }
+                if (won) {
+                    gameOver = true;
+                    gameWon = true;
+                    handleEndGame(true);
+                }
+            }
+
+            function update() {
+                if (gameOver) return;
+
+                if (paddle.isMovingLeft) {
+                    paddle.x -= paddle.dx;
+                    if (paddle.x < 0) paddle.x = 0;
+                }
+                if (paddle.isMovingRight) {
+                    paddle.x += paddle.dx;
+                    if (paddle.x + paddle.width > canvas.width) paddle.x = canvas.width - paddle.width;
+                }
+
+                // Mouvement de la balle
+                ball.x += ball.dx;
+                ball.y += ball.dy;
+
+                // Rebond murs gauche / droite
+                if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
+                    ball.dx = -ball.dx;
+                }
+                // Rebond mur haut
+                if (ball.y - ball.radius < 0) {
+                    ball.dy = -ball.dy;
+                } 
+                // Gestion de la raquette et du bas
+                else if (ball.y + ball.radius > paddle.y) {
+                    if (ball.x > paddle.x && ball.x < paddle.x + paddle.width) {
+                        // Effet de rebond selon l'endroit touché sur la raquette
+                        var hitPoint = ball.x - (paddle.x + paddle.width / 2);
+                        ball.dx = hitPoint * 0.15;
+                        ball.dy = -Math.abs(ball.dy);
+                    } else if (ball.y + ball.radius > canvas.height) {
+                        lives--;
+                        if (lives <= 0) {
+                            gameOver = true;
+                            handleEndGame(false);
+                        } else {
+                            // Reset position balle et raquette
+                            ball.x = canvas.width / 2;
+                            ball.y = canvas.height - 40;
+                            ball.dx = 3 + getLevel();
+                            ball.dy = -(3 + getLevel());
+                            paddle.x = canvas.width / 2 - paddle.width / 2;
+                        }
+                    }
+                }
+
+                collisionDetection();
+                infoEl.textContent = "Score: " + score + " | Vies: " + lives;
+            }
+
+            function handleEndGame(won) {
+                try {
+                    localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'breakout', won: won, score: score, ts: Date.now() }));
+                } catch (e) {}
+
+                var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                if (won && fromStory) {
+                    var continueBtn = document.getElementById('story-continue-btn');
+                    if (continueBtn) continueBtn.style.display = 'inline-block';
+                }
+            }
+
+            function draw() {
+                ctx.fillStyle = '#050510';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Dessin des briques
+                for (var c = 0; c < brickColumnCount; c++) {
+                    for (var r = 0; r < brickRowCount; r++) {
+                        if (bricks[c][r].status === 1) {
+                            var brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
+                            var brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
+                            bricks[c][r].x = brickX;
+                            bricks[c][r].y = brickY;
+                            
+                            ctx.fillStyle = brickColors[bricks[c][r].colorIndex % brickColors.length];
+                            ctx.fillRect(brickX, brickY, brickWidth, brickHeight);
+                            ctx.strokeStyle = '#050510';
+                            ctx.lineWidth = 2;
+                            ctx.strokeRect(brickX, brickY, brickWidth, brickHeight);
+                        }
+                    }
+                }
+
+                // Dessin de la raquette
+                ctx.fillStyle = '#ffd600';
+                ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+
+                // Dessin de la balle
+                ctx.fillStyle = '#00ff88';
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.closePath();
+
+                // Écran de fin
+                if (gameOver) {
+                    ctx.fillStyle = 'rgba(5, 5, 16, 0.85)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = gameWon ? '#00ff88' : '#ff006e';
+                    ctx.font = 'bold 1.5rem "Playfair Display", serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(gameWon ? "INDICE DÉCHIFFRÉ !" : "ÉCHEC DE L'INVESTIGATION", canvas.width / 2, canvas.height / 2 - 10);
+                }
+            }
+
+            function loop() {
+                update();
+                draw();
+                requestAnimationFrame(loop);
+            }
+
+            loop();
+
+            // Gestion du menu et de l'interface
             if (window.DPSettings && window.DPSettings.init) {
                 window.DPSettings.init({
-                    showMusicToggle: true,
-                    showMusicVolume: true,
-                    showNarrationVolume: false,
-                    showMuteToggle: false,
-                    showGameSection: true,
-                    showBackToHub: false,
-                    showRestart: false,
-                    showRules: false,
-                    customButtons: [],
-                    onBackToHub: function () {
-                        window.location.href = '../true-detective/index.html#minigames';
-                    }
+                    showMusicToggle: true, showMusicVolume: true, showNarrationVolume: false,
+                    showMuteToggle: false, showGameSection: true, showBackToHub: false, showRestart: false, showRules: false,
+                    onBackToHub: function () { window.location.href = '../true-detective/index.html#minigames'; }
                 });
             }
+
             var hamburgerBtn = document.getElementById('hamburger-btn');
             var menu = document.getElementById('hamburger-menu');
             if (hamburgerBtn && menu) {
@@ -97,32 +448,28 @@
                     }
                 });
             }
+
             var backBtn = document.getElementById('back-to-minigame-btn');
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+            
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
-                var continueBtn = document.createElement('button');
-                continueBtn.id = 'story-continue-btn';
-                continueBtn.className = 'btn btn-continue';
-                continueBtn.textContent = 'Continuer';
-                continueBtn.style.cssText = 'margin-left:8px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
-                continueBtn.addEventListener('click', function () {
-                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'breakout', won: true, ts: Date.now() })); } catch (e) {}
-                    try {
-                        var returnRaw = localStorage.getItem('td_standalone_game_return');
-                        if (returnRaw) {
-                            var rp = JSON.parse(returnRaw);
-                            if (rp && rp.returnUrl) {
-                                window.location.href = rp.returnUrl;
-                                return;
+                var storyContinueBtn = document.getElementById('story-continue-btn');
+                if (storyContinueBtn) {
+                    storyContinueBtn.addEventListener('click', function () {
+                        try {
+                            var returnRaw = localStorage.getItem('td_standalone_game_return');
+                            if (returnRaw) {
+                                var rp = JSON.parse(returnRaw);
+                                if (rp && rp.returnUrl) {
+                                    window.location.href = rp.returnUrl;
+                                    return;
+                                }
                             }
-                        }
-                    } catch (e) {}
-                    var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
-                    window.location.href = fromStory ? '../true-detective/index.html?standalone=breakout' : '../true-detective/index.html#minigames';
-                });
-                var header = document.querySelector('.sg-header');
-                if (header) header.appendChild(continueBtn);
+                        } catch (e) {}
+                        window.location.href = '../true-detective/index.html?standalone=breakout';
+                    });
+                }
             } else {
                 if (backBtn) {
                     backBtn.textContent = 'Accueil';
@@ -132,6 +479,7 @@
                     });
                 }
             }
+
             var menuHome = document.getElementById('menu-home');
             if (menuHome) {
                 menuHome.addEventListener('click', function () {
@@ -139,16 +487,15 @@
                     window.location.href = fromStory ? '../true-detective/index.html?standalone=breakout' : '../true-detective/index.html#minigames';
                 });
             }
+
             var menuSettings = document.getElementById('menu-settings');
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres : aucun réglage pour l\'instant.'); }
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres'); }
                 });
             }
         })();
     </script>
 </body>
 </html>
-
-

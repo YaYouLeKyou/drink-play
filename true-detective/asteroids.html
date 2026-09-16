@@ -8,34 +8,138 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
     <style>
+        :root {
+            --bg-dark: #070712;
+            --accent-pink: #ff006e;
+            --accent-blue: #00d4ff;
+            --accent-green: #00ff88;
+            --accent-gold: #f0d890;
+            --text-main: #e8f4ff;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% 10%, #1a162b 0%, var(--bg-dark) 100%);
+            color: var(--text-main);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
         .asteroids-wrap {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 12px;
             padding: 16px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            box-sizing: border-box;
         }
+
+        .asteroids-header {
+            width: 100%;
+            text-align: center;
+            background: rgba(12, 16, 24, 0.85);
+            border: 1px solid rgba(255, 0, 110, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .asteroids-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--accent-gold);
+            margin: 0;
+        }
+
+        .asteroids-info {
+            color: var(--accent-blue);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
         #asteroids-canvas {
             display: block;
             width: 100%;
-            max-width: 600px;
-            height: 400px;
-            background: #0a0a1a;
-            border: 2px solid #ff006e;
+            max-width: 650px;
+            height: 420px;
+            background: #050510;
+            border: 3px solid var(--accent-pink);
             border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(255, 0, 110, 0.25), inset 0 0 30px rgba(0, 0, 0, 0.9);
+            touch-action: none;
         }
-        .asteroids-info {
-            color: #e8f4ff;
-            font-weight: 600;
+
+        .touch-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        .ctrl-btn {
+            background: rgba(255, 0, 110, 0.15);
+            border: 2px solid var(--accent-pink);
+            color: var(--text-main);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .ctrl-btn:active {
+            background: rgba(255, 0, 110, 0.4);
+        }
+
+        .btn-continue {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            background: rgba(0, 255, 136, 0.15);
+            border: 2px solid var(--accent-green);
+            border-radius: 8px;
+            color: var(--accent-green);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            z-index: 100;
+        }
+        .btn-continue:hover {
+            background: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+        }
+
+        @media (max-width: 600px) {
+            #asteroids-canvas {
+                height: 320px;
+            }
         }
     </style>
 </head>
 <body>
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
-        <h2 class="sg-title" style="color:#ff006e;font-family:'Playfair Display',serif;">Astéroïdes</h2>
+        <h2 class="sg-title" style="color:var(--accent-pink);font-family:'Playfair Display',serif;">Traque Nocturne</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
+
+    <button id="story-continue-btn" class="btn-continue" style="display:none;">Continuer</button>
+
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
             <span class="menu-icon">🏠</span>
@@ -47,43 +151,277 @@
             <span>Paramètres</span>
         </button>
     </nav>
+
     <main class="sg-main">
         <div class="asteroids-wrap">
-            <div class="asteroids-info" id="asteroids-info">Score: 0 | Vies: 3</div>
+            <div class="asteroids-header">
+                <h2 class="asteroids-title">Interception des indices mobiles</h2>
+                <div class="asteroids-info" id="asteroids-info">Score: 0 | Vies: 3 | Objectif: 4000 pts</div>
+            </div>
             <canvas id="asteroids-canvas"></canvas>
+            <div class="touch-controls">
+                <button class="ctrl-btn" id="btn-left">◀ Pivoter</button>
+                <button class="ctrl-btn" id="btn-fire">🔥 Tirer</button>
+                <button class="ctrl-btn" id="btn-right">Pivoter ▶</button>
+            </div>
         </div>
     </main>
 
-    <script src="asteroids.js">
-        // Helper function to get retro game level (1-3)
+    <script src="../settings-menu.js"></script>
+    <script>
         function getLevel() {
             var level = parseInt(new URLSearchParams(window.location.search).get('level') || '1', 10);
             if (isNaN(level) || level < 1) level = 1;
             if (level > 3) level = 3;
             return level;
         }
-</script>
-    <script src="../settings-menu.js"></script>
-    <script>
+
         (function () {
             'use strict';
 
-            if (window.DPSettings && window.DPSettings.init) {
-                window.DPSettings.init({
-                    showMusicToggle: true,
-                    showMusicVolume: true,
-                    showNarrationVolume: false,
-                    showMuteToggle: false,
-                    showGameSection: true,
-                    showBackToHub: false,
-                    showRestart: false,
-                    showRules: false,
-                    customButtons: [],
-                    onBackToHub: function () {
-                        window.location.href = '../true-detective/index.html#minigames';
-                    }
+            var canvas = document.getElementById('asteroids-canvas');
+            var ctx = canvas.getContext('2d');
+            var infoEl = document.getElementById('asteroids-info');
+
+            canvas.width = 650;
+            canvas.height = 420;
+
+            var score = 0;
+            var lives = 3;
+            var targetScore = 4000; // Objectif quadruplé (4x plus d'astéroïdes/points nécessaires)
+            var gameOver = false;
+            var gameWon = false;
+
+            // Vaisseau
+            var ship = {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                radius: 12,
+                angle: 0,
+                rotationSpeed: 0.06,
+                isRotatingLeft: false,
+                isRotatingRight: false,
+                color: '#ff006e'
+            };
+
+            var bullets = [];
+            var asteroids = [];
+
+            function initAsteroids() {
+                asteroids = [];
+                // Multiplié par 4 (ex: niveau 1 passe de 6 à 24 astéroïdes initiaux)
+                var count = (4 + getLevel() * 2) * 4; 
+                for (var i = 0; i < count; i++) {
+                    asteroids.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        radius: 20 + Math.random() * 15,
+                        vx: (Math.random() - 0.5) * (1.2 + getLevel() * 0.5),
+                        vy: (Math.random() - 0.5) * (1.2 + getLevel() * 0.5)
+                    });
+                }
+            }
+
+            initAsteroids();
+
+            // Contrôles Clavier
+            window.addEventListener('keydown', function(e) {
+                if (e.code === 'ArrowLeft' || e.code === 'KeyA') ship.isRotatingLeft = true;
+                if (e.code === 'ArrowRight' || e.code === 'KeyD') ship.isRotatingRight = true;
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    shoot();
+                }
+            });
+
+            window.addEventListener('keyup', function(e) {
+                if (e.code === 'ArrowLeft' || e.code === 'KeyA') ship.isRotatingLeft = false;
+                if (e.code === 'ArrowRight' || e.code === 'KeyD') ship.isRotatingRight = false;
+            });
+
+            // Contrôles Tactiles / Boutons
+            document.getElementById('btn-left').addEventListener('touchstart', function(e) { e.preventDefault(); ship.isRotatingLeft = true; });
+            document.getElementById('btn-left').addEventListener('touchend', function() { ship.isRotatingLeft = false; });
+            document.getElementById('btn-left').addEventListener('mousedown', function() { ship.isRotatingLeft = true; });
+            document.getElementById('btn-left').addEventListener('mouseup', function() { ship.isRotatingLeft = false; });
+
+            document.getElementById('btn-right').addEventListener('touchstart', function(e) { e.preventDefault(); ship.isRotatingRight = true; });
+            document.getElementById('btn-right').addEventListener('touchend', function() { ship.isRotatingRight = false; });
+            document.getElementById('btn-right').addEventListener('mousedown', function() { ship.isRotatingRight = true; });
+            document.getElementById('btn-right').addEventListener('mouseup', function() { ship.isRotatingRight = false; });
+
+            document.getElementById('btn-fire').addEventListener('click', function() { shoot(); });
+
+            function shoot() {
+                if (gameOver) return;
+                bullets.push({
+                    x: ship.x + Math.cos(ship.angle) * ship.radius,
+                    y: ship.y + Math.sin(ship.angle) * ship.radius,
+                    vx: Math.cos(ship.angle) * 7,
+                    vy: Math.sin(ship.angle) * 7,
+                    radius: 3
                 });
             }
+
+            function update() {
+                if (gameOver) return;
+
+                if (ship.isRotatingLeft) ship.angle -= ship.rotationSpeed;
+                if (ship.isRotatingRight) ship.angle += ship.rotationSpeed;
+
+                ship.x += Math.cos(ship.angle) * 1.5;
+                ship.y += Math.sin(ship.angle) * 1.5;
+
+                if (ship.x < 0) ship.x = canvas.width;
+                if (ship.x > canvas.width) ship.x = 0;
+                if (ship.y < 0) ship.y = canvas.height;
+                if (ship.y > canvas.height) ship.y = 0;
+
+                for (var i = bullets.length - 1; i >= 0; i--) {
+                    var b = bullets[i];
+                    b.x += b.vx;
+                    b.y += b.vy;
+                    if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
+                        bullets.splice(i, 1);
+                    }
+                }
+
+                for (var i = 0; i < asteroids.length; i++) {
+                    var ast = asteroids[i];
+                    ast.x += ast.vx;
+                    ast.y += ast.vy;
+
+                    if (ast.x < -ast.radius) ast.x = canvas.width + ast.radius;
+                    if (ast.x > canvas.width + ast.radius) ast.x = -ast.radius;
+                    if (ast.y < -ast.radius) ast.y = canvas.height + ast.radius;
+                    if (ast.y > canvas.height + ast.radius) ast.y = -ast.radius;
+
+                    var dx = ship.x - ast.x;
+                    var dy = ship.y - ast.y;
+                    var dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < ship.radius + ast.radius) {
+                        lives--;
+                        ship.x = canvas.width / 2;
+                        ship.y = canvas.height / 2;
+                        if (lives <= 0) {
+                            gameOver = true;
+                            handleEndGame(false);
+                        }
+                    }
+
+                    for (var j = bullets.length - 1; j >= 0; j--) {
+                        var b = bullets[j];
+                        var bdx = b.x - ast.x;
+                        var bdy = b.y - ast.y;
+                        var bdist = Math.sqrt(bdx * bdx + bdy * bdy);
+                        if (bdist < ast.radius) {
+                            score += 100;
+                            bullets.splice(j, 1);
+                            
+                            if (ast.radius > 18) {
+                                asteroids.push({
+                                    x: ast.x, y: ast.y, radius: ast.radius / 2,
+                                    vx: (Math.random() - 0.5) * 3.5, vy: (Math.random() - 0.5) * 3.5
+                                });
+                            }
+                            ast.x = Math.random() * canvas.width;
+                            ast.y = Math.random() * canvas.height;
+
+                            // Respawn automatique d'astéroïdes si le champ se vide trop vite
+                            if (asteroids.length < 15) {
+                                asteroids.push({
+                                    x: Math.random() * canvas.width,
+                                    y: Math.random() * canvas.height,
+                                    radius: 20 + Math.random() * 15,
+                                    vx: (Math.random() - 0.5) * 2,
+                                    vy: (Math.random() - 0.5) * 2
+                                });
+                            }
+
+                            if (score >= targetScore) {
+                                gameOver = true;
+                                gameWon = true;
+                                handleEndGame(true);
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                infoEl.textContent = "Score: " + score + " | Vies: " + lives + " | Objectif: " + targetScore + " pts";
+            }
+
+            function handleEndGame(won) {
+                try {
+                    localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'asteroids', won: won, score: score, ts: Date.now() }));
+                } catch (e) {}
+
+                var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                if (won && fromStory) {
+                    var continueBtn = document.getElementById('story-continue-btn');
+                    if (continueBtn) continueBtn.style.display = 'inline-block';
+                }
+            }
+
+            function draw() {
+                ctx.fillStyle = '#050510';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.save();
+                ctx.translate(ship.x, ship.y);
+                ctx.rotate(ship.angle);
+                ctx.strokeStyle = ship.color;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(15, 0);
+                ctx.lineTo(-10, -10);
+                ctx.lineTo(-5, 0);
+                ctx.lineTo(-10, 10);
+                ctx.closePath();
+                ctx.stroke();
+                ctx.restore();
+
+                ctx.fillStyle = '#00ff88';
+                for (var i = 0; i < bullets.length; i++) {
+                    ctx.beginPath();
+                    ctx.arc(bullets[i].x, bullets[i].y, bullets[i].radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.strokeStyle = '#00d4ff';
+                ctx.lineWidth = 2;
+                for (var i = 0; i < asteroids.length; i++) {
+                    ctx.beginPath();
+                    ctx.arc(asteroids[i].x, asteroids[i].y, asteroids[i].radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                if (gameOver) {
+                    ctx.fillStyle = 'rgba(5, 5, 16, 0.85)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = gameWon ? '#00ff88' : '#ff006e';
+                    ctx.font = 'bold 1.6rem "Playfair Display", serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(gameWon ? "MISSION ACCOMPLIE" : "ÉCHEC DE L'OPÉRATION", canvas.width / 2, canvas.height / 2 - 10);
+                }
+            }
+
+            function loop() {
+                update();
+                draw();
+                requestAnimationFrame(loop);
+            }
+
+            loop();
+
+            if (window.DPSettings && window.DPSettings.init) {
+                window.DPSettings.init({
+                    showMusicToggle: true, showMusicVolume: true, showNarrationVolume: false,
+                    showMuteToggle: false, showGameSection: true, showBackToHub: false, showRestart: false, showRules: false,
+                    onBackToHub: function () { window.location.href = '../true-detective/index.html#minigames'; }
+                });
+            }
+
             var hamburgerBtn = document.getElementById('hamburger-btn');
             var menu = document.getElementById('hamburger-menu');
             if (hamburgerBtn && menu) {
@@ -97,32 +435,28 @@
                     }
                 });
             }
+
             var backBtn = document.getElementById('back-to-minigame-btn');
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+            
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
-                var continueBtn = document.createElement('button');
-                continueBtn.id = 'story-continue-btn';
-                continueBtn.className = 'btn btn-continue';
-                continueBtn.textContent = 'Continuer';
-                continueBtn.style.cssText = 'margin-left:8px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
-                continueBtn.addEventListener('click', function () {
-                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'asteroids', won: true, ts: Date.now() })); } catch (e) {}
-                    try {
-                        var returnRaw = localStorage.getItem('td_standalone_game_return');
-                        if (returnRaw) {
-                            var rp = JSON.parse(returnRaw);
-                            if (rp && rp.returnUrl) {
-                                window.location.href = rp.returnUrl;
-                                return;
+                var storyContinueBtn = document.getElementById('story-continue-btn');
+                if (storyContinueBtn) {
+                    storyContinueBtn.addEventListener('click', function () {
+                        try {
+                            var returnRaw = localStorage.getItem('td_standalone_game_return');
+                            if (returnRaw) {
+                                var rp = JSON.parse(returnRaw);
+                                if (rp && rp.returnUrl) {
+                                    window.location.href = rp.returnUrl;
+                                    return;
+                                }
                             }
-                        }
-                    } catch (e) {}
-                    var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
-                    window.location.href = fromStory ? '../true-detective/index.html?standalone=asteroids' : '../true-detective/index.html#minigames';
-                });
-                var header = document.querySelector('.sg-header');
-                if (header) header.appendChild(continueBtn);
+                        } catch (e) {}
+                        window.location.href = '../true-detective/index.html?standalone=asteroids';
+                    });
+                }
             } else {
                 if (backBtn) {
                     backBtn.textContent = 'Accueil';
@@ -132,6 +466,7 @@
                     });
                 }
             }
+
             var menuHome = document.getElementById('menu-home');
             if (menuHome) {
                 menuHome.addEventListener('click', function () {
@@ -139,16 +474,15 @@
                     window.location.href = fromStory ? '../true-detective/index.html?standalone=asteroids' : '../true-detective/index.html#minigames';
                 });
             }
+
             var menuSettings = document.getElementById('menu-settings');
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres : aucun réglage pour l\'instant.'); }
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres'); }
                 });
             }
         })();
     </script>
 </body>
 </html>
-
-
