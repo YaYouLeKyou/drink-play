@@ -7,6 +7,10 @@
 (function (global) {
     'use strict';
 
+    function playSfx(name, opts) {
+        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+    }
+
     var ASSETS_BASE = 'assets/image true detective/';
 
     var THEME_IMG_FOLDER = {
@@ -573,6 +577,8 @@
                         if (locked || interroPause) return;
                         if (flipped.indexOf(idx) !== -1) return;
                         if (matched.indexOf(idx) !== -1) return;
+
+                        playSfx('card_flip');
 
                         flipped.push(idx);
                         cardEl.classList.add('flipped');

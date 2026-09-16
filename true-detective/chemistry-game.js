@@ -6,6 +6,10 @@
 (function (global) {
     'use strict';
 
+    function playSfx(name, opts) {
+        try { if (global.TDSfx) global.TDSfx.play(name, opts); } catch (e) {}
+    }
+
     function ChemistryGame(container, options) {
         options = options || {};
         this.container = container;
@@ -116,6 +120,7 @@
         resetBtn.textContent = this.lang === 'fr' ? 'Réinitialiser mélanges' : 'Reset mixtures';
         var self = this;
         resetBtn.addEventListener('click', function () {
+            playSfx('click');
             self.resetGame();
         });
         footer.appendChild(resetBtn);
@@ -194,6 +199,8 @@
             toTube.push(fromTube.pop());
         }
 
+        playSfx('liquid_pour');
+
         this.moves++;
         this.selectedTubeIdx = null;
         this.isPouring = false;
@@ -239,6 +246,7 @@
                 self.container.appendChild(self.continueBtn);
                 self.continueBtn.style.cssText = 'position:fixed;bottom:calc(20px + env(safe-area-inset-bottom, 0px));left:50%;transform:translateX(-50%);z-index:100;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
                 self.continueBtn.addEventListener('click', function () {
+                    playSfx('click');
                     self.container.innerHTML = '';
                     if (self.onComplete) self.onComplete(true);
                 });

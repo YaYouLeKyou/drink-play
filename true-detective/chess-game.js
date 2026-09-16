@@ -6,6 +6,10 @@
 (function (global) {
     'use strict';
 
+    function playSfx(name, opts) {
+        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+    }
+
     var TDC_NS = 'td-chess';
 
     function t(obj, lang) {
@@ -673,6 +677,7 @@
                     var tc = parseInt(this.dataset.c);
                     var result = game.selectSquare(tr, tc);
                     if (result) {
+                        playSfx('chess_move');
                         renderBoard(game, boardEl, null, null, finish, cfg, lang);
                         if (result.gameOver) {
                             setTimeout(function () {

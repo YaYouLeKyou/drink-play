@@ -250,6 +250,7 @@
         credits: { label: 'Credits', intensity: 'low', tempo: 60 },
         intro: { label: 'Intro', intensity: 'low', tempo: 60 },
         mystere: { label: 'Mystère', intensity: 'low', tempo: 70 },
+        final_interrogation: { label: 'Interrogation finale', intensity: 'high', tempo: 120 },
     };
 
     var MUSIC_PHASE_PROMPTS = {
@@ -260,6 +261,7 @@
         revelation: 'Fast cinematic thriller, intense rhythmic percussion, rising tension, dramatic hybrid orchestral, dark synth pulses, high stakes climax, 120bpm, instrumental',
         credits: 'Slow cinematic outro, melancholic piano, gentle strings, resolution and closure, reflective mood',
         intro: 'Cinematic intro music, majestic orchestra, forward momentum, establishing the mystery theme, soft drums, building anticipation',
+        final_interrogation: 'Intense noir interrogation, urgent brass stabs, ticking percussion, psychological pressure, confrontational drama, 120bpm, instrumental',
     };
 
     var MUSIC_PHASE_TRACKS = {
@@ -270,7 +272,37 @@
         revelation: 'Rising Tension.mp3',
         credits: 'generique.mp3',
         intro: 'generique.mp3',
+        final_interrogation: 'interrogatoire finale.mp3',
     };
+
+    var MINIGAME_MUSIC = {
+        scene_fouille: 'enigme classic.mp3',
+        montre_code: 'enigme classic 2.mp3',
+        puzzle: 'enigme classic.mp3',
+        coffre_code: 'enigme classic 2.mp3',
+        reseau_alibis: 'enigme classic.mp3',
+        chemistry: 'enigme-cyberpunk-2.mp3',
+        chess: 'chess.mp3',
+        memory: 'enigme classic.mp3',
+        shooting: 'mini-jeux-cyberpunk.mp3',
+        jackpot: 'Neon Paradise.mp3',
+        connect4: 'enigme classic.mp3',
+        'bataille-navale': 'bataille-navale.mp3',
+        pong: 'pong.mp3',
+        pacman: 'pacman.mp3',
+        'space-invaders': 'space invader.mp3',
+        breakout: 'casse-brique.mp3',
+        asteroids: 'asteroid.mp3',
+        'marginal-tower': 'tower.mp3',
+    };
+
+    function playMinigameMusic(minigameType) {
+        if (typeof window === 'undefined' || !window.DPMusicPlayer) return;
+        var track = MINIGAME_MUSIC[minigameType];
+        if (track) {
+            window.DPMusicPlayer.playTrack(track);
+        }
+    }
 
     var THEME_MUSIC_TRACKS = {
         'agatha-christie': 'sherlock.mp3',
@@ -878,7 +910,8 @@
         setMusicPhase: setMusicPhase,
         getMusicForPhase: getMusicForPhase,
         getCurrentMusicPhase: getCurrentMusicPhase,
-         playThemeMusic: playThemeMusic,
+        playThemeMusic: playThemeMusic,
+        playMinigameMusic: playMinigameMusic,
         setCurrentTheme: setCurrentTheme,
         playTypingSound: playTypingSound,
         toggleTypingSound: toggleTypingSound,
@@ -897,5 +930,6 @@
         get volume() { return volume; },
         get muted() { return muted; },
         get typingSound() { return typingSoundEnabled; },
+        TDSfx: global.TDSfx || null,
     };
 })(typeof window !== 'undefined' ? window : global);

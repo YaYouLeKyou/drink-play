@@ -8,6 +8,10 @@
 (function (global) {
     'use strict';
 
+    function playSfx(name, opts) {
+        try { if (global.TDSfx) global.TDSfx.play(name, opts); } catch (e) {}
+    }
+
     function t(obj, lang) {
         if (!obj) return '';
         return obj[lang] || obj.fr || obj.en || '';
@@ -443,6 +447,7 @@
                         var tmp = puzzle.tiles[idx];
                         puzzle.tiles[idx] = puzzle.tiles[eIdx];
                         puzzle.tiles[eIdx] = tmp;
+                        playSfx('tile_click');
                         puzzle.emptyR = tr;
                         puzzle.emptyC = tc;
                         moves++;
@@ -478,6 +483,7 @@
                 continueBtn.textContent = lang === 'fr' ? 'Continuer' : 'Continue';
                 continueBtn.style.cssText = 'position:fixed;top:20px;right:20px;z-index:100;';
                 continueBtn.addEventListener('click', function () {
+                    playSfx('click');
                     cleanupSidePanel();
                     if (onDone) onDone({ won: true, clue: cfg.clue });
                 });

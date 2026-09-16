@@ -5,6 +5,10 @@
 (function (global) {
     'use strict';
 
+    function playSfx(name, opts) {
+        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+    }
+
     var TDShootingGallery = { play: play };
 
     var PHRASES = {
@@ -323,6 +327,8 @@
             var mx = (e.clientX - rect.left) * scaleX;
             var my = (e.clientY - rect.top) * scaleY;
 
+            playSfx('gunshot');
+
             var all = targets.concat([forbidden]);
             var hit = null;
             for (var i = all.length - 1; i >= 0; i--) {
@@ -340,6 +346,15 @@
                 return;
             }
 
+            hit.alive = false;
+            playSfx('target_hit');
+
+            if (hit.type === 'femme-fatale') {
+                playSfx('scream_female');
+            } else {
+                playSfx('scream_male');
+            }
+
             if (hit.type === forbiddenTarget) {
                 ended = true;
                 won = false;
@@ -351,7 +366,6 @@
                 return;
             }
 
-            hit.alive = false;
             score++;
             showNewPhrase();
 

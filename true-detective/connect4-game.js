@@ -5,6 +5,10 @@
 (function (global) {
     'use strict';
 
+    function playSfx(name, opts) {
+        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+    }
+
     function t(obj, lang) {
         if (!obj) return '';
         if (typeof obj === 'string') return obj;
@@ -138,6 +142,8 @@
         if (this.gameOver || this.isAiTurn || this.currentPlayer !== 1) return;
         if (!this.makeMove(col, 1)) return;
 
+        playSfx('token_drop');
+
         this.updateBoardUI();
 
         var winInfo = this.checkWin(1);
@@ -170,6 +176,9 @@
 
         var col = this.getBestColForAi();
         this.makeMove(col, 2);
+
+        playSfx('token_drop');
+
         this.updateBoardUI();
 
         var winInfo = this.checkWin(2);

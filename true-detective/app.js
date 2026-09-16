@@ -99,6 +99,7 @@
         'enigme': 'enigme.mp3',
         'tension': 'stress.mp3',
         'mystere': 'Midnight Ticking.mp3',
+        'final_interrogation': 'interrogatoire finale.mp3',
     };
 
     var TEXTS = {
@@ -269,7 +270,7 @@
         typingBtn: document.getElementById('typing-btn'),
         settingsToggle: document.getElementById('mobile-settings-toggle'),
         settingsPanel: document.getElementById('settings-menu-panel'),
-langEnBtn: document.getElementById('lang-en'),
+ langEnBtn: document.getElementById('lang-en'),
     langFrBtn: document.getElementById('lang-fr'),
     langEnHomeBtn: document.getElementById('lang-en-home'),
     langFrHomeBtn: document.getElementById('lang-fr-home'),
@@ -315,6 +316,10 @@ langEnBtn: document.getElementById('lang-en'),
         solutionRevealText: document.getElementById('solution-revealed-text'),
         endScreenTitle: null,
     };
+
+    function playSfx(name, opts) {
+        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+    }
 
     function showScreen(screen) {
         if (!screen) return;
@@ -1259,7 +1264,7 @@ applyMusicHidden(true);
             ? TDAudioService.MUSIC_PHASES[phase].label
             : (phase || 'Investigation');
         var icon = '🎵';
-        if (phase === 'tension' || phase === 'revelation') { icon = '⚡'; }
+        if (phase === 'tension' || phase === 'revelation' || phase === 'final_interrogation') { icon = '⚡'; }
         if (phase === 'credits') { icon = '🎬'; }
         if (phase === 'puzzle') { icon = '🧩'; }
         if (phase === 'interrogation') { icon = '🕵️'; }
@@ -3702,6 +3707,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         function onMinigameDone(res) {
             if (launched) return;
             launched = true;
+            playSfx(res && res.won ? 'success' : 'fail');
             if (res && res.won) {
                 var s = scrGetState();
                 s.miniGamesWon++;
@@ -3734,6 +3740,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 overlay.querySelector('#minigame-screen-content').innerHTML = '';
             }
             showScreen($.gameScreen);
+            if (TDAudioService && typeof TDAudioService.playThemeMusic === 'function') {
+                TDAudioService.playThemeMusic(getThemeId());
+            }
             scrNext();
         }
 
@@ -3783,6 +3792,11 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             $.minigameSkipBtn.textContent = ui.language === 'fr' ? 'Passer' : 'Skip';
             $.minigameSkipBtn.onclick = null;
 
+            if (TDAudioService && typeof TDAudioService.playMinigameMusic === 'function') {
+                TDAudioService.playMinigameMusic(mgCfg.type);
+            }
+            playSfx('click');
+
             var gameMap = getGlobalGameMap();
             var gameNS = gameMap[mgCfg.type];
             if (!gameNS || !window[gameNS]) {
@@ -3815,6 +3829,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         function onMinigameDone(res) {
             if (launched) return;
             launched = true;
+            playSfx(res && res.won ? 'success' : 'fail');
             if (res && res.won) {
                 var s = scrGetState();
                 s.miniGamesWon++;
@@ -3847,6 +3862,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 overlay.querySelector('#minigame-screen-content').innerHTML = '';
             }
             showScreen($.gameScreen);
+            if (TDAudioService && typeof TDAudioService.playThemeMusic === 'function') {
+                TDAudioService.playThemeMusic(getThemeId());
+            }
             scrNext();
         }
 
@@ -3892,6 +3910,11 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             $.minigameSkipBtn.textContent = ui.language === 'fr' ? 'Continuer' : 'Continue';
             $.minigameSkipBtn.onclick = null;
             window._minigameSkipHandler = onMinigameDone;
+
+            if (TDAudioService && typeof TDAudioService.playMinigameMusic === 'function') {
+                TDAudioService.playMinigameMusic(mgCfg.type);
+            }
+            playSfx('click');
 
             var gameMap = getGlobalGameMap();
             var gameNS = gameMap[mgCfg.type];
@@ -4616,6 +4639,11 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         window._minigameSkipHandler = null;
         var resultAnnounced = false;
 
+        if (TDAudioService && typeof TDAudioService.playMinigameMusic === 'function') {
+            TDAudioService.playMinigameMusic(minigameType);
+        }
+        playSfx('click');
+
         function onMinigameDone(result) {
             if (resultAnnounced) return;
             resultAnnounced = true;
@@ -4626,6 +4654,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             }
             $.minigameSelectScreen.classList.remove('hidden');
             $.minigameSelectScreen.classList.add('active');
+            if (TDAudioService && typeof TDAudioService.playThemeMusic === 'function') {
+                TDAudioService.playThemeMusic(getThemeId());
+            }
         }
         window._minigameSkipHandler = onMinigameDone;
 
@@ -4701,6 +4732,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         }
         hideScreen($.minigameScreen);
         showScreen($.gameScreen);
+        if (TDAudioService && typeof TDAudioService.playThemeMusic === 'function') {
+            TDAudioService.playThemeMusic(getThemeId());
+        }
 
         var it = scr.interro;
         if (!it) return;
@@ -4819,6 +4853,11 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             storyMode: true
         };
         if (mgCfg.difficulty) applyDifficultyToCfg(mgCfg.type, mgCfg, mgCfg.difficulty);
+
+        if (TDAudioService && typeof TDAudioService.playMinigameMusic === 'function') {
+            TDAudioService.playMinigameMusic(roundCfg.type);
+        }
+        playSfx('click');
 
         try {
             if (roundCfg.type === 'reseau_alibis' || roundCfg.type === 'chemistry') {

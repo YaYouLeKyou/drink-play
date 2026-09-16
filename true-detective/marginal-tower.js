@@ -6,6 +6,10 @@
 (function (global) {
     'use strict';
 
+    function playSfx(name, opts) {
+        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+    }
+
     if (!window.Matter) {
         console.error('[Marginal Tower] Matter.js is required.');
         return;
@@ -531,6 +535,8 @@
         blockCounts[selectedBlock]--;
         totalPlaced++;
         placedBlockTypes[selectedBlock] = (placedBlockTypes[selectedBlock] || 0) + 1;
+
+        playSfx('material_fall', { material: selectedBlock });
 
         // Update counts
         updatePaletteUI();

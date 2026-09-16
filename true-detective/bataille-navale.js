@@ -5,6 +5,10 @@
 (function (global) {
     'use strict';
 
+    function playSfx(name, opts) {
+        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+    }
+
     var SIZE = 10;
     var SHIPS = [5, 4, 3, 3, 2];
     var EMPTY = 0;
@@ -200,8 +204,10 @@
             if (enemyGrid[row][col] === SHIP) {
                 playerShots[row][col] = HIT;
                 playerHits++;
+                playSfx('explosion');
             } else {
                 playerShots[row][col] = MISS;
+                playSfx('water_miss');
             }
 
             renderEnemyBoard();
@@ -243,8 +249,10 @@
             if (playerGrid[row][col] === SHIP) {
                 enemyShots[row][col] = HIT;
                 enemyHits++;
+                playSfx('explosion');
             } else {
                 enemyShots[row][col] = MISS;
+                playSfx('water_miss');
             }
 
             renderPlayerBoard();

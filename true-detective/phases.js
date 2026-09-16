@@ -207,7 +207,7 @@
         label: { fr: 'Révélation', en: 'Revelation' },
         act: 'Acte 3',
         type: 'dialogue',
-        music: 'tension',
+        music: 'final_interrogation',
         pages: [
             { decor: 'headquarters', npc: 'detective-partner', text: { fr: "De retour au quartier général, la pression monte d'un cran. Votre partenaire étale les documents du coffre sur la table.\n\n« Voilà qui change tout, inspecteur. Ces papiers ressemblent trop à ce que chacun de nos suspects cherchait. Convoquons-les un par un au parloir, et regardons comment leurs beaux discuts tiennent face aux preuves. »", en: "Back at headquarters, the pressure rises. Your partner spreads the safe's documents on the table.\n\n\"This changes everything, inspector. These papers look too much like what each of our suspects was after. Let's summon them one by one to the interrogation room, and see how their fine stories hold up against the evidence.\"" } },
             { decor: 'headquarters', npc: 'protecteur', interrogation: 'protecteur', text: { fr: "Au parloir, Hale se tient droit, mais ses yeux vous fuient. Il s'assoit, les mains croisées.\n\n« Major Hale. Des versements occultes à un certain V.K. figurent dans le coffre. Votre passé militaire, vos dettes de jeu... Vous aviez bien des raisons de vouloir ces papiers disparus. »\n\n« Vous inventez, inspecteur. Je servais mon maître. Rien de plus. »", en: "In the interrogation room, Hale sits, hands crossed, gaze fixed ahead.\n\n\"Major Hale. Secret payments to a certain V.K. appear in the safe. Your military past, your gambling debts... You had every reason to want those vanished papers.\"\n\n\"You're inventing things, inspector. I served my master. Nothing more.\"" } },

@@ -5,6 +5,10 @@
 (function (global) {
     'use strict';
 
+    function playSfx(name, opts) {
+        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+    }
+
     var SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '🔔', '💎', '7️⃣', '⭐'];
     var WEIGHTS = [25, 22, 18, 14, 10, 5, 3, 3];
     var PAYOUTS = {
@@ -90,6 +94,8 @@
             updateSpins();
             $btn.disabled = true;
 
+            playSfx('spin');
+
             var results = await Promise.all([
                 spinReel($reel1, 600),
                 spinReel($reel2, 900),
@@ -109,6 +115,10 @@
             }
 
             flashMachine(won);
+
+            if (won) {
+                playSfx('jackpot');
+            }
 
             if (spinsLeft <= 0) {
                 gameOver = true;

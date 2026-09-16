@@ -10,6 +10,10 @@
 
     var t = function (obj, lang) { return obj[lang] || obj.fr || obj.en || ''; };
 
+    function playSfx(name, opts) {
+        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+    }
+
     /* Calcule les messages / boutons partagés */
     function play(cfg, lang, onDone, target) {
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
@@ -74,6 +78,7 @@
             resultAnnounced = true;
             if (timerId) clearInterval(timerId);
             if (won) cfg.bonusIndex = (cfg.bonusIndex || 1);
+            playSfx(won ? 'success' : 'fail');
             /* Enregistrer la catégorie de preuve pour le faisceau */
             if (won && cfg.evidence && global.TDScenario) {
                 global.TDScenario.recordEvidence(cfg.evidence);
@@ -334,19 +339,20 @@
             if (getRevealed() < answer.length) return;
             var entered = codeCells.map(function (c) { return c.value; }).join('');
             var time = timeCell.value.trim();
-            if (entered === codeStr) {
-                if (time !== '') {
-                    validateBtn.classList.add('correct');
-                    askSincerity(time);
-                } else {
-                    setStatus(lang === 'fr'
-                        ? 'Indiquez aussi l\'heure relevée sur la face de la montre.'
-                        : 'Also enter the time read from the watch face.');
-                }
-            } else {
-                validateBtn.classList.add('wrong');
-                setTimeout(function () { validateBtn.classList.remove('wrong'); }, 500);
-            }
+                    if (entered === codeStr) {
+                        if (time !== '') {
+                            validateBtn.classList.add('correct');
+                            askSincerity(time);
+                        } else {
+                            setStatus(lang === 'fr'
+                                ? 'Indiquez aussi l\'heure relevée sur la face de la montre.'
+                                : 'Also enter the time read from the watch face.');
+                        }
+                    } else {
+                        playSfx('fail');
+                        validateBtn.classList.add('wrong');
+                        setTimeout(function () { validateBtn.classList.remove('wrong'); }, 500);
+                    }
         });
         answersWrap.appendChild(validateBtn);
 
@@ -609,15 +615,17 @@
         evidenceDock.style.top = (spotY - evidenceDock.offsetHeight / 2) + 'px';
     }
 }
-function showEvidence(h) {
-     ensureEvidenceDock(h);
-    evidenceDockHead.textContent = (lang === 'fr' ? 'Pièce à conviction ' : 'Evidence ') + h.label;
-    evidenceDockText.textContent = t(h.info, lang);
-    evidenceDock.classList.remove('evidence-dock-pulse');
-    void evidenceDock.offsetWidth; /* relance l\'animation */
-    evidenceDock.classList.add('evidence-dock-pulse');
-     
-    // Position evidence-dock outside the image (near the center of the scene)
+    function showEvidence(h) {
+         ensureEvidenceDock(h);
+        evidenceDockHead.textContent = (lang === 'fr' ? 'Pièce à conviction ' : 'Evidence ') + h.label;
+        evidenceDockText.textContent = t(h.info, lang);
+        evidenceDock.classList.remove('evidence-dock-pulse');
+        void evidenceDock.offsetWidth; /* relance l\'animation */
+        evidenceDock.classList.add('evidence-dock-pulse');
+         
+        playSfx('click');
+
+        // Position evidence-dock outside the image (near the center of the scene)
     const rect = wrap.getBoundingClientRect();
     const spotX = (parseFloat(h.x) / 100) * rect.width;
     const spotY = (parseFloat(h.y) / 100) * rect.height;
@@ -892,6 +900,7 @@ function showEvidence(h) {
                     } else {
                         mistakes++;
                         perfectRun = false;
+                        playSfx('fail');
                         card.classList.add('wrong');
                         tag.textContent = (lang === 'fr' ? 'Erreur' : 'Wrong');
                         tag.classList.add('tag-wrong');
@@ -1001,6 +1010,7 @@ function showEvidence(h) {
                         found++;
                         if (found >= hintEls.length) complete(true);
                     } else {
+                        playSfx('fail');
                         setTimeout(function () { spot.textContent = '?'; spot.classList.remove('wrong'); spot.dataset.done = ''; }, 500);
                     }
                 });
@@ -1213,6 +1223,7 @@ var dos = document.createElement('img');
                                 : 'The safe creaks open!';
                             setTimeout(function () { complete(true); }, 700);
                         } else {
+                            playSfx('fail');
                             padBtn.classList.add('wrong');
                             status.textContent = lang === 'fr'
                                 ? 'Code incorrect. Réessayez.'
@@ -1272,6 +1283,7 @@ var dos = document.createElement('img');
                         idx++;
                         if (idx >= gears.length) complete(true);
                     } else {
+                        playSfx('fail');
                         b.classList.add('wrong');
                         setTimeout(function () { b.classList.remove('wrong'); }, 400);
                     }
@@ -1459,6 +1471,7 @@ var dos = document.createElement('img');
                         linked++;
                         if (linked >= good.length) showGraffiti();
                     } else {
+                        playSfx('fail');
                         b.classList.add('wrong');
                         setTimeout(function () { b.classList.remove('wrong'); }, 400);
                     }
@@ -1483,7 +1496,7 @@ var dos = document.createElement('img');
                 b.addEventListener('click', function () {
                     if (done) return;
                     if (i === match) { b.classList.add('correct'); done = true; complete(true); }
-                    else { b.classList.add('wrong'); setTimeout(function () { b.classList.remove('wrong'); }, 400); }
+                    else { playSfx('fail'); b.classList.add('wrong'); setTimeout(function () { b.classList.remove('wrong'); }, 400); }
                 });
             });
             function showGraffiti() {
