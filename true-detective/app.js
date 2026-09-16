@@ -365,7 +365,7 @@ langEnBtn: document.getElementById('lang-en'),
         currentSceneType: null,
         currentMusicPhase: null,
         puzzleData: null,
-        typingSpeed: 35,
+        typingSpeed: 20,
         skipPending: false,
         currentPage: 0,
         totalPages: 3,
@@ -2174,7 +2174,7 @@ function buildTransitionPages(sceneData) {
                         showTransitionToast(data.nextActTransition);
                         setTimeout(function () {
                             continueAfterTransition(data);
-                        }, 2000);
+                        }, 1500);
                     } else {
                         continueAfterTransition(data);
                     }
@@ -3355,7 +3355,7 @@ function buildTransitionPages(sceneData) {
                 overlay.classList.remove('visible');
                 setTimeout(function () {
                     if (typeof onContinue === 'function') onContinue();
-                }, 600);
+                }, 300);
             };
         }
     }

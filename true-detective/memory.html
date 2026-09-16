@@ -5,84 +5,161 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>True Detective - Memory</title>
     <link rel="icon" href="../icon/Logo%20d%26p.png">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
     <style>
+        :root {
+            --bg-deep: #05050a;
+            --bg-gradient: radial-gradient(circle at 50% 20%, #171426 0%, #05050a 100%);
+            --accent-gold: #f0d890;
+            --accent-blue: #00d4ff;
+            --accent-green: #00ff88;
+            --accent-pink: #ff00ff;
+            --text-main: #f0f4f8;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-deep);
+            background-image: var(--bg-gradient);
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* En-tête stylisé type enquête */
+        .sg-header {
+            background: rgba(10, 10, 18, 0.9) !important;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .sg-title {
+            text-shadow: 0 2px 10px rgba(240, 216, 144, 0.3);
+            letter-spacing: 0.05em;
+        }
+
+        .sg-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            box-sizing: border-box;
+            transform: translateZ(0);
+        }
+
+        #memory-app {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
         .memory-wrap {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             padding: 16px;
             width: 100%;
             max-width: 600px;
             margin: 0 auto;
+            box-sizing: border-box;
         }
+
         .memory-header {
             width: 100%;
             text-align: center;
             background: rgba(12, 16, 24, 0.85);
-            border: 1px solid rgba(0, 212, 255, 0.15);
+            border: 1px solid rgba(0, 212, 255, 0.25);
             border-radius: 12px;
             padding: 12px 16px;
             display: flex;
             flex-direction: column;
             gap: 6px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
         }
+
         .memory-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.2rem;
-            color: #f0d890;
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+            font-size: 1.3rem;
+            color: var(--accent-gold);
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
             margin: 0;
+            letter-spacing: 0.03em;
         }
+
         .memory-stats {
             display: flex;
             justify-content: center;
-            gap: 16px;
+            gap: 20px;
             flex-wrap: wrap;
         }
+
         .memory-stat {
             font-size: 0.9rem;
-            color: #00d4ff;
+            color: var(--accent-blue);
             font-weight: 600;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
         }
+
         .memory-grid {
             display: grid;
-            gap: 8px;
+            gap: 10px;
             justify-content: center;
             align-content: center;
             width: 100%;
         }
+
+        /* --- CARTES HAUT DE GAMME --- */
         .memory-card {
             aspect-ratio: 3 / 4;
-            background: #1a1a3a;
-            border: 2px solid #00d4ff;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #1f1f3a 0%, #101026 100%);
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            border-radius: 10px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2rem;
             position: relative;
-            transition: transform 0.25s ease, border-color 0.2s ease;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s ease, box-shadow 0.2s ease;
             transform-style: preserve-3d;
             min-height: 70px;
+            will-change: transform;
         }
+
         .memory-card:hover {
-            border-color: #ff00ff;
-            transform: translateY(-2px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.25);
+            transform: translateY(-3px) scale(1.02);
         }
+
         .memory-card.flipped {
             transform: rotateY(180deg);
-            background: #0a0a1a;
-            border-color: #ff00ff;
+            background: linear-gradient(135deg, #121225 0%, #080814 100%);
+            border-color: var(--accent-pink);
+            box-shadow: 0 8px 24px rgba(255, 0, 255, 0.2);
         }
+
         .memory-card.matched {
-            opacity: 0.5;
+            opacity: 0.45;
             cursor: default;
-            border-color: #39ff14;
+            border-color: var(--accent-green);
+            box-shadow: none;
+            transform: rotateY(180deg);
         }
+
         .memory-card-front,
         .memory-card-back {
             position: absolute;
@@ -91,37 +168,47 @@
             align-items: center;
             justify-content: center;
             backface-visibility: hidden;
-            border-radius: 6px;
+            -webkit-backface-visibility: hidden;
+            border-radius: 8px;
         }
+
         .memory-card-front {
-            background: transparent;
-            color: #00d4ff;
-            font-size: 1.5rem;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.08) 0%, transparent 70%);
+            color: var(--accent-blue);
+            font-size: 1.6rem;
             font-weight: 700;
             transform: rotateY(0deg);
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
         }
+
         .memory-card-back {
             flex-direction: column;
             gap: 4px;
-            padding: 4px;
+            padding: 6px;
             transform: rotateY(180deg);
+            background: #0d0d1c;
         }
+
         .memory-card-img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
         }
+
         .memory-card-label {
             font-size: 0.65rem;
-            color: #a0c0d0;
+            color: #b0d0e0;
             text-align: center;
             line-height: 1.1;
             margin-top: 2px;
+            font-weight: 500;
         }
+
         .memory-dialogue {
             width: 100%;
             background: rgba(12, 16, 24, 0.85);
-            border: 1px solid rgba(0, 212, 255, 0.15);
+            border: 1px solid rgba(0, 212, 255, 0.2);
             border-radius: 12px;
             padding: 12px 16px;
             min-height: 48px;
@@ -129,20 +216,49 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            color: #e8f4ff;
+            color: var(--text-main);
             font-size: 0.9rem;
             font-style: italic;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            box-sizing: border-box;
         }
+
+        /* Bouton Continuer ultra fluide */
+        #story-continue-btn {
+            margin-left: 8px;
+            padding: 8px 18px !important;
+            font-size: 0.85rem !important;
+            font-weight: 700 !important;
+            background: rgba(0, 255, 136, 0.12) !important;
+            border: 2px solid var(--accent-green) !important;
+            border-radius: 8px !important;
+            color: var(--accent-green) !important;
+            cursor: pointer !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            font-family: 'Montserrat', sans-serif !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+            will-change: transform, box-shadow;
+        }
+
+        #story-continue-btn:hover {
+            background: rgba(0, 255, 136, 0.25) !important;
+            box-shadow: 0 0 25px rgba(0, 255, 136, 0.5) !important;
+            transform: translateY(-2px);
+        }
+
         @media (max-width: 480px) {
             .memory-grid {
                 gap: 6px;
             }
             .memory-card {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
                 border-radius: 6px;
             }
             .memory-title {
-                font-size: 1rem;
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -153,6 +269,7 @@
         <h2 class="sg-title" style="color:#f0d890;font-family:'Playfair Display',serif;">Mémoire</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
+
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
             <span class="menu-icon">🏠</span>
@@ -164,6 +281,7 @@
             <span>Paramètres</span>
         </button>
     </nav>
+
     <main class="sg-main">
         <div id="memory-app">
             <div class="memory-wrap">
@@ -202,6 +320,7 @@
                     }
                 });
             }
+
             var hamburgerBtn = document.getElementById('hamburger-btn');
             var menu = document.getElementById('hamburger-menu');
             if (hamburgerBtn && menu) {
@@ -215,17 +334,21 @@
                     }
                 });
             }
+
             var backBtn = document.getElementById('back-to-minigame-btn');
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
                 var continueBtn = document.createElement('button');
                 continueBtn.id = 'story-continue-btn';
                 continueBtn.className = 'btn btn-continue';
                 continueBtn.textContent = 'Continuer';
-                continueBtn.style.cssText = 'margin-left:8px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
                 continueBtn.addEventListener('click', function () {
-                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'memory', won: true, ts: Date.now() })); } catch (e) {}
+                    try { 
+                        localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'memory', won: true, ts: Date.now() })); 
+                    } catch (e) {}
+                    
                     try {
                         var returnRaw = localStorage.getItem('td_standalone_game_return');
                         if (returnRaw) {
@@ -236,8 +359,8 @@
                             }
                         }
                     } catch (e) {}
-                    var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
-                    window.location.href = fromStory ? '../true-detective/index.html?standalone=memory' : '../true-detective/index.html#minigames';
+                    
+                    window.location.href = '../true-detective/index.html?standalone=memory';
                 });
                 var header = document.querySelector('.sg-header');
                 if (header) header.appendChild(continueBtn);
@@ -250,6 +373,7 @@
                     });
                 }
             }
+
             var menuHome = document.getElementById('menu-home');
             if (menuHome) {
                 menuHome.addEventListener('click', function () {
@@ -257,16 +381,29 @@
                     window.location.href = fromStory ? '../true-detective/index.html?standalone=memory' : '../true-detective/index.html#minigames';
                 });
             }
+
             var menuSettings = document.getElementById('menu-settings');
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres : aucun réglage pour l\'instant.'); }
+                    if (window.DPSettings && window.DPSettings.open) { 
+                        window.DPSettings.open(); 
+                    } else { 
+                        alert('Paramètres : aucun réglage pour l\'instant.'); 
+                    }
                 });
             }
+
+            // Chargement ultra-fluide synchronisé avec le rendu graphique
+            function initMemoryGame() {
+                // S'assure que memory.js est bien initialisé s'il possède une méthode d'appel globale (selon votre structure existante)
+                if (typeof window.initMemory === 'function') {
+                    window.initMemory();
+                }
+            }
+
+            requestAnimationFrame(initMemoryGame);
         })();
     </script>
 </body>
 </html>
-
-
