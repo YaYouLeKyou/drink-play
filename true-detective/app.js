@@ -3606,7 +3606,11 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.npcName.textContent = '';
         hideNPC();
 
-        scrMusicPlaying(phase.music);
+        if (phase.id === 'act3_2' && page.npc === 'protecteur' && page.interrogation === 'protecteur') {
+            scrMusicPlaying('final_interrogation');
+        } else {
+            scrMusicPlaying(phase.music);
+        }
         if ($.currentAct) $.currentAct.textContent = phase.act || '';
         if ($.currentScene) $.currentScene.textContent = (scr.pageIdx + 1) + '/' + phase.pages.length;
 
