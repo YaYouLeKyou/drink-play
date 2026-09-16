@@ -561,8 +561,10 @@
                 moveLoupe(clientX, clientY);
             }
             function endDrag() { isDragging = false; }
-            wrap.addEventListener('mousemove', function (e) { moveLoupe(e.clientX, e.clientY); });
-            wrap.addEventListener('mouseleave', function () { loupe.style.display = 'none'; });
+            wrap.addEventListener('mousedown', startDrag);
+            wrap.addEventListener('mousemove', function (e) { if (isDragging) { e.preventDefault(); drag(e); } });
+            wrap.addEventListener('mouseup', endDrag);
+            wrap.addEventListener('mouseleave', function () { isDragging = false; loupe.style.display = 'none'; });
             wrap.addEventListener('touchstart', startDrag, { passive: false });
             wrap.addEventListener('touchmove', drag, { passive: false });
             wrap.addEventListener('touchend', endDrag);

@@ -4105,7 +4105,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         scr.interro = { id: interroId, questionRound: 0, minigameRound: 0, done: false, questionsDone: false };
         // « Continuer » reste à l'écran mais reste inactif pendant l'interrogatoire
         $.continueBtn.classList.remove('hidden');
-        $.continueBtn.disabled = false;
+        $.continueBtn.disabled = true;
         $.continueBtn.textContent = getText('continue') || 'Continuer';
         scrShowInterroAskButton();
     }
@@ -4233,7 +4233,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             });
             $.choicesContainer.appendChild(askBtn);
             $.continueBtn.classList.remove('hidden');
-            $.continueBtn.disabled = false;
+            $.continueBtn.disabled = true;
             $.continueBtn.textContent = getText('continue') || 'Continuer';
             $.continueBtn.onclick = handleContinue;
 
@@ -5122,7 +5122,7 @@ function scrApplyChoice(choiceKey, choiceId) {
             s.reinterroges.push(choiceId);
             scr.interro = { id: choiceId, questionRound: 0, minigameRound: 0, done: false, questionsDone: false };
             $.continueBtn.classList.remove('hidden');
-            $.continueBtn.disabled = false;
+            $.continueBtn.disabled = true;
             $.continueBtn.textContent = getText('continue') || 'Continuer';
             $.continueBtn.onclick = handleContinue;
             scrShowInterroAskButton();
