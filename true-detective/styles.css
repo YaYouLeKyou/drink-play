@@ -3604,14 +3604,14 @@ html {
 
 /* Bouton Continuer pour réseau d'alibis - ancré en bas de l'écran */
 .reseau-alibis-continue {
-    position: fixed;
-    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-    left: 50%;
-    transform: translateX(-50%);
-    display: block;
+    position: fixed !important;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    display: block !important;
     width: auto !important;
     max-width: 320px !important;
-    z-index: 11001;
+    z-index: 11001 !important;
 }
 @media (max-width: 600px) {
     .reseau-alibis-continue {
