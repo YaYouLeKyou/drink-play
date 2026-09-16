@@ -3,39 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>True Detective - Pacman</title>
+    <title>True Detective - Pacman Arcade</title>
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
     <style>
+        :root {
+            --bg-dark: #05050f;
+            --panel-bg: rgba(12, 12, 30, 0.95);
+            --gold: #ffd700;
+            --gold-glow: rgba(255, 215, 0, 0.5);
+            --text-main: #e8f4ff;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at center, #101026 0%, #05050f 100%);
+            color: var(--text-main);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .sg-header {
+            background: rgba(5, 5, 15, 0.95);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.25);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+        }
+
+        .sg-main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
         .pacman-wrap {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 12px;
-            padding: 16px;
+            width: 100%;
+            max-width: 460px;
         }
+
+        .pacman-hud {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(255, 215, 0, 0.05);
+            box-sizing: border-box;
+        }
+
+        .hud-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hud-label {
+            color: #8fa4c7;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .hud-value {
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 1.15rem;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+        }
+
         #pacman-canvas {
             display: block;
             width: 100%;
-            max-width: 500px;
-            height: 400px;
-            background: #0a0a1a;
-            border: 2px solid #ffd600;
+            max-width: 448px;
+            height: auto;
+            background: #020208;
+            border: 2px solid var(--gold);
             border-radius: 12px;
+            box-shadow: 0 0 35px var(--gold-glow), inset 0 0 20px rgba(0,0,0,0.9);
+            aspect-ratio: 28 / 31;
         }
-        .pacman-info {
-            color: #e8f4ff;
-            font-weight: 600;
+
+        /* Pavé tactile directionnel responsive et élégant */
+        .pacman-controls {
+            display: none;
+            grid-template-columns: repeat(3, 65px);
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .pacman-controls button {
+            background: rgba(255, 215, 0, 0.12);
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            font-size: 1.4rem;
+            height: 55px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .pacman-controls button:active {
+            background: var(--gold);
+            color: var(--bg-dark);
+            transform: scale(0.93);
+        }
+
+        .btn-up { grid-column: 2; }
+        .btn-left { grid-column: 1; grid-row: 2; }
+        .btn-down { grid-column: 2; grid-row: 2; }
+        .btn-right { grid-column: 3; grid-row: 2; }
+
+        @media (max-width: 768px), (pointer: coarse) {
+            .pacman-controls {
+                display: grid;
+            }
         }
     </style>
 </head>
 <body>
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
-        <h2 class="sg-title" style="color:#ffd600;font-family:'Playfair Display',serif;">Pacman</h2>
+        <h2 class="sg-title" style="color:#ffd700;font-family:'Playfair Display',serif;margin:0;font-size:1.2rem;">Pacman Arcade</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
+
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
             <span class="menu-icon">🏠</span>
@@ -47,43 +157,362 @@
             <span>Paramètres</span>
         </button>
     </nav>
+
     <main class="sg-main">
         <div class="pacman-wrap">
-            <div class="pacman-info" id="pacman-info">Score: 0 | Vies: 3</div>
+            <div class="pacman-hud">
+                <div class="hud-item">
+                    <span class="hud-label">Score</span>
+                    <span class="hud-value" id="score-val">0</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">Record</span>
+                    <span class="hud-value" id="highscore-val">0</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">Niveau</span>
+                    <span class="hud-value" id="level-val">1</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">Vies</span>
+                    <span class="hud-value" id="lives-val">3</span>
+                </div>
+            </div>
+
             <canvas id="pacman-canvas"></canvas>
+
+            <div class="pacman-controls" id="pacman-controls">
+                <button class="btn-up" data-dir="UP">▲</button>
+                <button class="btn-left" data-dir="LEFT">◀</button>
+                <button class="btn-down" data-dir="DOWN">▼</button>
+                <button class="btn-right" data-dir="RIGHT">▶</button>
+            </div>
         </div>
     </main>
 
-    <script src="pacman.js">
-        // Helper function to get retro game level (1-3)
-        function getLevel() {
-            var level = parseInt(new URLSearchParams(window.location.search).get('level') || '1', 10);
-            if (isNaN(level) || level < 1) level = 1;
-            if (level > 3) level = 3;
-            return level;
-        }
-</script>
     <script src="../settings-menu.js"></script>
     <script>
-        (function () {
-            'use strict';
+        function getLevel() {
+            var lvl = parseInt(new URLSearchParams(window.location.search).get('level') || '1', 10);
+            return isNaN(lvl) || lvl < 1 ? 1 : (lvl > 3 ? 3 : lvl);
+        }
+        document.getElementById('level-val').textContent = getLevel();
 
-            if (window.DPSettings && window.DPSettings.init) {
-                window.DPSettings.init({
-                    showMusicToggle: true,
-                    showMusicVolume: true,
-                    showNarrationVolume: false,
-                    showMuteToggle: false,
-                    showGameSection: true,
-                    showBackToHub: false,
-                    showRestart: false,
-                    showRules: false,
-                    customButtons: [],
-                    onBackToHub: function () {
-                        window.location.href = '../true-detective/index.html#minigames';
+        // --- MOTEUR DE JEU PACMAN FLUIDE ET CORRIGÉ ---
+        (function() {
+            const canvas = document.getElementById('pacman-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const cols = 28;
+            const rows = 31;
+            const tileSize = 16;
+            canvas.width = cols * tileSize; // 448
+            canvas.height = rows * tileSize; // 496
+
+            let score = 0;
+            let highscore = localStorage.getItem('td_pacman_highscore') || 0;
+            document.getElementById('highscore-val').textContent = highscore;
+            let lives = 3;
+            let currentLevel = getLevel();
+            let energizerTimer = 0;
+            let gameState = 'READY'; // READY, PLAYING, GAMEOVER
+            let gameFrame = 0;
+
+            // 0: Vide, 1: Mur, 2: Indice, 3: Mandat/Energisant, 4: Porte enclos
+            const originalMap = [
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1],
+                [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+                [1,3,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,3,1],
+                [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+                [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+                [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
+                [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
+                [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
+                [1,1,1,1,1,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,1,1,1,1,1],
+                [0,0,0,0,0,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,0,0,0,0,0],
+                [0,0,0,0,0,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,0,0,0,0,0],
+                [0,0,0,0,0,1,2,1,1,0,1,1,1,4,4,1,1,1,0,1,1,2,1,0,0,0,0,0],
+                [1,1,1,1,1,1,2,1,1,0,1,0,0,0,0,0,0,1,0,1,1,2,1,1,1,1,1,1],
+                [0,0,0,0,0,0,2,0,0,0,1,0,0,0,0,0,0,1,0,0,0,2,0,0,0,0,0,0],
+                [1,1,1,1,1,1,2,1,1,0,1,0,0,0,0,0,0,1,0,1,1,2,1,1,1,1,1,1],
+                [0,0,0,0,0,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,0,0,0,0,0],
+                [0,0,0,0,0,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,0,0,0,0,0],
+                [0,0,0,0,0,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,0,0,0,0,0],
+                [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
+                [1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1],
+                [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+                [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+                [1,3,2,2,1,1,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,1,1,2,2,3,1],
+                [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
+                [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
+                [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
+                [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
+                [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
+                [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            ];
+
+            let map = JSON.parse(JSON.stringify(originalMap));
+
+            let pacman = {
+                x: 13.5 * tileSize,
+                y: 23 * tileSize,
+                dir: 'LEFT',
+                nextDir: 'LEFT',
+                speed: 2
+            };
+
+            let ghosts = [
+                { name: 'Blinky', x: 13.5 * tileSize, y: 11 * tileSize, color: '#ff3333', dir: 'LEFT', speed: 1.8, state: 'CHASE' },
+                { name: 'Pinky',  x: 13.5 * tileSize, y: 14 * tileSize, color: '#ffb8ff', dir: 'UP',   speed: 1.6,  state: 'CHASE' },
+                { name: 'Inky',   x: 11.5 * tileSize, y: 14 * tileSize, color: '#00ffff', dir: 'UP',   speed: 1.6,  state: 'CHASE' },
+                { name: 'Clyde',  x: 15.5 * tileSize, y: 14 * tileSize, color: '#ffb852', dir: 'UP',   speed: 1.6,  state: 'CHASE' }
+            ];
+
+            function resetPositions() {
+                pacman.x = 13.5 * tileSize;
+                pacman.y = 23 * tileSize;
+                pacman.dir = 'LEFT';
+                pacman.nextDir = 'LEFT';
+                
+                ghosts[0].x = 13.5 * tileSize; ghosts[0].y = 11 * tileSize; ghosts[0].state = 'CHASE';
+                ghosts[1].x = 13.5 * tileSize; ghosts[1].y = 14 * tileSize; ghosts[1].state = 'CHASE';
+                ghosts[2].x = 11.5 * tileSize; ghosts[2].y = 14 * tileSize; ghosts[2].state = 'CHASE';
+                ghosts[3].x = 15.5 * tileSize; ghosts[3].y = 14 * tileSize; ghosts[3].state = 'CHASE';
+            }
+
+            function isWall(col, row) {
+                if (col < 0 || col >= cols) return false; // Tunnels
+                if (row < 0 || row >= rows) return true;
+                return map[row][col] === 1 || map[row][col] === 4;
+            }
+
+            function canMove(x, y, dir, speed) {
+                let nextX = x, nextY = y;
+                if (dir === 'UP') nextY -= speed;
+                if (dir === 'DOWN') nextY += speed;
+                if (dir === 'LEFT') nextX -= speed;
+                if (dir === 'RIGHT') nextX += speed;
+
+                let c1 = Math.floor(nextX / tileSize);
+                let r1 = Math.floor(nextY / tileSize);
+                let c2 = Math.floor((nextX + tileSize - 1) / tileSize);
+                let r2 = Math.floor((nextY + tileSize - 1) / tileSize);
+
+                return !isWall(c1, r1) && !isWall(c2, r2) && !isWall(c1, r2) && !isWall(c2, r1);
+            }
+
+            // Commandes clavier & tactiles
+            window.addEventListener('keydown', e => {
+                if (e.key === 'ArrowUp' || e.key === 'z') pacman.nextDir = 'UP';
+                if (e.key === 'ArrowDown' || e.key === 's') pacman.nextDir = 'DOWN';
+                if (e.key === 'ArrowLeft' || e.key === 'q') pacman.nextDir = 'LEFT';
+                if (e.key === 'ArrowRight' || e.key === 'd') pacman.nextDir = 'RIGHT';
+                if (gameState === 'READY' || gameState === 'GAMEOVER') {
+                    if (gameState === 'GAMEOVER') {
+                        score = 0;
+                        lives = 3;
+                        map = JSON.parse(JSON.stringify(originalMap));
+                        document.getElementById('score-val').textContent = score;
+                        document.getElementById('lives-val').textContent = lives;
+                    }
+                    gameState = 'PLAYING';
+                }
+            });
+
+            document.querySelectorAll('.pacman-controls button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    pacman.nextDir = this.getAttribute('data-dir');
+                    if (gameState === 'READY' || gameState === 'GAMEOVER') {
+                        if (gameState === 'GAMEOVER') {
+                            score = 0;
+                            lives = 3;
+                            map = JSON.parse(JSON.stringify(originalMap));
+                            document.getElementById('score-val').textContent = score;
+                            document.getElementById('lives-val').textContent = lives;
+                        }
+                        gameState = 'PLAYING';
+                    }
+                });
+            });
+
+            function update() {
+                if (gameState !== 'PLAYING') return;
+                gameFrame++;
+
+                if (energizerTimer > 0) energizerTimer--;
+
+                // Gestion du virage fluide de Pacman
+                if (pacman.nextDir !== pacman.dir && canMove(pacman.x, pacman.y, pacman.nextDir, pacman.speed)) {
+                    pacman.dir = pacman.nextDir;
+                }
+                if (canMove(pacman.x, pacman.y, pacman.dir, pacman.speed)) {
+                    if (pacman.dir === 'UP') pacman.y -= pacman.speed;
+                    if (pacman.dir === 'DOWN') pacman.y += pacman.speed;
+                    if (pacman.dir === 'LEFT') pacman.x -= pacman.speed;
+                    if (pacman.dir === 'RIGHT') pacman.x += pacman.speed;
+                }
+
+                // Tunnels latéraux
+                if (pacman.x < -tileSize/2) pacman.x = cols * tileSize - tileSize/2;
+                if (pacman.x > cols * tileSize - tileSize/2) pacman.x = -tileSize/2;
+
+                // Consommation des points / indices
+                let centerCol = Math.floor((pacman.x + tileSize/2) / tileSize);
+                let centerRow = Math.floor((pacman.y + tileSize/2) / tileSize);
+                if (centerCol >= 0 && centerCol < cols && centerRow >= 0 && centerRow < rows) {
+                    if (map[centerRow][centerCol] === 2) {
+                        map[centerRow][centerCol] = 0;
+                        score += 10;
+                    } else if (map[centerRow][centerCol] === 3) {
+                        map[centerRow][centerCol] = 0;
+                        score += 50;
+                        energizerTimer = 450; // Durée de vulnérabilité
+                    }
+                }
+
+                document.getElementById('score-val').textContent = score;
+                if (score > highscore) {
+                    highscore = score;
+                    localStorage.setItem('td_pacman_highscore', highscore);
+                    document.getElementById('highscore-val').textContent = highscore;
+                }
+
+                // Déplacement des fantômes
+                ghosts.forEach(g => {
+                    let currentSpeed = energizerTimer > 0 ? g.speed * 0.55 : g.speed;
+                    
+                    let dirs = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
+                    let opposites = { 'UP': 'DOWN', 'DOWN': 'UP', 'LEFT': 'RIGHT', 'RIGHT': 'LEFT' };
+                    
+                    // Filtrer les directions valides (pas de retour en arrière immédiat sauf si bloqué)
+                    let validDirs = dirs.filter(d => d !== opposites[g.dir] && canMove(g.x, g.y, d, currentSpeed));
+                    if (validDirs.length === 0) validDirs = [opposites[g.dir]];
+
+                    // Choix intelligent vers Pacman ou aléatoire
+                    if (Math.floor(g.x) % tileSize === 0 && Math.floor(g.y) % tileSize === 0) {
+                        g.dir = validDirs[Math.floor(Math.random() * validDirs.length)];
+                    }
+
+                    if (canMove(g.x, g.y, g.dir, currentSpeed)) {
+                        if (g.dir === 'UP') g.y -= currentSpeed;
+                        if (g.dir === 'DOWN') g.y += currentSpeed;
+                        if (g.dir === 'LEFT') g.x -= currentSpeed;
+                        if (g.dir === 'RIGHT') g.x += currentSpeed;
+                    } else {
+                        g.dir = validDirs[Math.floor(Math.random() * validDirs.length)] || opposites[g.dir];
+                    }
+
+                    // Collision avec Pacman
+                    let dist = Math.hypot((pacman.x + tileSize/2) - (g.x + tileSize/2), (pacman.y + tileSize/2) - (g.y + tileSize/2));
+                    if (dist < tileSize * 0.7) {
+                        if (energizerTimer > 0) {
+                            score += 200;
+                            g.x = 13.5 * tileSize;
+                            g.y = 14 * tileSize;
+                        } else {
+                            lives--;
+                            document.getElementById('lives-val').textContent = lives;
+                            if (lives <= 0) {
+                                gameState = 'GAMEOVER';
+                            } else {
+                                resetPositions();
+                            }
+                        }
                     }
                 });
             }
+
+            function draw() {
+                ctx.fillStyle = '#020208';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Dessin du labyrinthe sophistiqué
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        if (map[r][c] === 1) {
+                            ctx.fillStyle = '#161642';
+                            ctx.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
+                            ctx.strokeStyle = '#2b2bd6';
+                            ctx.strokeRect(c * tileSize, r * tileSize, tileSize, tileSize);
+                        } else if (map[r][c] === 2) {
+                            ctx.fillStyle = '#ffdf7e';
+                            ctx.beginPath();
+                            ctx.arc(c * tileSize + tileSize/2, r * tileSize + tileSize/2, 2.5, 0, Math.PI * 2);
+                            ctx.fill();
+                        } else if (map[r][c] === 3) {
+                            if (Math.floor(gameFrame / 15) % 2 === 0) {
+                                ctx.fillStyle = '#00d2ff';
+                                ctx.beginPath();
+                                ctx.arc(c * tileSize + tileSize/2, r * tileSize + tileSize/2, 6, 0, Math.PI * 2);
+                                ctx.fill();
+                            }
+                        }
+                    }
+                }
+
+                // Dessin de Pacman (Détective)
+                ctx.fillStyle = '#ffd700';
+                ctx.beginPath();
+                let mouthAngle = (Math.floor(gameFrame / 5) % 2 === 0) ? 0.25 : 0.05;
+                let startAngle = mouthAngle, endAngle = 2 * Math.PI - mouthAngle;
+                
+                if (pacman.dir === 'RIGHT') { startAngle += 0; endAngle += 0; }
+                if (pacman.dir === 'DOWN') { startAngle += Math.PI/2; endAngle += Math.PI/2; }
+                if (pacman.dir === 'LEFT') { startAngle += Math.PI; endAngle += Math.PI; }
+                if (pacman.dir === 'UP') { startAngle += Math.PI * 1.5; endAngle += Math.PI * 1.5; }
+
+                ctx.arc(pacman.x + tileSize/2, pacman.y + tileSize/2, tileSize/2 - 1, startAngle, endAngle);
+                ctx.lineTo(pacman.x + tileSize/2, pacman.y + tileSize/2);
+                ctx.fill();
+
+                // Dessin des fantômes avec lueur néon
+                ghosts.forEach(g => {
+                    ctx.fillStyle = energizerTimer > 0 ? '#1e1eff' : g.color;
+                    ctx.beginPath();
+                    ctx.arc(g.x + tileSize/2, g.y + tileSize/2 - 2, tileSize/2 - 1, Math.PI, 0, false);
+                    ctx.lineTo(g.x + tileSize - 1, g.y + tileSize);
+                    ctx.lineTo(g.x + 1, g.y + tileSize);
+                    ctx.fill();
+                });
+
+                // Overlays d'état
+                if (gameState === 'READY') {
+                    ctx.fillStyle = '#ffd700';
+                    ctx.font = 'bold 16px Montserrat, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText("APPUYEZ POUR JOUER", canvas.width / 2, canvas.height / 2 + 50);
+                } else if (gameState === 'GAMEOVER') {
+                    ctx.fillStyle = '#ff3333';
+                    ctx.font = 'bold 22px Montserrat, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText("FIN DE PARTIE", canvas.width / 2, canvas.height / 2 + 50);
+                }
+            }
+
+            function loop() {
+                update();
+                draw();
+                requestAnimationFrame(loop);
+            }
+
+            document.getElementById('lives-val').textContent = lives;
+            loop();
+        })();
+
+        // --- NAVIGATION DU SITE & GESTION DE RETOUR ---
+        (function () {
+            'use strict';
+            if (window.DPSettings && window.DPSettings.init) {
+                window.DPSettings.init({
+                    showMusicToggle: true, showMusicVolume: true, showNarrationVolume: false,
+                    showMuteToggle: false, showGameSection: true, showBackToHub: false,
+                    showRestart: false, showRules: false, customButtons: [],
+                    onBackToHub: function () { window.location.href = '../true-detective/index.html#minigames'; }
+                });
+            }
+
             var hamburgerBtn = document.getElementById('hamburger-btn');
             var menu = document.getElementById('hamburger-menu');
             if (hamburgerBtn && menu) {
@@ -97,25 +526,24 @@
                     }
                 });
             }
+
             var backBtn = document.getElementById('back-to-minigame-btn');
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+            
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
                 var continueBtn = document.createElement('button');
-                continueBtn.id = 'story-continue-btn';
                 continueBtn.className = 'btn btn-continue';
                 continueBtn.textContent = 'Continuer';
-                continueBtn.style.cssText = 'margin-left:8px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
+                continueBtn.style.cssText = 'margin-left:8px;padding:8px 16px;font-size:0.85rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;';
+                
                 continueBtn.addEventListener('click', function () {
                     try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'pacman', won: true, ts: Date.now() })); } catch (e) {}
                     try {
                         var returnRaw = localStorage.getItem('td_standalone_game_return');
                         if (returnRaw) {
                             var rp = JSON.parse(returnRaw);
-                            if (rp && rp.returnUrl) {
-                                window.location.href = rp.returnUrl;
-                                return;
-                            }
+                            if (rp && rp.returnUrl) { window.location.href = rp.returnUrl; return; }
                         }
                     } catch (e) {}
                     window.location.href = '../true-detective/index.html?standalone=pacman';
@@ -131,6 +559,7 @@
                     });
                 }
             }
+
             var menuHome = document.getElementById('menu-home');
             if (menuHome) {
                 menuHome.addEventListener('click', function () {
@@ -138,16 +567,16 @@
                     window.location.href = fromStory ? '../true-detective/index.html?standalone=pacman' : '../true-detective/index.html#minigames';
                 });
             }
+
             var menuSettings = document.getElementById('menu-settings');
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres : aucun réglage pour l\'instant.'); }
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); }
+                    else { alert('Paramètres : aucun réglage pour l\'instant.'); }
                 });
             }
         })();
     </script>
 </body>
 </html>
-
-

@@ -4569,6 +4569,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             shooting: { fr: 'Tir forain', en: 'Shooting Gallery' },
             jackpot: { fr: 'Jackpot', en: 'Jackpot' },
             connect4: { fr: 'Puissance 4', en: 'Connect 4' },
+            chemistry: { fr: 'Analyse chimique', en: 'Chemistry' },
             pong: { fr: 'Pong', en: 'Pong' },
             pacman: { fr: 'Pacman', en: 'Pacman' },
             'space-invaders': { fr: 'Space Invaders', en: 'Space Invaders' },
