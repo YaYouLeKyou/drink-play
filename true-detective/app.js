@@ -5113,7 +5113,7 @@ function scrApplyChoice(choiceKey, choiceId) {
         if (good) {
             /* Fin 1 - Accusation juste : 3 pages (prison → QG extérieur → photo univers) */
             pages.push({
-                decor: 'prison', npc: null,
+                decor: 'prison', npc: truth.culprit,
                 text: {
                     fr: '<div class="accuse-screen"><div class="accuse-result success">✅ ACCUSATION JUSTE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">' + titleTxt + ' est coupable. ' + methodeTxt + '</div></div><div class="ending-text">Derrière les barreaux, le coupable s\'effondre. ' + prisonTxt + '</div>',
                     en: '<div class="accuse-screen"><div class="accuse-result success">✅ RIGHT ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">' + titleTxt + ' is guilty. ' + methodeTxt + '</div></div><div class="ending-text">Behind the bars, the culprit breaks down. ' + prisonTxt + '</div>'
@@ -5137,14 +5137,14 @@ function scrApplyChoice(choiceKey, choiceId) {
             /* Fin 2b - Accusation erronée MAIS faisceau d'indices suffisant :
                le vrai coupable est piégé par les preuves et arrete */
             pages.push({
-                decor: 'exile', npc: null,
+                decor: 'prison', npc: s.accused,
                 text: {
-                    fr: '<div class="accuse-screen"><div class="accuse-result partial">⚠ ACCUSATION ERRONÉE, MAIS LES PREUVES PARLENT</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Vous accusez ' + innocentTitle + ', un innocent. Mais le faisceau d\'indices est si épais que ' + titleTxt + ' ne peut plus se cacher.</div></div><div class="ending-text">' + exileTxt + ' Mais la pression des preuves le force à abandonner sa course. Il lâche un aveu avant de s\'envoler.</div>',
-                    en: '<div class="accuse-screen"><div class="accuse-result partial">⚠ WRONG ACCUSATION, BUT THE EVIDENCE SPEAKS</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">You accuse ' + innocentTitle + ', an innocent. But the evidence beam is so thick that ' + titleTxt + ' can no longer hide.</div></div><div class="ending-text">' + exileTxt + ' But the weight of the evidence forces him to abandon his flight. He breaks down before takeoff.</div>'
+                    fr: '<div class="accuse-screen"><div class="accuse-result partial">⚠ ACCUSATION ERRONÉE, MAIS LES PREUVES PARLENT</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Vous accusez ' + innocentTitle + ', un innocent. Mais le faisceau d\'indices est si épais que ' + titleTxt + ' ne peut plus se cacher.</div></div><div class="ending-text">Derrière les barreaux, ' + innocentTitle + ' s\'effondre, innocente. La vérité finira bien par émerger, mais trop tard pour cette affaire.</div>',
+                    en: '<div class="accuse-screen"><div class="accuse-result partial">⚠ WRONG ACCUSATION, BUT THE EVIDENCE SPEAKS</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">You accuse ' + innocentTitle + ', an innocent. But the evidence beam is so thick that ' + titleTxt + ' can no longer hide.</div></div><div class="ending-text">Behind the bars, ' + innocentTitle + ' collapses, innocent. The truth will eventually emerge, but too late for this case.</div>'
                 }
             });
             pages.push({
-                decor: 'prison', npc: null,
+                decor: 'exile', npc: truth.culprit,
                 text: {
                     fr: '<div class="ending-text">' + titleTxt + ' est finalement arrêté grâce aux preuves que vous avez collectées. La vérité a triplé en fin de compte.</div>',
                     en: '<div class="ending-text">' + titleTxt + ' is finally arrested thanks to the evidence you collected. The truth prevails in the end.</div>'
@@ -5158,19 +5158,19 @@ function scrApplyChoice(choiceKey, choiceId) {
                 }
             });
         } else {
-            /* Fin 2 - Accusation erronée : 3 pages (île paradisiaque → prison innocent → photo univers) */
+            /* Fin 2 - Accusation erronée : 3 pages (prison innocent → paradisiaque coupable → photo univers) */
             pages.push({
-                decor: 'exile', npc: null,
+                decor: 'prison', npc: s.accused,
                 text: {
-                    fr: '<div class="accuse-screen"><div class="accuse-result failure">❌ ACCUSATION ERRONÉE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Vous accusez ' + innocentTitle + ', un innocent. Le vrai coupable, ' + titleTxt + ', s\'est échappé.</div></div><div class="ending-text">' + exileTxt + ' Il rit de vous, loin, très loin de votre juridiction.</div>',
-                    en: '<div class="accuse-screen"><div class="accuse-result failure">❌ WRONG ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">You accuse ' + innocentTitle + ', an innocent. The real culprit, ' + titleTxt + ', has escaped.</div></div><div class="ending-text">' + exileTxt + ' He laughs at you, far, very far from your jurisdiction.</div>'
+                    fr: '<div class="accuse-screen"><div class="accuse-result failure">❌ ACCUSATION ERRONÉE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Vous accusez ' + innocentTitle + ', un innocent. Le vrai coupable, ' + titleTxt + ', s\'est échappé.</div></div><div class="ending-text">Derrière les barreaux, ' + innocentTitle + ' s\'effondre, innocente. La vérité finira bien par émerger, mais trop tard pour cette affaire.</div>',
+                    en: '<div class="accuse-screen"><div class="accuse-result failure">❌ WRONG ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">You accuse ' + innocentTitle + ', an innocent. The real culprit, ' + titleTxt + ', has escaped.</div></div><div class="ending-text">Behind the bars, ' + innocentTitle + ' collapses, innocent. The truth will eventually emerge, but too late for this case.</div>'
                 }
             });
             pages.push({
-                decor: 'prison', npc: null,
+                decor: 'exile', npc: truth.culprit,
                 text: {
-                    fr: '<div class="ending-text">Derrière les barreaux, ' + innocentTitle + ' s\'effondre, innocente. La vérité finira bien par émerger, mais trop tard pour cette affaire.</div>',
-                    en: '<div class="ending-text">Behind the bars, ' + innocentTitle + ' collapses, innocent. The truth will eventually emerge, but too late for this case.</div>'
+                    fr: '<div class="ending-text">' + exileTxt + ' ' + titleTxt + ' vous nargue depuis l\'île paradisiaque. « Vous avez cru me coincer ? La justice des hommes est aussi faillible que votre raisonnement. »</div>',
+                    en: '<div class="ending-text">' + exileTxt + ' ' + titleTxt + ' taunts you from the paradise island. "You thought you could corner me? Human justice is as fallible as your reasoning."</div>'
                 }
             });
             pages.push({
