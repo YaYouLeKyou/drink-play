@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>True Detective - Laboratoire d'Analyse ADN</title>
+    <title>True Detective - Séquençage ADN des 6 Suspects</title>
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
@@ -11,12 +11,12 @@
     <style>
         :root {
             --bg-deep: #030307;
-            --bg-gradient: radial-gradient(circle at 50% 30%, #121026 0%, #030307 100%);
+            --bg-gradient: radial-gradient(circle at 50% 20%, #100f24 0%, #030307 100%);
             --accent-gold: #f3d98a;
             --accent-blue: #00e1ff;
             --accent-green: #00ff88;
             --accent-pink: #ff007f;
-            --accent-purple: #9d00ff;
+            --accent-purple: #b000ff;
             --text-main: #f0f4f8;
         }
 
@@ -43,7 +43,8 @@
 
         .sg-title {
             text-shadow: 0 0 15px rgba(0, 225, 255, 0.4);
-            letter-spacing: 0.06em;
+            letter-spacing: 0.05em;
+            font-size: 1.1rem !important;
         }
 
         .sg-main {
@@ -51,7 +52,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            padding: 6px;
             box-sizing: border-box;
         }
 
@@ -63,94 +64,121 @@
             justify-content: center;
         }
 
-        /* Conteneur principal du Labo */
         #game-content {
             width: 100%;
-            max-width: 780px;
+            max-width: 820px;
             height: 100%;
-            max-height: 600px;
-            background: rgba(10, 12, 20, 0.9);
-            border: 1px solid rgba(0, 225, 255, 0.3);
+            max-height: 640px;
+            background: rgba(10, 12, 20, 0.94);
+            border: 1px solid rgba(0, 225, 255, 0.35);
             border-radius: 16px;
-            padding: 18px;
+            padding: 14px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 225, 255, 0.05);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
             box-sizing: border-box;
             position: relative;
             overflow: hidden;
         }
 
-        .lab-header-info {
-            text-align: center;
+        /* Sélecteur des 6 suspects (par numéro) */
+        .suspects-selector {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            width: 100%;
+            flex-wrap: wrap;
         }
 
-        .lab-instructions {
-            font-size: 0.88rem;
+        .suspect-tab {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .suspect-tab:hover {
+            background: rgba(0, 225, 255, 0.1);
+            border-color: var(--accent-blue);
+        }
+
+        .suspect-tab.selected {
+            background: rgba(0, 225, 255, 0.25);
+            border-color: var(--accent-blue);
             color: var(--accent-blue);
-            margin-top: 4px;
-            font-weight: 500;
-            text-shadow: 0 0 10px rgba(0, 225, 255, 0.4);
+            box-shadow: 0 0 10px rgba(0, 225, 255, 0.3);
         }
 
-        /* Zone des Éprouvettes ultra-stylisées */
+        .suspect-tab.solved {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        /* Mission / Indice Actuel */
+        .mission-board {
+            background: rgba(0, 225, 255, 0.05);
+            border-left: 3px solid var(--accent-blue);
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 0 6px 6px 0;
+            box-sizing: border-box;
+            font-size: 0.78rem;
+        }
+
+        .mission-board b {
+            color: var(--accent-gold);
+        }
+
+        /* Poste de travail (Éprouvettes) */
         .workstation {
             display: flex;
-            gap: 30px;
+            gap: 20px;
             justify-content: center;
             align-items: flex-end;
-            margin: 10px 0;
-            position: relative;
+            margin: 5px 0;
         }
 
         .tube-station {
             display: flex;
             flex-direction: column;
             align-items: center;
-            cursor: pointer;
-            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .tube-station:hover {
-            transform: translateY(-6px);
+            position: relative;
         }
 
         .chemistry-tube {
-            width: 65px;
-            height: 190px;
-            border: 3px solid rgba(0, 225, 255, 0.5);
+            width: 50px;
+            height: 150px;
+            border: 3px solid rgba(0, 225, 255, 0.4);
             border-top: none;
-            border-radius: 0 0 32px 32px;
+            border-radius: 0 0 24px 24px;
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.4) 100%);
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 225, 255, 0.15);
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.6) 100%);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
         }
 
-        .tube-station.active .chemistry-tube {
-            border-color: var(--accent-green);
-            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 255, 136, 0.6);
-        }
-
-        /* Effet de Fluide Réel avec vagues */
         .chemistry-liquid {
             position: absolute;
             bottom: 0;
             width: 100%;
             height: 0%;
-            transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.5s ease;
-            box-shadow: inset 0 4px 10px rgba(255, 255, 255, 0.4);
+            transition: height 0.4s ease, background 0.4s ease;
         }
 
         .liquid-wave {
             position: absolute;
-            top: -6px;
+            top: -4px;
             left: 0;
             width: 200%;
-            height: 12px;
+            height: 8px;
             background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 120 28" xmlns="http://www.w3.org/2000/svg"><path d="M0 14c30 0 30-14 60-14s30 14 60 14v14H0z" fill="rgba(255,255,255,0.25)"/></svg>');
             animation: wave-animation 3s linear infinite;
         }
@@ -160,103 +188,102 @@
             100% { transform: translateX(-50%); }
         }
 
-        /* Bulles d'effervescence animées dans les liquides */
         .bubble {
             position: absolute;
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.8);
             border-radius: 50%;
-            animation: rise-bubble 2s ease-in infinite;
+            animation: rise-bubble 1.2s ease-in infinite;
         }
 
         @keyframes rise-bubble {
-            0% { transform: translateY(0) scale(0.6); opacity: 0; }
-            50% { opacity: 0.8; }
-            100% { transform: translateY(-120px) scale(1.2); opacity: 0; }
+            0% { transform: translateY(0) scale(0.4); opacity: 0; }
+            50% { opacity: 0.9; }
+            100% { transform: translateY(-80px) scale(1); opacity: 0; }
         }
 
         .tube-label {
-            margin-top: 10px;
-            font-size: 0.75rem;
+            margin-top: 6px;
+            font-size: 0.68rem;
             font-weight: 600;
             color: var(--text-main);
             text-align: center;
         }
 
-        /* Panneau de réactifs interactifs (Pipettes) */
+        /* Panneau des Réactifs Chimiques */
         .reagents-panel {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             justify-content: center;
             flex-wrap: wrap;
-            background: rgba(5, 7, 12, 0.6);
-            padding: 10px 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(5, 7, 12, 0.8);
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .reagent-btn {
             background: rgba(15, 25, 45, 0.9);
             color: var(--text-main);
             border: 1px solid rgba(0, 225, 255, 0.3);
-            padding: 10px 16px;
-            border-radius: 8px;
+            padding: 6px 10px;
+            border-radius: 6px;
             cursor: pointer;
             font-family: 'Montserrat', sans-serif;
-            font-size: 0.8rem;
+            font-size: 0.72rem;
             font-weight: 600;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            gap: 5px;
         }
 
         .reagent-btn:hover {
             background: #1a305f;
             border-color: var(--accent-blue);
-            box-shadow: 0 0 15px rgba(0, 225, 255, 0.4);
             transform: translateY(-2px);
         }
 
-        .reagent-color-dot {
-            width: 12px;
-            height: 12px;
+        .reagent-dot {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            box-shadow: 0 0 8px currentColor;
         }
 
-        /* Console d'état et messages de l'enquêteur */
+        /* Console */
         .lab-console {
-            background: rgba(3, 4, 8, 0.85);
+            background: rgba(3, 4, 8, 0.95);
             border-left: 4px solid var(--accent-gold);
             width: 100%;
-            padding: 10px 14px;
-            border-radius: 0 8px 8px 0;
+            padding: 8px 12px;
+            border-radius: 0 6px 6px 0;
             font-family: 'Special Elite', monospace;
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             color: var(--accent-gold);
             box-sizing: border-box;
-            min-height: 42px;
+            min-height: 38px;
             display: flex;
             align-items: center;
         }
 
         .lab-actions {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
-            justify-content: flex-end;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .lab-btn {
             background: rgba(255, 255, 255, 0.05);
             color: var(--text-main);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 8px 18px;
-            border-radius: 8px;
+            padding: 7px 14px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             transition: all 0.2s ease;
         }
 
@@ -268,23 +295,21 @@
             background: rgba(0, 255, 136, 0.15);
             border-color: var(--accent-green);
             color: var(--accent-green);
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
         }
 
         .lab-btn.primary:hover {
             background: rgba(0, 255, 136, 0.3);
-            box-shadow: 0 0 25px rgba(0, 255, 136, 0.5);
         }
 
-        /* Animation laser de scan ADN lors de la validation */
         .scanner-beam {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 4px;
+            height: 3px;
             background: var(--accent-green);
-            box-shadow: 0 0 15px var(--accent-green), 0 0 30px var(--accent-green);
+            box-shadow: 0 0 12px var(--accent-green);
             opacity: 0;
             pointer-events: none;
         }
@@ -295,7 +320,6 @@
             100% { top: 0%; opacity: 0; }
         }
 
-        /* Bouton Continuer (Mode Histoire) */
         #story-continue-btn {
             position: fixed !important;
             top: 14px !important;
@@ -317,7 +341,7 @@
 <body>
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
-        <h2 class="sg-title" style="color:var(--accent-blue);font-family:'Playfair Display',serif;">🧬 Séquençage ADN</h2>
+        <h2 class="sg-title" style="color:var(--accent-blue);font-family:'Playfair Display',serif;">🧬 Séquençage ADN : Les 6 Suspects</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
 
@@ -338,88 +362,92 @@
             <div id="game-content">
                 <div class="scanner-beam" id="scanner"></div>
                 
-                <div class="lab-header-info">
-                    <h3 style="font-family:'Playfair Display',serif; color:var(--accent-gold); margin:0; font-size:1.15rem;">Analyse des Échantillons Biologiques</h3>
-                    <div class="lab-instructions">Sélectionnez une éprouvette active, puis utilisez les pipettes de réactifs pour provoquer la réaction d'extraction ADN.</div>
+                <!-- Sélecteur des 6 suspects par numéro -->
+                <div class="suspects-selector" id="suspects-selector">
+                    <button class="suspect-tab selected" onclick="switchSuspect(0)">Suspect 1</button>
+                    <button class="suspect-tab" onclick="switchSuspect(1)">Suspect 2</button>
+                    <button class="suspect-tab" onclick="switchSuspect(2)">Suspect 3</button>
+                    <button class="suspect-tab" onclick="switchSuspect(3)">Suspect 4</button>
+                    <button class="suspect-tab" onclick="switchSuspect(4)">Suspect 5</button>
+                    <button class="suspect-tab" onclick="switchSuspect(5)">Suspect 6</button>
                 </div>
 
-                <div class="workstation" id="workstation">
-                    <!-- Éprouvette 1 : Sang -->
-                    <div class="tube-station active" data-tube="0">
+                <!-- Mission / Indice -->
+                <div class="mission-board" id="mission-board">
+                    🎯 <b>Suspect 1 :</b> Trace prélevée sur la scène de crime. Appliquez le bon protocole chimique (2 réactifs) pour isoler son ADN.
+                </div>
+
+                <!-- Poste de travail (2 tubes de mélange + 1 tube résultat) -->
+                <div class="workstation">
+                    <div class="tube-station">
                         <div class="chemistry-tube">
-                            <div class="chemistry-liquid" id="liquid-0" style="height: 55%; background: linear-gradient(to top, #c70039, #ff5733);">
+                            <div class="chemistry-liquid" id="liquid-0" style="height: 50%; background: linear-gradient(to top, #7700ff, #b000ff);">
                                 <div class="liquid-wave"></div>
                             </div>
                         </div>
-                        <div class="tube-label">Échantillon A<br><span style="color:#ff5733; font-size:0.65rem;">Sang (Tache)</span></div>
+                        <div class="tube-label">Échantillon A</div>
                     </div>
 
-                    <!-- Éprouvette 2 : Tissu -->
-                    <div class="tube-station" data-tube="1">
+                    <div class="tube-station">
                         <div class="chemistry-tube">
-                            <div class="chemistry-liquid" id="liquid-1" style="height: 0%; background: linear-gradient(to top, #0077ff, #00d4ff);">
+                            <div class="chemistry-liquid" id="liquid-1" style="height: 0%; background: linear-gradient(to top, #0044aa, #00d4ff);">
                                 <div class="liquid-wave"></div>
                             </div>
                         </div>
-                        <div class="tube-label">Échantillon B<br><span style="color:#00d4ff; font-size:0.65rem;">Fibre / Tissu</span></div>
+                        <div class="tube-label">Échantillon B</div>
                     </div>
 
-                    <!-- Éprouvette 3 : Résultat Séquencé -->
-                    <div class="tube-station" data-tube="2" style="cursor: default;">
+                    <div class="tube-station">
                         <div class="chemistry-tube" style="border-color: var(--accent-gold);">
-                            <div class="chemistry-liquid" id="liquid-2" style="height: 0%; background: linear-gradient(to top, #00b050, #00ff88);">
+                            <div class="chemistry-liquid" id="liquid-2" style="height: 0%; background: linear-gradient(to top, #006622, #00ff88);">
                                 <div class="liquid-wave"></div>
                             </div>
                         </div>
-                        <div class="tube-label" style="color: var(--accent-gold);">Séquence Finale<br><span style="color:var(--accent-green); font-size:0.65rem;">Profil ADN Pur</span></div>
+                        <div class="tube-label" style="color: var(--accent-gold);">ADN Purifié</div>
                     </div>
                 </div>
 
+                <!-- Panneau des Réactifs -->
                 <div class="reagents-panel">
-                    <button class="reagent-btn" onclick="applyReagent('lyse', 'Enzyme de Lyse', '#00d4ff')">
-                        <span class="reagent-color-dot" style="color: #00d4ff; background: #00d4ff;"></span> 1. Enzyme de Lyse
+                    <button class="reagent-btn" onclick="addReagent('lyse')">
+                        <span class="reagent-dot" style="background: #00d4ff;"></span> Enzyme de Lyse
                     </button>
-                    <button class="reagent-btn" onclick="applyReagent('alcohol', 'Alcool Isopropylique', '#ff007f')">
-                        <span class="reagent-color-dot" style="color: #ff007f; background: #ff007f;"></span> 2. Alcool Isopropylique
+                    <button class="reagent-btn" onclick="addReagent('alcohol')">
+                        <span class="reagent-dot" style="background: #ff007f;"></span> Alcool Isopropylique
                     </button>
-                    <button class="reagent-btn" onclick="applyReagent('catalyst', 'Catalyseur Fluorescent', '#00ff88')">
-                        <span class="reagent-color-dot" style="color: #00ff88; background: #00ff88;"></span> 3. Catalyseur UV
+                    <button class="reagent-btn" onclick="addReagent('catalyst')">
+                        <span class="reagent-dot" style="background: #00ff88;"></span> Catalyseur UV
+                    </button>
+                    <button class="reagent-btn" onclick="addReagent('buffer')">
+                        <span class="reagent-dot" style="background: #f3d98a;"></span> Solution Tampon
                     </button>
                 </div>
 
+                <!-- Console -->
                 <div class="lab-console" id="lab-console">
-                    [SYSTEM] Prêt. Éprouvette 1 sélectionnée. Appliquez l'enzyme pour détruire la membrane cellulaire.
+                    👉 Choisissez le premier réactif pour l'Échantillon A du Suspect 1.
                 </div>
 
                 <div class="lab-actions">
-                    <button class="lab-btn" onclick="resetLab()">Vider / Réinitialiser</button>
-                    <button class="lab-btn primary" onclick="validateSequence()">Lancer le Séquençage</button>
+                    <button class="lab-btn" onclick="resetCurrentSuspect()">🔄 Vider les tubes</button>
+                    <button class="lab-btn primary" onclick="validateCurrentSuspect()">🔬 Analyser le Profil</button>
                 </div>
             </div>
         </div>
     </main>
 
-    <button id="story-continue-btn" class="btn btn-continue">Continuer</button>
+    <button id="story-continue-btn" class="btn btn-continue">Continuer l'Enquête</button>
 
     <script src="../settings-menu.js"></script>
     <script>
         (function () {
             'use strict';
-
             if (window.DPSettings && window.DPSettings.init) {
                 window.DPSettings.init({
-                    showMusicToggle: true,
-                    showMusicVolume: true,
-                    showNarrationVolume: false,
-                    showMuteToggle: false,
-                    showGameSection: true,
-                    showBackToHub: false,
-                    showRestart: false,
-                    showRules: false,
-                    customButtons: [],
-                    onBackToHub: function () {
-                        window.location.href = '../true-detective/index.html#minigames';
-                    }
+                    showMusicToggle: true, showMusicVolume: true, showNarrationVolume: false,
+                    showMuteToggle: false, showGameSection: true, showBackToHub: false,
+                    showRestart: false, showRules: false, customButtons: [],
+                    onBackToHub: function () { window.location.href = '../true-detective/index.html#minigames'; }
                 });
             }
 
@@ -440,27 +468,18 @@
             }
 
             function handleContinueNavigation() {
-                try { 
-                    localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'chemistry', won: true, ts: Date.now() })); 
-                } catch (e) {}
-                
+                try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'chemistry', won: true, ts: Date.now() })); } catch (e) {}
                 try {
                     var returnRaw = localStorage.getItem('td_standalone_game_return');
                     if (returnRaw) {
                         var rp = JSON.parse(returnRaw);
-                        if (rp && rp.returnUrl) {
-                            window.location.href = rp.returnUrl;
-                            return;
-                        }
+                        if (rp && rp.returnUrl) { window.location.href = rp.returnUrl; return; }
                     }
                 } catch (e) {}
-                
                 window.location.href = fromStory ? '../true-detective/index.html?standalone=chemistry' : '../true-detective/index.html#minigames';
             }
 
-            if ($continueBtn) {
-                $continueBtn.addEventListener('click', handleContinueNavigation);
-            }
+            if ($continueBtn) { $continueBtn.addEventListener('click', handleContinueNavigation); }
 
             var menuHome = document.getElementById('menu-home');
             if (menuHome) {
@@ -472,11 +491,7 @@
             var menuSettings = document.getElementById('menu-settings');
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
-                    if (window.DPSettings && window.DPSettings.open) { 
-                        window.DPSettings.open(); 
-                    } else { 
-                        alert('Paramètres : aucun réglage pour l\'instant.'); 
-                    }
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); }
                 });
             }
 
@@ -488,111 +503,123 @@
                     menu.classList.toggle('open');
                 });
                 document.addEventListener('click', function (e) {
-                    if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
-                        menu.classList.remove('open');
-                    }
+                    if (!menu.contains(e.target) && e.target !== hamburgerBtn) { menu.classList.remove('open'); }
                 });
             }
         })();
 
-        // Logique de simulation des fluides avancée
-        let activeTube = 0;
-        let labData = {
-            0: { reagent: 'none', color: 'linear-gradient(to top, #c70039, #ff5733)', level: 55 },
-            1: { reagent: 'none', color: 'linear-gradient(to top, #0077ff, #00d4ff)', level: 0 },
-            2: { reagent: 'none', color: 'linear-gradient(to top, #00b050, #00ff88)', level: 0 }
-        };
+        // Données des 6 suspects numérotés et leurs combinaisons secrètes
+        const suspectsData = [
+            { name: "Suspect 1", clue: "Trace prélevée sur le comptoir du bar.", solution: ['lyse', 'alcohol'], solved: false },
+            { name: "Suspect 2", clue: "Empreinte relevée sur l'insigne de la victime.", solution: ['buffer', 'catalyst'], solved: false },
+            { name: "Suspect 3", clue: "Résidu sur le col de chemise.", solution: ['lyse', 'buffer'], solved: false },
+            { name: "Suspect 4", clue: "Mèche de cheveux sur le canapé.", solution: ['alcohol', 'catalyst'], solved: false },
+            { name: "Suspect 5", clue: "Tache de sueur sur le dossier de contrat.", solution: ['catalyst', 'lyse'], solved: false },
+            { name: "Suspect 6", clue: "Sang sous les ongles de la victime.", solution: ['buffer', 'alcohol'], solved: false }
+        ];
 
-        const tubeStations = document.querySelectorAll('.tube-station[data-tube]');
-        tubeStations.forEach(station => {
-            const idx = parseInt(station.getAttribute('data-tube'));
-            if (idx !== 2) {
-                station.addEventListener('click', () => {
-                    tubeStations.forEach(s => s.classList.remove('active'));
-                    station.classList.add('active');
-                    activeTube = idx;
-                    document.getElementById('lab-console').textContent = `[INFO] Éprouvette ${activeTube + 1} sélectionnée. Prête pour injection de réactif.`;
-                });
-            }
-        });
+        let currentSuspectIndex = 0;
+        let currentSteps = [];
 
-        function applyReagent(type, name, hexColor) {
-            labData[activeTube].reagent = type;
-            let liquidEl = document.getElementById(`liquid-${activeTube}`);
+        function switchSuspect(index) {
+            currentSuspectIndex = index;
+            currentSteps = [];
             
-            if (type === 'lyse') {
-                labData[activeTube].color = `linear-gradient(to top, #004488, ${hexColor})`;
-                labData[activeTube].level = 75;
-            } else if (type === 'alcohol') {
-                labData[activeTube].color = `linear-gradient(to top, #880044, ${hexColor})`;
-                labData[activeTube].level = 90;
-            } else if (type === 'catalyst') {
-                labData[activeTube].color = `linear-gradient(to top, #006622, ${hexColor})`;
-                labData[activeTube].level = 80;
+            document.querySelectorAll('.suspect-tab').forEach((tab, idx) => {
+                tab.classList.remove('selected');
+                if (idx === index) tab.classList.add('selected');
+            });
+
+            const suspect = suspectsData[index];
+            document.getElementById('mission-board').innerHTML = `🎯 <b>${suspect.name} :</b> ${suspect.clue} Appliquez 2 réactifs chimiques dans l'ordre requis.`;
+            document.getElementById('lab-console').style.color = 'var(--accent-gold)';
+            document.getElementById('lab-console').textContent = `👉 Échantillon de ${suspect.name} chargé. Prêt pour le premier réactif.`;
+
+            document.getElementById('liquid-0').style.height = '50%';
+            document.getElementById('liquid-1').style.height = '0%';
+            document.getElementById('liquid-2').style.height = '0%';
+        }
+
+        function addReagent(type) {
+            if (currentSteps.length >= 2) {
+                document.getElementById('lab-console').textContent = "⚠️ Les deux tubes de mélange sont pleins. Lancez l'analyse !";
+                return;
             }
 
-            liquidEl.style.background = labData[activeTube].color;
-            liquidEl.style.height = labData[activeTube].level + '%';
+            currentSteps.push(type);
+            const tubeIdx = currentSteps.length - 1;
+            let liquidEl = document.getElementById(`liquid-${tubeIdx}`);
+            liquidEl.style.height = '75%';
 
-            // Ajouter des bulles dynamiques pour l'effet fun de réaction
+            if (type === 'lyse') liquidEl.style.background = 'linear-gradient(to top, #004488, #00d4ff)';
+            else if (type === 'alcohol') liquidEl.style.background = 'linear-gradient(to top, #880044, #ff007f)';
+            else if (type === 'catalyst') liquidEl.style.background = 'linear-gradient(to top, #006622, #00ff88)';
+            else if (type === 'buffer') liquidEl.style.background = 'linear-gradient(to top, #775500, #f3d98a)';
+
             spawnBubbles(liquidEl.parentElement);
-
-            document.getElementById('lab-console').textContent = `[RÉACTION] ${name} injecté avec succès dans l'éprouvette ${activeTube + 1}. Le fluide réagit.`;
+            document.getElementById('lab-console').textContent = `🧪 Réactif ajouté (${currentSteps.length}/2). Ajoutez le suivant ou lancez l'analyse.`;
         }
 
         function spawnBubbles(tubeElement) {
             for (let i = 0; i < 4; i++) {
                 let bubble = document.createElement('div');
                 bubble.className = 'bubble';
-                bubble.style.left = Math.random() * 80 + 10 + '%';
-                bubble.style.width = Math.random() * 6 + 4 + 'px';
-                bubble.style.height = bubble.style.width;
-                bubble.style.animationDuration = (Math.random() * 1 + 1) + 's';
+                bubble.style.left = Math.random() * 60 + 20 + '%';
+                bubble.style.width = '5px';
+                bubble.style.height = '5px';
                 tubeElement.appendChild(bubble);
-                setTimeout(() => bubble.remove(), 2000);
+                setTimeout(() => bubble.remove(), 1200);
             }
         }
 
-        function resetLab() {
-            labData = {
-                0: { reagent: 'none', color: 'linear-gradient(to top, #c70039, #ff5733)', level: 55 },
-                1: { reagent: 'none', color: 'linear-gradient(to top, #0077ff, #00d4ff)', level: 0 },
-                2: { reagent: 'none', color: 'linear-gradient(to top, #00b050, #00ff88)', level: 0 }
-            };
-            document.getElementById('liquid-0').style.background = labData[0].color;
-            document.getElementById('liquid-0').style.height = '55%';
+        function resetCurrentSuspect() {
+            currentSteps = [];
+            document.getElementById('liquid-0').style.height = '50%';
             document.getElementById('liquid-1').style.height = '0%';
             document.getElementById('liquid-2').style.height = '0%';
-            document.getElementById('lab-console').textContent = "[SYSTEM] Laboratoire réinitialisé. Suivez le protocole de l'enquête.";
+            document.getElementById('lab-console').textContent = "🔄 Tubes vidés pour ce suspect. Recommencez.";
         }
 
-        function validateSequence() {
+        function validateCurrentSuspect() {
             const consoleEl = document.getElementById('lab-console');
             const scanner = document.getElementById('scanner');
+            const suspect = suspectsData[currentSuspectIndex];
 
-            // Animation laser de scan
+            if (currentSteps.length < 2) {
+                consoleEl.style.color = '#ff4d4d';
+                consoleEl.textContent = "❌ Il manque des réactifs ! Ajoutez 2 réactifs avant d'analyser.";
+                return;
+            }
+
             scanner.style.animation = 'none';
-            scanner.offsetHeight; // trigger reflow
+            scanner.offsetHeight;
             scanner.style.animation = 'scan-effect 1.2s ease-in-out';
 
             setTimeout(() => {
-                // Condition de victoire : tube 0 avec lyse et tube 1 avec alcohol (ou autre combinaison logique)
-                if (labData[0].reagent === 'lyse' && labData[1].reagent === 'alcohol') {
+                let correct = currentSteps[0] === suspect.solution[0] && currentSteps[1] === suspect.solution[1];
+
+                if (correct) {
+                    suspect.solved = true;
+                    document.querySelectorAll('.suspect-tab')[currentSuspectIndex].classList.add('solved');
+                    
                     let dnaLiquid = document.getElementById('liquid-2');
-                    dnaLiquid.style.background = 'linear-gradient(to top, #008844, #00ff88)';
                     dnaLiquid.style.height = '85%';
-                    spawnBubbles(dnaLiquid.parentElement);
+                    dnaLiquid.style.background = 'linear-gradient(to top, #006622, #00ff88)';
 
                     consoleEl.style.color = 'var(--accent-green)';
-                    consoleEl.textContent = "[SUCCÈS] Séquençage ADN réussi ! Correspondance parfaite avec l'empreinte génétique du suspect.";
+                    consoleEl.textContent = `🎉 SUCCÈS : Profil ADN de ${suspect.name} extrait avec succès !`;
 
-                    const fromStory = new URLSearchParams(window.location.search).get('story') === '1' || new URLSearchParams(window.location.search).get('mode') === 'story';
-                    if (fromStory) {
-                        document.getElementById('story-continue-btn').style.display = 'block';
+                    let allSolved = suspectsData.every(s => s.solved);
+                    if (allSolved) {
+                        document.getElementById('mission-board').innerHTML = "🏆 <b>TOUS LES SUSPECTS ONT ÉTÉ ANALYSÉS !</b> Séquençage complet terminé.";
+                        const fromStory = new URLSearchParams(window.location.search).get('story') === '1' || new URLSearchParams(window.location.search).get('mode') === 'story';
+                        if (fromStory) {
+                            document.getElementById('story-continue-btn').style.display = 'block';
+                        }
                     }
                 } else {
-                    consoleEl.style.color = '#ff4444';
-                    consoleEl.textContent = "[ERREUR] Échec du séquençage : Séquence de réactifs invalide. Le mélange n'a pas purifié l'ADN.";
+                    consoleEl.style.color = '#ff4d4d';
+                    consoleEl.textContent = "❌ ÉCHEC : Le mélange ne réagit pas correctement. Mauvaise combinaison chimique.";
                 }
             }, 1200);
         }

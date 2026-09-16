@@ -335,6 +335,79 @@
                 ]
             }
         },
+
+        "femme-fatale": {
+            intro: { fr: "Lady Vivienne vous reçoit dans le boudoir aux rideaux de velours rouge. Elle ne se lève pas. Une tasse de thé fume entre ses doigts gantés, mais elle n'y porte pas les lèvres.\n\n« Mon mari avait des ennemis, certes. Mais l'auteur de ce crime… c'est quelqu'un de la maison. Quelqu'un qui connaissait ses habitudes. »\n\nElle vous défie du regard, les yeux deux charbons dans la pénombre. Lady Vivienne attend votre première question.", en: "Lady Vivienne receives you in the boudoir with blood-red velvet curtains. She does not rise. A teacup smokes between her gloved fingers, but she does not raise it to her lips.\n\n\"My husband had enemies, certainly. But the perpetrator… it's someone from the house. Someone who knew his habits.\"\n\nShe challenges you with her gaze, eyes like coals in the half-light. Lady Vivienne waits for your first question." },
+            questions: [
+                {
+                    id: 'viv_q1',
+                    label: { fr: "« Vous étiez au manoir, cette nuit-là. Pourquoi n'avez-vous appelé personne ? »", en: "\"You were at the manor that night. Why didn't you call anyone?\"" },
+                    response: { fr: "Vivienne sourit sans chaleur. « Parce que je savais que mon mari recevait. Et quand on reçoit à cette heure, on ne veut pas être dérangé. J'ai entendu la voiture partir… et puis plus rien. »\n\n[Alibi] Elle a entendu une voiture partir mais n'a pas appelé. Étrange, pour une épouse qui prétend aimer son mari.", en: "Vivienne smiles without warmth. \"Because I knew my husband was receiving visitors. And when one receives at that hour, one does not wish to be disturbed. I heard a car leave… and then nothing.\"\n\n[Alibi] She heard a car leave but did not call. Strange, for a wife who claims to love her husband." },
+                    evidence: 'alibi'
+                },
+                {
+                    id: 'viv_q2',
+                    label: { fr: "« Votre mari avait des ennemis. Lequel vous inquiétait le plus ? »", en: "\"Your husband had enemies. Which one worried you the most?\"" },
+                    response: { fr: "Elle tourne sa tasse lentement. « Les ennemis de mon mari sont nombreux. Mais celui qui le connaissait le mieux… celui qui avait le plus à gagner… c'est quelqu'un que vous n'avez pas encore interrogé. »\n\n[Mobile] Elle désigne quelqu'un sans le nommer. À identifier.", en: "She turns her cup slowly. \"My husband's enemies are many. But the one who knew him best… the one who had the most to gain… it is someone you have not yet questioned.\"\n\n[Mobile] She points to someone without naming them. To identify." },
+                    evidence: 'mobile'
+                },
+                {
+                    id: 'viv_q3',
+                    label: { fr: "« Le coffre-fort était ouvert. Vous saviez où se trouvait la combinaison ? »", en: "\"The safe was open. Did you know where the combination was?\"" },
+                    response: { fr: "Ses doigts se crispent sur la porcelaine. « Aldric changeait de cachette tous les mois. Paranoïa, vous voyez. La montre de poche ? C'était le dernier essai. Il l'a montrée à tout le monde, ce soir-là. »\n\n[Accès] Elle sait que la montre contenait la combinaison. Mais affirme ne pas l'avoir utilisée.", en: "Her fingers tighten on the porcelain. \"Aldric changed his hiding place every month. Paranoia, you see. The pocket watch? It was the last attempt. He showed it to everyone that evening.\"\n\n[Accès] She knows the watch contained the combination. But claims not to have used it." },
+                    evidence: 'opportunity'
+                }
+            ],
+            rounds2: [
+                {
+                    id: 'viv_r2q1',
+                    label: { fr: "« Hale et Pembrooke étaient en panne ensemble. Croyez-vous à cet alibi ? »", en: "\"Hale and Pembrooke were broken down together. Do you believe that alibi?\"" },
+                    response: { fr: "Elle émet un petit rire. « Hale est trop perfectionniste pour laisser sa voiture en panne. Et Pembrooke… Julian a toujours eu de la chance avec les femmes. Pas avec les moteurs. »\n\n[Témoin] Elle doute de l'alibi de panne. Mais ne fournit pas de contre-preuve.", en: "She lets out a small laugh. \"Hale is too much of a perfectionist to let his car break down. And Pembrooke… Julian has always been lucky with women. Not with engines.\"\n\n[Témoin] She doubts the breakdown alibi. But provides no counter-evidence." },
+                    evidence: 'witness'
+                },
+                {
+                    id: 'viv_r2q2',
+                    label: { fr: "« Blackwood, le notaire. Il gétait les affaires de votre mari. Vous lui faisiez confiance ? »", en: "\"Blackwood, the notary. He handled your husband's affairs. Did you trust him?\"" },
+                    response: { fr: "La tasse s'arrête à mi-chemin. « Rupert était efficace. Trop efficace. Il savait où Aldric cachait ses documents… et il savait aussi que le testament était en ma faveur. »\n\n[Mobile] Blackwood connaissait le testament et la cachette des documents.", en: "The cup stops halfway. \"Rupert was efficient. Too efficient. He knew where Aldric hid his documents… and he also knew the will was in my favor.\"\n\n[Mobile] Blackwood knew the will and the document hiding place." },
+                    evidence: 'mobile'
+                },
+                {
+                    id: 'viv_r2q3',
+                    label: { fr: "« Quelqu'un a utilisé la montre comme combinaison du coffre. Vous avez une idée de qui ? »", en: "\"Someone used the watch as the safe combination. Any idea who?\"" },
+                    response: { fr: "Elle croise les bras. « La combinaison changeait chaque mois. Ce soir-là, c'était 22h09. L'heure à laquelle mon mari attendait quelqu'un. Mais il n'a jamais eu le temps de l'utiliser. »\n\n[Chronologie] Elle confirme l'heure de la combinaison et l'attente d'un visiteur.", en: "She crosses her arms. \"The combination changed every month. That evening, it was 10:09 PM. The time at which my husband was expecting someone. But he never had time to use it.\"\n\n[Chronologie] She confirms the combination time and the expectation of a visitor." },
+                    evidence: 'timeline'
+                }
+            ],
+            rounds3: [
+                {
+                    id: 'viv_r3q1',
+                    label: { fr: "« On a retrouvé des empreintes de tout le monde sur la scène. Même les vôtres. »", en: "\"We found everyone's prints at the scene. Even yours.\"" },
+                    response: { fr: "Elle hausse les épaules. « Je vis dans cette maison. Mes empreintes sont partout. Mais je n'ai pas tué mon mari. Si je voulais sa fortune, je n'avais qu'à attendre qu'il meure de vieillesse. »\n\n[Forensique] Les empreintes de Vivienne sont partout, mais elle avait une raison légitime d'être là.", en: "She shrugs. \"I live in this house. My prints are everywhere. But I did not kill my husband. If I wanted his fortune, I only had to wait for him to die of old age.\"\n\n[Forensique] Vivienne's prints are everywhere, but she had a legitimate reason to be there." },
+                    evidence: 'forensic'
+                },
+                {
+                    id: 'viv_r3q2',
+                    label: { fr: "« Hale vous aime depuis des années. L'avez-vous utilisé ? »", en: "\"Hale has loved you for years. Did you use him?\"" },
+                    response: { fr: "Un silence. Puis un sourire froid. « Hale est un soldat. Il suit les ordres. Si Aldric est mort, c'est parce que quelqu'un a donné un ordre. Pas parce que quelqu'un a souri. »\n\n[Témoin] Elle écarte la jalousie de Hale. Mais ne nie pas son influence.", en: "A silence. Then a cold smile. \"Hale is a soldier. He follows orders. If Aldric is dead, it is because someone gave an order. Not because someone smiled.\"\n\n[Témoin] She dismisses Hale's jealousy. But does not deny his influence." },
+                    evidence: 'witness'
+                },
+                {
+                    id: 'viv_r3q3',
+                    label: { fr: "« Si je vous accuse du meurtre, que répondrez-vous au juge ? »", en: "\"If I accuse you of murder, what will you say to the judge?\"" },
+                    response: { fr: "Elle se lève lentement. « Je dirai que l'inspecteur qui a résolu cette affaire a été manipulé par les véritables coupables. Et je dirai aussi que vous avez oublié de vérifier l'alibi de celui qui a payé Krane. »\n\n[Méthode] Elle retourne l'accusation. La partie d'échecs va trancher.", en: "She rises slowly. \"I will say that the inspector who solved this case was manipulated by the real culprits. And I will also say that you forgot to check the alibi of the one who paid Krane.\"\n\n[Méthode] She turns the accusation around. The chess game will decide." },
+                    evidence: 'method'
+                }
+            ],
+            minigame: {
+                type: 'chess',
+                difficulty: [
+                    { clue: { fr: "Vivienne renverse son thé, fait glisser l'échiquier entre vous deux : « Les mots m'ennuient, inspecteur. Jouons. » Elle joue avec une précision chirurgicale, mais une erreur lui coûte la partie. Dans sa colère, elle laisse échapper un nom : Hale.", en: "Vivienne spills her tea, slides the chessboard between you: 'Words bore me, inspector. Let us play.' She plays with surgical precision, but one mistake costs her the game. In her anger, she lets slip a name: Hale." }, failClue: { fr: "Vivienne ferme l'échiquier d'un geste sec. « Vous n'êtes pas digne de mes secrets. » Elle se lève et quitte le boudoir. Vous n'obtenez rien.", en: "Vivienne closes the chessboard with a sharp gesture. 'You are not worthy of my secrets.' She rises and leaves the boudoir. You get nothing." }, rounds: [{ title: { fr: 'Échecs 1', en: 'Chess 1' } }] },
+                    { clue: { fr: "Vivienne joue avec une élégance féline, mais Hale, présent dans la pièce, trépigne nerveusement. Quand elle perd, elle ordonne à Hale de sortir. Seule avec vous, elle avoue avoir tout orchestré depuis le début.", en: "Vivienne plays with feline elegance, but Hale, present in the room, paces nervously. When she loses, she orders Hale out. Alone with you, she confesses to having orchestrated everything from the start." }, failClue: { fr: "Hale intervient : « Assez, milady. » Il vous expulse du boudoir. Vous n'obtenez aucune information.", en: "Hale intervenes: 'Enough, milady.' He expels you from the boudoir. You obtain no information." }, rounds: [{ title: { fr: 'Échecs 2', en: 'Chess 2' } }] },
+                    { clue: { fr: "Vivienne, furieuse de perdre, dévoile le plan : Hale a tué Aldric par jalousie, et elle a manipulé tout le monde pour hériter. Elle vous tend la preuve ultime : le billet de Krane signé Hale.", en: "Vivienne, furious at losing, unveils the plan: Hale killed Aldric out of jealousy, and she manipulated everyone to inherit. She hands you the ultimate proof: Krane's note signed by Hale." }, failClue: { fr: "Vivienne sourit : « Vous avez gagné la partie, mais pas la guerre. » Elle brûle le billet compromettant devant vous. La piste est perdue.", en: "Vivienne smiles: 'You won the game, but not the war.' She burns the compromising note in front of you. The trail is lost." }, rounds: [{ title: { fr: 'Échecs 3', en: 'Chess 3' } }] }
+                ]
+            }
+        },
+
         marginal: {
             intro: { fr: "Silas Crane grelotte dans l'encadrement de la porte. Il a besoin d'une pièce. Choisissez votre question, doucement.", en: "Silas Crane shivers in the doorway. He needs a coin. Choose your question, gently." },
             questions: [

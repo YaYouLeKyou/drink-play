@@ -9,39 +9,84 @@
     <link rel="stylesheet" href="standalone-game.css">
     <link rel="stylesheet" href="styles.css">
     <style>
+        :root {
+            --bg-deep: #030307;
+            --bg-gradient: radial-gradient(circle at 50% 20%, #100f24 0%, #030307 100%);
+            --accent-gold: #f3d98a;
+            --text-main: #f0f4f8;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-deep);
+            background-image: var(--bg-gradient);
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .sg-header {
+            background: rgba(8, 8, 14, 0.95) !important;
+            border-bottom: 1px solid rgba(240, 216, 144, 0.25);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+        }
+
+        .sg-title {
+            text-shadow: 0 0 15px rgba(240, 216, 144, 0.3);
+            letter-spacing: 0.05em;
+            font-size: 1.1rem !important;
+        }
+
+        .sg-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
         /* Réseau d'Alibis (Crime Investigation Board) */
-.reseau-alibis-board { position: relative; width: 100%; max-width: 800px; margin: 0 auto; }
-.reseau-alibis-carousel-wrap { position: relative; width: 100%; overflow: hidden; padding: 8px 0 8px 0; z-index: 1; }
-.reseau-alibis-carousel-track { display: flex; transition: transform 0.3s ease; width: 100%; }
-.reseau-alibis-carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; border: 2px solid rgba(240,216,144,0.5); background: rgba(20,14,10,0.85); color: #f0d890; border-radius: 50%; font-size: 1.2rem; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-family: 'Montserrat', sans-serif; }
-.reseau-alibis-carousel-btn:hover { background: rgba(240,216,144,0.15); border-color: rgba(240,216,144,0.9); }
-.reseau-alibis-carousel-btn.prev { left: 8px; }
-.reseau-alibis-carousel-btn.next { right: 8px; }
-.reseau-alibis-board-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(60,35,20,0.15) 0%, rgba(40,22,12,0.18) 100%); border: 2px dashed rgba(240,216,144,0.15); border-radius: 12px; pointer-events: none; }
-.reseau-alibis-intro { position: relative; font-size: 0.95rem; color: #f0d890; margin: 0 0 8px 0; font-style: italic; text-align: center; z-index: 1; line-height: 1.4; }
-.reseau-alibis-counter { position: relative; font-size: 0.85rem; color: #d8c8a0; margin: 0 0 16px 0; padding: 6px 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(240,216,144,0.3); border-radius: 6px; display: inline-block; z-index: 1; }
-.reseau-alibis-grid { position: relative; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 16px; z-index: 1; }
-.reseau-alibis-card { position: relative; padding: 16px 14px 20px 14px; background: linear-gradient(180deg, rgba(40,32,22,0.9) 0%, rgba(28,22,16,0.9) 100%); border: 2px solid rgba(240,216,144,0.3); border-radius: 12px; color: #e8dcc4; font-family: inherit; font-size: 0.88rem; line-height: 1.4; text-align: left; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-.reseau-alibis-card:hover { transform: translateY(-3px); border-color: rgba(240,216,144,0.8); box-shadow: 0 6px 20px rgba(0,0,0,0.6); }
-.reseau-alibis-photo { width: 100%; height: 70px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(240,216,144,0.2); border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.3); flex-shrink: 0; }
-.reseau-alibis-img { max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; image-rendering: pixelated; }
-.reseau-alibis-who { font-weight: 700; color: #f0d890; font-size: 1.0rem; margin-bottom: 6px; letter-spacing: 0.02em; }
-.reseau-alibis-what { color: #d8c8a0; font-size: 0.82rem; margin-bottom: 8px; }
-.reseau-alibis-tag { position: absolute; top: 8px; right: 10px; font-size: 0.65rem; padding: 2px 8px; border-radius: 999px; background: rgba(240,216,144,0.15); color: #f0d890; border: 1px solid rgba(240,216,144,0.4); }
-.reseau-alibis-card.wrong { border-color: #d8574a; animation: mg-shake 0.4s; }
-.reseau-alibis-card .tag-wrong { background: rgba(216,87,74,0.25); color: #f2c1ba; border-color: #d8574a; }
-.reseau-alibis-card.lie-found { border-color: #d8574a; background: linear-gradient(180deg, rgba(70,20,20,0.85) 0%, rgba(40,16,16,0.85) 100%); box-shadow: 0 0 20px rgba(216,87,74,0.6); }
-.reseau-alibis-card.lie-found .reseau-alibis-tag { background: rgba(216,87,74,0.4); color: #fff; border-color: #d8574a; }
-.reseau-alibis-continue { position: fixed !important; bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important; left: 50% !important; transform: translateX(-50%) !important; display: block !important; width: auto !important; max-width: 320px !important; z-index: 11001 !important; }
-.reseau-alibis-card.lie-found .tag-lie { background: rgba(216,87,74,0.5); color: #fff; border-color: #d8574a; }
-.reseau-alibis-card.confirmed-true { border-color: rgba(127,212,138,0.6); opacity: 0.85; }
-.reseau-alibis-card.confirmed-true .reseau-alibis-tag { background: rgba(127,212,138,0.3); color: #c9f2d2; }
-.reseau-alibis-card.confirmed-true .tag-true { background: rgba(127,212,138,0.4); color: #fff; border-color: #7fd48a; }
-.reseau-alibis-card.hint-glow { box-shadow: 0 0 20px rgba(240,216,144,0.7); border-color: rgba(240,216,144,0.9); animation: hint-pulse 1.2s ease-in-out infinite; }
-@keyframes hint-pulse { 0%,100% { box-shadow: 0 0 14px rgba(240,216,144,0.5); } 50% { box-shadow: 0 0 26px rgba(240,216,144,1); } }
-@keyframes mg-shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-.reseau-alibis-board { padding-bottom: 72px; }
-.reseau-alibis-message { position: relative; margin: 14px auto 0; padding: 10px 16px; max-width: 480px; text-align: center; font-size: 0.95rem; color: #f0d890; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(240, 216, 144, 0.4); border-radius: 8px; z-index: 1; }
+        .reseau-alibis-board { position: relative; width: 100%; max-width: 800px; margin: 0 auto; background: rgba(10, 12, 20, 0.94); border: 1px solid rgba(240, 216, 144, 0.35); border-radius: 16px; padding: 16px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8); box-sizing: border-box; padding-bottom: 72px; }
+        .reseau-alibis-carousel-wrap { position: relative; width: 100%; overflow: hidden; padding: 8px 0; z-index: 1; }
+        .reseau-alibis-carousel-track { display: flex; transition: transform 0.3s ease; width: 100%; }
+        .reseau-alibis-carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; border: 2px solid rgba(240,216,144,0.5); background: rgba(20,14,10,0.85); color: #f0d890; border-radius: 50%; font-size: 1.2rem; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-family: 'Montserrat', sans-serif; }
+        .reseau-alibis-carousel-btn:hover { background: rgba(240,216,144,0.15); border-color: rgba(240,216,144,0.9); }
+        .reseau-alibis-carousel-btn.prev { left: 8px; }
+        .reseau-alibis-carousel-btn.next { right: 8px; }
+        .reseau-alibis-board-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(60,35,20,0.15) 0%, rgba(40,22,12,0.18) 100%); border: 2px dashed rgba(240,216,144,0.15); border-radius: 12px; pointer-events: none; }
+        .reseau-alibis-intro { position: relative; font-size: 0.95rem; color: #f0d890; margin: 0 0 8px 0; font-style: italic; text-align: center; z-index: 1; line-height: 1.4; }
+        .reseau-alibis-counter { position: relative; font-size: 0.85rem; color: #d8c8a0; margin: 0 0 16px 0; padding: 6px 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(240,216,144,0.3); border-radius: 6px; display: inline-block; z-index: 1; }
+        .reseau-alibis-grid { position: relative; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 16px; z-index: 1; }
+        .reseau-alibis-card { position: relative; padding: 16px 14px 20px 14px; background: linear-gradient(180deg, rgba(40,32,22,0.9) 0%, rgba(28,22,16,0.9) 100%); border: 2px solid rgba(240,216,144,0.3); border-radius: 12px; color: #e8dcc4; font-family: inherit; font-size: 0.88rem; line-height: 1.4; text-align: left; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .reseau-alibis-card:hover { transform: translateY(-3px); border-color: rgba(240,216,144,0.8); box-shadow: 0 6px 20px rgba(0,0,0,0.6); }
+        .reseau-alibis-photo { width: 100%; height: 70px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(240,216,144,0.2); border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.3); flex-shrink: 0; }
+        .reseau-alibis-img { max-width: 100%; max-height: 100%; width: auto; height: auto; display: block; image-rendering: pixelated; }
+        .reseau-alibis-who { font-weight: 700; color: #f0d890; font-size: 1.0rem; margin-bottom: 6px; letter-spacing: 0.02em; }
+        .reseau-alibis-what { color: #d8c8a0; font-size: 0.82rem; margin-bottom: 8px; }
+        .reseau-alibis-tag { position: absolute; top: 8px; right: 10px; font-size: 0.65rem; padding: 2px 8px; border-radius: 999px; background: rgba(240,216,144,0.15); color: #f0d890; border: 1px solid rgba(240,216,144,0.4); }
+        .reseau-alibis-card.wrong { border-color: #d8574a; animation: mg-shake 0.4s; }
+        .reseau-alibis-card .tag-wrong { background: rgba(216,87,74,0.25); color: #f2c1ba; border-color: #d8574a; }
+        .reseau-alibis-card.lie-found { border-color: #d8574a; background: linear-gradient(180deg, rgba(70,20,20,0.85) 0%, rgba(40,16,16,0.85) 100%); box-shadow: 0 0 20px rgba(216,87,74,0.6); }
+        .reseau-alibis-card.lie-found .reseau-alibis-tag { background: rgba(216,87,74,0.4); color: #fff; border-color: #d8574a; }
+        .reseau-alibis-card.lie-found .tag-lie { background: rgba(216,87,74,0.5); color: #fff; border-color: #d8574a; }
+        .reseau-alibis-card.confirmed-true { border-color: rgba(127,212,138,0.6); opacity: 0.85; }
+        .reseau-alibis-card.confirmed-true .reseau-alibis-tag { background: rgba(127,212,138,0.3); color: #c9f2d2; }
+        .reseau-alibis-card.confirmed-true .tag-true { background: rgba(127,212,138,0.4); color: #fff; border-color: #7fd48a; }
+        .reseau-alibis-card.hint-glow { box-shadow: 0 0 20px rgba(240,216,144,0.7); border-color: rgba(240,216,144,0.9); animation: hint-pulse 1.2s ease-in-out infinite; }
+        
+        @keyframes hint-pulse { 0%,100% { box-shadow: 0 0 14px rgba(240,216,144,0.5); } 50% { box-shadow: 0 0 26px rgba(240,216,144,1); } }
+        @keyframes mg-shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        .reseau-alibis-continue { position: fixed !important; bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important; left: 50% !important; transform: translateX(-50%) !important; display: none !important; width: auto !important; max-width: 320px !important; z-index: 11001 !important; box-shadow: 0 0 15px rgba(0, 255, 136, 0.3); }
+        .reseau-alibis-message { position: relative; margin: 14px auto 0; padding: 10px 16px; max-width: 480px; text-align: center; font-size: 0.95rem; color: #f0d890; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(240, 216, 144, 0.4); border-radius: 8px; z-index: 1; }
     </style>
 </head>
 <body>
@@ -50,6 +95,7 @@
         <h2 class="sg-title" style="color:#f0d890;font-family:'Playfair Display',serif;">🕸️ Réseau d'alibis - 6 cartes</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
+
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
             <span class="menu-icon">🏠</span>
@@ -61,9 +107,15 @@
             <span>Paramètres</span>
         </button>
     </nav>
+
     <main class="sg-main">
-        <div id="reseau-alibis-app"></div>
+        <div id="reseau-alibis-app">
+            <div style="color: #f0d890; text-align: center; padding: 20px; font-style: italic;">
+                Chargement du réseau d'alibis...
+            </div>
+        </div>
     </main>
+
     <script src="minigames.js"></script>
     <script src="../settings-menu.js"></script>
     <script>
@@ -122,14 +174,14 @@
             }
 
             var backBtn = document.getElementById('back-to-minigame-btn');
-            var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+            var fromStory = new URLSearchParams(window.location.search).get('story') === '1' || new URLSearchParams(window.location.search).get('mode') === 'story';
 
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
                 var continueBtn = document.createElement('button');
                 continueBtn.id = 'story-continue-btn';
-                continueBtn.className = 'btn btn-continue';
-                continueBtn.textContent = 'Continuer';
+                continueBtn.className = 'btn btn-continue reseau-alibis-continue';
+                continueBtn.textContent = 'Continuer l\'Enquête';
                 continueBtn.addEventListener('click', function () {
                     try { 
                         localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau_alibis', won: true, ts: Date.now() })); 
@@ -146,8 +198,7 @@
                     } catch (e) {}
                     window.location.href = '../true-detective/index.html?standalone=reseau_alibis';
                 });
-                var header = document.querySelector('.sg-header');
-                if (header) header.appendChild(continueBtn);
+                document.body.appendChild(continueBtn);
             } else {
                 if (backBtn) {
                     backBtn.textContent = 'Accueil';
@@ -178,7 +229,14 @@
                 });
             }
 
-            var testimonies = [{\"witness\":{\"en\":\"Major Hale\",\"fr\":\"Major Hale\"},\"id\":\"hale\",\"statement\":{\"en\":\"I was broken down with Pembrooke at 10pm. The manor lock was opened with a key, not forced. The victim didn\u0027t resist.\",\"fr\":\"J\u0027étais en panne avec Pembrooke à 22h. Le verrou du manoir a été ouvert avec une clé, pas forcé. La victime n\u0027a pas opposé de résistance.\"},\"isLie\":false},{\"witness\":{\"en\":\"Lady Vivienne\",\"fr\":\"Lady Vivienne\"},\"id\":\"vivienne\",\"statement\":{\"en\":\"I was at the theatre with friends, then alone at the manor. My husband and I had a relationship based on money, not love, I had no reason to kill him.\",\"fr\":\"J\u0027étais au théâtre avec des amies, puis seule au manoir. Mon mari et moi avions une relation basée sur l\u0027argent, pas l\u0027amour, je n\u0027avais aucune raison de le tuer.\"},\"isLie\":true},{\"witness\":{\"en\":\"Julian Pembrooke\",\"fr\":\"Julian Pembrooke\"},\"id\":\"pembrooke\",\"statement\":{\"en\":\"My car broke down, Hale joined me at 10pm. I was ALONE waiting, no prowler passed near the manor that night.\",\"fr\":\"Ma voiture est tombée en panne, Hale m\u0027a rejoint à 22h. J\u0027étais SEUL à attendre, aucun rôdeur n\u0027est passé près du manoir cette nuit-là.\"},\"isLie\":true},{\"witness\":{\"en\":\"Rupert Blackwood\",\"fr\":\"Rupert Blackwood\"},\"id\":\"blackwood\",\"statement\":{\"en\":\"I dined with the Duke at 7pm, he wanted to withdraw funds. I left around 8pm, Silas saw me pass the gate. The will matters little to me, it\u0027s the heir that matters.\",\"fr\":\"J\u0027ai dîné avec le Duc à 19h, il voulait retirer des fonds. Je suis parti vers 20h, Silas m\u0027a vu passer au portail. Le testament m\u0027importe peu, c\u0027est l\u0027héritier qui compte.\"},\"isLie\":false},{\"witness\":{\"en\":\"Silas Crane\",\"fr\":\"Silas Crane\"},\"id\":\"silas\",\"statement\":{\"en\":\"I saw a prowler at 10pm near the pavilion, gold watch, nervous. And I saw Blackwood pass at 8pm, the notary has always been straight.\",\"fr\":\"J\u0027ai vu un rôdeur à 22h près du pavillon, montre en or, nerveux. Et j\u0027ai vu Blackwood passer à 20h, le notaire a toujours été réglo.\"},\"isLie\":false},{\"witness\":{\"en\":\"Victor Krane\",\"fr\":\"Victor Krane\"},\"id\":\"krane\",\"statement\":{\"en\":\"For whoever pays. That night, I was alone. The homeless make up anything, especially that Silas, a vagrant with a murky past.\",\"fr\":\"Pour qui paye. Cette nuit-là, j\u0027étais seul. Les clochards racontent n\u0027importe quoi, surtout ce Silas, un vagabond au passé trouble.\"},\"isLie\":true}];
+            var testimonies = [
+                {"witness":{"en":"Major Hale","fr":"Major Hale"},"id":"hale","statement":{"en":"I was broken down with Pembrooke at 10pm. The manor lock was opened with a key, not forced. The victim didn't resist.","fr":"J'étais en panne avec Pembrooke à 22h. Le verrou du manoir a été ouvert avec une clé, pas forcé. La victime n'a pas opposé de résistance."}, "isLie":false},
+                {"witness":{"en":"Lady Vivienne","fr":"Lady Vivienne"},"id":"vivienne","statement":{"en":"I was at the theatre with friends, then alone at the manor. My husband and I had a relationship based on money, not love, I had no reason to kill him.","fr":"J'étais au théâtre avec des amies, puis seule au manoir. Mon mari et moi avions une relation basée sur l'argent, pas l'amour, je n'avais aucune raison de le tuer."}, "isLie":true},
+                {"witness":{"en":"Julian Pembrooke","fr":"Julian Pembrooke"},"id":"pembrooke","statement":{"en":"My car broke down, Hale joined me at 10pm. I was ALONE waiting, no prowler passed near the manor that night.","fr":"Ma voiture est tombée en panne, Hale m'a rejoint à 22h. J'étais SEUL à attendre, aucun rôdeur n'est passé près du manoir cette nuit-là."}, "isLie":true},
+                {"witness":{"en":"Rupert Blackwood","fr":"Rupert Blackwood"},"id":"blackwood","statement":{"en":"I dined with the Duke at 7pm, he wanted to withdraw funds. I left around 8pm, Silas saw me pass the gate. The will matters little to me, it's the heir that matters.","fr":"J'ai dîné avec le Duc à 19h, il voulait retirer des fonds. Je suis parti vers 20h, Silas m'a vu passer au portail. Le testament m'importe peu, c'est l'héritier qui compte."}, "isLie":false},
+                {"witness":{"en":"Silas Crane","fr":"Silas Crane"},"id":"silas","statement":{"en":"I saw a prowler at 10pm near the pavilion, gold watch, nervous. And I saw Blackwood pass at 8pm, the notary has always been straight.","fr":"J'ai vu un rôdeur à 22h près du pavillon, montre en or, nerveux. Et j'ai vu Blackwood passer à 20h, le notaire a toujours été réglo."}, "isLie":false},
+                {"witness":{"en":"Victor Krane","fr":"Victor Krane"},"id":"krane","statement":{"en":"For whoever pays. That night, I was alone. The homeless make up anything, especially that Silas, a vagrant with a murky past.","fr":"Pour qui paye. Cette nuit-là, j'étais seul. Les clochards racontent n'importe quoi, surtout ce Silas, un vagabond au passé trouble."}, "isLie":true}
+            ];
             
             var cfg = {
                 type: 'reseau_alibis',
@@ -194,9 +252,10 @@
             var minigame = TDNarrativeEngine.createMinigame('reseau_alibis', cfg);
             minigame.onComplete(function(result) {
                 if (result && result.won) {
-                    console.log('Victoire !');
-                } else {
-                    console.log('Défaite...');
+                    var continueButtonElem = document.getElementById('story-continue-btn');
+                    if (fromStory && continueButtonElem) {
+                        continueButtonElem.style.display = 'block';
+                    }
                 }
             });
             minigame.start();
