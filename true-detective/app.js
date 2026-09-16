@@ -3606,7 +3606,8 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.npcName.textContent = '';
         hideNPC();
 
-        if (phase.id === 'act3_2' && page.npc === 'protecteur' && page.interrogation === 'protecteur') {
+        if ((phase.id === 'act3_2' && page.npc === 'protecteur' && page.interrogation === 'protecteur') ||
+            (phase.id === 'act3_3' && page.interrogation === 'dynamic')) {
             scrMusicPlaying('final_interrogation');
         } else {
             scrMusicPlaying(phase.music);
