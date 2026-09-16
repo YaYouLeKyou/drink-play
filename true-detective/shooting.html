@@ -8,6 +8,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
     <style>
+        :root {
+            --bg-dark: #070712;
+            --accent-blue: #00d4ff;
+            --accent-green: #00ff88;
+            --accent-orange: #ff6b00;
+            --accent-gold: #f0d890;
+            --text-main: #e8f4ff;
+            --text-secondary: #a0c0d0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% 10%, #1a162b 0%, var(--bg-dark) 100%);
+            color: var(--text-main);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
         .shooting-wrap {
             display: flex;
             flex-direction: column;
@@ -17,51 +39,61 @@
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
+            box-sizing: border-box;
         }
+
         .shooting-header {
             width: 100%;
             text-align: center;
             background: rgba(12, 16, 24, 0.85);
-            border: 1px solid rgba(0, 212, 255, 0.15);
+            border: 1px solid rgba(0, 212, 255, 0.2);
             border-radius: 12px;
             padding: 12px 16px;
             display: flex;
             flex-direction: column;
             gap: 6px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
+
         .shooting-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.2rem;
-            color: #f0d890;
+            font-size: 1.3rem;
+            color: var(--accent-gold);
             text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
             margin: 0;
         }
+
         .shooting-stats {
             display: flex;
             justify-content: center;
-            gap: 16px;
+            gap: 20px;
             flex-wrap: wrap;
         }
+
         .shooting-stat {
             font-size: 0.9rem;
-            color: #00d4ff;
+            color: var(--accent-blue);
             font-weight: 600;
         }
+
         #shooting-canvas {
             display: block;
             width: 100%;
             max-width: 800px;
-            height: 400px;
-            background: #0a0a1a;
-            border: 2px solid #00d4ff;
+            height: 420px;
+            background: #050510;
+            border: 3px solid var(--accent-blue);
             border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.25), inset 0 0 30px rgba(0, 0, 0, 0.9);
             cursor: crosshair;
             touch-action: none;
         }
+
         .shooting-dialogue {
             width: 100%;
+            max-width: 800px;
             background: rgba(12, 16, 24, 0.85);
-            border: 1px solid rgba(0, 212, 255, 0.15);
+            border: 1px solid rgba(0, 212, 255, 0.2);
             border-radius: 12px;
             padding: 12px 16px;
             min-height: 48px;
@@ -69,13 +101,38 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            color: #e8f4ff;
+            color: var(--text-main);
             font-size: 0.9rem;
             font-style: italic;
+            box-sizing: border-box;
         }
+
+        .btn-continue {
+            position: fixed;
+            top: 15px;
+            right: 20px;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            background: rgba(0, 255, 136, 0.15);
+            border: 2px solid var(--accent-green);
+            border-radius: 8px;
+            color: var(--accent-green);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            z-index: 100;
+        }
+        .btn-continue:hover {
+            background: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+        }
+
         @media (max-width: 600px) {
             #shooting-canvas {
-                height: 300px;
+                height: 320px;
             }
         }
     </style>
@@ -83,9 +140,12 @@
 <body>
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
-        <h2 class="sg-title" style="color:#f0d890;font-family:'Playfair Display',serif;">Tir forain</h2>
+        <h2 class="sg-title" style="color:var(--accent-gold);font-family:'Playfair Display',serif;">Tir forain - Enquête</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
+
+    <button id="story-continue-btn" class="btn-continue" style="display:none;">Continuer</button>
+
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
             <span class="menu-icon">🏠</span>
@@ -97,43 +157,276 @@
             <span>Paramètres</span>
         </button>
     </nav>
+
     <main class="sg-main">
         <div class="shooting-wrap">
             <div class="shooting-header">
-                <h2 class="shooting-title" id="shooting-title">Tir forain</h2>
+                <h2 class="shooting-title" id="target-banner">Éliminez les criminels, épargnez la Femme Fatale et les civils !</h2>
                 <div class="shooting-stats">
                     <div class="shooting-stat" id="shooting-score">Score: 0</div>
-                    <div class="shooting-stat" id="shooting-targets">Cibles: 0/0</div>
-                    <div class="shooting-stat" id="shooting-misses">Manqués: 0</div>
+                    <div class="shooting-stat" id="shooting-targets">Cibles abattues: 0 / 10</div>
+                    <div class="shooting-stat" id="shooting-misses">Erreurs: 0 / 3</div>
                 </div>
             </div>
             <canvas id="shooting-canvas"></canvas>
-            <div class="shooting-dialogue" id="shooting-dialogue">Tirez sur les cibles. Évitez les innocents.</div>
+            <div class="shooting-dialogue" id="shooting-dialogue">Restez vigilants. Ne touchez surtout pas la Femme Fatale.</div>
         </div>
     </main>
 
-    <script src="shooting.js"></script>
     <script src="../settings-menu.js"></script>
     <script>
         (function () {
             'use strict';
 
-            if (window.DPSettings && window.DPSettings.init) {
-                window.DPSettings.init({
-                    showMusicToggle: true,
-                    showMusicVolume: true,
-                    showNarrationVolume: false,
-                    showMuteToggle: false,
-                    showGameSection: true,
-                    showBackToHub: false,
-                    showRestart: false,
-                    showRules: false,
-                    customButtons: [],
-                    onBackToHub: function () {
-                        window.location.href = '../true-detective/index.html#minigames';
+            var canvas = document.getElementById('shooting-canvas');
+            var ctx = canvas.getContext('2d');
+            var scoreEl = document.getElementById('shooting-score');
+            var targetsEl = document.getElementById('shooting-targets');
+            var missesEl = document.getElementById('shooting-misses');
+            var dialogueEl = document.getElementById('shooting-dialogue');
+
+            canvas.width = 800;
+            canvas.height = 420;
+
+            // Définition des assets personnages (Femme Fatale basculée en innocent, Le Protecteur retiré)
+            var characterData = [
+                { name: "Le Criminel", file: "le-criminel.png", type: "criminal", points: 100, quote: "Vous ne m'aurez pas si facilement..." },
+                { name: "Femme Fatale", file: "femme-fatal.png", type: "innocent", points: -200, quote: "Vous venez de faire une grave erreur..." },
+                { name: "Le Suspect", file: "Le-suspect.png", type: "criminal", points: 100, quote: "Je n'ai rien à voir avec cette histoire." },
+                { name: "Le Marginal", file: "Le-marginal.png", type: "criminal", points: 120, quote: "Les ombres parlent si on sait écouter." },
+                { name: "Détective Partenaire", file: "detective-partenaire.png", type: "innocent", points: -150, quote: "T'es fou ? C'est moi, abats pas ton coéquipier !" },
+                { name: "Le Scientifique", file: "le-scientific.png", type: "innocent", points: -100, quote: "Attention aux échantillons de scène de crime !" },
+                { name: "Le Séducteur", file: "le-seducteur.png", type: "innocent", points: -100, quote: "Calmez-vous, inspecteur, on peut s'entendre." }
+            ];
+
+            var loadedImages = {};
+
+            // Préchargement des images depuis le dossier de vos assets
+            characterData.forEach(function(char) {
+                var img = new Image();
+                img.src = 'assets/image true detective/characteres/classic/' + char.file;
+                img.onerror = function() {
+                    console.warn("Impossible de charger : " + char.file);
+                };
+                loadedImages[char.file] = img;
+            });
+
+            var score = 0;
+            var targetsHit = 0;
+            var misses = 0;
+            var targetGoal = 10;
+            var gameOver = false;
+            var activeTargets = [];
+            var particleEffects = [];
+            var spawnTimer = 0;
+
+            canvas.addEventListener('click', function(e) {
+                if (gameOver) return;
+                var rect = canvas.getBoundingClientRect();
+                var scaleX = canvas.width / rect.width;
+                var scaleY = canvas.height / rect.height;
+                var clickX = (e.clientX - rect.left) * scaleX;
+                var clickY = (e.clientY - rect.top) * scaleY;
+
+                checkShot(clickX, clickY);
+            });
+
+            function checkShot(x, y) {
+                var hitSomething = false;
+                for (var i = activeTargets.length - 1; i >= 0; i--) {
+                    var t = activeTargets[i];
+                    if (x >= t.x && x <= t.x + t.width && y >= t.y && y <= t.y + t.height) {
+                        hitSomething = true;
+                        
+                        createSparks(x, y, t.type === 'criminal' ? '#00ff88' : '#ff3333');
+
+                        if (t.type === 'criminal') {
+                            score += t.points;
+                            targetsHit++;
+                            dialogueEl.innerHTML = '<span style="color:var(--accent-green);">Cible neutralisée (' + t.name + ') : "' + t.quote + '"</span>';
+                            activeTargets.splice(i, 1);
+                        } else {
+                            score += t.points; // Points négatifs importants
+                            misses++;
+                            dialogueEl.innerHTML = '<span style="color:var(--accent-orange);">ERREUR ! Vous avez touché ' + t.name + ' ! "' + t.quote + '"</span>';
+                            activeTargets.splice(i, 1);
+                        }
+                        updateUI();
+                        checkGameStatus();
+                        break;
                     }
+                }
+
+                if (!hitSomething) {
+                    misses++;
+                    createSparks(x, y, '#a0c0d0');
+                    dialogueEl.textContent = "Tir dans le vide...";
+                    updateUI();
+                    checkGameStatus();
+                }
+            }
+
+            function createSparks(x, y, color) {
+                for (var i = 0; i < 10; i++) {
+                    particleEffects.push({
+                        x: x, y: y,
+                        vx: (Math.random() - 0.5) * 8,
+                        vy: (Math.random() - 0.5) * 8,
+                        radius: Math.random() * 3 + 1,
+                        color: color,
+                        alpha: 1
+                    });
+                }
+            }
+
+            function spawnTarget() {
+                if (activeTargets.length >= 4 || gameOver) return;
+
+                var randomChar = characterData[Math.floor(Math.random() * characterData.length)];
+                var w = 90;
+                var h = 110;
+                var x = Math.random() * (canvas.width - w - 60) + 30;
+                var y = canvas.height - h - 45;
+
+                activeTargets.push({
+                    name: randomChar.name,
+                    file: randomChar.file,
+                    type: randomChar.type,
+                    points: randomChar.points,
+                    quote: randomChar.quote,
+                    x: x,
+                    y: y,
+                    width: w,
+                    height: h,
+                    lifeTimer: 120
                 });
             }
+
+            function updateUI() {
+                if (scoreEl) scoreEl.textContent = "Score: " + score;
+                if (targetsEl) targetsEl.textContent = "Cibles abattues: " + targetsHit + " / " + targetGoal;
+                if (missesEl) missesEl.textContent = "Erreurs: " + misses + " / 3";
+            }
+
+            function checkGameStatus() {
+                if (targetsHit >= targetGoal) {
+                    gameOver = true;
+                    dialogueEl.innerHTML = '<strong style="color:var(--accent-green);">Enquête réussie ! Vous avez nettoyé le secteur.</strong>';
+                    saveResult(true);
+                } else if (misses >= 3) {
+                    gameOver = true;
+                    dialogueEl.innerHTML = '<strong style="color:var(--accent-orange);">Échec de l\'opération. Trop d\'erreurs commises.</strong>';
+                    saveResult(false);
+                }
+            }
+
+            function saveResult(won) {
+                try {
+                    localStorage.setItem('td_standalone_game_result', JSON.stringify({
+                        type: 'shooting', won: won, score: score, ts: Date.now()
+                    }));
+                } catch (e) {}
+
+                var storyBtn = document.getElementById('story-continue-btn');
+                if (storyBtn) storyBtn.style.display = 'inline-block';
+            }
+
+            function update() {
+                if (gameOver) return;
+
+                spawnTimer++;
+                if (spawnTimer > 75) {
+                    spawnTarget();
+                    spawnTimer = 0;
+                }
+
+                for (var i = activeTargets.length - 1; i >= 0; i--) {
+                    activeTargets[i].lifeTimer--;
+                    if (activeTargets[i].lifeTimer <= 0) {
+                        activeTargets.splice(i, 1);
+                    }
+                }
+
+                for (var i = particleEffects.length - 1; i >= 0; i--) {
+                    var p = particleEffects[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.alpha -= 0.04;
+                    if (p.alpha <= 0) particleEffects.splice(i, 1);
+                }
+            }
+
+            function draw() {
+                ctx.fillStyle = '#050510';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.strokeStyle = 'rgba(0, 212, 255, 0.08)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for (var i = 0; i < canvas.width; i += 80) {
+                    ctx.moveTo(i, 0);
+                    ctx.lineTo(i, canvas.height);
+                }
+                ctx.stroke();
+
+                ctx.fillStyle = '#0e1222';
+                ctx.fillRect(0, canvas.height - 45, canvas.width, 45);
+                ctx.strokeStyle = 'var(--accent-blue)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, canvas.height - 45);
+                ctx.lineTo(canvas.width, canvas.height - 45);
+                ctx.stroke();
+
+                for (var i = 0; i < activeTargets.length; i++) {
+                    var t = activeTargets[i];
+                    var img = loadedImages[t.file];
+
+                    ctx.save();
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = t.type === 'criminal' ? 'rgba(0, 255, 136, 0.3)' : 'rgba(255, 107, 0, 0.3)';
+
+                    if (img && img.complete && img.naturalWidth !== 0) {
+                        ctx.drawImage(img, t.x, t.y, t.width, t.height);
+                    } else {
+                        ctx.fillStyle = t.type === 'criminal' ? '#00ff88' : '#ff6b00';
+                        ctx.fillRect(t.x, t.y, t.width, t.height);
+                    }
+
+                    ctx.strokeStyle = t.type === 'criminal' ? 'rgba(0,255,136,0.6)' : 'rgba(255,107,0,0.6)';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(t.x, t.y, t.width, t.height);
+                    ctx.restore();
+                }
+
+                for (var i = 0; i < particleEffects.length; i++) {
+                    var p = particleEffects[i];
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = p.alpha;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+
+                if (gameOver) {
+                    ctx.fillStyle = 'rgba(5, 5, 16, 0.82)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#e8f4ff';
+                    ctx.font = 'bold 1.5rem "Playfair Display", serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(targetsHit >= targetGoal ? "MISSION ACCOMPLIE" : "MISSION ÉCHOUÉE", canvas.width / 2, canvas.height / 2 - 20);
+                }
+            }
+
+            function mainLoop() {
+                update();
+                draw();
+                requestAnimationFrame(mainLoop);
+            }
+
+            mainLoop();
+
             var hamburgerBtn = document.getElementById('hamburger-btn');
             var menu = document.getElementById('hamburger-menu');
             if (hamburgerBtn && menu) {
@@ -147,33 +440,32 @@
                     }
                 });
             }
-            var backBtn = document.getElementById('back-to-minigame-btn');
+
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+            var backBtn = document.getElementById('back-to-minigame-btn');
+            var storyContinueBtn = document.getElementById('story-continue-btn');
+
+            function proceedToNext() {
+                try {
+                    var returnRaw = localStorage.getItem('td_standalone_game_return');
+                    if (returnRaw) {
+                        var rp = JSON.parse(returnRaw);
+                        if (rp && rp.returnUrl) {
+                            window.location.href = rp.returnUrl;
+                            return;
+                        }
+                    }
+                } catch (e) {}
+                window.location.href = fromStory ? '../true-detective/index.html?standalone=shooting' : '../true-detective/index.html#minigames';
+            }
+
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
-                var continueBtn = document.createElement('button');
-                continueBtn.id = 'story-continue-btn';
-                continueBtn.className = 'btn btn-continue';
-                continueBtn.textContent = 'Continuer';
-                continueBtn.style.cssText = 'margin-left:8px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
-                continueBtn.addEventListener('click', function () {
-                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'shooting', won: true, ts: Date.now() })); } catch (e) {}
-                    try {
-                        var returnRaw = localStorage.getItem('td_standalone_game_return');
-                        if (returnRaw) {
-                            var rp = JSON.parse(returnRaw);
-                            if (rp && rp.returnUrl) {
-                                window.location.href = rp.returnUrl;
-                                return;
-                            }
-                        }
-                    } catch (e) {}
-                    var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
-                    window.location.href = fromStory ? '../true-detective/index.html?standalone=shooting' : '../true-detective/index.html#minigames';
-                });
-                var header = document.querySelector('.sg-header');
-                if (header) header.appendChild(continueBtn);
+                if (storyContinueBtn) {
+                    storyContinueBtn.addEventListener('click', proceedToNext);
+                }
             } else {
+                if (storyContinueBtn) storyContinueBtn.style.display = 'none';
                 if (backBtn) {
                     backBtn.textContent = 'Accueil';
                     backBtn.addEventListener('click', function () {
@@ -182,6 +474,7 @@
                     });
                 }
             }
+
             var menuHome = document.getElementById('menu-home');
             if (menuHome) {
                 menuHome.addEventListener('click', function () {
@@ -189,16 +482,15 @@
                     window.location.href = fromStory ? '../true-detective/index.html?standalone=shooting' : '../true-detective/index.html#minigames';
                 });
             }
+
             var menuSettings = document.getElementById('menu-settings');
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres : aucun réglage pour l\'instant.'); }
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres'); }
                 });
             }
         })();
     </script>
 </body>
 </html>
-
-
