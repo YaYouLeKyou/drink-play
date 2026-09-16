@@ -4513,7 +4513,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
               'montre_code': 'montre-code.html',
               'scene_fouille': 'scene-fouille.html',
               'puzzle': 'puzzle.html',
-              'coffre_code': 'coffre-code.html'
+              'coffre_code': 'coffre-code.html',
+              'reseau_alibis': 'reseau-alibis.html',
+              'chemistry': 'chemistry.html'
           };
 
          if (standalonePages[type]) {

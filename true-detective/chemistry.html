@@ -1,20 +1,21 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>True Detective - chemistry</title>
+    <title>True Detective - Analyse ADN & Chimie</title>
     <link rel="icon" href="../icon/Logo%20d%26p.png">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
+    <link rel="stylesheet" href="styles.css">
     <style>
         :root {
             --bg-deep: #05050a;
             --bg-gradient: radial-gradient(circle at 50% 20%, #171426 0%, #05050a 100%);
-            --accent-gold: #f0d890;
+            --accent-gold: #e5c158;
             --accent-blue: #00d4ff;
             --accent-green: #00ff88;
-            --accent-pink: #ff00ff;
+            --accent-red: #e94560;
             --text-main: #f0f4f8;
         }
 
@@ -22,7 +23,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             background-color: var(--bg-deep);
@@ -33,7 +34,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* En-tête stylisé type enquête */
         .sg-header {
             background: rgba(10, 10, 18, 0.9) !important;
             border-bottom: 1px solid rgba(0, 212, 255, 0.2);
@@ -43,7 +43,7 @@
         }
 
         .sg-title {
-            text-shadow: 0 2px 10px rgba(240, 216, 144, 0.3);
+            text-shadow: 0 2px 10px rgba(0, 212, 255, 0.3);
             letter-spacing: 0.05em;
         }
 
@@ -52,181 +52,181 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 12px;
+            min-height: 0;
             box-sizing: border-box;
             transform: translateZ(0);
         }
 
-        #chemistry-app {
+        #game-container {
             width: 100%;
+            height: 100%;
             display: flex;
+            align-items: center;
             justify-content: center;
         }
 
-        .chemistry-wrap {
+        #game-content {
+            width: 100%;
+            max-width: 700px;
+            height: 100%;
+            max-height: 550px;
+            background: rgba(12, 16, 24, 0.85);
+            border: 1px solid rgba(0, 212, 255, 0.25);
+            border-radius: 14px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 14px;
-            padding: 16px;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
+            justify-content: space-between;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
             box-sizing: border-box;
         }
 
-        .chemistry-header {
-            width: 100%;
+        .lab-instructions {
+            font-size: 0.9rem;
+            color: var(--accent-blue);
             text-align: center;
-            background: rgba(12, 16, 24, 0.85);
-            border: 1px solid rgba(0, 212, 255, 0.25);
-            border-radius: 12px;
-            padding: 12px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
+            margin-bottom: 10px;
+            font-weight: 500;
+            text-shadow: 0 0 8px rgba(0, 212, 255, 0.3);
         }
 
-        .chemistry-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.3rem;
-            color: var(--accent-gold);
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
-            margin: 0;
-            letter-spacing: 0.03em;
-        }
-
-        .chemistry-stats {
+        /* Zone des éprouvettes */
+        .tubes-container {
             display: flex;
+            gap: 25px;
             justify-content: center;
-            gap: 20px;
+            align-items: flex-end;
+            margin: 15px 0;
             flex-wrap: wrap;
         }
 
-        .chemistry-stat {
-            font-size: 0.9rem;
-            color: var(--accent-blue);
-            font-weight: 600;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-        }
-
-        .chemistry-grid {
-            display: grid;
-            gap: 10px;
-            justify-content: center;
-            align-content: center;
-            width: 100%;
-        }
-
-        /* --- CARTES HAUT DE GAMME --- */
-        .chemistry-card {
-            aspect-ratio: 3 / 4;
-            background: linear-gradient(135deg, #1f1f3a 0%, #101026 100%);
-            border: 2px solid rgba(0, 212, 255, 0.4);
-            border-radius: 10px;
-            cursor: pointer;
+        .tube-wrapper {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            position: relative;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
-            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s ease, box-shadow 0.2s ease;
-            transform-style: preserve-3d;
-            min-height: 70px;
-            will-change: transform;
-        }
-
-        .chemistry-card:hover {
-            border-color: var(--accent-blue);
-            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.25);
-            transform: translateY(-3px) scale(1.02);
-        }
-
-        .chemistry-card.flipped {
-            transform: rotateY(180deg);
-            background: linear-gradient(135deg, #121225 0%, #080814 100%);
-            border-color: var(--accent-pink);
-            box-shadow: 0 8px 24px rgba(255, 0, 255, 0.2);
-        }
-
-        .chemistry-card.matched {
-            opacity: 0.45;
-            cursor: default;
-            border-color: var(--accent-green);
-            box-shadow: none;
-            transform: rotateY(180deg);
-        }
-
-        .chemistry-card-front,
-        .chemistry-card-back {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            border-radius: 8px;
-        }
-
-        .chemistry-card-front {
-            background: radial-gradient(circle, rgba(0, 212, 255, 0.08) 0%, transparent 70%);
-            color: var(--accent-blue);
-            font-size: 1.6rem;
-            font-weight: 700;
-            transform: rotateY(0deg);
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
-        }
-
-        .chemistry-card-back {
             flex-direction: column;
-            gap: 4px;
-            padding: 6px;
-            transform: rotateY(180deg);
-            background: #0d0d1c;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease;
         }
 
-        .chemistry-card-img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+        .tube-wrapper:hover {
+            transform: translateY(-4px);
         }
 
-        .chemistry-card-label {
-            font-size: 0.65rem;
-            color: #b0d0e0;
-            text-align: center;
-            line-height: 1.1;
-            margin-top: 2px;
-            font-weight: 500;
+        .chemistry-tube {
+            width: 65px;
+            height: 170px;
+            border: 3px solid rgba(0, 212, 255, 0.4);
+            border-top: none;
+            border-radius: 0 0 32px 32px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.02);
+            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.6), 0 0 10px rgba(0, 212, 255, 0.1);
         }
 
-        .chemistry-dialogue {
+        .tube-wrapper.selected .chemistry-tube {
+            border-color: var(--accent-green);
+            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 255, 136, 0.4);
+        }
+
+        .chemistry-liquid {
+            position: absolute;
+            bottom: 0;
             width: 100%;
-            background: rgba(12, 16, 24, 0.85);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            border-radius: 12px;
-            padding: 12px 16px;
-            min-height: 48px;
+            height: 0%;
+            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s ease;
+            box-shadow: inset 0 2px 5px rgba(255,255,255,0.3);
+        }
+
+        .tube-label {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-main);
+            text-align: center;
+            max-width: 80px;
+        }
+
+        /* Panneau de réactifs / Pipettes */
+        .reagents-panel {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+
+        .reagent-btn {
+            background: rgba(15, 52, 96, 0.7);
+            color: var(--text-main);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: var(--text-main);
-            font-size: 0.9rem;
-            font-style: italic;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            box-sizing: border-box;
+            gap: 6px;
         }
 
-        /* Bouton Continuer ultra fluide */
+        .reagent-btn:hover {
+            background: #1a508b;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .reagent-color-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .lab-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .lab-btn {
+            background: rgba(233, 69, 96, 0.2);
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+
+        .lab-btn:hover {
+            background: rgba(233, 69, 96, 0.4);
+            box-shadow: 0 0 12px rgba(233, 69, 96, 0.4);
+        }
+
+        /* Messages de statut du labo */
+        #lab-status {
+            font-size: 0.85rem;
+            font-style: italic;
+            color: var(--accent-gold);
+            text-align: center;
+            min-height: 20px;
+            margin-top: 5px;
+        }
+
+        /* Bouton Continuer (Mode Histoire) */
         #story-continue-btn {
-            margin-left: 8px;
+            position: fixed !important;
+            top: 14px !important;
+            right: 20px !important;
             padding: 8px 18px !important;
             font-size: 0.85rem !important;
             font-weight: 700 !important;
@@ -239,34 +239,22 @@
             font-family: 'Montserrat', sans-serif !important;
             text-transform: uppercase !important;
             letter-spacing: 0.05em !important;
+            z-index: 100 !important;
+            display: none;
             box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
-            will-change: transform, box-shadow;
         }
-
+        
         #story-continue-btn:hover {
             background: rgba(0, 255, 136, 0.25) !important;
             box-shadow: 0 0 25px rgba(0, 255, 136, 0.5) !important;
             transform: translateY(-2px);
-        }
-
-        @media (max-width: 480px) {
-            .chemistry-grid {
-                gap: 6px;
-            }
-            .chemistry-card {
-                font-size: 1.4rem;
-                border-radius: 6px;
-            }
-            .chemistry-title {
-                font-size: 1.1rem;
-            }
         }
     </style>
 </head>
 <body>
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
-        <h2 class="sg-title" style="color:#f0d890;font-family:'Playfair Display',serif;">Mémoire</h2>
+        <h2 class="sg-title" style="color:var(--accent-blue);font-family:'Playfair Display',serif;">🧬 Analyse ADN Lab</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
 
@@ -283,22 +271,58 @@
     </nav>
 
     <main class="sg-main">
-        <div id="chemistry-app">
-            <div class="chemistry-wrap">
-                <div class="chemistry-header">
-                    <h2 class="chemistry-title" id="chemistry-title">Jeu de mémoire</h2>
-                    <div class="chemistry-stats">
-                        <div class="chemistry-stat" id="chemistry-timer">00:00</div>
-                        <div class="chemistry-stat" id="chemistry-pairs">Paires: 0/0</div>
+        <div id="game-container">
+            <div id="game-content">
+                <div class="lab-instructions">Sélectionnez une éprouvette puis ajoutez les réactifs chimiques dans le bon ordre pour isoler le profil ADN du suspect.</div>
+                
+                <div class="tubes-container" id="tubes-container">
+                    <!-- Éprouvette 1 : Prélèvement -->
+                    <div class="tube-wrapper" data-tube="0">
+                        <div class="chemistry-tube">
+                            <div class="chemistry-liquid" id="liquid-0" style="height: 60%; background-color: rgba(255, 100, 100, 0.7);"></div>
+                        </div>
+                        <div class="tube-label">Échantillon Sang</div>
+                    </div>
+                    <!-- Éprouvette 2 : Solvant de Lixiviation -->
+                    <div class="tube-wrapper" data-tube="1">
+                        <div class="chemistry-tube">
+                            <div class="chemistry-liquid" id="liquid-1" style="height: 0%; background-color: rgba(0, 212, 255, 0.7);"></div>
+                        </div>
+                        <div class="tube-label">Réactif Tampon</div>
+                    </div>
+                    <!-- Éprouvette 3 : Résultat ADN Final -->
+                    <div class="tube-wrapper" data-tube="2" style="cursor: default;">
+                        <div class="chemistry-tube" style="border-color: var(--accent-gold);">
+                            <div class="chemistry-liquid" id="liquid-2" style="height: 0%; background-color: rgba(0, 255, 136, 0.8);"></div>
+                        </div>
+                        <div class="tube-label" style="color: var(--accent-gold);">Séquence ADN</div>
                     </div>
                 </div>
-                <div class="chemistry-grid" id="chemistry-grid"></div>
-                <div class="chemistry-dialogue" id="chemistry-dialogue"></div>
+
+                <div class="reagents-panel">
+                    <button class="reagent-btn" onclick="addReagent('enzyme')">
+                        <span class="reagent-color-dot" style="background: #00d4ff;"></span> Enzyme de Lyse
+                    </button>
+                    <button class="reagent-btn" onclick="addReagent('alcohol')">
+                        <span class="reagent-color-dot" style="background: #ff00ff;"></span> Alcool Isopropylique
+                    </button>
+                    <button class="reagent-btn" onclick="addReagent('catalyst')">
+                        <span class="reagent-color-dot" style="background: #00ff88;"></span> Catalyseur UV
+                    </button>
+                </div>
+
+                <div id="lab-status">Préparez le mélange en injectant les fluides adéquats.</div>
+
+                <div class="lab-actions">
+                    <button class="lab-btn" onclick="resetLab()">Réinitialiser</button>
+                    <button class="lab-btn" style="border-color: var(--accent-green); color: var(--accent-green);" onclick="validateDNA()">Analyser le profil</button>
+                </div>
             </div>
         </div>
     </main>
 
-    <script src="chemistry.js"></script>
+    <button id="story-continue-btn" class="btn btn-continue">Continuer</button>
+
     <script src="../settings-menu.js"></script>
     <script>
         (function () {
@@ -321,6 +345,63 @@
                 });
             }
 
+            var $backBtn = document.getElementById('back-to-minigame-btn');
+            var $continueBtn = document.getElementById('story-continue-btn');
+            var fromStory = new URLSearchParams(window.location.search).get('story') === '1' || new URLSearchParams(window.location.search).get('mode') === 'story';
+
+            if (fromStory) {
+                if ($backBtn) $backBtn.style.display = 'none';
+                if ($continueBtn) $continueBtn.style.display = 'block';
+            } else {
+                if ($backBtn) {
+                    $backBtn.textContent = 'Accueil';
+                    $backBtn.addEventListener('click', function () {
+                        window.location.href = '../true-detective/index.html#minigames';
+                    });
+                }
+            }
+
+            function handleContinueNavigation() {
+                try { 
+                    localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'chemistry', won: true, ts: Date.now() })); 
+                } catch (e) {}
+                
+                try {
+                    var returnRaw = localStorage.getItem('td_standalone_game_return');
+                    if (returnRaw) {
+                        var rp = JSON.parse(returnRaw);
+                        if (rp && rp.returnUrl) {
+                            window.location.href = rp.returnUrl;
+                            return;
+                        }
+                    }
+                } catch (e) {}
+                
+                window.location.href = fromStory ? '../true-detective/index.html?standalone=chemistry' : '../true-detective/index.html#minigames';
+            }
+
+            if ($continueBtn) {
+                $continueBtn.addEventListener('click', handleContinueNavigation);
+            }
+
+            var menuHome = document.getElementById('menu-home');
+            if (menuHome) {
+                menuHome.addEventListener('click', function () {
+                    window.location.href = fromStory ? '../true-detective/index.html?standalone=chemistry' : '../true-detective/index.html#minigames';
+                });
+            }
+
+            var menuSettings = document.getElementById('menu-settings');
+            if (menuSettings) {
+                menuSettings.addEventListener('click', function () {
+                    if (window.DPSettings && window.DPSettings.open) { 
+                        window.DPSettings.open(); 
+                    } else { 
+                        alert('Paramètres : aucun réglage pour l\'instant.'); 
+                    }
+                });
+            }
+
             var hamburgerBtn = document.getElementById('hamburger-btn');
             var menu = document.getElementById('hamburger-menu');
             if (hamburgerBtn && menu) {
@@ -334,76 +415,85 @@
                     }
                 });
             }
-
-            var backBtn = document.getElementById('back-to-minigame-btn');
-            var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
-
-            if (fromStory) {
-                if (backBtn) backBtn.style.display = 'none';
-                var continueBtn = document.createElement('button');
-                continueBtn.id = 'story-continue-btn';
-                continueBtn.className = 'btn btn-continue';
-                continueBtn.textContent = 'Continuer';
-                continueBtn.addEventListener('click', function () {
-                    try { 
-                        localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'chemistry', won: true, ts: Date.now() })); 
-                    } catch (e) {}
-                    
-                    try {
-                        var returnRaw = localStorage.getItem('td_standalone_game_return');
-                        if (returnRaw) {
-                            var rp = JSON.parse(returnRaw);
-                            if (rp && rp.returnUrl) {
-                                window.location.href = rp.returnUrl;
-                                return;
-                            }
-                        }
-                    } catch (e) {}
-                    
-                    window.location.href = '../true-detective/index.html?standalone=chemistry';
-                });
-                var header = document.querySelector('.sg-header');
-                if (header) header.appendChild(continueBtn);
-            } else {
-                if (backBtn) {
-                    backBtn.textContent = 'Accueil';
-                    backBtn.addEventListener('click', function () {
-                        if (menu) menu.classList.remove('open');
-                        window.location.href = '../true-detective/index.html#minigames';
-                    });
-                }
-            }
-
-            var menuHome = document.getElementById('menu-home');
-            if (menuHome) {
-                menuHome.addEventListener('click', function () {
-                    if (menu) menu.classList.remove('open');
-                    window.location.href = fromStory ? '../true-detective/index.html?standalone=chemistry' : '../true-detective/index.html#minigames';
-                });
-            }
-
-            var menuSettings = document.getElementById('menu-settings');
-            if (menuSettings) {
-                menuSettings.addEventListener('click', function () {
-                    if (menu) menu.classList.remove('open');
-                    if (window.DPSettings && window.DPSettings.open) { 
-                        window.DPSettings.open(); 
-                    } else { 
-                        alert('Paramètres : aucun réglage pour l\'instant.'); 
-                    }
-                });
-            }
-
-            // Chargement ultra-fluide synchronisé avec le rendu graphique
-            function initchemistryGame() {
-                // S'assure que chemistry.js est bien initialisé s'il possède une méthode d'appel globale (selon votre structure existante)
-                if (typeof window.initchemistry === 'function') {
-                    window.initchemistry();
-                }
-            }
-
-            requestAnimationFrame(initchemistryGame);
         })();
+
+        // Logique interactive du Mini-Jeu de Chimie ADN
+        let selectedTube = 0;
+        let labState = {
+            tube0: { fluid: 'blood', level: 60, color: 'rgba(255, 100, 100, 0.7)' },
+            tube1: { fluid: 'empty', level: 0, color: 'transparent' },
+            tube2: { fluid: 'empty', level: 0, color: 'transparent' }
+        };
+
+        const tubeWrappers = document.querySelectorAll('.tube-wrapper[data-tube]');
+        tubeWrappers.forEach(wrapper => {
+            const tubeIdx = parseInt(wrapper.getAttribute('data-tube'));
+            if (tubeIdx !== 2) { // L'éprouvette finale (2) n'est pas sélectionnable directement
+                wrapper.addEventListener('click', () => {
+                    tubeWrappers.forEach(w => w.classList.remove('selected'));
+                    wrapper.classList.add('selected');
+                    selectedTube = tubeIdx;
+                    document.getElementById('lab-status').textContent = `Éprouvette ${selectedTube + 1} sélectionnée. Choisissez un réactif.`;
+                });
+            }
+        });
+
+        // Sélection par défaut de la première éprouvette
+        if(tubeWrappers[0]) tubeWrappers[0].classList.add('selected');
+
+        function addReagent(type) {
+            const liquidEl = document.getElementById(`liquid-${selectedTube}`);
+            const statusEl = document.getElementById('lab-status');
+
+            if (type === 'enzyme') {
+                labState[`tube${selectedTube}`] = { fluid: 'enzyme', level: 80, color: 'rgba(0, 212, 255, 0.8)' };
+                statusEl.textContent = `Enzyme de lyse injectée dans l'éprouvette ${selectedTube + 1}. Les membranes cellulaires se dissolvent.`;
+            } else if (type === 'alcohol') {
+                labState[`tube${selectedTube}`] = { fluid: 'alcohol', level: 90, color: 'rgba(255, 0, 255, 0.8)' };
+                statusEl.textContent = `Alcool isopropylique ajouté dans l'éprouvette ${selectedTube + 1}. Précipitation des brins d'ADN en cours.`;
+            } else if (type === 'catalyst') {
+                labState[`tube${selectedTube}`] = { fluid: 'catalyst', level: 70, color: 'rgba(0, 255, 136, 0.8)' };
+                statusEl.textContent = `Catalyseur UV activé dans l'éprouvette ${selectedTube + 1}. Réaction fluorescente amorcée.`;
+            }
+
+            liquidEl.style.height = labState[`tube${selectedTube}`].level + '%';
+            liquidEl.style.backgroundColor = labState[`tube${selectedTube}`].color;
+        }
+
+        function resetLab() {
+            labState = {
+                tube0: { fluid: 'blood', level: 60, color: 'rgba(255, 100, 100, 0.7)' },
+                tube1: { fluid: 'empty', level: 0, color: 'transparent' },
+                tube2: { fluid: 'empty', level: 0, color: 'transparent' }
+            };
+            document.getElementById('liquid-0').style.height = '60%';
+            document.getElementById('liquid-0').style.backgroundColor = 'rgba(255, 100, 100, 0.7)';
+            document.getElementById('liquid-1').style.height = '0%';
+            document.getElementById('liquid-2').style.height = '0%';
+            document.getElementById('lab-status').textContent = "Laboratoire réinitialisé. Recommencez le protocole d'extraction.";
+        }
+
+        function validateDNA() {
+            const statusEl = document.getElementById('lab-status');
+            const dnaLiquid = document.getElementById('liquid-2');
+
+            // Condition de victoire : tube 0 avec enzyme, tube 1 avec alcool (ou inverse selon l'énigme)
+            if (labState.tube0.fluid === 'enzyme' && labState.tube1.fluid === 'alcohol') {
+                dnaLiquid.style.height = '85%';
+                dnaLiquid.style.backgroundColor = 'rgba(0, 255, 136, 0.9)';
+                statusEl.style.color = 'var(--accent-green)';
+                statusEl.textContent = "Succès ! Le profil ADN correspond à l'échantillon du suspect principal. Enquête débloquée.";
+                
+                // Afficher le bouton Continuer si on est en mode histoire
+                const fromStory = new URLSearchParams(window.location.search).get('story') === '1' || new URLSearchParams(window.location.search).get('mode') === 'story';
+                if (fromStory) {
+                    document.getElementById('story-continue-btn').style.display = 'block';
+                }
+            } else {
+                statusEl.style.color = 'var(--accent-red)';
+                statusEl.textContent = "Échec de l'analyse : Le mélange chimique est instable ou la séquence de réactifs est incorrecte.";
+            }
+        }
     </script>
 </body>
 </html>
