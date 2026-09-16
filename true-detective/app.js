@@ -4496,37 +4496,39 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         return cfg;
     }
 
-     function getMinigameStandaloneUrl(type, diff, lang, mode) {
-         var standalonePages = {
-             'marginal-tower': 'marginal-tower.html',
-             'memory': 'memory.html',
-             'shooting': 'shooting.html',
-             'jackpot': 'jackpot.html',
-             'connect4': 'connect4.html',
-             'bataille-navale': 'bataille-navale.html',
-             'pong': 'pong.html',
-             'pacman': 'pacman.html',
-             'space-invaders': 'space-invaders.html',
-             'breakout': 'breakout.html',
-             'asteroids': 'asteroids.html',
-             'chess': 'chess.html',
-             'montre_code': 'montre-code.html',
-             'scene_fouille': 'scene-fouille.html',
-             'puzzle': 'puzzle.html',
-             'coffre_code': 'coffre-code.html'
-         };
+      function getMinigameStandaloneUrl(type, diff, lang, mode) {
+          var standalonePages = {
+              'marginal-tower': 'marginal-tower.html',
+              'memory': 'memory.html',
+              'shooting': 'shooting.html',
+              'jackpot': 'jackpot.html',
+              'connect4': 'connect4.html',
+              'bataille-navale': 'bataille-navale.html',
+              'pong': 'pong.html',
+              'pacman': 'pacman.html',
+              'space-invaders': 'space-invaders.html',
+              'breakout': 'breakout.html',
+              'asteroids': 'asteroids.html',
+              'chess': 'chess.html',
+              'montre_code': 'montre-code.html',
+              'scene_fouille': 'scene-fouille.html',
+              'puzzle': 'puzzle.html',
+              'coffre_code': 'coffre-code.html',
+              'reseau_alibis': 'reseau-alibis.html',
+              'chemistry': 'chemistry.html'
+          };
 
-        if (standalonePages[type]) {
-            var url = standalonePages[type] + '?difficulty=' + diff + '&lang=' + lang;
-            if (mode === 'story') url += '&story=1';
-            return url;
-        }
+         if (standalonePages[type]) {
+             var url = standalonePages[type] + '?difficulty=' + diff + '&lang=' + lang;
+             if (mode === 'story') url += '&story=1';
+             return url;
+         }
 
-        if (['pong', 'pacman', 'space-invaders', 'breakout', 'asteroids'].indexOf(type) >= 0) {
-            return 'standalone-game.html?game=' + type + '&level=' + diff + '&lang=' + lang + (mode ? ('&mode=' + mode) : '');
-        }
-        return 'standalone-game.html?game=' + type + '&difficulty=' + diff + '&lang=' + lang + (mode ? ('&mode=' + mode) : '');
-    }
+         if (['pong', 'pacman', 'space-invaders', 'breakout', 'asteroids'].indexOf(type) >= 0) {
+             return 'standalone-game.html?game=' + type + '&level=' + diff + '&lang=' + lang + (mode ? ('&mode=' + mode) : '');
+         }
+         return 'standalone-game.html?game=' + type + '&difficulty=' + diff + '&lang=' + lang + (mode ? ('&mode=' + mode) : '');
+     }
 
     function getGlobalGameMap() {
         return {
@@ -4795,11 +4797,6 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
 
         var gameMap = getGlobalGameMap();
         var gameNS = gameMap[roundCfg.type];
-        if (!gameNS || !window[gameNS]) {
-            setTimeout(function () { scrHandleMinigameResult(roundIndex, { won: false }); }, 100);
-            return;
-        }
-
         var mgCfg = {
             type: roundCfg.type,
             depth: roundCfg.depth,
@@ -4817,10 +4814,55 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         if (mgCfg.difficulty) applyDifficultyToCfg(mgCfg.type, mgCfg, mgCfg.difficulty);
 
         try {
-            window[gameNS].play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
+            if (roundCfg.type === 'reseau_alibis') {
+                var testimonies = mgCfg.dialogues || [];
+                if (!testimonies.length && roundCfg.testimonies) testimonies = roundCfg.testimonies;
+                if (!testimonies.length && roundCfg.cards) testimonies = roundCfg.cards;
+                var nodes = [];
+                if (testimonies.length) {
+                    nodes = testimonies.map(function (t, idx) {
+                        var id = (t.id || ('node_' + idx));
+                        var witness = (typeof t === 'string') ? t : (t.witness || t.name || ('Témoin ' + (idx + 1)));
+                        var statement = (typeof t === 'string') ? t : (t.statement || t.text || '');
+                        var isLie = !!(t.isLie || t.lie || t.false);
+                        return { id: id, witness: witness, statement: statement, isLie: isLie };
+                    });
+                }
+                if (!nodes.length) {
+                    nodes = [
+                        { id: 'hale', witness: 'Marcus Hale', statement: ui.language === 'fr' ? 'J\'étais chez moi, je regardais la télévision.' : 'I was at home watching television.', isLie: true },
+                        { id: 'vivienne', witness: 'Vivienne', statement: ui.language === 'fr' ? 'Je n\'ai pas vu la victime ce soir-là.' : 'I did not see the victim that night.', isLie: false },
+                        { id: 'pembrooke', witness: 'Pembrooke', statement: ui.language === 'fr' ? 'Nous étions ensemble au restaurant.' : 'We were together at the restaurant.', isLie: true },
+                        { id: 'blackwood', witness: 'Blackwood', statement: ui.language === 'fr' ? 'Je suis rentré directement après le travail.' : 'I came straight home after work.', isLie: false }
+                    ];
+                }
+                mgCfg.testimonies = nodes;
+                if (window.TDMiniGames && typeof window.TDMiniGames.play === 'function') {
+                    window.TDMiniGames.play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
+                } else if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.createMinigame === 'function') {
+                    var minigame = window.TDNarrativeEngine.createMinigame('reseau_alibis', mgCfg);
+                    if (minigame && typeof minigame.onComplete === 'function') {
+                        minigame.onComplete(onMinigameDone);
+                    } else {
+                        setTimeout(function () { onMinigameDone({ won: false }); }, 100);
+                    }
+                } else {
+                    setTimeout(function () { onMinigameDone({ won: false }); }, 100);
+                }
+            } else if (roundCfg.type === 'chemistry') {
+                if (window.TDChemistryGame && typeof window.TDChemistryGame.play === 'function') {
+                    window.TDChemistryGame.play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
+                } else {
+                    setTimeout(function () { onMinigameDone({ won: false }); }, 100);
+                }
+            } else if (gameNS && window[gameNS]) {
+                window[gameNS].play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
+            } else {
+                setTimeout(function () { onMinigameDone({ won: false }); }, 100);
+            }
         } catch (e) {
             console.error('[True Detective] Minigame error "' + roundCfg.type + '" :', e);
-            scrHandleMinigameResult(roundIndex, { won: false });
+            onMinigameDone({ won: false });
         }
     }
 
