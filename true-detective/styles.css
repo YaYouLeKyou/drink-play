@@ -1551,7 +1551,7 @@ html {
 #game-screen .interrogation-ask {
     position: fixed;
     bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-    left: calc(50% + 110px); /* Décalage vers la droite du bouton Continuer */
+    left: calc(50% + 150px); /* Décalage vers la droite du bouton Continuer */
     transform: translateX(-50%);
     z-index: 11001;
     margin: 0;
