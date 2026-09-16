@@ -259,7 +259,7 @@
         continueBtn.disabled = false;
         continueBtn.textContent = 'Continuer l\'enquête';
         continueBtn.addEventListener('click', function () {
-            try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'montre_code', won: true, ts: Date.now() })); } catch (e) {}
+            try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'montre_code', won: true, ts: Date.now() })); } catch (e) { }
             try {
                 var returnRaw = localStorage.getItem('td_standalone_game_return');
                 if (returnRaw) {
@@ -269,7 +269,7 @@
                         return;
                     }
                 }
-            } catch (e) {}
+            } catch (e) { }
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
             window.location.href = fromStory ? '../true-detective/index.html?standalone=montre_code' : '../true-detective/index.html#minigames';
         });
@@ -288,7 +288,7 @@
         var storyContinueBtn = document.getElementById('story-continue-btn');
         if (storyContinueBtn) {
             storyContinueBtn.addEventListener('click', function () {
-                try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'montre_code', won: true, ts: Date.now() })); } catch (e) {}
+                try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'montre_code', won: true, ts: Date.now() })); } catch (e) { }
                 try {
                     var returnRaw = localStorage.getItem('td_standalone_game_return');
                     if (returnRaw) {
@@ -298,9 +298,9 @@
                             return;
                         }
                     }
-                } catch (e) {}
+                } catch (e) { }
                 var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
-            window.location.href = fromStory ? '../true-detective/index.html?standalone=montre_code' : '../true-detective/index.html#minigames';
+                window.location.href = fromStory ? '../true-detective/index.html?standalone=montre_code' : '../true-detective/index.html#minigames';
             });
         }
 
