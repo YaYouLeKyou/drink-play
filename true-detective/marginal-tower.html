@@ -6,46 +6,354 @@
     <title>True Detective - La Tour de Silas</title>
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="marginal-tower.css">
+    <style>
+        :root {
+            --bg-dark: #03040a;
+            --panel-bg: rgba(8, 12, 24, 0.92);
+            --neon-blue: #00f0ff;
+            --neon-pink: #ff007f;
+            --neon-green: #00ff88;
+            --neon-yellow: #ffea00;
+            --text-main: #e8f4ff;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% 20%, #0d1538 0%, #03040a 100%),
+                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            color: var(--text-main);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #marginal-tower-app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            box-sizing: border-box;
+        }
+
+        .tower-header {
+            background: rgba(3, 4, 10, 0.95);
+            border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            z-index: 10;
+        }
+
+        .tower-title {
+            color: var(--neon-blue);
+            font-family: 'Playfair Display', serif;
+            margin: 0;
+            font-size: 1.3rem;
+            letter-spacing: 0.05em;
+            text-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+        }
+
+        .tower-main {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-container {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #060919 0%, #020307 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .height-hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(8, 12, 24, 0.85);
+            border: 1px solid rgba(0, 240, 255, 0.35);
+            padding: 12px 18px;
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 5;
+            pointer-events: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .height-hud-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #8aa3b8;
+            font-weight: 600;
+        }
+
+        .height-progress-bar {
+            width: 140px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .height-progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .height-progress-fill.stabilizing {
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-yellow));
+            box-shadow: 0 0 15px var(--neon-yellow);
+        }
+
+        .block-palette {
+            width: 280px;
+            background: var(--panel-bg);
+            border-left: 1px solid rgba(0, 240, 255, 0.25);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 10;
+            box-sizing: border-box;
+            backdrop-filter: blur(10px);
+        }
+
+        .palette-title {
+            margin: 0;
+            font-size: 1.05rem;
+            color: var(--neon-blue);
+            border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+            padding-bottom: 10px;
+            letter-spacing: 0.05em;
+        }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+
+        .palette-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: rgba(0, 240, 255, 0.04);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 10px;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem;
+            text-align: left;
+            width: 100%;
+        }
+
+        .palette-btn:hover {
+            background: rgba(0, 240, 255, 0.12);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .palette-btn.active {
+            background: rgba(0, 240, 255, 0.2);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.35);
+        }
+
+        .palette-icon {
+            font-size: 1.3rem;
+        }
+
+        .palette-name {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .palette-count {
+            font-weight: 700;
+            color: var(--neon-blue);
+            font-size: 0.9rem;
+        }
+
+        .palette-hint {
+            font-size: 0.75rem;
+            color: #8aa3b8;
+            text-align: center;
+            margin: 5px 0 0 0;
+            line-height: 1.4;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .victory-overlay, .defeat-overlay, .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(3, 4, 10, 0.88);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .victory-content, .defeat-content, .loading-content {
+            background: var(--panel-bg);
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            padding: 35px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(0, 240, 255, 0.15);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            margin-top: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--neon-blue);
+            color: #03040a;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 0 25px var(--neon-blue);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #8aa3b8;
+        }
+        .btn-secondary:hover {
+            border-color: #fff;
+            color: #fff;
+        }
+
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 4px solid rgba(0, 240, 255, 0.1);
+            border-left-color: var(--neon-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .tower-main {
+                flex-direction: column-reverse;
+            }
+            .block-palette {
+                width: 100%;
+                max-height: 150px;
+                padding: 12px;
+                border-left: none;
+                border-top: 1px solid rgba(0, 240, 255, 0.25);
+            }
+            .palette-grid {
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                max-height: none;
+                gap: 8px;
+            }
+            .palette-btn {
+                flex-direction: column;
+                align-items: center;
+                min-width: 80px;
+                padding: 8px;
+                text-align: center;
+            }
+            .palette-hint {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
     <div id="marginal-tower-app">
-        <header class="tower-header" style="position:relative;">
-            <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
+        <header class="tower-header">
+            <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu" style="background:none;border:none;color:var(--neon-blue);font-size:1.3rem;cursor:pointer;">☰</button>
             <h1 class="tower-title">La Tour de Silas</h1>
-            <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
+            <button id="back-to-minigame-btn" class="btn btn-secondary" style="margin-top:0;padding:6px 14px;font-size:0.75rem;">Retour</button>
         </header>
-
-        <nav id="hamburger-menu" class="sg-menu">
-            <button class="sg-menu-item" id="menu-home">
-                <span class="menu-icon">🏠</span>
-                <span>Menu principal</span>
-            </button>
-            <div class="sg-menu-divider"></div>
-            <button class="sg-menu-item" id="menu-settings">
-                <span class="menu-icon">⚙</span>
-                <span>Paramètres</span>
-            </button>
-        </nav>
 
         <main class="tower-main">
             <div id="game-container" class="game-container">
-                <canvas id="tower-canvas"></canvas>
-                <div id="wind-indicator" class="wind-indicator hidden">
-                    <span class="wind-arrow">→</span>
-                    <span class="wind-label">VENT</span>
+                <div class="height-hud">
+                    <span class="height-hud-title">Objectif Hauteur</span>
+                    <div class="height-progress-bar">
+                        <div class="height-progress-fill" id="height-progress-fill"></div>
+                    </div>
                 </div>
+
+                <canvas id="tower-canvas"></canvas>
+                
                 <div id="victory-overlay" class="victory-overlay hidden">
                     <div class="victory-content">
-                        <h2 class="victory-title">Tour achevée !</h2>
-                        <p class="victory-text">Silas a construit sa tour. La vérité émerge du chaos.</p>
+                        <h2 class="victory-title" style="color:var(--neon-green);margin-top:0;text-shadow:0 0 10px rgba(0,255,136,0.4);">Objectif Atteint !</h2>
+                        <p class="victory-text" style="color:#c5d8ed;line-height:1.5;">La tour de Silas s'est stabilisée au-delà de la ligne cible. La vérité émerge du chaos.</p>
                         <button id="victory-continue-btn" class="btn btn-primary">Continuer l'enquête</button>
                     </div>
                 </div>
+
                 <div id="defeat-overlay" class="defeat-overlay hidden">
                     <div class="defeat-content">
-                        <h2 class="defeat-title">Tour effondrée</h2>
-                        <p class="defeat-text">Les blocs se sont écroulés. Silas recommencera...</p>
+                        <h2 class="defeat-title" style="color:var(--neon-pink);margin-top:0;text-shadow:0 0 10px rgba(255,0,127,0.4);">Tour effondrée</h2>
+                        <p class="defeat-text" style="color:#c5d8ed;line-height:1.5;">Les structures n'ont pas résisté. Silas doit recommencer...</p>
                         <button id="defeat-retry-btn" class="btn btn-primary">Réessayer</button>
                         <button id="defeat-continue-btn" class="btn btn-secondary">Continuer sans gagner</button>
                     </div>
@@ -55,52 +363,289 @@
             <aside id="block-palette" class="block-palette">
                 <h3 class="palette-title">Matériaux</h3>
                 <div class="palette-grid" id="palette-grid">
-                    <button class="palette-btn active" data-block="wood" data-i18n-name="Bois">
+                    <button class="palette-btn active" data-block="wood">
                         <span class="palette-icon">🪵</span>
                         <span class="palette-name">Bois</span>
                         <span class="palette-count" id="count-wood">x8</span>
                     </button>
-                    <button class="palette-btn" data-block="stone" data-i18n-name="Pierre">
+                    <button class="palette-btn" data-block="stone">
                         <span class="palette-icon">🪨</span>
                         <span class="palette-name">Pierre</span>
                         <span class="palette-count" id="count-stone">x6</span>
                     </button>
-                    <button class="palette-btn" data-block="glass" data-i18n-name="Verre">
+                    <button class="palette-btn" data-block="glass">
                         <span class="palette-icon">🧊</span>
                         <span class="palette-name">Verre</span>
                         <span class="palette-count" id="count-glass">x4</span>
                     </button>
-                    <button class="palette-btn" data-block="metal" data-i18n-name="Métal">
+                    <button class="palette-btn" data-block="metal">
                         <span class="palette-icon">🔩</span>
                         <span class="palette-name">Métal</span>
                         <span class="palette-count" id="count-metal">x3</span>
                     </button>
-                    <button class="palette-btn" data-block="cardboard" data-i18n-name="Carton">
+                    <button class="palette-btn" data-block="cardboard">
                         <span class="palette-icon">📦</span>
                         <span class="palette-name">Carton</span>
                         <span class="palette-count" id="count-cardboard">x5</span>
                     </button>
-                    <button class="palette-btn" data-block="brick" data-i18n-name="Brique">
+                    <button class="palette-btn" data-block="brick">
                         <span class="palette-icon">🧱</span>
                         <span class="palette-name">Brique</span>
                         <span class="palette-count" id="count-brick">x5</span>
                     </button>
                 </div>
                 <div class="palette-info">
-                    <p class="palette-hint" id="palette-hint">Cliquez sur la plateforme pour placer un bloc</p>
+                    <p class="palette-hint" id="palette-hint">Cliquez sur le décor pour faire tomber un matériau. Empilez-les stratégiquement.</p>
                 </div>
             </aside>
         </main>
 
-        <div id="loading-overlay" class="loading-overlay hidden">
+        <div id="loading-overlay" class="loading-overlay">
             <div class="loading-content">
                 <div class="spinner"></div>
-                <p class="loading-text">Chargement de la physique...</p>
+                <p class="loading-text" style="margin:0;color:var(--text-main);font-weight:500;">Initialisation du moteur physique...</p>
             </div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-    <script src="marginal-tower.js"></script>
+    <script>
+        (function() {
+            'use strict';
+
+            const { Engine, Render, Runner, Bodies, Composite, Events } = Matter;
+
+            const container = document.getElementById('game-container');
+            const canvas = document.getElementById('tower-canvas');
+            
+            let blockCounts = {
+                wood: 8,
+                stone: 6,
+                glass: 4,
+                metal: 3,
+                cardboard: 5,
+                brick: 5
+            };
+
+            let selectedBlockType = 'wood';
+            let engine, render, runner;
+            let groundY = 600;
+            let targetHeightY = 200;
+            let isGameOver = false;
+            let framesStable = 0; // Compteur pour forcer la stabilité dans le temps
+
+            const blockProperties = {
+                wood: { width: 80, height: 28, density: 0.0012, friction: 0.6, restitution: 0.05, color: '#d9822b', stroke: '#ffaa54' },
+                stone: { width: 70, height: 35, density: 0.004, friction: 0.7, restitution: 0.02, color: '#6e8196', stroke: '#a2b8d0' },
+                glass: { width: 60, height: 25, density: 0.0008, friction: 0.1, restitution: 0.2, color: '#7ad9ff', stroke: '#c2f0ff' },
+                metal: { width: 55, height: 25, density: 0.0055, friction: 0.5, restitution: 0.1, color: '#4675a8', stroke: '#85baf2' },
+                cardboard: { width: 85, height: 30, density: 0.0004, friction: 0.85, restitution: 0.01, color: '#c49a65', stroke: '#e8c499' },
+                brick: { width: 75, height: 30, density: 0.0025, friction: 0.6, restitution: 0.05, color: '#a84d43', stroke: '#e07d73' }
+            };
+
+            function initPhysics() {
+                engine = Engine.create({
+                    gravity: { x: 0, y: 1 }
+                });
+
+                const width = container.clientWidth || 400;
+                const height = container.clientHeight || 600;
+                groundY = height - 20;
+                targetHeightY = height * 0.35;
+
+                render = Render.create({
+                    canvas: canvas,
+                    engine: engine,
+                    options: {
+                        width: width,
+                        height: height,
+                        wireframes: false,
+                        background: 'transparent'
+                    }
+                });
+
+                Render.run(render);
+                runner = Runner.create();
+                Runner.run(runner, engine);
+
+                createBoundaries(width, height);
+                initCustomGraphics();
+                initUI();
+
+                setTimeout(() => {
+                    document.getElementById('loading-overlay').classList.add('hidden');
+                }, 400);
+            }
+
+            function createBoundaries(width, height) {
+                const thickness = 100;
+                const ground = Bodies.rectangle(width / 2, height - 10, width, 20, { 
+                    isStatic: true, 
+                    render: { fillStyle: '#00f0ff', strokeStyle: '#ffffff', lineWidth: 1 } 
+                });
+                
+                const leftWall = Bodies.rectangle(-thickness / 2, height / 2, thickness, height * 2, { isStatic: true });
+                const rightWall = Bodies.rectangle(width + thickness / 2, height / 2, thickness, height * 2, { isStatic: true });
+
+                Composite.add(engine.world, [ground, leftWall, rightWall]);
+            }
+
+            function initCustomGraphics() {
+                Events.on(render, 'afterRender', () => {
+                    const ctx = render.context;
+                    const width = render.options.width;
+
+                    ctx.save();
+                    
+                    // Couleur de la ligne change si la tour est en train de se stabiliser
+                    if(framesStable > 10) {
+                        ctx.strokeStyle = '#ffea00';
+                        ctx.shadowColor = '#ffea00';
+                        ctx.fillStyle = '#ffea00';
+                    } else {
+                        ctx.strokeStyle = '#00ff88';
+                        ctx.shadowColor = '#00ff88';
+                        ctx.fillStyle = '#00ff88';
+                    }
+
+                    ctx.lineWidth = 2;
+                    ctx.shadowBlur = 10;
+                    ctx.setLineDash([8, 6]);
+                    ctx.beginPath();
+                    ctx.moveTo(0, targetHeightY);
+                    ctx.lineTo(width, targetHeightY);
+                    ctx.stroke();
+
+                    ctx.font = '600 11px Montserrat, sans-serif';
+                    ctx.fillText('LIGNE CIBLE', 20, targetHeightY - 10);
+                    ctx.restore();
+
+                    updateTowerHeightProgress();
+                });
+            }
+
+            function updateTowerHeightProgress() {
+                if (isGameOver) return;
+
+                const bodies = Composite.allBodies(engine.world);
+                let highestY = groundY;
+                let activeBlocksCount = 0;
+                let allStable = true;
+
+                bodies.forEach(body => {
+                    if (!body.isStatic) {
+                        activeBlocksCount++;
+                        const topY = body.position.y - (body.bounds.max.y - body.bounds.min.y) / 2;
+                        if (topY < highestY) {
+                            highestY = topY;
+                        }
+                        // Vérification de la vitesse (Matter.js gère 'body.speed')
+                        if (body.speed > 0.2) {
+                            allStable = false;
+                        }
+                    }
+                });
+
+                const totalDistance = groundY - targetHeightY;
+                const currentDistance = groundY - highestY;
+                let percentage = Math.max(0, Math.min(100, (currentDistance / totalDistance) * 100));
+
+                const fillEl = document.getElementById('height-progress-fill');
+                if (fillEl) {
+                    fillEl.style.width = percentage + '%';
+                }
+
+                // SI on est au-dessus de la cible ET qu'absolument rien ne bouge
+                if (activeBlocksCount > 0 && highestY <= targetHeightY && highestY < groundY - 40 && allStable) {
+                    framesStable++; // On incrémente le chronomètre de stabilité
+                    
+                    if (fillEl) fillEl.classList.add('stabilizing');
+
+                    // Si ça tient pendant ~1 seconde complète (60 frames), c'est gagné !
+                    if (framesStable >= 60) {
+                        isGameOver = true;
+                        document.getElementById('victory-overlay').classList.remove('hidden');
+                    }
+                } else {
+                    framesStable = 0; // Dès qu'un bloc bouge ou tombe, on remet le chrono à 0
+                    if (fillEl) fillEl.classList.remove('stabilizing');
+                }
+            }
+
+            function initUI() {
+                const paletteBtns = document.querySelectorAll('.palette-btn');
+                paletteBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        paletteBtns.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        selectedBlockType = btn.getAttribute('data-block');
+                    });
+                });
+
+                canvas.addEventListener('click', (event) => {
+                    if (isGameOver) return;
+                    const rect = canvas.getBoundingClientRect();
+                    const x = event.clientX - rect.left;
+                    
+                    // Fait apparaître le bloc au-dessus de la limite visible
+                    const y = 35; 
+
+                    spawnBlock(x, y, selectedBlockType);
+                });
+
+                document.getElementById('defeat-retry-btn').addEventListener('click', () => {
+                    window.location.reload();
+                });
+
+                document.getElementById('victory-continue-btn').addEventListener('click', () => {
+                    window.location.href = '../true-detective/index.html';
+                });
+
+                document.getElementById('defeat-continue-btn').addEventListener('click', () => {
+                    window.location.href = '../true-detective/index.html';
+                });
+
+                document.getElementById('back-to-minigame-btn').addEventListener('click', () => {
+                    window.location.href = '../true-detective/index.html';
+                });
+
+                updateCounters();
+            }
+
+            function spawnBlock(x, y, type) {
+                if (blockCounts[type] <= 0) return;
+
+                const props = blockProperties[type];
+                if (!props) return;
+
+                const block = Bodies.rectangle(x, y, props.width, props.height, {
+                    density: props.density,
+                    friction: props.friction,
+                    restitution: props.restitution,
+                    render: {
+                        fillStyle: props.color,
+                        strokeStyle: props.stroke,
+                        lineWidth: 2
+                    }
+                });
+
+                Composite.add(engine.world, block);
+
+                blockCounts[type]--;
+                updateCounters();
+            }
+
+            function updateCounters() {
+                for (let type in blockCounts) {
+                    const countEl = document.getElementById(`count-${type}`);
+                    if (countEl) {
+                        countEl.textContent = `x${blockCounts[type]}`;
+                    }
+                }
+            }
+
+            window.addEventListener('load', initPhysics);
+        })();
+    </script>
 </body>
 </html>
