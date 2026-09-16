@@ -184,7 +184,7 @@
         sec.appendChild(devBtn);
 
         const contactBtn = el('a', 'dp-setting-btn contact');
-        contactBtn.href = 'https://portfolio2026-ss9v.vercel.app/';
+        contactBtn.href = 'https://portefolio-2026.vercel.app/';
         contactBtn.target = '_blank';
         contactBtn.rel = 'noopener';
         contactBtn.innerHTML = '<span class="dp-setting-btn-icon">⌨️</span> Contacter le développeur';

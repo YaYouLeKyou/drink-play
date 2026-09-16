@@ -240,7 +240,6 @@
                 </div>
                 <div class="dialogue-history" id="dialogue-history"></div>
                 <div class="choices-container" id="choices-container"></div>
-                <button class="btn btn-continue always-active" id="continue-btn">Continue</button>
                 <div class="conversation-input hidden" id="conversation-input">
                     <input type="text" id="player-text" class="player-text-input" placeholder="Ask the NPC something..." maxlength="200" autocomplete="off">
                     <button id="send-btn" class="btn btn-send">Send</button>
@@ -256,7 +255,6 @@
             </div>
         </div>
 
-        <button class="btn btn-continue always-active mobile-continue-btn" id="mobile-continue-btn">Continue</button>
     </section>
 
         <!-- ===== ACT PAGE OVERLAY ===== -->
@@ -394,6 +392,9 @@
     <div id="minigame-layer" class="minigame-layer">
         <!-- rempli par minigames.js -->
     </div>
+
+    <button class="btn btn-continue always-active" id="continue-btn">Continue</button>
+    <button class="btn btn-continue always-active mobile-continue-btn" id="mobile-continue-btn">Continue</button>
 
     <script src="imageService.js"></script>
     <script src="audioService.js"></script>

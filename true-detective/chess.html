@@ -213,9 +213,28 @@
     </div>
 
     <script src="chess-game.js"></script>
+    <script src="../settings-menu.js"></script>
     <script>
         (function () {
             'use strict';
+
+            if (window.DPSettings && window.DPSettings.init) {
+                window.DPSettings.init({
+                    showMusicToggle: true,
+                    showMusicVolume: true,
+                    showNarrationVolume: false,
+                    showMuteToggle: false,
+                    showGameSection: true,
+                    showBackToHub: false,
+                    showRestart: false,
+                    showRules: false,
+                    customButtons: [],
+                    onBackToHub: function () {
+                        window.location.href = '../true-detective/index.html#minigames';
+                    }
+                });
+            }
+
             var $content = document.getElementById('game-content');
             var $backBtn = document.getElementById('back-to-minigame-btn');
             var $continueBtn = document.getElementById('story-continue-btn');
@@ -255,7 +274,7 @@
             var menuSettings = document.getElementById('menu-settings');
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
-                    alert('Paramètres : aucun réglage pour l\'instant.');
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres : aucun réglage pour l\'instant.'); }
                 });
             }
 

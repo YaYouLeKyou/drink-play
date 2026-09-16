@@ -178,9 +178,27 @@
     </main>
 
     <script src="minigames.js"></script>
+    <script src="../settings-menu.js"></script>
     <script>
         (function () {
             'use strict';
+
+            if (window.DPSettings && window.DPSettings.init) {
+                window.DPSettings.init({
+                    showMusicToggle: true,
+                    showMusicVolume: true,
+                    showNarrationVolume: false,
+                    showMuteToggle: false,
+                    showGameSection: true,
+                    showBackToHub: false,
+                    showRestart: false,
+                    showRules: false,
+                    customButtons: [],
+                    onBackToHub: function () {
+                        window.location.href = '../true-detective/index.html#minigames';
+                    }
+                });
+            }
             var CODE = '1981';
             var currentCode = '----';
             var dialValue = 0;
@@ -362,7 +380,7 @@
                 if (menuSettings) {
                     menuSettings.addEventListener('click', function () {
                         if (menu) menu.classList.remove('open');
-                        alert('Paramètres : aucun réglage pour l\'instant.');
+                        if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres : aucun réglage pour l\'instant.'); }
                     });
                 }
                 if (fromStory) {

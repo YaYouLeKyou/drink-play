@@ -941,7 +941,6 @@ function showEvidence(h) {
                 var btn = document.createElement('button');
                 btn.className = 'btn reseau-alibis-continue';
                 btn.textContent = lang === 'fr' ? 'Continuer' : 'Continue';
-                btn.style.cssText = 'padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;width:auto;max-width:320px;margin-top:16px;display:block;margin-left:auto;margin-right:auto;';
                 btn.addEventListener('click', function () {
                     try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau_alibis', won: true, ts: Date.now() })); } catch (e) {}
                     try {

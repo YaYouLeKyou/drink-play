@@ -84,6 +84,23 @@
         $container = document.getElementById('game-container');
         $content = document.getElementById('game-content');
 
+        if (window.DPSettings && window.DPSettings.init) {
+            window.DPSettings.init({
+                showMusicToggle: true,
+                showMusicVolume: true,
+                showNarrationVolume: false,
+                showMuteToggle: false,
+                showGameSection: true,
+                showBackToHub: false,
+                showRestart: false,
+                showRules: false,
+                customButtons: [],
+                onBackToHub: function () {
+                    window.location.href = '../true-detective/index.html#minigames';
+                }
+            });
+        }
+
         parseParams();
         loadGame();
         setupControls();
@@ -562,7 +579,11 @@
         if (menuSettings) {
             menuSettings.addEventListener('click', function () {
                 if (menu) menu.classList.remove('open');
-                alert('Paramètres : aucun réglage pour l\'instant.');
+                if (window.DPSettings && window.DPSettings.open) {
+                    window.DPSettings.open();
+                } else {
+                    alert('Paramètres : aucun réglage pour l\'instant.');
+                }
             });
         }
 

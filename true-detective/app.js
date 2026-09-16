@@ -320,12 +320,39 @@ langEnBtn: document.getElementById('lang-en'),
         if (!screen) return;
         screen.classList.remove('hidden');
         screen.classList.add('active');
+        updateContinueBtnVisibility();
     }
 
     function hideScreen(screen) {
         if (!screen) return;
         screen.classList.remove('active');
         screen.classList.add('hidden');
+        updateContinueBtnVisibility();
+    }
+
+    function updateContinueBtnVisibility() {
+        var storyScreens = ['game-screen'];
+        var activeScreen = document.querySelector('.screen.active');
+        var isStoryScreen = activeScreen && storyScreens.indexOf(activeScreen.id) >= 0;
+        var actOverlay = document.getElementById('act-page-overlay');
+        var isActPageVisible = actOverlay && actOverlay.classList.contains('visible');
+        var notebook = document.getElementById('notebook');
+        var isNotebookOpen = notebook && notebook.classList.contains('open');
+
+        if ($.continueBtn) {
+            if (isStoryScreen && !isActPageVisible) {
+                $.continueBtn.classList.remove('hidden');
+            } else {
+                $.continueBtn.classList.add('hidden');
+            }
+        }
+        if ($.mobileContinueBtn) {
+            if (isStoryScreen && !isActPageVisible) {
+                $.mobileContinueBtn.classList.remove('hidden');
+            } else {
+                $.mobileContinueBtn.classList.add('hidden');
+            }
+        }
     }
 
     var ui = {
@@ -451,6 +478,7 @@ function saveSettings() {
      function init() {
         $.endScreenTitle = $.endScreen ? $.endScreen.querySelector('h1') : null;
         updateVoiceButtonVisibility();
+        updateContinueBtnVisibility();
         renderThemeCards();
         checkSavedGame();
         setupEventListeners();
@@ -479,6 +507,7 @@ function saveSettings() {
                     updateLanguageUI(); updateLanguageButtons();
                     animateDots();
                     renderScenarioPage();
+                    updateContinueBtnVisibility();
                     return;
                 }
             }
@@ -508,6 +537,7 @@ function saveSettings() {
                     updateLanguageUI(); updateLanguageButtons();
                     animateDots();
                     renderScenarioPage();
+                    updateContinueBtnVisibility();
                     return;
                 }
             }
@@ -538,13 +568,14 @@ function saveSettings() {
                                     scrEnsureThemeMusic();
                                     if ($.homeScreen) { $.homeScreen.classList.remove('active'); $.homeScreen.classList.add('hidden'); }
                                     if ($.themeScreen) { $.themeScreen.classList.remove('active'); $.themeScreen.classList.add('hidden'); }
-                                    if ($.gameScreen) { $.gameScreen.classList.remove('hidden'); $.gameScreen.classList.add('active'); }
-                                    if ($.endScreen) { $.endScreen.classList.add('hidden'); $.endScreen.classList.remove('active'); }
-                                    hideLoading();
-                                    updateLanguageUI(); updateLanguageButtons();
-                                    animateDots();
-                                    renderScenarioPage();
-                                    return;
+                    if ($.gameScreen) { $.gameScreen.classList.remove('hidden'); $.gameScreen.classList.add('active'); }
+                    if ($.endScreen) { $.endScreen.classList.add('hidden'); $.endScreen.classList.remove('active'); }
+                    hideLoading();
+                    updateLanguageUI(); updateLanguageButtons();
+                    animateDots();
+                    renderScenarioPage();
+                    updateContinueBtnVisibility();
+                    return;
                                 }
                             } catch (eR) {}
                         }
@@ -552,13 +583,14 @@ function saveSettings() {
                         scrEnsureThemeMusic();
                         if ($.homeScreen) { $.homeScreen.classList.remove('active'); $.homeScreen.classList.add('hidden'); }
                         if ($.themeScreen) { $.themeScreen.classList.remove('active'); $.themeScreen.classList.add('hidden'); }
-                        if ($.gameScreen) { $.gameScreen.classList.remove('hidden'); $.gameScreen.classList.add('active'); }
-                        if ($.endScreen) { $.endScreen.classList.add('hidden'); $.endScreen.classList.remove('active'); }
-                        hideLoading();
-                        updateLanguageUI(); updateLanguageButtons();
-                        animateDots();
-                        renderScenarioPage();
-                        return;
+                    if ($.gameScreen) { $.gameScreen.classList.remove('hidden'); $.gameScreen.classList.add('active'); }
+                    if ($.endScreen) { $.endScreen.classList.add('hidden'); $.endScreen.classList.remove('active'); }
+                    hideLoading();
+                    updateLanguageUI(); updateLanguageButtons();
+                    animateDots();
+                    renderScenarioPage();
+                    updateContinueBtnVisibility();
+                    return;
                     }
                 }
             }
@@ -741,6 +773,7 @@ function saveSettings() {
                 $.homeScreen.classList.add('active');
                 hidePageNav();
                 checkSavedGame();
+                updateContinueBtnVisibility();
             });
         }
 
@@ -1014,6 +1047,7 @@ applyMusicHidden(true);
                 $.homeScreen.classList.add('active');
                 hidePageNav();
                 checkSavedGame();
+                updateContinueBtnVisibility();
             });
         }
 
@@ -1035,6 +1069,7 @@ applyMusicHidden(true);
                 $.homeScreen.classList.add('active');
                 hidePageNav();
                 checkSavedGame();
+                updateContinueBtnVisibility();
             });
         }
 
@@ -1049,6 +1084,7 @@ applyMusicHidden(true);
                     window._minigameSkipHandler({ won: false });
                     window._minigameSkipHandler = null;
                 }
+                updateContinueBtnVisibility();
             });
         }
 
@@ -1439,6 +1475,7 @@ applyMusicHidden(true);
         $.gameScreen.classList.remove('hidden');
         $.gameScreen.classList.add('active');
         updateIndicators();
+        updateContinueBtnVisibility();
 
         var firstScene = null;
         if (script.acts && script.acts.length) {
@@ -1600,6 +1637,7 @@ applyMusicHidden(true);
                 $.gameScreen.classList.remove('hidden');
                 $.gameScreen.classList.add('active');
                 $.endScreen.classList.add('hidden');
+                updateContinueBtnVisibility();
             } else if (state.script && state.script.acts && state.script.acts[0]) {
                 hideLoading();
                 ui.sceneCounter = 0;
@@ -1631,6 +1669,7 @@ applyMusicHidden(true);
                 $.gameScreen.classList.remove('hidden');
                 $.gameScreen.classList.add('active');
                 $.endScreen.classList.add('hidden');
+                updateContinueBtnVisibility();
             }
         } else {
             showToast(getText('noSavedGame'), true);
@@ -1646,6 +1685,7 @@ applyMusicHidden(true);
         $.gameScreen.classList.remove('hidden');
         $.gameScreen.classList.add('active');
         updateIndicators();
+        updateContinueBtnVisibility();
 
         var firstScene = null;
         if (script.acts && script.acts.length) {
@@ -1961,9 +2001,7 @@ function buildTransitionPages(sceneData) {
             $.continueBtn.classList.remove('hidden');
             $.continueBtn.textContent = getText('nextPage') || 'Next';
         } else {
-            if (!isMobile()) {
-                $.continueBtn.classList.add('hidden');
-            }
+            $.continueBtn.classList.remove('hidden');
             $.continueBtn.textContent = getText('continue') || 'Continue';
         }
 
@@ -1971,9 +2009,9 @@ function buildTransitionPages(sceneData) {
             $.mobileContinueBtn.textContent = $.continueBtn.textContent;
         }
 
-        $.continueBtn.disabled = pageNumber >= ui.totalPages && !isMobile();
+        $.continueBtn.disabled = false;
         if (!isMobile()) {
-            $.continueBtn.onclick = pageNumber < ui.totalPages ? handleContinue : null;
+            $.continueBtn.onclick = handleContinue;
         } else {
             $.continueBtn.onclick = handleContinue;
         }
@@ -2095,6 +2133,9 @@ function buildTransitionPages(sceneData) {
         stopNarrationTimer();
         if (ui.isWaiting) return;
 
+        var actOverlay = document.getElementById('act-page-overlay');
+        if (actOverlay && actOverlay.classList.contains('visible')) return;
+
         // IMMEDIATELY skip typing if active - button should always be clickable
         if (ui.isTyping) {
             skipTypeWriter();
@@ -2157,7 +2198,15 @@ function buildTransitionPages(sceneData) {
             return;
         }
 
-        // Effet machine à écrire avec skip au clic
+        if (text.indexOf('<') >= 0) {
+            $.dialogueText.innerHTML = text;
+            ui.isTyping = false;
+            $.typeCursor.classList.add('hidden');
+            _typeWriterCallback = null;
+            if (onComplete) { onComplete(); }
+            return;
+        }
+
         $.dialogueText.textContent = '';
         $.typeCursor.classList.remove('hidden');
         ui.isTyping = true;
@@ -2165,7 +2214,6 @@ function buildTransitionPages(sceneData) {
 
         function typeChar() {
             if (ui.skipPending) {
-                // Already handled by skipTypeWriter - do nothing to avoid double-callback
                 return;
             }
 
@@ -2179,9 +2227,6 @@ function buildTransitionPages(sceneData) {
             } else {
                 ui.isTyping = false;
                 $.typeCursor.classList.add('hidden');
-                if (text.indexOf('<') >= 0) {
-                    $.dialogueText.innerHTML = text;
-                }
                 _typeWriterCallback = null;
                 if (onComplete) { onComplete(); }
             }
@@ -2404,11 +2449,9 @@ function buildTransitionPages(sceneData) {
 
         $.choicesContainer.innerHTML = '';
         $.conversationInput.classList.add('hidden');
-        if (!isMobile()) {
-            $.continueBtn.classList.add('hidden');
-        }
+        $.continueBtn.classList.remove('hidden');
         $.continueBtn.disabled = false;
-        $.continueBtn.onclick = null;
+        $.continueBtn.onclick = handleContinue;
         $.npcName.textContent = '';
         hideNPC();
         clearDialogueHistory();
@@ -2811,7 +2854,6 @@ function buildTransitionPages(sceneData) {
             }
         }
     }
-
     function toggleNotebook() {
         if (!$.notebook) return;
         var wasOpen = $.notebook.classList.contains('open');
@@ -2820,6 +2862,7 @@ function buildTransitionPages(sceneData) {
             resetNotebookTabs();
         }
         updateNotebook();
+        updateContinueBtnVisibility();
     }
 
     function resetNotebookTabs() {
@@ -3298,6 +3341,7 @@ function buildTransitionPages(sceneData) {
         if (continueBtn) continueBtn.textContent = getText('continue') || 'Continuer';
 
         overlay.classList.add('visible');
+        updateContinueBtnVisibility();
 
         // Musique mystère sur la page d'acte
         scrMusicPlaying('mystere');
@@ -3505,6 +3549,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.gameScreen.classList.add('active');
         $.endScreen.classList.add('hidden');
         renderScenarioPage();
+        updateContinueBtnVisibility();
     }
 
     var EVIDENCE_HINTS = {
@@ -3554,7 +3599,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.conversationInput.classList.add('hidden');
         $.continueBtn.classList.remove('hidden');
         $.continueBtn.disabled = false;
-        $.continueBtn.onclick = null;
+        $.continueBtn.onclick = handleContinue;
         $.npcName.textContent = '';
         hideNPC();
 
@@ -3969,11 +4014,8 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         scr.interro = { id: interroId, questionRound: 0, minigameRound: 0, done: false, questionsDone: false };
         // « Continuer » reste à l'écran mais reste inactif pendant l'interrogatoire
         $.continueBtn.classList.remove('hidden');
-        $.continueBtn.disabled = !isMobile();
+        $.continueBtn.disabled = false;
         $.continueBtn.textContent = getText('continue') || 'Continuer';
-        if (!isMobile()) {
-            $.continueBtn.onclick = null;
-        }
         scrShowInterroAskButton();
     }
 
@@ -4100,11 +4142,10 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             });
             $.choicesContainer.appendChild(askBtn);
             $.continueBtn.classList.remove('hidden');
-            $.continueBtn.disabled = !isMobile();
+            $.continueBtn.disabled = false;
             $.continueBtn.textContent = getText('continue') || 'Continuer';
-            if (!isMobile()) {
-                $.continueBtn.onclick = null;
-            }
+            $.continueBtn.onclick = handleContinue;
+
             return;
         }
 
@@ -4872,11 +4913,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                         s2.prochainSuspect = suspectId;
                         scr.interro = { id: suspectId, questionRound: 0, minigameRound: 0, done: false, questionsDone: false };
                         $.continueBtn.classList.remove('hidden');
-                        $.continueBtn.disabled = !isMobile();
+                        $.continueBtn.disabled = false;
                         $.continueBtn.textContent = getText('continue') || 'Continuer';
-                        if (!isMobile()) {
-                            $.continueBtn.onclick = null;
-                        }
+                        $.continueBtn.onclick = handleContinue;
                         scrShowInterroAskButton();
                     });
                     $.choicesContainer.appendChild(btn);
@@ -4952,11 +4991,9 @@ function scrApplyChoice(choiceKey, choiceId) {
             s.reinterroges.push(choiceId);
             scr.interro = { id: choiceId, questionRound: 0, minigameRound: 0, done: false, questionsDone: false };
             $.continueBtn.classList.remove('hidden');
-            $.continueBtn.disabled = !isMobile();
+            $.continueBtn.disabled = false;
             $.continueBtn.textContent = getText('continue') || 'Continuer';
-            if (!isMobile()) {
-                $.continueBtn.onclick = null;
-            }
+            $.continueBtn.onclick = handleContinue;
             scrShowInterroAskButton();
         } else if (choiceKey === 'accuser') {
             s.accused = choiceId;

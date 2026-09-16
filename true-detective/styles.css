@@ -1166,12 +1166,12 @@ html {
     cursor: pointer;
     transition: box-shadow 0.2s ease, opacity 0.2s ease;
     position: fixed;
-    top: calc(20px + env(safe-area-inset-top, 0px));
-    right: calc(20px + env(safe-area-inset-right, 0px));
-    transform: none;
-    z-index: 11002;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9997;
     width: auto;
-    max-width: 500px;
+    max-width: min(320px, calc(100vw - 32px));
     text-align: center;
     box-sizing: border-box;
     margin: 0;
@@ -1547,11 +1547,11 @@ html {
     border: 1px solid rgba(255, 0, 255, 0.5);
 }
 
-/* Positionnement fixe du bouton Interroger à gauche du bouton Continuer */
+/* Positionnement fixe du bouton Interroger à droite du bouton Continuer */
 #game-screen .interrogation-ask {
     position: fixed;
     bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-    left: calc(50% - 180px); /* Décalage vers la gauche du bouton Continuer (largeur ~160px) */
+    left: calc(50% + 110px); /* Décalage vers la droite du bouton Continuer */
     transform: translateX(-50%);
     z-index: 11001;
     margin: 0;
@@ -3376,11 +3376,11 @@ html {
     }
 
     .mobile-continue-btn {
-        display: flex;
+        display: none !important;
     }
 
     #continue-btn {
-        display: none;
+        display: flex !important;
     }
 }
 
@@ -3435,19 +3435,10 @@ html {
     }
 
     .mobile-continue-btn {
-        display: flex;
-        position: fixed;
-        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-        left: 50%;
-        transform: translateX(-50%);
-        width: calc(100vw - 24px);
-        max-width: 420px;
-        z-index: 300;
-        justify-content: center;
-        align-items: center;
+        display: none !important;
     }
 
-    #game-screen .btn-continue.hidden {
+    .btn-continue.hidden {
         display: flex !important;
     }
 }
@@ -4515,27 +4506,28 @@ html {
 }
 
     .act-page-continue {
-        margin-top: 80px;
-        opacity: 0;
-        animation: actFadeInUp 0.8s ease 1.1s forwards;
+        margin-top: 0;
+        opacity: 1;
+        animation: none;
     }
 
 .act-page-continue .btn-continue {
     font-size: 1.2em;
     padding: 16px 50px;
     letter-spacing: 3px;
-    /* Sur la page d'acte, le bouton vit dans le flux (pas de position fixed)
-       pour rester visible et ne chevaucher ni le lecteur musique ni le titre */
-    position: static;
-    transform: none;
+    position: fixed;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
     display: inline-block;
     min-width: 0;
-    max-width: 90vw;
+    max-width: min(320px, calc(100vw - 48px));
+    z-index: 9997;
 }
 
 .act-page-continue .btn-continue:hover,
 .act-page-continue .btn-continue:active {
-    transform: translateY(-1px) !important;
+    transform: translateX(-50%) !important;
 }
 
 @keyframes actFadeInUp {
@@ -4876,44 +4868,32 @@ html {
         object-position: bottom center;
     }
 
-    /* Bouton Continuer: fixe en bas avec marge de sécurité */
-#game-screen .btn-continue {
-    position: fixed;
-    top: calc(20px + env(safe-area-inset-top, 0px));
-    right: calc(20px + env(safe-area-inset-right, 0px));
-    transform: none;
-    width: auto;
-    max-width: 500px;
-    border-radius: 50px;
-    padding: 14px;
-    font-size: 1em;
-    z-index: 11002;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
-    order: 6;
-}
+    /* Bouton Continuer: fixe en bas au milieu */
+    .btn-continue {
+        position: fixed;
+        bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+        left: 50%;
+        transform: translateX(-50%);
+        width: auto;
+        max-width: min(320px, calc(100vw - 32px));
+        border-radius: 50px;
+        padding: 14px;
+        font-size: 1em;
+        z-index: 9997;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+    }
 
-    #game-screen .btn-continue:hover,
-    #game-screen .btn-continue:active {
+    .btn-continue:hover,
+    .btn-continue:active {
         transform: translateX(-50%) !important;
     }
 
-    /* Bouton mobile-continue-btn aligné avec le .btn-continue */
-    #game-screen .mobile-continue-btn {
-        display: flex;
-        position: fixed;
-        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-        left: 50%;
-        transform: translateX(-50%);
-        width: calc(100vw - 24px);
-        max-width: 500px;
-        z-index: 11002;
-        justify-content: center;
-        align-items: center;
-        border-radius: 50px;
-        padding: 14px;
+    /* Bouton mobile-continue-btn caché, on utilise .btn-continue */
+    .mobile-continue-btn {
+        display: none !important;
     }
 
-    #game-screen .btn-continue.hidden {
+    .btn-continue.hidden {
         display: flex !important;
     }
 
@@ -4922,7 +4902,7 @@ html {
         0%, 100% { box-shadow: 0 -4px 15px rgba(255, 0, 255, 0.4), 0 0 15px rgba(0, 255, 255, 0.3); }
         50% { box-shadow: 0 -4px 30px rgba(255, 0, 255, 0.8), 0 0 30px rgba(0, 255, 255, 0.6); }
     }
-    #game-screen .btn-continue:not(:disabled) {
+    .btn-continue:not(:disabled) {
         animation: btn-glow-pulse-mobile 2s ease-in-out infinite;
     }
 
@@ -5198,7 +5178,7 @@ html {
     }
 
     /* Bouton Continuer: fixe en bas avec marge de sécurité */
-    #game-screen .btn-continue {
+    .btn-continue {
         position: fixed;
         bottom: calc(10px + env(safe-area-inset-bottom, 0px));
         left: 50%;
@@ -5209,32 +5189,21 @@ html {
         padding: 12px;
         font-size: 0.95em;
         letter-spacing: 1px;
-        z-index: 11002;
+        z-index: 9997;
         box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
     }
 
-    #game-screen .btn-continue:hover,
-    #game-screen .btn-continue:active {
+    .btn-continue:hover,
+    .btn-continue:active {
         transform: translateX(-50%) !important;
     }
 
-    /* Bouton mobile-continue-btn aligné avec le .btn-continue */
-    #game-screen .mobile-continue-btn {
-        display: flex;
-        position: fixed;
-        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-        left: 50%;
-        transform: translateX(-50%);
-        width: calc(100vw - 20px);
-        max-width: 420px;
-        z-index: 11002;
-        justify-content: center;
-        align-items: center;
-        border-radius: 50px;
-        padding: 12px;
+    /* Bouton mobile-continue-btn caché, on utilise .btn-continue */
+    .mobile-continue-btn {
+        display: none !important;
     }
 
-    #game-screen .btn-continue.hidden {
+    .btn-continue.hidden {
         display: flex !important;
     }
 
@@ -5243,7 +5212,7 @@ html {
         0%, 100% { box-shadow: 0 -4px 12px rgba(255, 0, 255, 0.4), 0 0 12px rgba(0, 255, 255, 0.3); }
         50% { box-shadow: 0 -4px 25px rgba(255, 0, 255, 0.8), 0 0 25px rgba(0, 255, 255, 0.6); }
     }
-    #game-screen .btn-continue:not(:disabled) {
+    .btn-continue:not(:disabled) {
         animation: btn-glow-pulse-mobile-sm 2s ease-in-out infinite;
     }
 
