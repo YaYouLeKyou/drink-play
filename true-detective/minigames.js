@@ -953,7 +953,8 @@ function showEvidence(h) {
                             }
                         }
                     } catch (e) {}
-                    window.location.href = '../true-detective/index.html?standalone=reseau_alibis';
+                    var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                    window.location.href = fromStory ? '../true-detective/index.html?standalone=reseau_alibis' : '../true-detective/index.html#minigames';
                 });
                 board.appendChild(btn);
             }

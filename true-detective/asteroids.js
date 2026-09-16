@@ -149,7 +149,8 @@
                             try {
                                 localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'asteroids', won: false, ts: Date.now() }));
                             } catch (e) {}
-                            window.location.href = '../true-detective/index.html?standalone=asteroids';
+                                var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                                window.location.href = fromStory ? '../true-detective/index.html?standalone=asteroids' : '../true-detective/index.html#minigames';
                         }, 1500);
                         return;
                     }
@@ -178,7 +179,8 @@
                     try {
                         localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'asteroids', won: true, ts: Date.now() }));
                     } catch (e) {}
-                    window.location.href = '../true-detective/index.html?standalone=asteroids';
+                    var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                    window.location.href = fromStory ? '../true-detective/index.html?standalone=asteroids' : '../true-detective/index.html#minigames';
                 }, 1000);
             }
 

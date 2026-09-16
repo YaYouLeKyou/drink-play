@@ -3,63 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>True Detective - Le Puzzle</title>
+    <title>True Detective - Reconstitution de Scellé</title>
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
     <style>
+        :root {
+            --bg-dark: #070712;
+            --panel-bg: rgba(13, 13, 26, 0.95);
+            --accent-orange: #ff6b00;
+            --accent-blue: #00d4ff;
+            --accent-green: #00ff88;
+            --accent-red: #ff3366;
+            --text-main: #e8f4ff;
+            --text-secondary: #a0c0d0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 50% 10%, #16122d 0%, var(--bg-dark) 100%);
+            color: var(--text-main);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
         .puzzle-wrap {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
-            padding: 24px;
+            gap: 12px;
+            padding: 15px;
             width: 100%;
-            max-width: 900px;
+            max-width: 600px;
             margin: 0 auto;
+            box-sizing: border-box;
         }
-        .puzzle-canvas-wrap {
-            position: relative;
+
+        .puzzle-hud {
+            display: flex;
+            justify-content: space-between;
             width: 100%;
-            max-width: 800px;
-            aspect-ratio: 4/3;
-            background: #0d0d1a;
-            border: 2px solid rgba(255,255,255,0.15);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 0 5px;
+        }
+
+        .timer-display {
+            color: var(--accent-orange);
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+
+        /* Grille coulissante 3x3 */
+        .puzzle-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1/1;
+            background: var(--panel-bg);
+            padding: 10px;
+            border: 2px solid rgba(255, 107, 0, 0.4);
             border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 107, 0, 0.15);
         }
-        #puzzle-canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-            cursor: grab;
+
+        .puzzle-tile {
+            background: #121225;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease;
+            user-select: none;
+            padding: 6px;
+            text-align: center;
         }
-        #puzzle-canvas:active {
-            cursor: grabbing;
+
+        .puzzle-tile:hover:not(.empty) {
+            border-color: var(--accent-blue);
+            background: rgba(0, 212, 255, 0.15);
         }
+
+        .puzzle-tile.correct {
+            border-color: var(--accent-green);
+            background: rgba(0, 255, 136, 0.08);
+        }
+
+        .puzzle-tile.empty {
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            cursor: default;
+        }
+
+        .tile-id {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            font-family: monospace;
+        }
+
+        .puzzle-tile.correct .tile-id {
+            color: var(--accent-green);
+        }
+
+        .tile-text {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            line-height: 1.1;
+        }
+
         .puzzle-status {
-            font-family: 'Montserrat', sans-serif;
             font-size: 0.95rem;
             color: var(--text-secondary);
             text-align: center;
+            font-weight: 500;
+            min-height: 24px;
         }
-        .puzzle-hint {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            text-align: center;
-            max-width: 500px;
-            line-height: 1.5;
+
+        .puzzle-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
+
         .puzzle-btn {
             padding: 10px 20px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
             background: rgba(0, 212, 255, 0.15);
-            border: 2px solid #00d4ff;
+            border: 2px solid var(--accent-blue);
             border-radius: 8px;
-            color: #00d4ff;
+            color: var(--accent-blue);
             cursor: pointer;
             transition: all 0.2s ease;
             font-family: 'Montserrat', sans-serif;
@@ -68,24 +154,32 @@
         }
         .puzzle-btn:hover {
             background: rgba(0, 212, 255, 0.3);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
         }
-        .puzzle-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            box-shadow: none;
+
+        .puzzle-hint {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 500px;
+            line-height: 1.4;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
+
         .btn-continue {
             position: fixed;
-            top: 20px;
+            top: 15px;
             right: 20px;
-            padding: 10px 20px;
-            font-size: 0.9rem;
+            padding: 8px 18px;
+            font-size: 0.85rem;
             font-weight: 700;
             background: rgba(0, 255, 136, 0.15);
-            border: 2px solid #00ff88;
+            border: 2px solid var(--accent-green);
             border-radius: 8px;
-            color: #00ff88;
+            color: var(--accent-green);
             cursor: pointer;
             transition: all 0.2s ease;
             font-family: 'Montserrat', sans-serif;
@@ -102,10 +196,12 @@
 <body>
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
-        <h2 class="sg-title" style="color:#ff6b00;font-family:'Playfair Display',serif;">Le Puzzle</h2>
+        <h2 class="sg-title" style="color:var(--accent-orange);font-family:'Playfair Display',serif;">Reconstitution Coulissante</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
-    <button id="story-continue-btn" class="btn btn-continue" style="display:none;">Continuer</button>
+    
+    <button id="story-continue-btn" class="btn-continue" style="display:none;">Continuer</button>
+    
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
             <span class="menu-icon">🏠</span>
@@ -117,20 +213,28 @@
             <span>Paramètres</span>
         </button>
     </nav>
+
     <main class="sg-main">
         <div class="puzzle-wrap">
-            <div class="puzzle-canvas-wrap">
-                <canvas id="puzzle-canvas"></canvas>
+            <div class="puzzle-hud">
+                <span id="moves-count">Mouvements : 0</span>
+                <span class="timer-display" id="puzzle-timer">Temps : 02:00</span>
             </div>
-            <div class="puzzle-status" id="puzzle-status">Assemblez les pièces pour reconstituer la forme finale.</div>
-            <button class="puzzle-btn" id="reset-puzzle-btn" disabled>Réinitialiser</button>
+            
+            <div class="puzzle-grid" id="puzzle-grid"></div>
+            
+            <div class="puzzle-status" id="puzzle-status">Glissez les tuiles adjacentes vers la case vide pour reconstituer le dossier.</div>
+            
+            <div class="puzzle-controls">
+                <button class="puzzle-btn" id="reset-puzzle-btn">Réinitialiser</button>
+            </div>
+            
             <div class="puzzle-hint">
-                Faites glisser et pivoter les pièces. Quand une pièce est proche de sa place, elle se snap automatiquement. Reconstruisez la forme complète.
+                Cliquez sur une pièce voisine de la case vide pour la faire coulisser. Classez les indices de 1 à 8 dans l'ordre croissant.
             </div>
         </div>
     </main>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="minigames.js"></script>
     <script src="standalone-game.js"></script>
     <script src="../settings-menu.js"></script>
@@ -138,256 +242,184 @@
         (function () {
             'use strict';
 
-            if (window.DPSettings && window.DPSettings.init) {
-                window.DPSettings.init({
-                    showMusicToggle: true,
-                    showMusicVolume: true,
-                    showNarrationVolume: false,
-                    showMuteToggle: false,
-                    showGameSection: true,
-                    showBackToHub: false,
-                    showRestart: false,
-                    showRules: false,
-                    customButtons: [],
-                    onBackToHub: function () {
-                        window.location.href = '../true-detective/index.html#minigames';
-                    }
-                });
-            }
-
-            if (typeof Matter === 'undefined') {
-                document.getElementById('puzzle-status').textContent = 'Erreur : Matter.js non chargé.';
-                return;
-            }
-
-            var canvas = document.getElementById('puzzle-canvas');
+            var gridEl = document.getElementById('puzzle-grid');
             var statusEl = document.getElementById('puzzle-status');
             var resetBtn = document.getElementById('reset-puzzle-btn');
+            var timerEl = document.getElementById('puzzle-timer');
+            var movesEl = document.getElementById('moves-count');
 
-            var W = 800;
-            var H = 600;
-            canvas.width = W;
-            canvas.height = H;
-
-            var Engine = Matter.Engine,
-                Render = Matter.Render,
-                Runner = Matter.Runner,
-                Bodies = Matter.Bodies,
-                Body = Matter.Body,
-                Composite = Matter.Composite,
-                Events = Matter.Events,
-                Mouse = Matter.Mouse,
-                MouseConstraint = Matter.MouseConstraint,
-                Vector = Matter.Vector;
-
-            var engine = Engine.create({ gravity: { x: 0, y: 0.6 } });
-            var world = engine.world;
-
-            var pieces = [];
-            var slots = [];
-            var fitted = {};
-            var solved = false;
-            var snapDistance = 25;
-            var snapAngle = Math.PI / 8;
-
-            function createFinalShape() {
-                var cx = W / 2;
-                var cy = H / 2;
-                var w = 320;
-                var h = 240;
-                var parts = [
-                    Bodies.rectangle(cx, cy, w, h, { isStatic: true, isSensor: true, label: 'final-shape', plugin: { partOfFinal: true } }),
-                    Bodies.rectangle(cx - w/2 - 20, cy, 40, h, { isStatic: true, isSensor: true, label: 'final-left', plugin: { partOfFinal: true } }),
-                    Bodies.rectangle(cx + w/2 + 20, cy, 40, h, { isStatic: true, isSensor: true, label: 'final-right', plugin: { partOfFinal: true } }),
-                    Bodies.rectangle(cx, cy - h/2 - 20, w + 80, 40, { isStatic: true, isSensor: true, label: 'final-top', plugin: { partOfFinal: true } }),
-                    Bodies.rectangle(cx, cy + h/2 + 20, w + 80, 40, { isStatic: true, isSensor: true, label: 'final-bottom', plugin: { partOfFinal: true } })
-                ];
-                return parts;
-            }
-
-            var pieceDefs = [
-                { id: 'rect1', type: 'rect', x: 180, y: 150, w: 120, h: 80, color: '#ff006e', targetX: W/2 - 100, targetY: H/2 - 60, targetAngle: 0 },
-                { id: 'rect2', type: 'rect', x: 340, y: 150, w: 120, h: 80, color: '#ffbe0b', targetX: W/2 + 100, targetY: H/2 - 60, targetAngle: 0 },
-                { id: 'rect3', type: 'rect', x: 180, y: 300, w: 120, h: 80, color: '#00d4ff', targetX: W/2 - 100, targetY: H/2 + 60, targetAngle: 0 },
-                { id: 'rect4', type: 'rect', x: 340, y: 300, w: 120, h: 80, color: '#8338ec', targetX: W/2 + 100, targetY: H/2 + 60, targetAngle: 0 },
-                { id: 'center', type: 'square', x: 500, y: 220, size: 50, color: '#06d6a0', targetX: W/2, targetY: H/2, targetAngle: 0 },
-                { id: 'top', type: 'rect', x: 600, y: 120, w: 140, h: 40, color: '#ef476f', targetX: W/2, targetY: H/2 - 100, targetAngle: 0 },
-                { id: 'bottom', type: 'rect', x: 600, y: 380, w: 140, h: 40, color: '#ffd600', targetX: W/2, targetY: H/2 + 100, targetAngle: 0 }
+            // 8 pièces + 1 case vide (représentée par la valeur 0)
+            var tileData = [
+                { id: 1, text: 'Rapport Initial' },
+                { id: 2, text: 'Scène de Crime' },
+                { id: 3, text: 'Relevé Empreintes' },
+                { id: 4, text: 'Analyse Balistique' },
+                { id: 5, text: 'Témoignage Clé' },
+                { id: 6, text: 'Aveux du Suspect' },
+                { id: 7, text: 'Mandat de Perqu\'' },
+                { id: 8, text: 'Pièce à Conviction' }
             ];
 
-            function createPieceBody(def, index) {
-                var x = 100 + (index % 4) * 160;
-                var y = 80 + Math.floor(index / 4) * 140;
-                var body;
-                if (def.type === 'circle') {
-                    body = Bodies.circle(x, y, def.size, { restitution: 0.2, friction: 0.5, density: 0.002, label: 'piece-' + def.id, plugin: { pieceId: def.id, color: def.color, targetX: def.targetX, targetY: def.targetY, targetAngle: def.targetAngle } });
-                } else if (def.type === 'square') {
-                    body = Bodies.rectangle(x, y, def.size * 2, def.size * 2, { restitution: 0.2, friction: 0.5, density: 0.002, label: 'piece-' + def.id, plugin: { pieceId: def.id, color: def.color, targetX: def.targetX, targetY: def.targetY, targetAngle: def.targetAngle } });
-                } else if (def.type === 'rect') {
-                    body = Bodies.rectangle(x, y, def.w, def.h, { restitution: 0.2, friction: 0.5, density: 0.002, label: 'piece-' + def.id, plugin: { pieceId: def.id, color: def.color, targetX: def.targetX, targetY: def.targetY, targetAngle: def.targetAngle } });
-                } else if (def.type === 'triangle') {
-                    body = Bodies.polygon(x, y, 3, def.size, { restitution: 0.2, friction: 0.5, density: 0.002, label: 'piece-' + def.id, plugin: { pieceId: def.id, color: def.color, targetX: def.targetX, targetY: def.targetY, targetAngle: def.targetAngle } });
-                } else if (def.type === 'polygon') {
-                    body = Bodies.polygon(x, y, def.sides, def.size, { restitution: 0.2, friction: 0.5, density: 0.002, label: 'piece-' + def.id, plugin: { pieceId: def.id, color: def.color, targetX: def.targetX, targetY: def.targetY, targetAngle: def.targetAngle } });
+            var board = []; // Tableau de 9 éléments contenant les IDs (1 à 8, et 0 pour le vide)
+            var emptyIndex = 8; // La case vide commence en bas à droite (index 8)
+            var moves = 0;
+            var solved = false;
+            var failed = false;
+            var timeLeft = 120;
+            var timerInterval = null;
+
+            function startTimer() {
+                clearInterval(timerInterval);
+                timeLeft = 120;
+                updateTimerDisplay();
+                
+                timerInterval = setInterval(function() {
+                    if (solved || failed) {
+                        clearInterval(timerInterval);
+                        return;
+                    }
+                    timeLeft--;
+                    updateTimerDisplay();
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        failPuzzle();
+                    }
+                }, 1000);
+            }
+
+            function updateTimerDisplay() {
+                var mins = Math.floor(timeLeft / 60);
+                var secs = timeLeft % 60;
+                timerEl.textContent = 'Temps : ' + (mins < 10 ? '0' : '') + mins + ':' + (secs < 10 ? '0' : '') + secs;
+                if (timeLeft <= 25) {
+                    timerEl.style.color = 'var(--accent-red)';
+                } else {
+                    timerEl.style.color = 'var(--accent-orange)';
                 }
-                if (body) {
-                    body.plugin = body.plugin || {};
-                    body.plugin.pieceId = def.id;
-                    body.plugin.color = def.color;
-                    body.plugin.targetX = def.targetX;
-                    body.plugin.targetY = def.targetY;
-                    body.plugin.targetAngle = def.targetAngle || 0;
+            }
+
+            function failPuzzle() {
+                failed = true;
+                statusEl.innerHTML = '<span style="color:var(--accent-red); font-weight:700;">Temps écoulé ! L\'enquête est compromise.</span>';
+            }
+
+            // Mélanger en effectuant des mouvements valides pour garantir la résolubilité
+            function shuffleBoard() {
+                board = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+                emptyIndex = 8;
+
+                var shuffleSteps = 100;
+                for (var s = 0; s < shuffleSteps; s++) {
+                    var validMoves = getValidAdjacentIndices(emptyIndex);
+                    var randomPos = validMoves[Math.floor(Math.random() * validMoves.length)];
+                    
+                    // Échanger la case vide avec une voisine valide
+                    board[emptyIndex] = board[randomPos];
+                    board[randomPos] = 0;
+                    emptyIndex = randomPos;
                 }
-                return body;
+            }
+
+            function getValidAdjacentIndices(idx) {
+                var row = Math.floor(idx / 3);
+                var col = idx % 3;
+                var valid = [];
+
+                if (row > 0) valid.push(idx - 3); // Haut
+                if (row < 2) valid.push(idx + 3); // Bas
+                if (col > 0) valid.push(idx - 1); // Gauche
+                if (col < 2) valid.push(idx + 1); // Droite
+
+                return valid;
             }
 
             function initPuzzle() {
-                Composite.clear(world);
-                pieces = [];
-                slots = [];
-                fitted = {};
                 solved = false;
+                failed = false;
+                moves = 0;
+                movesEl.textContent = 'Mouvements : 0';
+                statusEl.textContent = 'Glissez les tuiles adjacentes vers la case vide.';
+                shuffleBoard();
+                renderGrid();
+                startTimer();
+            }
 
-                var wallOpts = { isStatic: true, render: { fillStyle: '#1a1a3a' } };
-                Composite.add(world, [
-                    Bodies.rectangle(W / 2, H + 25, W, 50, wallOpts),
-                    Bodies.rectangle(-25, H / 2, 50, H, wallOpts),
-                    Bodies.rectangle(W + 25, H / 2, 50, H, wallOpts)
-                ]);
+            function renderGrid() {
+                gridEl.innerHTML = '';
+                board.forEach(function (tileId, index) {
+                    var tile = document.createElement('div');
+                    
+                    if (tileId === 0) {
+                        tile.className = 'puzzle-tile empty';
+                    } else {
+                        tile.className = 'puzzle-tile';
+                        // Vérifier si la pièce est à sa place correcte (index + 1)
+                        if (tileId === index + 1) {
+                            tile.classList.add('correct');
+                        }
 
-                var finalParts = createFinalShape();
-                finalParts.forEach(function (part) {
-                    Composite.add(world, part);
-                });
+                        var data = tileData.find(function(d) { return d.id === tileId; });
 
-                pieceDefs.forEach(function (def, i) {
-                    var piece = createPieceBody(def, i);
-                    if (piece) {
-                        pieces.push(piece);
-                        Composite.add(world, piece);
-                    }
-                });
+                        var idSpan = document.createElement('span');
+                        idSpan.className = 'tile-id';
+                        idSpan.textContent = '#' + tileId;
 
-                var mouse = Mouse.create(canvas);
-                var mouseConstraint = MouseConstraint.create(engine, {
-                    mouse: mouse,
-                    constraint: {
-                        stiffness: 0.2,
-                        render: { visible: false }
-                    }
-                });
-                Composite.add(world, mouseConstraint);
+                        var textSpan = document.createElement('span');
+                        textSpan.className = 'tile-text';
+                        textSpan.textContent = data ? data.text : '';
 
-                Events.on(engine, 'afterUpdate', function () {
-                    if (solved) return;
-                    pieces.forEach(function (piece) {
-                        if (!piece || !piece.plugin) return;
-                        if (fitted[piece.plugin.pieceId]) return;
-                        var tx = piece.plugin.targetX;
-                        var ty = piece.plugin.targetY;
-                        var dx = piece.position.x - tx;
-                        var dy = piece.position.y - ty;
-                        var dist = Math.sqrt(dx * dx + dy * dy);
-                        var angleDiff = Math.abs(piece.angle - (piece.plugin.targetAngle || 0));
-                        if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
-                        if (dist < snapDistance && angleDiff < snapAngle) {
-                            Body.setPosition(piece, { x: tx, y: ty });
-                            Body.setAngle(piece, piece.plugin.targetAngle || 0);
-                            Body.setVelocity(piece, { x: 0, y: 0 });
-                            Body.setAngularVelocity(piece, 0);
-                            piece.isSensor = true;
-                            fitted[piece.plugin.pieceId] = true;
-                            statusEl.textContent = 'Pièce assemblée : ' + piece.plugin.pieceId + '. Reste : ' + (pieceDefs.length - Object.keys(fitted).length);
-                            if (Object.keys(fitted).length === pieceDefs.length) {
-                                solved = true;
-                                statusEl.innerHTML = '<span style="color:#00ff88">Puzzle résolu ! La forme est reconstituée.</span>';
-                                resetBtn.disabled = false;
-                                try {
-                                    localStorage.setItem('td_standalone_game_result', JSON.stringify({
-                                        type: 'puzzle',
-                                        won: true,
-                                        ts: Date.now()
-                                    }));
-                                } catch (e) {}
+                        tile.appendChild(idSpan);
+                        tile.appendChild(textSpan);
+
+                        // Gestion du clic pour coulisser
+                        tile.addEventListener('click', function () {
+                            if (solved || failed) return;
+
+                            var validMoves = getValidAdjacentIndices(emptyIndex);
+                            if (validMoves.includes(index)) {
+                                // Effectuer le glissement
+                                board[emptyIndex] = board[index];
+                                board[index] = 0;
+                                emptyIndex = index;
+
+                                moves++;
+                                movesEl.textContent = 'Mouvements : ' + moves;
+                                renderGrid();
+                                checkWin();
                             }
-                        }
-                    });
-                });
-
-                statusEl.textContent = 'Assemblez les pièces pour reconstituer la forme finale.';
-                resetBtn.disabled = true;
-            }
-
-            function drawBackground(ctx) {
-                ctx.fillStyle = '#0d0d1a';
-                ctx.fillRect(0, 0, W, H);
-
-                ctx.strokeStyle = '#1f1f3a';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(20, 20, W - 40, H - 40);
-
-                ctx.fillStyle = 'rgba(255,255,255,0.02)';
-                ctx.fillRect(20, 20, W - 40, H - 40);
-
-                ctx.save();
-                ctx.translate(W/2, H/2);
-                ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-                ctx.lineWidth = 1;
-                ctx.setLineDash([4, 4]);
-                ctx.strokeRect(-160, -120, 320, 240);
-                ctx.restore();
-
-                ctx.fillStyle = '#a0c0d0';
-                ctx.font = '12px Montserrat, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('Zone cible', W/2, H/2 - 140);
-            }
-
-            function renderLoop() {
-                var ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, W, H);
-                drawBackground(ctx);
-
-                pieces.forEach(function (body) {
-                    if (!body) return;
-                    var pos = body.position;
-                    var angle = body.angle;
-                    var color = (body.plugin && body.plugin.color) ? body.plugin.color : '#00d4ff';
-                    ctx.save();
-                    ctx.translate(pos.x, pos.y);
-                    ctx.rotate(angle);
-                    ctx.fillStyle = color;
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 2;
-                    ctx.shadowColor = color;
-                    ctx.shadowBlur = 10;
-                    var verts = body.vertices;
-                    if (verts && verts.length) {
-                        ctx.beginPath();
-                        ctx.moveTo(verts[0].x - pos.x, verts[0].y - pos.y);
-                        for (var i = 1; i < verts.length; i++) {
-                            ctx.lineTo(verts[i].x - pos.x, verts[i].y - pos.y);
-                        }
-                        ctx.closePath();
-                        ctx.fill();
-                        ctx.stroke();
+                        });
                     }
-                    ctx.restore();
-                });
 
-                if (!solved) {
-                    Engine.update(engine, 1000 / 60);
+                    gridEl.appendChild(tile);
+                });
+            }
+
+            function checkWin() {
+                // Le puzzle est gagné si les tuiles 1 à 8 sont en place (la case 0 peut être à la fin)
+                for (var i = 0; i < 8; i++) {
+                    if (board[i] !== i + 1) return;
                 }
 
-                requestAnimationFrame(renderLoop);
+                solved = true;
+                clearInterval(timerInterval);
+                statusEl.innerHTML = '<span style="color:var(--accent-green); font-weight:700;">Dossier parfaitement reconstitué ! Affaire classée.</span>';
+
+                try {
+                    localStorage.setItem('td_standalone_game_result', JSON.stringify({
+                        type: 'puzzle', won: true, score: timeLeft, ts: Date.now()
+                    }));
+                } catch (e) {}
+
+                var storyBtn = document.getElementById('story-continue-btn');
+                if (storyBtn) storyBtn.style.display = 'inline-block';
             }
 
             resetBtn.addEventListener('click', function () {
-                if (solved) return;
                 initPuzzle();
-                statusEl.textContent = 'Puzzle réinitialisé.';
             });
 
+            // Navigation et menu
             var hamburgerBtn = document.getElementById('hamburger-btn');
             var menu = document.getElementById('hamburger-menu');
             if (hamburgerBtn && menu) {
@@ -405,10 +437,10 @@
             var backBtn = document.getElementById('back-to-minigame-btn');
             var storyContinueBtn = document.getElementById('story-continue-btn');
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+            
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
                 if (storyContinueBtn) {
-                    storyContinueBtn.style.display = 'inline-block';
                     storyContinueBtn.addEventListener('click', function () {
                         try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'puzzle', won: true, ts: Date.now() })); } catch (e) {}
                         try {
@@ -421,10 +453,12 @@
                                 }
                             }
                         } catch (e) {}
-                        window.location.href = '../true-detective/index.html?standalone=puzzle';
+                        var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                        window.location.href = fromStory ? '../true-detective/index.html?standalone=puzzle' : '../true-detective/index.html#minigames';
                     });
                 }
             } else {
+                if (storyContinueBtn) storyContinueBtn.style.display = 'none';
                 if (backBtn) {
                     backBtn.textContent = 'Accueil';
                     backBtn.addEventListener('click', function () {
@@ -441,16 +475,16 @@
                     window.location.href = fromStory ? '../true-detective/index.html?standalone=puzzle' : '../true-detective/index.html#minigames';
                 });
             }
+
             var menuSettings = document.getElementById('menu-settings');
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres : aucun réglage pour l\'instant.'); }
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres'); }
                 });
             }
 
             initPuzzle();
-            renderLoop();
         })();
     </script>
 </body>

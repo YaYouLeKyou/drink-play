@@ -108,7 +108,8 @@
                             ts: Date.now()
                         }));
                     } catch (e) {}
-                    window.location.href = '../true-detective/index.html?standalone=pong';
+                        var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                        window.location.href = fromStory ? '../true-detective/index.html?standalone=pong' : '../true-detective/index.html#minigames';
                 }, 1500);
                 return;
             }

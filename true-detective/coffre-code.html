@@ -257,7 +257,8 @@
                     if (storyContinueBtn) {
                         storyContinueBtn.style.display = 'inline-block';
                         storyContinueBtn.addEventListener('click', function () {
-                            window.location.href = '../true-detective/index.html?standalone=coffre_code';
+                                var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                                window.location.href = fromStory ? '../true-detective/index.html?standalone=coffre_code' : '../true-detective/index.html#minigames';
                         });
                     }
                 }
@@ -327,8 +328,9 @@
                     $dial.style.pointerEvents = 'none';
                 }
 
+                var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
                 setTimeout(function () {
-                    window.location.href = '../true-detective/index.html?standalone=coffre_code';
+                    window.location.href = fromStory ? '../true-detective/index.html?standalone=coffre_code' : '../true-detective/index.html#minigames';
                 }, 2000);
             }
 
@@ -401,7 +403,8 @@
                                 }
                             }
                         } catch (e) {}
-                        window.location.href = '../true-detective/index.html?standalone=coffre_code';
+                        var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                        window.location.href = fromStory ? '../true-detective/index.html?standalone=coffre_code' : '../true-detective/index.html#minigames';
                     });
                     var main = document.querySelector('.sg-main');
                     if (main) main.appendChild(continueBtn);

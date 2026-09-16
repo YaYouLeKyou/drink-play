@@ -164,7 +164,8 @@
                                 try {
                                     localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'pacman', won: false, ts: Date.now() }));
                                 } catch (e) {}
-                                window.location.href = '../true-detective/index.html?standalone=pacman';
+                                var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                                window.location.href = fromStory ? '../true-detective/index.html?standalone=pacman' : '../true-detective/index.html#minigames';
                             }, 1500);
                             return;
                         }
@@ -180,7 +181,8 @@
                     try {
                         localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'pacman', won: true, ts: Date.now() }));
                     } catch (e) {}
-                    window.location.href = '../true-detective/index.html?standalone=pacman';
+                    var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                    window.location.href = fromStory ? '../true-detective/index.html?standalone=pacman' : '../true-detective/index.html#minigames';
                 }, 1000);
                 return;
             }

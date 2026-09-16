@@ -220,7 +220,8 @@
                         ts: Date.now()
                     }));
                 } catch (e) {}
-                window.location.href = '../true-detective/index.html?standalone=shooting';
+                var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                window.location.href = fromStory ? '../true-detective/index.html?standalone=shooting' : '../true-detective/index.html#minigames';
             }, 1500);
         }
 

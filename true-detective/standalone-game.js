@@ -533,7 +533,7 @@
         } else if (fromStory) {
             window.location.href = '../true-detective/index.html?standalone=' + gameType;
         } else {
-            window.location.href = '../true-detective/index.html?standalone=' + gameType;
+            window.location.href = '../true-detective/index.html#minigames';
         }
     }
 

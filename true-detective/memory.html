@@ -236,7 +236,8 @@
                             }
                         }
                     } catch (e) {}
-                    window.location.href = '../true-detective/index.html?standalone=memory';
+                    var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                    window.location.href = fromStory ? '../true-detective/index.html?standalone=memory' : '../true-detective/index.html#minigames';
                 });
                 var header = document.querySelector('.sg-header');
                 if (header) header.appendChild(continueBtn);

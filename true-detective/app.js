@@ -579,18 +579,16 @@ function saveSettings() {
                                 }
                             } catch (eR) {}
                         }
-                        /* Fallback : retour au choix des mini-jeux. */
+                        /* Fallback : retour a l'accueil pour un mini-jeu standalone sans contexte story. */
                         scrEnsureThemeMusic();
-                        if ($.homeScreen) { $.homeScreen.classList.remove('active'); $.homeScreen.classList.add('hidden'); }
+                        if ($.gameScreen) { $.gameScreen.classList.remove('active'); $.gameScreen.classList.add('hidden'); }
                         if ($.themeScreen) { $.themeScreen.classList.remove('active'); $.themeScreen.classList.add('hidden'); }
-                    if ($.gameScreen) { $.gameScreen.classList.remove('hidden'); $.gameScreen.classList.add('active'); }
-                    if ($.endScreen) { $.endScreen.classList.add('hidden'); $.endScreen.classList.remove('active'); }
-                    hideLoading();
-                    updateLanguageUI(); updateLanguageButtons();
-                    animateDots();
-                    renderScenarioPage();
-                    updateContinueBtnVisibility();
-                    return;
+                        if ($.endScreen) { $.endScreen.classList.add('hidden'); $.endScreen.classList.remove('active'); }
+                        if ($.homeScreen) { $.homeScreen.classList.remove('hidden'); $.homeScreen.classList.add('active'); }
+                        hideLoading();
+                        updateLanguageUI(); updateLanguageButtons();
+                        updateContinueBtnVisibility();
+                        return;
                     }
                 }
             }

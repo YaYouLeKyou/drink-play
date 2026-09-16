@@ -169,7 +169,8 @@
                             ts: Date.now()
                         }));
                     } catch (e) {}
-                    window.location.href = '../true-detective/index.html?standalone=connect4';
+                        var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                        window.location.href = fromStory ? '../true-detective/index.html?standalone=connect4' : '../true-detective/index.html#minigames';
                 }, 1000);
                 return;
             }
@@ -185,7 +186,8 @@
                             ts: Date.now()
                         }));
                     } catch (e) {}
-                    window.location.href = '../true-detective/index.html?standalone=connect4';
+                        var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                        window.location.href = fromStory ? '../true-detective/index.html?standalone=connect4' : '../true-detective/index.html#minigames';
                 }, 1000);
                 return;
             }
@@ -210,7 +212,8 @@
                                 ts: Date.now()
                             }));
                         } catch (e) {}
-                        window.location.href = '../true-detective/index.html?standalone=connect4';
+                        var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                        window.location.href = fromStory ? '../true-detective/index.html?standalone=connect4' : '../true-detective/index.html#minigames';
                     }, 1000);
                     return;
                 }
@@ -226,7 +229,8 @@
                                 ts: Date.now()
                             }));
                         } catch (e) {}
-                        window.location.href = '../true-detective/index.html?standalone=connect4';
+                        var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                        window.location.href = fromStory ? '../true-detective/index.html?standalone=connect4' : '../true-detective/index.html#minigames';
                     }, 1000);
                     return;
                 }

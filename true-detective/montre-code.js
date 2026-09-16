@@ -270,7 +270,8 @@
                     }
                 }
             } catch (e) {}
-            window.location.href = '../true-detective/index.html?standalone=montre_code';
+            var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+            window.location.href = fromStory ? '../true-detective/index.html?standalone=montre_code' : '../true-detective/index.html#minigames';
         });
 
         /* Back button */
@@ -298,7 +299,8 @@
                         }
                     }
                 } catch (e) {}
-                window.location.href = '../true-detective/index.html?standalone=montre_code';
+                var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+            window.location.href = fromStory ? '../true-detective/index.html?standalone=montre_code' : '../true-detective/index.html#minigames';
             });
         }
 
