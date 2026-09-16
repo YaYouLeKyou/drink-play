@@ -2067,6 +2067,7 @@ html {
     max-width: 1200px;
     width: 100%;
     margin-top: 16px;
+    padding-top: 0;
 }
 
 .minigame-select-content h1 {
