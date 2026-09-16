@@ -2059,6 +2059,7 @@ html {
     padding: 32px 16px 16px;
     box-sizing: border-box;
     overflow-y: auto;
+    scroll-padding-top: 32px;
 }
 
 .minigame-select-content {
