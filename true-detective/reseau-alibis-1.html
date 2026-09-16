@@ -191,15 +191,17 @@
                 lang: 'fr'
             };
             
-            var minigame = TDNarrativeEngine.createMinigame('reseau_alibis', cfg);
-            minigame.onComplete(function(result) {
-                if (result && result.won) {
-                    console.log('Victoire !');
-                } else {
-                    console.log('Défaite...');
-                }
-            });
-            minigame.start();
+            var target = document.getElementById('reseau-alibis-app');
+            if (target) {
+                target.innerHTML = '';
+                TDMiniGames.play(cfg, cfg.lang || 'fr', function(result) {
+                    if (result && result.won) {
+                        console.log('Victoire !');
+                    } else {
+                        console.log('Défaite...');
+                    }
+                }, target);
+            }
         })();
     </script>
 </body>
