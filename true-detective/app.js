@@ -375,15 +375,19 @@
         if ($.continueBtn) {
             if (isStoryScreen && !isActPageVisible) {
                 $.continueBtn.classList.remove('hidden');
+                $.continueBtn.classList.add('always-active');
             } else {
                 $.continueBtn.classList.add('hidden');
+                $.continueBtn.classList.remove('always-active');
             }
         }
         if ($.mobileContinueBtn) {
             if (isStoryScreen && !isActPageVisible) {
                 $.mobileContinueBtn.classList.remove('hidden');
+                $.mobileContinueBtn.classList.add('always-active');
             } else {
                 $.mobileContinueBtn.classList.add('hidden');
+                $.mobileContinueBtn.classList.remove('always-active');
             }
         }
     }
@@ -656,6 +660,7 @@ function saveSettings() {
 
         if ($.homeScreen) {
             $.homeScreen.classList.add('active');
+            updateContinueBtnVisibility();
             hideLoading();
             if (TDAudioService && typeof window !== 'undefined' && window.DPMusicPlayer) {
                 window.DPMusicPlayer.playTrack('generique.mp3');
@@ -735,6 +740,7 @@ function saveSettings() {
                     $.themeScreen.classList.remove('hidden');
                     $.themeScreen.classList.add('active');
                 }
+                updateContinueBtnVisibility();
                 if (window.DPMusicPlayer) {
                     window.DPMusicPlayer.playTrack('night ride.mp3');
                 }
@@ -784,6 +790,7 @@ function saveSettings() {
                 $.gameModeScreen.classList.add('hidden');
                 $.minigameSelectScreen.classList.remove('hidden');
                 $.minigameSelectScreen.classList.add('active');
+                updateContinueBtnVisibility();
             });
         }
 
@@ -793,6 +800,7 @@ function saveSettings() {
                 $.minigameSelectScreen.classList.add('hidden');
                 $.gameModeScreen.classList.remove('hidden');
                 $.gameModeScreen.classList.add('active');
+                updateContinueBtnVisibility();
             });
         }
 
@@ -1050,6 +1058,7 @@ applyMusicHidden(true);
                 }
                 $.themeScreen.classList.remove('hidden');
                 $.themeScreen.classList.add('active');
+                updateContinueBtnVisibility();
                 $.gameScreen.classList.add('hidden');
                 $.gameScreen.classList.remove('active');
                 $.endScreen.classList.add('hidden');
@@ -1352,6 +1361,7 @@ applyMusicHidden(true);
             if ($.gameModeScreen) {
                 $.gameModeScreen.classList.remove('hidden');
                 $.gameModeScreen.classList.add('active');
+                updateContinueBtnVisibility();
             }
         }, 300);
     }
@@ -1368,6 +1378,7 @@ applyMusicHidden(true);
         $.themeScreen.classList.add('hidden');
         $.gameModeScreen.classList.remove('hidden');
         $.gameModeScreen.classList.add('active');
+        updateContinueBtnVisibility();
     }
 
     function startSoloGame() {
@@ -3062,6 +3073,7 @@ function buildTransitionPages(sceneData) {
 
         $.endScreen.classList.remove('hidden');
         $.endScreen.classList.add('active');
+        updateContinueBtnVisibility();
 
         if (TDAudioService) {
             TDAudioService.speak(solution.revealed || 'Case closed.', 'narrator');
@@ -3091,6 +3103,7 @@ function buildTransitionPages(sceneData) {
         setTimeout(function () {
             $.homeScreen.classList.remove('hidden');
             $.homeScreen.classList.add('active');
+            updateContinueBtnVisibility();
             $.themeScreen.classList.remove('active');
             $.themeScreen.classList.add('hidden');
             checkSavedGame();
@@ -4232,10 +4245,14 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 scrShowInterroQuestions();
             });
             $.choicesContainer.appendChild(askBtn);
-            $.continueBtn.classList.remove('hidden');
-            $.continueBtn.disabled = true;
-            $.continueBtn.textContent = getText('continue') || 'Continuer';
-            $.continueBtn.onclick = handleContinue;
+            if (isMobile()) {
+                $.continueBtn.classList.add('hidden');
+            } else {
+                $.continueBtn.classList.remove('hidden');
+                $.continueBtn.disabled = true;
+                $.continueBtn.textContent = getText('continue') || 'Continuer';
+                $.continueBtn.onclick = handleContinue;
+            }
 
             return;
         }
@@ -4421,6 +4438,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     function scrEndInterrogation() {
         scr.interro.done = true;
         scr.awaitingChoice = false;
+        if (isMobile()) {
+            $.continueBtn.classList.remove('hidden');
+        }
         $.continueBtn.disabled = false;
         $.continueBtn.textContent = getText('continue') || 'Continuer';
         $.continueBtn.onclick = function () {
@@ -4724,6 +4744,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             }
             $.minigameSelectScreen.classList.remove('hidden');
             $.minigameSelectScreen.classList.add('active');
+            updateContinueBtnVisibility();
             if (TDAudioService && typeof TDAudioService.playThemeMusic === 'function') {
                 TDAudioService.playThemeMusic(getThemeId());
             }
@@ -4736,6 +4757,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             showToast('Minigame not available: ' + minigameType, true);
             $.minigameSelectScreen.classList.remove('hidden');
             $.minigameSelectScreen.classList.add('active');
+            updateContinueBtnVisibility();
             return;
         }
 
@@ -5308,6 +5330,7 @@ function scrApplyChoice(choiceKey, choiceId) {
             }
             $.endScreen.classList.remove('hidden');
             $.endScreen.classList.add('active');
+            updateContinueBtnVisibility();
         }
     }
         // ===== EXPOSITION MODE DÉVELOPPEUR =====
