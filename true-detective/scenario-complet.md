@@ -39,8 +39,8 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 
 - **Coupable (maître d'œuvre)** : le Major Hale, « LE PROTECTEUR », garde du corps de la victime.
 - **La lame** : Victor Krane, « LE CRIMINEL », tueur payé, ADN inconnu sur la scène.
-- **Complicité passive** : Lady Vivienne (menaces rédigées de sa main élégante) et Julian Pembrooke (fausse panne montée avec Hale).
-- **Le mobile de Hale** : dettes, chantage, jalousie de serviteur ; il a payé Krane (versements révélés au fur et à mesure des interrogatoires et des réseaux d'alibis).
+- **Complicité passive** : Lady Vivienne (liaison avec le Duc) et Julian Pembrooke (faux alibi « panne »).
+- **Le mobile de Hale** : jaloux de la liaison entre Vivienne et Pembrooke, Hale a manipulé le Duc pour qu'il engage Krane contre Pembrooke. L'arme a tué le Duc, et Hale a orchestré le tout pour éliminer Pembrooke (versements révélés au fur et à mesure des interrogatoires et des réseaux d'alibis).
 
 ### L'heure du crime, MÉCANIQUE CENTRALE (twist final)
 - **Aucune heure n'est établie au départ.** Personne ne sait quand la victime est morte.
@@ -128,45 +128,46 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 
 ### ACTE II, Phase 1 « Piste du bar » (dialogue, musique énigme)
 1. **MINI-JEU `reseau_alibis` (2e cartographie mentale, QG)**, quatre dépositions sur la table de Wexford, à étiqueter une par une (Mensonge ou Vérité) :
+   - **Vivienne** (vrai) : « J'étais au théâtre avec des amies, puis seule au manoir. Mon mari et moi avions une relation basée sur l'argent, pas l'amour, je n'avais aucune raison de le tuer. »
    - **Hale** (vrai) : « À 22h j'étais avec Pembrooke en panne sur la route. On a passé vingt minutes sur le bas-côté, sa durite était sectionnée. »
-   - **Pembrooke** (mensonge) : « Ma voiture est tombée en panne à 22h, Hale m'a rejoint. J'étais SEUL à attendre, personne d'autre n'est passé. » (contredit Silas, qui a vu un rôdeur à la même heure)
-   - **Blackwood** (vrai) : « J'ai dîné avec le Duc à 19h, je suis parti vers 20h, Silas m'a vu passer au portail. Le testament m'importe peu. »
-   - **Vivienne** (mensonge) : « Au théâtre avec des amies jusqu'à 22h, puis ici seule. Les domestiques avaient congé, le manoir était vide. » (contredit Hale, qui est domestique et rôdait près du pavillon)
-   - **INDICE MAJEUR** : le réseau d'alibis révèle deux menteurs. Suivez les incohérences.
-2. *(bar, Julian Pembrooke)* « Je n'ai rien vu, rien entendu. Mais si vous cherchez un mobile, regardez du côté des dettes de Hale. », alibi de panne.
+   - **Silas** (mensonge) : « J'ai vu un rôdeur à 22h près du pavillon, montre en or, nerveux. » (ment — il a vu Pembrooke, pas un rôdeur)
+   - **Krane** (mensonge) : « Pour qui paye. Cette nuit-là, j'étais seul. » (ment — le Duc l'a engagé pour tuer Pembrooke, mais l'arme a tué le Duc)
+   - **INDICE MAJEUR** : le réseau révèle deux menteurs. La victime devait de l'argent à Krane et voulait qu'il élimine Pembrooke, mais l'arme a tué le Duc.
+2. *(bar, Julian Pembrooke)* **Interrogatoire du séducteur** : Pembrooke, voix trop calme. « Le Duc m'avait engagé pour une élimination, pas pour un vol. Mais l'arme a mal tourné. », alibi de panne.
 3. *(alley, Victor Krane)* **Interrogatoire du criminel** : Krane, accroupi dans la ruelle derrière le bar, mâchonne un clou. « Tiens, l'inspecteur. Vous voulez quoi, cette fois ? » Wexford étale ensuite **MINI-JEU `reseau_alibis` (3e cartographie mentale)**, six dépositions à étiqueter (Mensonge ou Vérité) :
    - **Hale** (vrai) : « J'étais en panne avec Pembrooke à 22h. Le verrou a été ouvert avec une clé, pas forcé. Whitmore, le rapport toxicologique est formel. »
-   - **Vivienne** (mensonge) : « J'étais au théâtre, puis seule au manoir. Mon mari et moi avions une relation basée sur l'argent, pas l'amour, je n'avais aucune raison de le tuer. » (contredit l'ADN de la scène et l'alibi de Hale)
+   - **Vivienne** (mensonge) : « J'étais au théâtre, puis seule au manoir. Mon mari et moi avions une relation basée sur l'argent, pas l'amour, je n'avais aucune raison de le tuer. »
    - **Pembrooke** (mensonge) : « Ma voiture est tombée en panne, Hale m'a rejoint à 22h. J'étais SEUL à attendre, aucun rôdeur n'est passé. » (contredit le témoignage de Silas)
    - **Blackwood** (vrai) : « J'ai dîné avec le Duc à 19h, je suis parti vers 20h, Silas m'a vu passer. Le testament m'importe peu, c'est l'héritier qui compte. »
-   - **Silas** (vrai) : « J'ai vu un rôdeur à 22h près du pavillon, montre en or. Blackwood est réglo. »
-   - **Krane** (mensonge) : « Pour qui paye. Cette nuit-là, j'étais seul. Silas, un vagabond au passé trouble. » (contredit tout le faisceau d'indices, l'ADN et les aveux partiels précédents)
-   - **INDICE MAJEUR** : le réseau complet révèle trois menteurs (Vivienne + Pembrooke + Krane) qui se couvrent mutuellement. Le commanditaire se dessine.
+   - **Silas** (vrai) : « J'ai vu un rôdeur à 22h près du pavillon, montre en or, nerveux. »
+   - **Krane** (mensonge) : « Pour qui paye. Cette nuit-là, j'étais seul. Silas, un vagabond au passé trouble. » (contredit le faisceau d'indices et l'ADN)
+   - **INDICE MAJEUR** : le réseau complet révèle trois menteurs (Vivienne + Pembrooke + Krane) qui se couvrent mutuellement. Le Duc a engagé Krane pour tuer Pembrooke, mais l'arme a tué le maître.
 
 ### ACTE II, Phase 2 « Laboratoire » (dialogue, musique énigme)
 1. *(laboratoire, Whitmore + partenaire)* Intro ADN, puis **MINI-JEU `chemistry` (analyse toxico, éprouvettes)** : transvasez les réactifs mélangés pour isoler chaque fluide pur dans son éprouvette (45 s). Réussite = **INDICE MAJEUR** (forensique) : le poison rare et coûteux, administré avec précision, prouve un meurtre prémédité commandité par un initié qui connaissait la maison. Échec = perte de l'indice, jamais de game over (le joueur peut toujours « Passer »).
-2. **6 interrogatoires ADN** *(laboratoire, Dr Whitmore, scientifique)*, un par suspect, ordre imposé : Protecteur → Femme-fatale → Séducteur → Marginal → Suspect → Criminel.
+2. **Whitmore** : « L'ADN sur l'arme, les poignées, le corps… il y en a de TOUS. Mais la scène a été fréquentée par chacun pour des raisons légites. Confrontez-les un par un, dans leurs lieux. »
 
-1. **Whitmore intro** : « L'ADN sur l'arme, les poignées, le corps… a des traces de TOUS. Chaque suspect a approché la victime. La science ne tranchera pas. » (Tolérance zéro certitude.)
-2. **Protecteur (Hale)** : interrogatoire + commentaire Whitmore. Hale nie, l'ADN confirme sa présence (garde du corps, vie sur place).
-3. **Femme-fatale (Vivienne)** : interrogatoire + commentaire Whitmore. ADN présent, relation intime avec la victime.
-4. **Séducteur (Pembrooke)** : interrogatoire + commentaire Whitmore. ADN présent, alibi de panne à vérifier.
-5. **Marginal (Silas)** : interrogatoire + commentaire Whitmore. ADN présent, fréquentait la ruelle, a vu le rôdeur.
-6. **Suspect (Blackwood)** : interrogatoire + commentaire Whitmore. ADN présent, dîners réguliers, testament.
-7. **Criminel (Krane)** : interrogatoire + commentaire Whitmore. **TWIST** : l'ADN de Krane est sur l'arme car la victime le lui a tendue pour montrer la cible (Pembrooke). L'arme a tué le VICTIME. Krane : « Le Duc m'a engagé pour le séducteur. J'ai raté la cible ? Non, l'arme a tourné. » Whitmore : « L'échantillon ne ment pas. Mais il ne dit pas POURQUOI. »
-8. **Whitmore conclusion** : « Six profils. Zéro certitude. L'ADN place tout le monde sur scène. C'est à vous de choisir qui a tiré. »
+### ACTE II, Phase 3 « Interrogatoires sur site » (dialogue, musique réflexion)
+1. **Réseau d'Alibis 3** *(QG)* — Wexford étale six dépositions révélées par les interrogatoires. Chacun a une raison légitime d'être au manoir, mais tous mentionnent le coffre, et personne ne sait pourquoi leur ADN est sur l'arme.
+    - **Hale** (mensonge) : « J'étais en panne avec Pembrooke à 22h. Le verrou a été ouvert avec une clé. » (lie sur l'arme)
+    - **Vivienne** (mensonge) : « J'étais au théâtre, puis seule au manoir. » (ADN sur l'arme)
+    - **Pembrooke** (mensonge) : « Ma voiture est tombée en panne, Hale m'a rejoint à 22h. » (ADN sur la porte)
+    - **Blackwood** (vrai) : « J'ai dîné avec le Duc à 19h, je suis parti vers 20h. »
+    - **Silas** (vrai) : « J'ai vu un rôdeur à 22h. »
+    - **Krane** (mensonge) : « Cette nuit-là, j'étais seul dans le bureau du Duc. » (ADN sur l'arme)
+    - **INDICE MAJEUR** : le réseau révèle que chacun avait une raison légitime d'être au manoir, mais le coffre est la clé. Silas et Krane corroborent leur rencontre.
 
 ### ACTE III, Phase 1 « Tension » (dialogue, musique tension)
 1. **MINI-JEU `puzzle` (QG)**, assembler les formes géométriques de Victor Krane :
-   - **« HALE ENGAGE KRANE »**, la complicité est établie.
-   - **INDICE MAJEUR** : le contrat a été payé par un proche de l'intérieur.
+   - **« LE DUC ENGAGE KRANE »**, la complicité est établie.
+   - **INDICE MAJEUR** : le contrat a été signé par le Duc pour éliminer Pembrooke, mais l'arme a tué le maître. Le vrai commanditaire est Hale, qui a orchestré le meurtre.
 2. *(residence, Lady Vivienne)* Les fichiers du coffre : Vivienne trompait la victime avec Hale.
 3. *(residence, Hale)* « Je n'ai rien dit de tout cela ! Vous n'avez aucune preuve ! »
 
 ### ACTE III, Phase 2 « Révélation » (dialogue, musique tension)
 1. *(qg, Wexford)* « Si la durite a été coupée, alors Hale savait où et quand aider Pembrooke. » → la panne était un faux alibi coordonné.
 2. *(secretPlace, Silas Crane)* « Blackwood m'a payé pour mentir. Le rôdeur, c'était Pembrooke. » → confirmation du complice.
-3. *(alley, Krane)* Le téléphone de Hale sonne. C'est Krane : « Tu m'as payé pour le meurtre. C'est fini. »
+3. *(alley, Krane)* Le téléphone de Hale sonne. C'est Krane : « Le Duc m'a engagé pour tuer Pembrooke. Mais l'arme a tué le maître. Hale l'a orchestré. »
 
 ### ACTE III, Phase 3 « Révélation finale » (dialogue, musique stress)
 1. *(alley, Krane)* « Je ne connaissais pas la victime par hasard. C'est Hale qui m'a contacté. »
@@ -221,9 +222,10 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 | Puzzle | Phase | Type | Mécanique | Asset utilisé | Récompense |
 |---|---|---|---|---|---|
 | Réseau d'Alibis 1 | act1_1 (3/4) | `reseau_alibis` | Identifier le mensonge parmi 2 dépositions | aucun | Point d'entrée dans le réseau |
-| Réseau d'Alibis 2 | act2_1 (1/3) | `reseau_alibis` | Identifier 2 menteurs parmi 4 dépositions croisées | aucun | Deux menteurs isolés, complicité |
-| Réseau d'Alibis 3 | act2_1 (3/3) | `reseau_alibis` | Identifier 3 menteurs parmi 6 dépositions croisées | aucun | Trois menteurs se couvrent, commanditaire identifié |
-| Puzzle | 2 (bar) | `puzzle` | Emboîter des formes géométriques | aucun | Confirme Hale→Krane |
+| Réseau d'Alibis 2 | act2_1 (1/3) | `reseau_alibis` | Identifier 2 menteurs parmi 4 dépositions croisées | aucun | La victime devait de l'argent à Krane |
+| Réseau d'Alibis 3 | act2_1 (3/3) | `reseau_alibis` | Identifier 3 menteurs parmi 6 dépositions croisées | aucun | Chacun a une raison légitime, le coffre est la clé |
+| Réseau d'Alibis 4 | act2_3 (6/6) | `reseau_alibis` | Réseau final : 6 dépositions post-interrogatoires | aucun | Confusion ADN, coffre = vérité |
+| Puzzle | 2 (bar) | `puzzle` | Emboîter des formes géométriques | aucun | Confirme Duc→Krane, Hale orchestrateur |
 | Câblage alarme | 3B (labo) | `cablage_alarme` | SVG : pivoter segments pour boucle intacte | `alarm-circuit-blueprint.png.jfif` | Intrusion non forcée |
 | Roue des alibis | 4A (QG) | `roue_alibis` | Aligner 3 cadrans (montre, alibi, horloge-mère) | `pocket-watch-dial.png.jfif` | Pulvérise l'alibi de Hale |
 

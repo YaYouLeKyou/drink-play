@@ -13,11 +13,11 @@
     TRUTH['protecteur'] = {
         coupable: 'protecteur',
         title: { fr: 'Le Major Hale', en: 'Major Hale' },
-        mobile: { fr: 'Amoureux obsessionnel de Lady Vivienne, il a fait exécuter le meurtre pour l\'assurance et les bijoux, croyant la conquérir.', en: 'Hopelessly in love with Lady Vivienne, he had the murder carried out for the insurance and jewels, believing it would win her.' },
+        mobile: { fr: 'Jaloux de la liaison entre Vivienne et Pembrooke, Hale a manipulé le Duc pour qu\'il engagee Krane contre Pembrooke. L\'arme a tué le Duc, et Hale a orchestré le tout pour éliminer Pembrooke.', en: 'Jealous of the liaison between Vivienne and Pembrooke, Hale manipulated the Duke into hiring Krane against Pembrooke. The weapon killed the Duke, and Hale orchestrated it all to eliminate Pembrooke.' },
         methode: { fr: 'Sabotage de la voiture du Séducteur, recrutement du Criminel, cambriolage simulé.', en: 'Sabotaging Julian Pembrooke\'s car, hiring Victor Krane, staging the burglary.' },
         adn: { fr: 'L\'ADN inconnue est celle du Criminel : son bras armé.', en: 'The unknown DNA belongs to Victor Krane: his enforcer.' },
         revel1: { fr: 'La panne du Séducteur était factice : la durite avait été sectionnée. Le Major Hale s\'était bâti un faux alibi.', en: 'Julian Pembrooke\'s breakdown was staged: the hose had been cut. Major Hale had built a false alibi.' },
-        revel2: { fr: 'Victor Krane avoue : « Le garde du corps m\'a payé pour le meurtre et le vol. »', en: 'Victor Krane confesses: "The bodyguard paid me for the murder and the robbery."' },
+        revel2: { fr: 'Victor Krane avoue : « Le Duc m\'a engagé pour tuer Pembrooke, mais l\'arme a tué le maître. »', en: 'Victor Krane confesses: "The Duke hired me to kill Pembrooke, but the weapon killed the master."' },
         indice: { fr: 'La porte était verrouillée à son retour, pourtant il décrit la mare de sang avec une précision troublante.', en: 'The door was locked when he returned, yet he describes the pool of blood with troubling precision.' },
         prison: { fr: 'Tout ça pour elle... mais elle ne l\'a jamais aimé. Il s\'effondre dans la cellule.', en: 'All of this for her... but she never loved him. He collapses in the cell.' },
         morale: { fr: 'De l\'amour à la folie criminelle, il n\'y a qu\'une obsession.', en: 'From love to criminal madness, there is only an obsession.' },

@@ -7,6 +7,7 @@
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
+    <link rel="stylesheet" href="../settings-menu.css">
     <link rel="stylesheet" href="styles.css">
     <style>
         :root {
@@ -157,6 +158,8 @@
     <button id="story-continue-btn" class="btn btn-continue">Continuer l'Enquête</button>
 
     <script src="minigames.js"></script>
+    <script src="sfx.js"></script>
+    <script src="minigame-audio.js" data-minigame="reseau_alibis"></script>
     <script src="../settings-menu.js"></script>
     <script>
         (function () {
@@ -275,13 +278,14 @@
                 {"witness":{"en":"Lady Vivienne","fr":"Lady Vivienne"},"id":"vivienne","statement":{"en":"I was at the theatre with friends, then alone at the manor. My husband and I had a relationship based on money, not love, I had no reason to kill him.","fr":"J'étais au théâtre avec des amies, puis seule au manoir. Mon mari et moi avions une relation basée sur l'argent, pas l'amour, je n'avais aucune raison de le tuer."}, "isLie":true}
             ];
             
-            var cfg = {
+             var cfg = {
                 type: 'reseau_alibis',
+                difficulty: 'easy',
                 time: 60,
                 evidence: 'witness',
-                title: { fr: 'Le Réseau d\'alibis', en: 'The Alibi Network' },
-                desc: { fr: 'Identifiez les menteurs.', en: 'Identify the liars.' },
-                clue: { fr: 'Le réseau révèle des contradictions.', en: 'The network reveals contradictions.' },
+                title: { fr: 'Le Réseau d\'alibis — 2 cartes', en: 'The Alibi Network — 2 cards' },
+                desc: { fr: 'Deux dépositions se contredisent déjà. Cliquez sur chaque carte : Mensonge ou Vérité. Identifiez le menteur.', en: 'Two testimonies already contradict each other. Click each card : Lie or Truth. Identify the liar.' },
+                clue: { fr: 'Le réseau des deux premiers témoins révèle une contradiction : l\'un ment sur sa présence sur les lieux.', en: 'The network of the first two witnesses reveals a contradiction: one lies about being on scene.' },
                 testimonies: testimonies,
                 lang: 'fr'
             };

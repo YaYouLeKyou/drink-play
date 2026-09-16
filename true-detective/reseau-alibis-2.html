@@ -7,6 +7,7 @@
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
+    <link rel="stylesheet" href="../settings-menu.css">
     <link rel="stylesheet" href="styles.css">
     <style>
         :root {
@@ -138,6 +139,8 @@
     </main>
 
     <script src="minigames.js"></script>
+    <script src="sfx.js"></script>
+    <script src="minigame-audio.js" data-minigame="reseau_alibis"></script>
     <script src="../settings-menu.js"></script>
     <script>
         (function () {
@@ -251,19 +254,20 @@
             }
 
             var testimonies = [
+                {"witness":{"en":"Lady Vivienne","fr":"Lady Vivienne"},"id":"vivienne","statement":{"en":"I was at the theatre with friends, then alone at the manor. My husband and I had a relationship based on money, not love, I had no reason to kill him.","fr":"J'étais au théâtre avec des amies, puis seule au manoir. Mon mari et moi avions une relation basée sur l'argent, pas l'amour, je n'avais aucune raison de le tuer."}, "isLie":false},
                 {"witness":{"en":"Major Hale","fr":"Major Hale"},"id":"hale","statement":{"en":"I was broken down with Pembrooke at 10pm. The manor lock was opened with a key, not forced. The victim didn't resist.","fr":"J'étais en panne avec Pembrooke à 22h. Le verrou du manoir a été ouvert avec une clé, pas forcé. La victime n'a pas opposé de résistance."}, "isLie":false},
-                {"witness":{"en":"Lady Vivienne","fr":"Lady Vivienne"},"id":"vivienne","statement":{"en":"I was at the theatre with friends, then alone at the manor. My husband and I had a relationship based on money, not love, I had no reason to kill him.","fr":"J'étais au théâtre avec des amies, puis seule au manoir. Mon mari et moi avions une relation basée sur l'argent, pas l'amour, je n'avais aucune raison de le tuer."}, "isLie":true},
-                {"witness":{"en":"Julian Pembrooke","fr":"Julian Pembrooke"},"id":"pembrooke","statement":{"en":"My car broke down, Hale joined me at 10pm. I was ALONE waiting, no prowler passed near the manor that night.","fr":"Ma voiture est tombée en panne, Hale m'a rejoint à 22h. J'étais SEUL à attendre, aucun rôdeur n'est passé près du manoir cette nuit-là."}, "isLie":true},
-                {"witness":{"en":"Rupert Blackwood","fr":"Rupert Blackwood"},"id":"blackwood","statement":{"en":"I dined with the Duke at 7pm, he wanted to withdraw funds. I left around 8pm, Silas saw me pass the gate. The will matters little to me, it's the heir that matters.","fr":"J'ai dîné avec le Duc à 19h, il voulait retirer des fonds. Je suis parti vers 20h, Silas m'a vu passer au portail. Le testament m'importe peu, c'est l'héritier qui compte."}, "isLie":false}
+                {"witness":{"en":"Silas Crane","fr":"Silas Crane"},"id":"silas","statement":{"en":"I saw a prowler at 10pm near the pavilion, gold watch, nervous. And I saw Blackwood pass at 8pm, the notary has always been straight.","fr":"J'ai vu un rôdeur à 22h près du pavillon, montre en or, nerveux. Et j'ai vu Blackwood passer à 20h, le notaire a toujours été réglo."}, "isLie":true},
+                {"witness":{"en":"Victor Krane","fr":"Victor Krane"},"id":"krane","statement":{"en":"For whoever pays. That night, I was alone. The homeless make up anything, especially that Silas, a vagrant with a murky past.","fr":"Pour qui paye. Cette nuit-là, j'étais seul. Les clochards racontent n'importe quoi, surtout ce Silas, un vagabond au passé trouble."}, "isLie":true}
             ];
             
-            var cfg = {
+             var cfg = {
                 type: 'reseau_alibis',
+                difficulty: 'medium',
                 time: 60,
                 evidence: 'witness',
-                title: { fr: 'Le Réseau d\'alibis', en: 'The Alibi Network' },
-                desc: { fr: 'Identifiez les menteurs.', en: 'Identify the liars.' },
-                clue: { fr: 'Le réseau révèle des contradictions.', en: 'The network reveals contradictions.' },
+                title: { fr: 'Le Réseau d\'alibis — 4 cartes', en: 'The Alibi Network — 4 cards' },
+                desc: { fr: 'Quatre dépositions. Certaines se contredisent déjà. Cliquez sur chaque carte : Mensonge ou Vérité. Identifiez les menteurs.', en: 'Four testimonies. Some already contradict each other. Click each card : Lie or Truth. Identify the liars.' },
+                clue: { fr: 'Le réseau des quatre témoins révèle des contradictions : Silas ment sur le rôdeur et Krane nie sa présence. La victime devait de l\'argent à Krane et voulait qu\'il élimine Pembrooke, mais l\'arme a tué le Duc.', en: 'The network of the four witnesses reveals contradictions: Silas lies about the prowler and Krane denies his presence. The victim owed money to Krane and wanted him to eliminate Pembrooke, but the weapon killed the Duke instead.' },
                 testimonies: testimonies,
                 lang: 'fr'
             };

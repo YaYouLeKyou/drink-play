@@ -4323,16 +4323,37 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
 
             scr.awaitingChoice = false;
             $.choicesContainer.innerHTML = '';
-            $.dialogueText.textContent = lang === 'fr'
-                ? 'Le défi commence. Appuyez sur Continuer pour y faire face.'
-                : 'The challenge begins. Press Continue to face it.';
-            if ($.typeCursor) $.typeCursor.classList.add('hidden');
-            $.continueBtn.classList.remove('hidden');
-            $.continueBtn.disabled = false;
-            $.continueBtn.textContent = getText('continue') || 'Continuer';
-            $.continueBtn.onclick = function () {
-                window.location.href = getMinigameStandaloneUrl(standaloneType, diff, langParam, 'story', getThemeId());
-            };
+            /* Page de dialogue de transition : le suspect introduit lui-même
+               sa passion et le défi, avant que le joueur ne le relance. */
+            var introTxt = null;
+            if (interroData && interroData.minigameIntro) {
+                introTxt = interroData.minigameIntro[ui.language] || interroData.minigameIntro.fr || interroData.minigameIntro.en || null;
+            }
+            if (introTxt) {
+                introTxt = scrSubstituteNames(introTxt, themeId);
+                typeWriter(introTxt, function () {
+                    if (!scr.active) return;
+                    if ($.typeCursor) $.typeCursor.classList.add('hidden');
+                    $.continueBtn.classList.remove('hidden');
+                    $.continueBtn.disabled = false;
+                    $.continueBtn.textContent = lang === 'fr' ? '🎯 Lancer le défi' : '🎯 Face the challenge';
+                    $.continueBtn.onclick = function () {
+                        $.continueBtn.disabled = true;
+                        window.location.href = getMinigameStandaloneUrl(standaloneType, diff, langParam, 'story', getThemeId());
+                    };
+                });
+            } else {
+                $.dialogueText.textContent = lang === 'fr'
+                    ? 'Le défi commence. Appuyez sur Continuer pour y faire face.'
+                    : 'The challenge begins. Press Continue to face it.';
+                if ($.typeCursor) $.typeCursor.classList.add('hidden');
+                $.continueBtn.classList.remove('hidden');
+                $.continueBtn.disabled = false;
+                $.continueBtn.textContent = getText('continue') || 'Continuer';
+                $.continueBtn.onclick = function () {
+                    window.location.href = getMinigameStandaloneUrl(standaloneType, diff, langParam, 'story', getThemeId());
+                };
+            }
             return;
         }
 
@@ -4475,7 +4496,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         'protecteur':    { phase: 'act2_3', pageIdx: 0 },  // Acte 2, Interrogatoires P1 : tir forain
         'femme-fatale':  { phase: 'act1_1', pageIdx: 1 },  // Acte 1, Interrogatoires P2 : échecs
         'seducteur':     { phase: 'act2_3', pageIdx: 2 },  // Acte 2, Interrogatoires P3 : jackpot
-        'suspect':       { phase: 'act2_3', pageIdx: 3 },  // Acte 2, Interrogatoires P4 : sudoku
+        'suspect':       { phase: 'act2_3', pageIdx: 4 },  // Acte 2, Interrogatoires P5 : sudoku
         'marginal':      { phase: 'act1_2', pageIdx: 3 },  // Acte 1, Témoignages P4 : tour de cartes
         'criminel':      { phase: 'act2_1', pageIdx: 2 }   // Acte 2, Piste du bar P3 : mémoire
     };
@@ -4516,8 +4537,6 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             cfg.depth = roundCfg.depth;
             cfg.title = roundCfg.title;
         } else if (mgType === 'puzzle') {
-            cfg.title = roundCfg.title;
-        } else if (mgType === 'sudoku') {
             cfg.title = roundCfg.title;
         } else if (mgType === 'jackpot') {
             cfg.spins = Math.min(roundCfg.spins || 9, 9);
@@ -4598,6 +4617,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         } else if (minigameType === 'connect4') {
             cfg.aiDepth = Math.min(tier, 4);
             cfg.winScore = 10;
+        } else if (minigameType === 'sudoku') {
+            cfg.holes = 40 - tier * 5;             // 35..25 cases à remplir
+            cfg.time = 90 + tier * 30;             // 2..5 minutes
         } else if (minigameType === 'bataille-navale') {
             cfg.shipCount = 3 + tier; // 4..6 ships per player
             cfg.gridSize = 6 + tier;  // 7..9 grid
@@ -4625,6 +4647,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
               'shooting': 'shooting.html',
               'jackpot': 'jackpot.html',
               'connect4': 'connect4.html',
+              'sudoku': 'sudoku.html',
               'bataille-navale': 'bataille-navale.html',
               'pong': 'pong.html',
               'pacman': 'pacman.html',
@@ -4663,7 +4686,6 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         return {
             chess: 'TDChessGame',
             memory: 'TDMemoryGame',
-            sudoku: 'TDConnect4Game',
             connect4: 'TDConnect4Game',
             chemistry: 'TDChemistryGame',
             coffre_code: 'TDMiniGames',
@@ -4698,6 +4720,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             shooting: { fr: 'Tir forain', en: 'Shooting Gallery' },
             jackpot: { fr: 'Jackpot', en: 'Jackpot' },
             connect4: { fr: 'Puissance 4', en: 'Connect 4' },
+            sudoku: { fr: 'Sudoku de Blackwood', en: "Blackwood's Sudoku" },
             chemistry: { fr: 'Analyse chimique', en: 'Chemistry' },
             pong: { fr: 'Pong', en: 'Pong' },
             pacman: { fr: 'Pacman', en: 'Pacman' },

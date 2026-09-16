@@ -41,8 +41,8 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 
 - **Coupable (maître d'œuvre)** : le Major Hale, « LE PROTECTEUR », garde du corps de la victime.
 - **La lame** : Victor Krane, « LE CRIMINEL », tueur payé, ADN inconnu sur la scène.
-- **Complicité passive** : Lady Vivienne (menaces rédigées de sa main élégante) et Julian Pembrooke (fausse panne montée avec Hale).
-- **Le mobile de Hale** : dettes, chantage, jalousie de serviteur ; il a payé Krane (carnet dans le coffre).
+- **Complicité passive** : Lady Vivienne (liaison avec le Duc) et Julian Pembrooke (faux alibi « panne »).
+- **Le mobile de Hale** : jaloux de la liaison entre Vivienne et Pembrooke, Hale a manipulé le Duc pour qu'il engage Krane contre Pembrooke. L'arme a tué le Duc, et Hale a orchestré le tout pour éliminer Pembrooke.
 
 ### L'heure du crime — MÉCANIQUE CENTRALE (twist final)
 
@@ -144,7 +144,7 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 4. *(bar, criminel)* Victor Krane, voix trop calme : « bu un verre à 18h… je rentrais chez moi. »
 5. *(alley, femme-fatale)* Vivienne souffle le nom de Krane comme « le corbeau » — brouillage possible.
 6. *(crimeScene, Wexford)* **MINI-JEU `coffre_code`** — le coffre familial : composer **1981** (récompense du joueur attentif).
-   - **INDICE MAJEUR** : carnet de versements — Hale a payé Krane en plusieurs fois, dernière la veille du meurtre. Hale n'était pas le gardien… mais l'employeur.
+   - **INDICE MAJEUR** : carnet de versements signés par le Duc — le Duc a engagé Krane pour une élimination. Hale a orchestré le meurtre en manipulant le Duc.
 
 ### ACTE III — Phase 4A « Le Nœud » (narration, musique thème)
 
@@ -166,7 +166,7 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 
 ### ACTE III — Phase 4C « Révélation » (dialogue, musique Act III Revelations)
 
-1. *(crimeScene, criminel)* Krane avoue en partie : « je suis payé pour la violence. »
+1. *(crimeScene, criminel)* Krane avoue en partie : « Le Duc m'a engagé pour tuer Pembrooke, mais l'arme a tué le maître. »
 2. *(crimeScene, protecteur)* Hale se contredit : décrit la mare de sang trop précisément, porte verrouillée à son retour.
 3. **CHOIX FINAL `accuser`** : protecteur / femme-fatale / seducteur / suspect / marginal / criminel.
 
@@ -175,7 +175,7 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 **Bonne accusation (protecteur)** — écran de victoire avec faisceau de preuves complet :
 
 - Le Major Hale s'effondre : « Tout ça pour elle… mais elle ne m'a jamais aimé. »
-- Victor Krane (la lame) avoue : « Le garde du corps m'a payé. »
+- Victor Krane (la lame) avoue : « Le Duc m'a engagé pour tuer Pembrooke, mais l'arme a tué le maître. » »
 - Lady Vivienne complice démasquée, Julian Pembrooke alibi tombé.
 - Morale : « De l'amour à la folie criminelle, il n'y a qu'une obsession. »
 
@@ -185,8 +185,8 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 - **seducteur** : Pembrooke blêmit. « C\'est une erreur… J\'étais en panne ! La panne était un faux — mais moi je n\'était que l'alibi. » → indice `alibi` (sabotage) manquant.
 - **suspect** : Rupert ricane. « J\'étais parti à 21h30, Silas peut confirmer. Ce n\'est pas moi qui ai sectionné la durite… ni payé Krane. » → indice `witness` (Silas) manquant.
 - **marginal** : Silas secoue la tête. « J\'ai VU le rôdeur à 22h — suivez cette piste. » → indice `timeline` manquant.
-- **criminel** : Krane sourit. « Je ne suis que le bras, inspecteur. La main, c\'est Hale — relisez les versements du coffre. » → indice `mobile` (coffre) manquant.
-- **protecteur** : Le Major Hale s\'effondre. « Tout ça pour elle… but elle ne m\'a jamais aimé. » La vérité éclate : amour obsessionnel, Krane payé, Pembrooke alibi, crime maîtré. JUSTICE EST FAITE.
+- **criminel** : Krane sourit. « Je ne suis que le bras, inspecteur. La main, c\'est Hale — il a manipulé le Duc pour m\'engager. Relisez les versements du coffre. » → indice `mobile` (coffre) manquant.
+- **protecteur** : Le Major Hale s\'effondre. « Tout ça pour une liaison... mais le Duc m\'a engagé pour tuer Pembrooke. L\'arme a tué le maître, et j\'ai orchestré le tout pour m\'emparer de sa fortune. » La vérité éclate : jalousie, manipulation, Pembrooke alibi, crime maîtrisé. JUSTICE EST FAITE.
 
 **Dans tous les cas d'échec** : le vrai coupable s'échappe, le joueur perd son badge, fin dépressive. Le faisceau de preuves (affiché à l'écran) montre exactement quelles catégories étaient insuffisantes.
 
@@ -219,8 +219,12 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 
 | Puzzle | Phase | Type | Mécanique | Asset utilisé | Récompense |
 |---|---|---|---|---|---|
+| Réseau d'Alibis 1 | 1A (3/4) | `reseau_alibis` | Identifier le mensonge parmi 2 dépositions | aucun | Point d'entrée dans le réseau |
+| Réseau d'Alibis 2 | 2A (1/3) | `reseau_alibis` | Identifier 2 menteurs parmi 4 dépositions croisées | aucun | La victime devait de l'argent à Krane |
+| Réseau d'Alibis 3 | 2A (3/3) | `reseau_alibis` | Identifier 3 menteurs parmi 6 dépositions croisées | aucun | Chacun a une raison légitime, le coffre est la clé |
+| Réseau d'Alibis 4 | 2C (6/6) | `reseau_alibis` | Réseau final : 6 dépositions post-interrogatoires | aucun | Confusion ADN, coffre = vérité |
 | Carnet déchiré | 1B | `carnet_dechire` | Reconstituer 4 bandes + loupe pour empreintes | `prescription-eliane.png` | Mobile financier + empreintes |
-| Cryptogramme | 2 (bar) | `cryptogramme` | Substitution de César à décoder | `krane-coded-note.png.jfif` | Confirme Hale→Krane |
+| Cryptogramme | 2 (bar) | `cryptogramme` | Substitution de César à décoder | `krane-coded-note.png.jfif` | Confirme Duc→Krane, Hale orchestrateur |
 | Câblage alarme | 3B (labo) | `cablage_alarme` | SVG : pivoter segments pour boucle intacte | `alarm-circuit-blueprint.png.jfif` | Intrusion non forcée |
 | Roue des alibis | 4A (QG) | `roue_alibis` | Aligner 3 cadrans (montre, alibi, horloge-mère) | `pocket-watch-dial.png.jfif` | Pulvérise l'alibi de Hale |
 
@@ -234,6 +238,7 @@ Chaque puzzle respecte l'architecture existante (fabrique dans `minigames.js`, `
 - [x] **Réactions d'accusation** — 5 innocents avec réaction unique indiquant l'indice manqué. ✅
 - [x] **Heure du crime reconstruisable** — montre (raccourci) OU croisement Silas + verrou + horloge-mère. ✅
 - [x] **4 mini-puzzles logiques** — Carnet, Cryptogramme, Câblage, Roue. ✅
+- [x] **4 Réseaux d'Alibis** — 2 cartes (act1_1), 4 cartes (act2_1), 6 cartes (act2_1 + act2_3), 6 cartes final. ✅
 - [x] **Intégration prescription-eliane** — reconstitution page + empreintes à la loupe. ✅
 - [ ] Textes détaillés par zone zoomée de la fouille (à fournir ultérieurement).
 - [ ] Variante du twist si le joueur n'a PAS relevé 22h09 (Wexford le déduit plus difficilement).
