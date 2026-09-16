@@ -1592,6 +1592,15 @@ html {
     transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
+/* Boutons de question : pleine largeur, empilés l'un sous l'autre
+   (disposition d'origine, avant la grille de choix à 3 colonnes) */
+.choices-container .interrogation-question {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: 100%;
+    text-align: left;
+}
+
 .interrogation-question:hover {
     border-left-color: rgba(255, 0, 255, 0.8);
     transform: translateX(4px);

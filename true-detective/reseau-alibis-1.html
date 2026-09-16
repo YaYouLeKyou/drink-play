@@ -105,6 +105,13 @@
             position: fixed !important;
             top: 14px !important;
             right: 20px !important;
+            /* Annule bottom/left/transform heritees de styles.css (.btn-continue) :
+               avec top + bottom definis, le bouton fixed s'etirerait sur toute la
+               hauteur de l'ecran et masquerait le mini-jeu. */
+            bottom: auto !important;
+            left: auto !important;
+            transform: none !important;
+            max-width: none !important;
             padding: 8px 18px !important;
             font-size: 0.85rem !important;
             font-weight: 700 !important;
