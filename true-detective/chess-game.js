@@ -723,7 +723,7 @@
             var continueBtn = document.createElement('button');
             continueBtn.className = 'btn btn-continue';
             continueBtn.textContent = lang === 'fr' ? 'Continuer' : 'Continue';
-            continueBtn.style.cssText = 'position:fixed;top:20px;right:20px;z-index:100;';
+            continueBtn.style.cssText = 'position:fixed;top:20px;right:20px;bottom:auto;left:auto;z-index:100;';
             continueBtn.addEventListener('click', function () {
                 finish({ won: game.result === 'white', clue: game.result === 'white' ? cfg.clue : cfg.failClue });
             });

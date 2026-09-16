@@ -624,5 +624,18 @@
             }, 1200);
         }
     </script>
+
+    <script>
+        (function(){
+            function playSfx(name, opts) {
+                try { if (parent.TDSfx) parent.TDSfx.play(name, opts); } catch (e) {}
+            }
+            function playMinigameMusic(type) {
+                try { if (parent.TDAudioService && parent.TDAudioService.playMinigameMusic) parent.TDAudioService.playMinigameMusic(type); } catch (e) {}
+            }
+            window._tdPlaySfx = playSfx;
+            window._tdPlayMinigameMusic = playMinigameMusic;
+        })();
+    </script>
 </body>
 </html>

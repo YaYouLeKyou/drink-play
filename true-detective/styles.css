@@ -4,7 +4,6 @@
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
-    user-select: none;
 }
 
 body {
@@ -19,6 +18,16 @@ body {
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
 }
+    /* Prevent accidental text selection during gameplay */
+    .btn, .game-screen, .choices-container, .minigame-select-card, .page-dot,
+    .notebook-tab-btn, .chess-sq, .card, .hotspot, .token, .piece, .paddle,
+    .btn-continue, .mobile-continue-btn, .lang-btn, .start-btn {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
 
 body::before {
     content: '';
@@ -55,6 +64,16 @@ body {
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
 }
+    /* Prevent accidental text selection during gameplay */
+    .btn, .game-screen, .choices-container, .minigame-select-card, .page-dot,
+    .notebook-tab-btn, .chess-sq, .card, .hotspot, .token, .piece, .paddle,
+    .btn-continue, .mobile-continue-btn, .lang-btn, .start-btn {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
 
 body::before {
     content: '';
@@ -2325,6 +2344,16 @@ html {
     overflow-y: auto;
     overflow-x: hidden;
 }
+    /* Prevent accidental text selection during gameplay */
+    .btn, .game-screen, .choices-container, .minigame-select-card, .page-dot,
+    .notebook-tab-btn, .chess-sq, .card, .hotspot, .token, .piece, .paddle,
+    .btn-continue, .mobile-continue-btn, .lang-btn, .start-btn {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
 
 .minigame-screen-container {
     width: 100%;
@@ -2338,6 +2367,16 @@ html {
     overflow-y: auto;
     overflow-x: hidden;
 }
+    /* Prevent accidental text selection during gameplay */
+    .btn, .game-screen, .choices-container, .minigame-select-card, .page-dot,
+    .notebook-tab-btn, .chess-sq, .card, .hotspot, .token, .piece, .paddle,
+    .btn-continue, .mobile-continue-btn, .lang-btn, .start-btn {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
 
 .minigame-screen-header {
     display: flex;
@@ -3549,6 +3588,16 @@ html {
     overflow-y: auto;
     overflow-x: hidden;
 }
+    /* Prevent accidental text selection during gameplay */
+    .btn, .game-screen, .choices-container, .minigame-select-card, .page-dot,
+    .notebook-tab-btn, .chess-sq, .card, .hotspot, .token, .piece, .paddle,
+    .btn-continue, .mobile-continue-btn, .lang-btn, .start-btn {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
 
 @media (max-width: 768px) {
     .chess-wrap, .sudoku-wrap, .memory-wrap, .jackpot-wrap, .domino-wrap,

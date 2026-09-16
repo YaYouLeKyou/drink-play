@@ -304,7 +304,73 @@
         }
     }
 
-    var THEME_MUSIC_TRACKS = {
+
+
+    /* Crossfade helpers */
+    var audioCtx = null;
+    var currentGain = null;
+    var nextGain = null;
+    var currentAudioEl = null;
+    var nextAudioEl = null;
+
+    function getAudioContext() {
+        if (!audioCtx) {
+            try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { audioCtx = null; }
+        }
+        return audioCtx;
+    }
+
+    function connectGain(audioEl, gainNode) {
+        try {
+            var ctx = getAudioContext();
+            if (!ctx) return;
+            var source = ctx.createMediaElementSource(audioEl);
+            source.connect(gainNode);
+            gainNode.connect(ctx.destination);
+        } catch (e) {}
+    }
+
+    function crossfadeTo(newAudioEl, duration) {
+        duration = duration || 2;
+        var ctx = getAudioContext();
+        if (!ctx) {
+            if (currentAudioEl && currentAudioEl !== newAudioEl) { currentAudioEl.pause(); currentAudioEl = null; }
+            return;
+        }
+        if (currentAudioEl === newAudioEl) return;
+
+        if (currentAudioEl && !currentGain) {
+            try {
+                currentGain = ctx.createGain();
+                currentGain.gain.value = 1;
+                connectGain(currentAudioEl, currentGain);
+            } catch (e) { currentGain = null; }
+        }
+        if (nextGain) {
+            try { nextGain.disconnect(); } catch (e) {}
+            nextGain = null;
+        }
+        nextGain = ctx.createGain();
+        nextGain.gain.value = 0;
+        try { connectGain(newAudioEl, nextGain); } catch (e) {}
+
+        var now = ctx.currentTime;
+        if (currentGain) {
+            try { currentGain.gain.linearRampToValueAtTime(0, now + duration); } catch (e) {}
+        }
+        try { nextGain.gain.linearRampToValueAtTime(1, now + duration); } catch (e) {}
+
+        if (currentAudioEl && currentAudioEl !== newAudioEl) {
+            currentAudioEl.pause();
+            currentAudioEl = null;
+            currentGain = null;
+        }
+        currentAudioEl = newAudioEl;
+        currentGain = nextGain;
+        nextGain = null;
+    }
+
+        var THEME_MUSIC_TRACKS = {
         'agatha-christie': 'sherlock.mp3',
         'cyberpunk': 'cyberpunk.mp3',
         'film-noir': 'noire.mp3',
