@@ -7,6 +7,7 @@
     'use strict';
 
     function playSfx(name, opts) {
+    playMinigameMusic('marginal-tower');
         try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
     }
 

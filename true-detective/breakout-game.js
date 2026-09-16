@@ -1,6 +1,15 @@
 (function (global) {
     'use strict';
 
+    /* Audio bridge for mini-game */
+    function playSfx(name, opts) {
+        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+    }
+    function playMinigameMusic(type) {
+        try { if (window.TDAudioService && window.TDAudioService.playMinigameMusic) window.TDAudioService.playMinigameMusic(type); } catch (e) {}
+    }
+
+
     function t(obj, lang) {
         if (!obj) return '';
         return obj[lang] || obj.fr || obj.en || '';
@@ -65,6 +74,7 @@
     }
 
     function play(cfg, lang, onDone, target) {
+        playMinigameMusic('breakout');
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
 
         var overlay = document.getElementById('minigame-overlay');
@@ -328,10 +338,10 @@
             ball.x += ball.vx;
             ball.y += ball.vy;
             if (ball.x - ball.r < 0 || ball.x + ball.r > cw) ball.vx *= -1;
-            if (ball.y - ball.r < 0) ball.vy *= -1;
+            if (ball.y - ball.r < 0) ball.vy *= -1; playSfx("paddle");
             if (ball.y + ball.r > paddle.y && ball.y - ball.r < paddle.y + paddle.h &&
                 ball.x > paddle.x && ball.x < paddle.x + paddle.w) {
-                ball.vy *= -1;
+                ball.vy *= -1; playSfx("paddle");
                 ball.y = paddle.y - ball.r;
             }
             var brokenBefore = 0;
@@ -341,7 +351,7 @@
                 if (ball.x + ball.r > b.x && ball.x - ball.r < b.x + b.w &&
                     ball.y + ball.r > b.y && ball.y - ball.r < b.y + b.h) {
                     b.alive = false;
-                    ball.vy *= -1;
+                    ball.vy *= -1; playSfx("paddle");
                     score += 10;
                     bricksBroken++;
                     if (PHRASE_TRIGGERS.indexOf(bricksBroken) !== -1 && !interroCompleted) {

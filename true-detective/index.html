@@ -421,6 +421,24 @@
     <script src="chemistry-game.js"></script>
     <script src="devmode.js"></script>
     <script src="app.js"></script>
+    <div id="minigame-settings-panel" class="dp-settings-panel">
+        <div class="dp-settings-header">
+            <h3>Paramètres du mini-jeu</h3>
+            <button id="minigame-settings-close" class="dp-settings-close-btn">✕</button>
+        </div>
+        <div class="dp-settings-body">
+            <div class="dp-settings-section">
+                <h4>Audio</h4>
+                <label><input type="checkbox" id="minigame-music-toggle" checked> Musique</label>
+                <label><input type="checkbox" id="minigame-sfx-toggle" checked> Bruitages</label>
+            </div>
+            <div class="dp-settings-section">
+                <h4>Affichage</h4>
+                <label><input type="checkbox" id="minigame-fullscreen-toggle"> Plein écran</label>
+            </div>
+        </div>
+    </div>
+
     <script src="../settings-menu.js" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {

@@ -6,6 +6,7 @@
     'use strict';
 
     function playSfx(name, opts) {
+    playMinigameMusic('shooting');
         try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
     }
 

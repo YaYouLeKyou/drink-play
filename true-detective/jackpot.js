@@ -6,6 +6,7 @@
     'use strict';
 
     function playSfx(name, opts) {
+    playMinigameMusic('jackpot');
         try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
     }
 

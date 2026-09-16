@@ -330,6 +330,39 @@
         } catch (e) {}
     }
 
+
+
+    /* Narration ducking: lower music volume by 30% when TTS speaks */
+    var duckGain = null;
+    var duckCtx = null;
+    function initDuckGain() {
+        if (duckGain) return duckGain;
+        try {
+            duckCtx = new (window.AudioContext || window.webkitAudioContext)();
+            duckGain = duckCtx.createGain();
+            duckGain.gain.value = 1;
+            duckGain.connect(duckCtx.destination);
+            return duckGain;
+        } catch (e) { return null; }
+    }
+
+    function duckMusicForSpeech(active) {
+        try {
+            var g = initDuckGain();
+            if (!g || !currentAudioEl) return;
+            var ctx = duckCtx;
+            try {
+                if (!currentAudioEl._tdSource) {
+                    currentAudioEl._tdSource = ctx.createMediaElementSource(currentAudioEl);
+                    currentAudioEl._tdSource.connect(g);
+                }
+            } catch (e) {}
+            var now = ctx.currentTime;
+            g.gain.cancelScheduledValues(now);
+            g.gain.linearRampToValueAtTime(active ? 0.7 : 1, now + 0.5);
+        } catch (e) {}
+    }
+
     function crossfadeTo(newAudioEl, duration) {
         duration = duration || 2;
         var ctx = getAudioContext();
@@ -534,6 +567,7 @@
             global.speechSynthesis.cancel();
         }
         isSpeaking = false;
+        duckMusicForSpeech(false);
     }
 
     function getMatchedVoice(profileId) {
@@ -622,6 +656,57 @@
             window.DPMusicPlayer.playTrack(track);
         }
         return currentMusicPhase;
+    }
+
+
+
+    /* Ambient sound layers */
+    var ambientAudio = null;
+    var ambientGain = null;
+    var currentAmbientType = null;
+
+    function initAmbient() {
+        if (ambientAudio) return;
+        try {
+            ambientAudio = new Audio();
+            ambientAudio.loop = true;
+            ambientAudio.volume = 0.3;
+            var ctx = new (window.AudioContext || window.webkitAudioContext)();
+            ambientGain = ctx.createGain();
+            ambientGain.gain.value = 0.3;
+            var source = ctx.createMediaElementSource(ambientAudio);
+            source.connect(ambientGain);
+            ambientGain.connect(ctx.destination);
+        } catch (e) {
+            ambientAudio = null;
+            ambientGain = null;
+        }
+    }
+
+    function playAmbient(type) {
+        initAmbient();
+        if (!ambientAudio) return;
+        if (currentAmbientType === type) return;
+        currentAmbientType = type;
+        // Map ambient type to file path
+        var map = {
+            rain: 'music true detective/ambient/rain.mp3',
+            city: 'music true detective/ambient/city.mp3',
+            wind: 'music true detective/ambient/wind.mp3',
+            interior: 'music true detective/ambient/interior.mp3',
+        };
+        var src = map[type];
+        if (!src) return;
+        try {
+            ambientAudio.src = src;
+            ambientAudio.play().catch(function() {});
+        } catch (e) {}
+    }
+
+    function stopAmbient() {
+        if (!ambientAudio) return;
+        try { ambientAudio.pause(); } catch (e) {}
+        currentAmbientType = null;
     }
 
     function playThemeMusic(themeId) {

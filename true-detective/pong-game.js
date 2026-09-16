@@ -1,6 +1,15 @@
 (function (global) {
     'use strict';
 
+    /* Audio bridge for mini-game */
+    function playSfx(name, opts) {
+        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+    }
+    function playMinigameMusic(type) {
+        try { if (window.TDAudioService && window.TDAudioService.playMinigameMusic) window.TDAudioService.playMinigameMusic(type); } catch (e) {}
+    }
+
+
     function t(obj, lang) {
         if (!obj) return '';
         return obj[lang] || obj.fr || obj.en || '';
@@ -65,6 +74,7 @@
     }
 
     function play(cfg, lang, onDone, target) {
+        playMinigameMusic('pong');
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
 
         // Read level from URL for standalone mode (used by standalone-game.html)
@@ -352,18 +362,18 @@
             ball.x += ball.vx;
             ball.y += ball.vy;
             if (ball.y < ball.r || ball.y > ch - ball.r) ball.vy *= -1;
-            if (ball.x < paddleW + ball.r && ball.y > playerY && ball.y < playerY + paddleH) {
+            if (ball.x < paddleW + ball.r && ball.y > playerY && ball.y < playerY + paddleH) { playSfx("paddle");
                 ball.vx = Math.abs(ball.vx);
                 var dy = (ball.y - (playerY + paddleH / 2)) / (paddleH / 2);
                 ball.vy = dy * 4;
             }
-            if (ball.x > cw - paddleW - ball.r && ball.y > aiY && ball.y < aiY + paddleH) {
+            if (ball.x > cw - paddleW - ball.r && ball.y > aiY && ball.y < aiY + paddleH) { playSfx("paddle");
                 ball.vx = -Math.abs(ball.vx);
                 var dy = (ball.y - (aiY + paddleH / 2)) / (paddleH / 2);
                 ball.vy = dy * 4;
             }
             if (ball.x < 0) {
-                aiScore++;
+                aiScore++; playSfx("score");
                 if (aiScore < winScore && !interroCompleted) {
                     showTaunt();
                     tryStartInterrogation();
@@ -372,7 +382,7 @@
                 resetBall(1);
             }
             if (ball.x > cw) {
-                playerScore++;
+                playerScore++; playSfx("score");
                 if (PHRASE_TRIGGERS.indexOf(playerScore) !== -1 && !interroCompleted) {
                     showNewPhrase();
                     tryStartInterrogation();

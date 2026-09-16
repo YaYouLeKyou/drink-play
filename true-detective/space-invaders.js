@@ -5,6 +5,15 @@
 (function (global) {
     'use strict';
 
+    /* Audio bridge for mini-game */
+    function playSfx(name, opts) {
+        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+    }
+    function playMinigameMusic(type) {
+        try { if (window.TDAudioService && window.TDAudioService.playMinigameMusic) window.TDAudioService.playMinigameMusic(type); } catch (e) {}
+    }
+
+
     function init() {
         var params = new URLSearchParams(window.location.search);
         var lang = params.get('lang') || 'fr';

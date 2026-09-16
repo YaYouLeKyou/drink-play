@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
     'use strict';
 
     function isMobile() {
@@ -92,6 +92,34 @@
         'cyberpunk': CYBERPUNK_ASSETS,
         'film-noir': FILM_NOIR_ASSETS,
     };
+
+
+    /* ============================================================
+       MINIGAME REGISTRY
+       Single source of truth for minigame metadata.
+    ============================================================ */
+    var MINIGAME_REGISTRY = {
+        'scene_fouille': { name: 'Fouille de scene', type: 'scene_fouille', category: 'puzzle', script: null, standaloneUrl: null, difficultyLevels: 1, clueReward: 'forensic' },
+        'montre_code': { name: 'La Montre du Duc', type: 'montre_code', category: 'puzzle', script: null, standaloneUrl: null, difficultyLevels: 1, clueReward: 'timeline' },
+        'puzzle': { name: 'Le Puzzle', type: 'puzzle', category: 'puzzle', script: 'puzzle-game.js', standaloneUrl: 'puzzle.html', difficultyLevels: 3, clueReward: 'scene' },
+        'coffre_code': { name: 'Coffre-fort', type: 'coffre_code', category: 'puzzle', script: null, standaloneUrl: null, difficultyLevels: 1, clueReward: 'mobile' },
+        'reseau_alibis': { name: 'Reseau d\'alibis', type: 'reseau_alibis', category: 'puzzle', script: null, standaloneUrl: 'reseau-alibis.html', difficultyLevels: 4, clueReward: 'witness' },
+        'chemistry': { name: 'Chimie', type: 'chemistry', category: 'puzzle', script: 'chemistry-game.js', standaloneUrl: 'chemistry.html', difficultyLevels: 3, clueReward: 'forensic' },
+        'chess': { name: 'Echecs', type: 'chess', category: 'classic', script: 'chess-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'psychological' },
+        'memory': { name: 'Memoire', type: 'memory', category: 'classic', script: 'memory-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'witness' },
+        'shooting': { name: 'Tir forain', type: 'shooting', category: 'classic', script: 'shooting-gallery.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'psychological' },
+        'jackpot': { name: 'Jackpot', type: 'jackpot', category: 'classic', script: null, standaloneUrl: null, difficultyLevels: 1, clueReward: 'mobile' },
+        'connect4': { name: 'Puissance 4', type: 'connect4', category: 'classic', script: 'connect4-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'scene' },
+        'marginal-tower': { name: 'Tour de Silas', type: 'marginal-tower', category: 'classic', script: null, standaloneUrl: 'marginal-tower.html', difficultyLevels: 3, clueReward: 'scene' },
+        'bataille-navale': { name: 'Bataille navale', type: 'bataille-navale', category: 'retro', script: 'bataille-navale.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'witness' },
+        'pong': { name: 'Pong', type: 'pong', category: 'retro', script: 'pong-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'scene' },
+        'pacman': { name: 'Pacman', type: 'pacman', category: 'retro', script: 'pacman-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'scene' },
+        'space-invaders': { name: 'Space Invaders', type: 'space-invaders', category: 'retro', script: 'space-invaders.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'scene' },
+        'breakout': { name: 'Breakout', type: 'breakout', category: 'retro', script: 'breakout-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'scene' },
+        'asteroids': { name: 'Asteroides', type: 'asteroids', category: 'retro', script: 'asteroids-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'scene' },
+    };
+
+    function getMinigameRegistry() { return MINIGAME_REGISTRY; }
 
     var PHASE_MUSIC_TRACKS = {
         'recherche': 'recherche.mp3',
@@ -1123,6 +1151,14 @@ applyMusicHidden(true);
                 }
             });
         }
+        var minigameSettingsCloseBtn = document.getElementById('minigame-settings-close');
+        if (minigameSettingsCloseBtn && minigameSettingsPanel) {
+            minigameSettingsCloseBtn.addEventListener('click', function () {
+                minigameSettingsPanel.classList.remove('open');
+                if (minigameSettingsToggle) minigameSettingsToggle.setAttribute('aria-expanded', 'false');
+            });
+        }
+
 
         if ($.dialogueText) {
             $.dialogueText.addEventListener('click', function () {
@@ -3506,6 +3542,35 @@ function buildTransitionPages(sceneData) {
             }
         }
         updateMusicInfo(phaseMusic || 'investigation', getThemeId(), true);
+    }
+
+
+    /* ============================================================
+       DETECTIVE RANK SYSTEM
+    ============================================================ */
+    var RANK_THRESHOLDS = [
+        { max: 0, rank: 'Rookie', fr: 'Recrue', en: 'Rookie', icon: '🔍' },
+        { max: 6, rank: 'Inspector', fr: 'Inspecteur', en: 'Inspector', icon: '🕵️' },
+        { max: 12, rank: 'Detective Chief', fr: 'Commissaire', en: 'Detective Chief', icon: '⭐' },
+        { max: 18, rank: 'Legend', fr: 'Légende', en: 'Legend', icon: '🏆' }
+    ];
+
+    function getDetectiveRank(evidenceCount) {
+        var rank = RANK_THRESHOLDS[0];
+        for (var i = 0; i < RANK_THRESHOLDS.length; i++) {
+            if (evidenceCount >= RANK_THRESHOLDS[i].max) rank = RANK_THRESHOLDS[i];
+        }
+        return rank;
+    }
+
+    function updateRankDisplay() {
+        var s = scrGetState();
+        var count = (s && s.clues) ? s.clues.length : 0;
+        var rank = getDetectiveRank(count);
+        var el = document.getElementById('rank-display');
+        if (el) {
+            el.textContent = rank.icon + ' ' + (ui.language === 'fr' ? rank.fr : rank.rank);
+        }
     }
 
     function scrEnsureThemeMusic() {

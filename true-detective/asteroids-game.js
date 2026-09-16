@@ -1,6 +1,15 @@
 (function (global) {
     'use strict';
 
+    /* Audio bridge for mini-game */
+    function playSfx(name, opts) {
+        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+    }
+    function playMinigameMusic(type) {
+        try { if (window.TDAudioService && window.TDAudioService.playMinigameMusic) window.TDAudioService.playMinigameMusic(type); } catch (e) {}
+    }
+
+
     function t(obj, lang) {
         if (!obj) return '';
         return obj[lang] || obj.fr || obj.en || '';
@@ -67,6 +76,7 @@
     }
 
     function play(cfg, lang, onDone, target) {
+        playMinigameMusic('asteroids');
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
 
         var overlay = document.getElementById('minigame-overlay');
