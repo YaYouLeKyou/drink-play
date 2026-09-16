@@ -2056,7 +2056,7 @@ html {
     justify-content: center;
     min-height: 100vh;
     min-height: 100dvh;
-    padding: 48px 16px 16px;
+    padding: 56px 16px 16px;
     box-sizing: border-box;
     overflow-y: auto;
     scroll-padding-top: 32px;
