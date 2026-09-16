@@ -165,11 +165,17 @@
             transform: scale(1.08);
         }
 
-        /* Bouton Continuer ultra fluide */
+        /* Bouton Continuer : fixe en bas au centre de l'ecran, toujours visible.
+           Important : ne jamais le placer dans un ancetre avec transform/filter/
+           backdrop-filter, sinon cet ancetre devient son bloc conteneur et le
+           bouton se retrouve positionne hors de l'ecran (bug corrige). */
         #story-continue-btn {
             position: fixed !important;
-            top: 14px !important;
-            right: 20px !important;
+            top: auto !important;
+            right: auto !important;
+            bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
             padding: 8px 18px !important;
             font-size: 0.85rem !important;
             font-weight: 700 !important;
@@ -182,7 +188,7 @@
             font-family: 'Montserrat', sans-serif !important;
             text-transform: uppercase !important;
             letter-spacing: 0.05em !important;
-            z-index: 100 !important;
+            z-index: 11001 !important;
             white-space: nowrap !important;
             box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
             will-change: transform, box-shadow;
@@ -191,21 +197,31 @@
         #story-continue-btn:hover {
             background: rgba(0, 255, 136, 0.25) !important;
             box-shadow: 0 0 25px rgba(0, 255, 136, 0.5) !important;
-            transform: translateY(-2px);
+            transform: translate(-50%, -2px) !important;
         }
 
+        /* Conteneur neutre : le bouton est en position:fixed, ce bloc ne doit
+           donc creer ni bloc conteneur (backdrop-filter) ni bande visible. */
         .story-continue-wrap {
             display: none;
             flex-direction: row;
             justify-content: center;
             align-items: center;
             gap: 12px;
-            padding: 10px;
+            padding: 0;
             flex-shrink: 0;
-            background: rgba(5, 5, 10, 0.8);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: transparent;
+            border-top: none;
+        }
+
+        /* Ecrans peu hauts : on reduit la taille de l'echiquier pour reserver
+           la bande du bouton Continuer (fixe en bas) et ne jamais recouvrir
+           la derniere rangee. L'echiquier reste carre et jamais tronque. */
+        @media (max-height: 700px) {
+            .chess-board {
+                width: min(76vw, calc(100vh - 200px));
+                height: min(76vw, calc(100vh - 200px));
+            }
         }
     </style>
 </head>
@@ -240,6 +256,7 @@
 
     <script src="chess-game.js"></script>
     <script src="../settings-menu.js"></script>
+    <script src="standalone-theme.js"></script>
     <script>
         (function () {
             'use strict';

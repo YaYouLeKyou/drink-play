@@ -102,6 +102,19 @@
         }
 
         parseParams();
+
+        // Expose theme globally for mini-games that use window.getThemeId / window.THEME_ASSETS
+        try {
+            if (typeof window !== 'undefined') {
+                window.getThemeId = function () {
+                    return themeId || 'agatha-christie';
+                };
+                if (!window.THEME_ASSETS) {
+                    window.THEME_ASSETS = {};
+                }
+            }
+        } catch (e) {}
+
         loadGame();
         setupControls();
     }
@@ -142,6 +155,14 @@
     }
 
     var retroLevel = 1;
+
+    function getThemeId() {
+        return themeId || 'agatha-christie';
+    }
+
+    function getThemeAssets() {
+        return (typeof window !== 'undefined' && window.THEME_ASSETS && window.THEME_ASSETS[themeId]) || (typeof window !== 'undefined' && window.THEME_ASSETS && window.THEME_ASSETS['agatha-christie']) || {};
+    }
 
     function loadGame() {
         if (!gameType) return;

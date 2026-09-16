@@ -191,6 +191,19 @@
             background: rgba(0, 255, 136, 0.3);
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
         }
+
+        /* styles.css est charge apres ce <style> et redefinit .btn-continue en bas
+           au centre (bottom/left/transform). Sans ce rappel, le bouton se retrouve
+           avec top ET bottom definis : il s'etire alors sur toute la hauteur de
+           l'ecran et masque le puzzle. */
+        #story-continue-btn {
+            top: 15px !important;
+            right: 20px !important;
+            bottom: auto !important;
+            left: auto !important;
+            transform: none !important;
+            max-width: none !important;
+        }
     </style>
 </head>
 <body>
@@ -238,6 +251,7 @@
     <script src="minigames.js"></script>
     <script src="standalone-game.js"></script>
     <script src="../settings-menu.js"></script>
+    <script src="standalone-theme.js"></script>
     <script>
         (function () {
             'use strict';

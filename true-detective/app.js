@@ -440,6 +440,15 @@
         return typeof ui.theme === 'string' ? ui.theme : (ui.theme.id || 'agatha-christie');
     }
 
+    function setThemeId(themeId) {
+        if (!themeId) return;
+        if (typeof themeId === 'string') {
+            ui.theme = themeId;
+        } else if (themeId && themeId.id) {
+            ui.theme = themeId;
+        }
+    }
+
     var STORAGE_PREFIX = 'trueDetective_cache_';
 
     function getStorageKey(key) {
@@ -4069,7 +4078,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.continueBtn.onclick = function () {
             $.continueBtn.disabled = true;
             if (standaloneType) {
-                window.location.href = getMinigameStandaloneUrl(standaloneType, diff, langParam, 'story');
+                window.location.href = getMinigameStandaloneUrl(standaloneType, diff, langParam, 'story', getThemeId());
             } else {
                 scrLaunchMinigame(page);
             }
@@ -4322,7 +4331,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             $.continueBtn.disabled = false;
             $.continueBtn.textContent = getText('continue') || 'Continuer';
             $.continueBtn.onclick = function () {
-                window.location.href = getMinigameStandaloneUrl(standaloneType, diff, langParam, 'story');
+                window.location.href = getMinigameStandaloneUrl(standaloneType, diff, langParam, 'story', getThemeId());
             };
             return;
         }
@@ -4609,7 +4618,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         return cfg;
     }
 
-      function getMinigameStandaloneUrl(type, diff, lang, mode) {
+      function getMinigameStandaloneUrl(type, diff, lang, mode, themeId) {
           var standalonePages = {
               'marginal-tower': 'marginal-tower.html',
               'memory': 'memory.html',
@@ -4631,7 +4640,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
           };
 
          if (standalonePages[type]) {
-             var url = standalonePages[type] + '?difficulty=' + diff + '&lang=' + lang;
+             var url = standalonePages[type] + '?difficulty=' + diff + '&lang=' + lang + '&theme=' + encodeURIComponent(themeId || getThemeId());
              if (mode === 'story') url += '&story=1';
              return url;
          }
@@ -4641,13 +4650,13 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
              if (diff === 'medium') page = 'reseau-alibis-2.html';
              else if (diff === 'hard') page = 'reseau-alibis-3.html';
              else if (diff === 'extreme') page = 'reseau-alibis-4.html';
-             return page + '?difficulty=' + diff + '&lang=' + lang + (mode === 'story' ? '&story=1' : '');
+             return page + '?difficulty=' + diff + '&lang=' + lang + '&theme=' + encodeURIComponent(themeId || getThemeId()) + (mode === 'story' ? '&story=1' : '');
          }
 
          if (['pong', 'pacman', 'space-invaders', 'breakout', 'asteroids'].indexOf(type) >= 0) {
-             return 'standalone-game.html?game=' + type + '&level=' + diff + '&lang=' + lang + (mode ? ('&mode=' + mode) : '');
+             return 'standalone-game.html?game=' + type + '&level=' + diff + '&lang=' + lang + '&theme=' + encodeURIComponent(themeId || getThemeId()) + (mode ? ('&mode=' + mode) : '');
          }
-         return 'standalone-game.html?game=' + type + '&difficulty=' + diff + '&lang=' + lang + (mode ? ('&mode=' + mode) : '');
+         return 'standalone-game.html?game=' + type + '&difficulty=' + diff + '&lang=' + lang + '&theme=' + encodeURIComponent(themeId || getThemeId()) + (mode ? ('&mode=' + mode) : '');
      }
 
     function getGlobalGameMap() {
@@ -4703,16 +4712,30 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
 
         if (minigameType === 'marginal-tower') {
             showDifficultySelection({ type: 'marginal-tower', title: title }, function (selectedDifficulty) {
-                window.location.href = getMinigameStandaloneUrl('marginal-tower', selectedDifficulty, (ui.language === 'en' ? 'en' : 'fr'), 'selection');
+                window.location.href = getMinigameStandaloneUrl('marginal-tower', selectedDifficulty, (ui.language === 'en' ? 'en' : 'fr'), 'selection', getThemeId());
+            });
+            return;
+        }
+
+        if (minigameType) {
+            showDifficultySelection({ type: minigameType, title: title }, function (selectedDifficulty) {
+                window.location.href = getMinigameStandaloneUrl(minigameType, 1, (ui.language === 'en' ? 'en' : 'fr'), 'selection', getThemeId());
+            });
+            return;
+        }
+
+        if (minigameType) {
+            showDifficultySelection({ type: minigameType, title: title }, function (selectedDifficulty) {
+                window.location.href = getMinigameStandaloneUrl(minigameType, 2, (ui.language === 'en' ? 'en' : 'fr'), 'selection', getThemeId());
             });
             return;
         }
 
         // Retro games use level (1-3) instead of difficulty number
         if (['pong', 'pacman', 'space-invaders', 'breakout', 'asteroids'].indexOf(minigameType) >= 0) {
-            window.location.href = getMinigameStandaloneUrl(minigameType, 1, (ui.language === 'en' ? 'en' : 'fr'), 'selection');
+            window.location.href = getMinigameStandaloneUrl(minigameType, 1, (ui.language === 'en' ? 'en' : 'fr'), 'selection', getThemeId());
         } else {
-            window.location.href = getMinigameStandaloneUrl(minigameType, 2, (ui.language === 'en' ? 'en' : 'fr'), 'selection');
+            window.location.href = getMinigameStandaloneUrl(minigameType, 2, (ui.language === 'en' ? 'en' : 'fr'), 'selection', getThemeId());
         }
     }
 
@@ -4953,7 +4976,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
 
         try {
             if (roundCfg.type === 'reseau_alibis' || roundCfg.type === 'chemistry') {
-                var standaloneUrl = getMinigameStandaloneUrl(roundCfg.type, mgCfg.difficulty || 'medium', ui.language, 'story');
+                var standaloneUrl = getMinigameStandaloneUrl(roundCfg.type, mgCfg.difficulty || 'medium', ui.language, 'story', getThemeId());
                 var iframe = document.createElement('iframe');
                 iframe.src = standaloneUrl;
                 iframe.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:none;background:#05050a;z-index:11050;';
@@ -5344,6 +5367,7 @@ function scrApplyChoice(choiceKey, choiceId) {
     window.THEME_ASSETS = THEME_ASSETS;
     window.scr = scr;
     window.getThemeId = getThemeId;
+    window.setThemeId = setThemeId;
     window.scrNpcImage = scrNpcImage;
     window.MINIGAME_LOCATIONS = MINIGAME_LOCATIONS;
     window.scrDecorImage = scrDecorImage;
