@@ -809,6 +809,8 @@
 
             function init() {
 
+                var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+
                 var faceWrap = document.getElementById('face-wrap');
 
                 var dosWrap = document.getElementById('dos-wrap');
@@ -1023,7 +1025,7 @@
 
                         var continueButtonElem = document.getElementById('story-continue-btn');
 
-                        if (continueButtonElem && urlParams.get('story') === '1') {
+                        if (continueButtonElem && fromStory) {
 
                             continueButtonElem.style.display = 'inline-block';
 
@@ -1301,10 +1303,6 @@
 
                 /* Back button */
 
-                var urlParams = new URLSearchParams(window.location.search);
-
-                var fromStory = urlParams.get('story') === '1';
-
                 if (fromStory) {
 
                     if (backBtn) backBtn.style.display = 'none';
@@ -1408,6 +1406,11 @@
                             if (revealed >= CODE.length) {
 
                                 unlockCodeCells();
+
+                                if (fromStory) {
+                                    var sb = document.getElementById('story-continue-btn');
+                                    if (sb) sb.style.display = 'inline-block';
+                                }
 
                             }
 

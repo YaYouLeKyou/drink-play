@@ -282,7 +282,7 @@
         coffre_code: 'enigme classic 2.mp3',
         reseau_alibis: 'enigme classic.mp3',
         chemistry: 'enigme-cyberpunk-2.mp3',
-        chess: 'chess.mp3',
+        chess: 'enigme classic 2.mp3',
         memory: 'enigme classic.mp3',
         shooting: 'mini-jeux-cyberpunk.mp3',
         jackpot: 'Neon Paradise.mp3',

@@ -17,7 +17,7 @@
         'coffre_code': 'enigme classic 2.mp3',
         'reseau_alibis': 'enigme classic.mp3',
         'chemistry': 'enigme-cyberpunk-2.mp3',
-        'chess': 'chess.mp3',
+        'chess': 'enigme classic 2.mp3',
         'memory': 'enigme classic.mp3',
         'shooting': 'mini-jeux-cyberpunk.mp3',
         'jackpot': 'Neon Paradise.mp3',
@@ -64,16 +64,16 @@
     window.playMinigameMusic = function (type) {
         if (!type || !TRACKS[type]) return;
         currentType = type;
-        started = false; // réautoriser le démarrage au prochain geste
         // 1) Service du parent si iframe
         try {
             var svc = window.TDAudioService || (window.parent && window.parent.TDAudioService);
-            if (svc && svc.playMinigameMusic) { svc.playMinigameMusic(type); return; }
+            if (svc && svc.playMinigameMusic) { svc.playMinigameMusic(type); started = true; return; }
         } catch (e) {}
         // 2) Fallback local (page ouverte hors iframe)
+        //    Le navigateur bloque l'autoplay sans geste utilisateur :
+        //    on ne lance pas la musique ici, on laisse onFirstGesture le faire.
         if (localAudio) { try { localAudio.pause(); } catch (e) {} localAudio = null; }
-        startLocalMusic(type);
-        started = true;
+        started = false; // réautoriser le démarrage au prochain geste
     };
 
     // Autoplay : la musique ne peut démarrer qu'après un geste utilisateur.
@@ -86,9 +86,11 @@
         } catch (e) {}
         if (!localAudio) startLocalMusic(currentType);
     }
-    document.addEventListener('click', onFirstGesture);
-    document.addEventListener('keydown', onFirstGesture);
-    document.addEventListener('touchstart', onFirstGesture, { passive: true });
+    // Capture phase so stopPropagation() on child elements doesn't block autoplay unlock.
+    document.addEventListener('click', onFirstGesture, true);
+    document.addEventListener('mousedown', onFirstGesture, true);
+    document.addEventListener('keydown', onFirstGesture, true);
+    document.addEventListener('touchstart', onFirstGesture, { capture: true, passive: true });
 
     // Type de mini-jeu lu depuis l'attribut data-minigame du script,
     // sinon depuis l'URL (?game= ou ?type=)
