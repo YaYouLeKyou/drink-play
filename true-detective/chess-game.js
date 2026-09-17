@@ -7,8 +7,16 @@
     'use strict';
 
     function playSfx(name, opts) {
-    playMinigameMusic('chess');
-        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+        try {
+            var fx = window.TDSfx || (window.parent && window.parent.TDSfx);
+            if (fx) fx.play(name, opts);
+        } catch (e) {}
+    }
+    function playMinigameMusic(type) {
+        try {
+            var svc = window.TDAudioService || (window.parent && window.parent.TDAudioService);
+            if (svc && svc.playMinigameMusic) svc.playMinigameMusic(type);
+        } catch (e) {}
     }
 
     var TDC_NS = 'td-chess';
@@ -767,6 +775,7 @@
     }
 
     function play(cfg, lang, onDone, target) {
+        playMinigameMusic('chess');
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
         if (!target) {
             var layer = document.getElementById('minigame-layer');

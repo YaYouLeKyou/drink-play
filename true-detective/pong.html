@@ -7,6 +7,7 @@
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
+    <link rel="stylesheet" href="../settings-menu.css">
     <style>
         :root {
             --bg-dark: #070712;
@@ -136,6 +137,8 @@
 
     <script src="../settings-menu.js"></script>
     <script src="standalone-theme.js"></script>
+    <script src="sfx.js"></script>
+    <script src="minigame-audio.js" data-minigame="pong"></script>
     <script>
         (function () {
             'use strict';
@@ -291,6 +294,7 @@
                     // Limiter vitesse maximale
                     if (Math.abs(ball.speedX) > ball.maxSpeed) ball.speedX = ball.speedX > 0 ? ball.maxSpeed : -ball.maxSpeed;
                     createParticles(ball.x, ball.y, '#00ff88');
+                    playSfx('paddle');
                 }
 
                 // Collision Raquette IA
@@ -306,16 +310,19 @@
                     ball.speedY = hitPoint * 0.25;
                     if (Math.abs(ball.speedX) > ball.maxSpeed) ball.speedX = ball.speedX > 0 ? ball.maxSpeed : -ball.maxSpeed;
                     createParticles(ball.x, ball.y, '#ff6b00');
+                    playSfx('paddle');
                 }
 
                 // Gestion des buts (Points)
                 if (ball.x < 0) {
                     ai.score++;
+                    playSfx('score');
                     updateScoreText();
                     checkGameOver();
                     resetBall('ai');
                 } else if (ball.x > canvas.width) {
                     player.score++;
+                    playSfx('score');
                     updateScoreText();
                     checkGameOver();
                     resetBall('player');
@@ -454,6 +461,14 @@
                     }
                 } catch (e) {}
                 window.location.href = fromStory ? '../true-detective/index.html?standalone=pong' : '../true-detective/index.html#minigames';
+            }
+
+            if (window.DPSettings && window.DPSettings.init) {
+                window.DPSettings.init({
+                    showMusicToggle: false, showMusicVolume: false, showNarrationVolume: false,
+                    showMuteToggle: false, showGameSection: true, showBackToHub: false, showRestart: false, showRules: false,
+                    onBackToHub: function () { window.location.href = '../true-detective/index.html#minigames'; }
+                });
             }
 
             if (fromStory) {

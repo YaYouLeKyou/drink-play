@@ -7,6 +7,7 @@
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
+    <link rel="stylesheet" href="../settings-menu.css">
     <style>
         :root {
             --bg-dark: #070712;
@@ -206,6 +207,8 @@
 
     <script src="../settings-menu.js"></script>
     <script src="standalone-theme.js"></script>
+    <script src="sfx.js"></script>
+    <script src="minigame-audio.js" data-minigame="shooting"></script>
     <script>
         (function () {
             'use strict';
@@ -267,6 +270,7 @@
 
             function checkShot(x, y) {
                 var hitSomething = false;
+                playSfx('gunshot');
                 for (var i = activeTargets.length - 1; i >= 0; i--) {
                     var t = activeTargets[i];
                     if (x >= t.x && x <= t.x + t.width && y >= t.y && y <= t.y + t.height) {
@@ -278,11 +282,13 @@
                             score += t.points;
                             targetsHit++;
                             dialogueEl.innerHTML = '<span style="color:var(--accent-green);">Cible neutralisée (' + t.name + ') : "' + t.quote + '"</span>';
+                            playSfx('target_hit');
                             activeTargets.splice(i, 1);
                         } else {
                             score += t.points;
                             misses++;
                             dialogueEl.innerHTML = '<span style="color:var(--accent-orange);">ERREUR ! Vous avez touché la Femme Fatale ! "' + t.quote + '"</span>';
+                            playSfx('scream_female');
                             activeTargets.splice(i, 1);
                         }
                         updateUI();
@@ -508,6 +514,14 @@
                     }
                 } catch (e) {}
                 window.location.href = fromStory ? '../true-detective/index.html?standalone=shooting' : '../true-detective/index.html#minigames';
+            }
+
+            if (window.DPSettings && window.DPSettings.init) {
+                window.DPSettings.init({
+                    showMusicToggle: false, showMusicVolume: false, showNarrationVolume: false,
+                    showMuteToggle: false, showGameSection: true, showBackToHub: false, showRestart: false, showRules: false,
+                    onBackToHub: function () { window.location.href = '../true-detective/index.html#minigames'; }
+                });
             }
 
             if (fromStory) {

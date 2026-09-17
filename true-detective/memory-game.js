@@ -8,8 +8,16 @@
     'use strict';
 
     function playSfx(name, opts) {
-    playMinigameMusic('memory');
-        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+        try {
+            var fx = window.TDSfx || (window.parent && window.parent.TDSfx);
+            if (fx) fx.play(name, opts);
+        } catch (e) {}
+    }
+    function playMinigameMusic(type) {
+        try {
+            var svc = window.TDAudioService || (window.parent && window.parent.TDAudioService);
+            if (svc && svc.playMinigameMusic) svc.playMinigameMusic(type);
+        } catch (e) {}
     }
 
     var ASSETS_BASE = 'assets/image true detective/';
@@ -214,6 +222,7 @@
     }
 
     function play(cfg, lang, onDone, target) {
+        playMinigameMusic('memory');
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
         if (!target) {
             var layer = document.getElementById('minigame-layer');

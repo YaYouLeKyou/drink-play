@@ -11,6 +11,12 @@
     function playSfx(name, opts) {
         try { if (global.TDSfx) global.TDSfx.play(name, opts); } catch (e) {}
     }
+    function playMinigameMusic(type) {
+        try {
+            var svc = window.TDAudioService || (window.parent && window.parent.TDAudioService);
+            if (svc && svc.playMinigameMusic) svc.playMinigameMusic(type);
+        } catch (e) {}
+    }
 
     function t(obj, lang) {
         if (!obj) return '';
@@ -168,6 +174,7 @@
     }
 
     function play(cfg, lang, onDone, target) {
+        playMinigameMusic('puzzle');
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
         if (!target) {
             var layer = document.getElementById('minigame-layer');

@@ -205,10 +205,31 @@
         }
     };
 
+    PERMUTATIONS['detective'] = {
+        id: 'detective',
+        coupable: { fr: 'L\'Inspecteur Wexford', en: 'Inspector Wexford' },
+        coComplice: { fr: 'Personne - Wexford agit seul', en: 'Nobody - Wexford acts alone' },
+        faussePiste: { fr: 'le coffre-fort vide et la lettre cachée', en: 'the emptied safe and hidden letter' },
+        lame: { fr: 'Victor Krane', en: 'Victor Krane' },
+        heure: '22:09',
+        mobile: { fr: 'Wexford, le partenaire fidèle, a orchestré le meurtre pour cacher sa corruption. Le coffre contenait les preuves de ses versements illégaux. Il l\'a vidé lui-même la veille de la pluie, connaissant la combinaison de la montre.', en: 'Wexford, the trusted partner, orchestrated the murder to hide his corruption. The safe contained proof of his illegal payments. He emptied it himself the night before the rain, knowing the watch combination.' },
+        alibi: { fr: 'Wexford a été vu sur plusieurs scènes, mais chacun s\'appuie sur ses propres mensonges. Personne n\'a vérifié qui l\'avait aidé à ouvrir le coffre.', en: 'Wexford was seen at multiple scenes, but everyone relied on his own lies. No one checked who helped him open the safe.' },
+        fouille: [
+            { label: '1', info: { fr: 'La note pliée dans le tiroir : "Le coffre a été vidé. Personne ne doit savoir. - W."', en: 'The crumpled note in the drawer: "The safe has been emptied. No one must know. - W."' } },
+            { label: 'X', info: { fr: 'Le mur de reconstruction bascule : un compartiment caché contient les contrats falsifiés et la lettre de Wexford.', en: 'The reconstruction wall swings open: a hidden compartment contains the forged contracts and Wexford\'s letter.' } }
+        ],
+        fouilleClue: { fr: 'Le coffre vide et la lettre cachée derrière le mur révèlent que Wexford a agi lui-même. Le vrai coupable est votre partenaire.', en: 'The empty safe and the letter hidden behind the wall reveal that Wexford acted alone. The true culprit is your partner.' },
+        clues: {
+            coffre_code: { fr: 'Le coffre est vide, mais la lettre derrière le mur révèle que Wexford l\'a vidé lui-même.', en: 'The safe is empty, but the letter behind the wall reveals Wexford emptied it himself.' },
+            bataille_navale: { fr: 'Chaque duel de bataille navale révèle une connaissance intime de l\'affaire que seul Wexford pourrait avoir.', en: 'Each battleship duel reveals intimate knowledge of the case that only Wexford could have.' },
+            lettre_cachee: { fr: 'La lettre signée Wexford, datée de la semaine dernière, contient les versements illégaux et l\'admission du meurtre.', en: 'The letter signed Wexford, dated last week, contains the illegal payments and admission of murder.' }
+        }
+    };
+
     /* API */
     var API = {
         DATA: PERMUTATIONS,
-        list: function () { return ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel']; },
+        list: function () { return ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel', 'detective']; },
         get: function (id) { return PERMUTATIONS[id] || PERMUTATIONS['protecteur']; }
     };
 

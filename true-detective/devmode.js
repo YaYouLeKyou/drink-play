@@ -225,10 +225,12 @@
                         if (page.minigame) {
                             mgLabel = ' [MG:' + page.minigame.type + ']';
                         } else if (isInterroMinigame) {
-                            mgLabel = ' [INT:' + page.interrogation + ']';
+                            var mgType = (interro && interro.minigame && interro.minigame.type) ? interro.minigame.type : 'mini-jeu';
+                            var hasIntro = !!(interro && interro.minigameIntro);
+                            mgLabel = ' [INT:' + page.interrogation + ' → ' + mgType + (hasIntro ? ' 🎭' : '') + ']';
                         }
                         pageBtn.textContent = 'P' + (pageIdx + 1) + (pageText ? ': ' + pageText : '') + mgLabel;
-                        pageBtn.title = page.text ? (page.text.fr || page.text.en || '') : (page.minigame ? ('Minigame: ' + page.minigame.type) : (isInterroMinigame ? ('Interrogation minigame: ' + page.interrogation) : ''));
+                        pageBtn.title = page.text ? (page.text.fr || page.text.en || '') : (page.minigame ? ('Minigame: ' + page.minigame.type) : (isInterroMinigame ? ('Interrogation minigame: ' + (interro && interro.minigame ? interro.minigame.type : '?') + (interro && interro.minigameIntro ? ' (page de dialogue de transition incluse)' : '')) : ''));
                         pageBtn.addEventListener('click', function () {
                             jumpToPhase(phaseIdx, pageIdx);
                         });

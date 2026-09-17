@@ -7,6 +7,7 @@
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
+    <link rel="stylesheet" href="../settings-menu.css">
     <style>
         :root {
             --bg-dark: #070712;
@@ -313,6 +314,8 @@
     <script src="minigames.js"></script>
     <script src="../settings-menu.js"></script>
     <script src="standalone-theme.js"></script>
+    <script src="sfx.js"></script>
+    <script src="minigame-audio.js" data-minigame="coffre_code"></script>
     <script>
         (function () {
             'use strict';
@@ -389,8 +392,10 @@
 
                 if (enteredCode === CORRECT_CODE) {
                     unlockSafe();
+                    playSfx('success');
                 } else {
                     // Erreur de code
+                    playSfx('fail');
                     containerEl.classList.add('shake');
                     setTimeout(function() {
                         containerEl.classList.remove('shake');
@@ -457,6 +462,14 @@
                     }
                 } catch (e) {}
                 window.location.href = fromStory ? '../true-detective/index.html?standalone=coffre_code' : '../true-detective/index.html#minigames';
+            }
+
+            if (window.DPSettings && window.DPSettings.init) {
+                window.DPSettings.init({
+                    showMusicToggle: false, showMusicVolume: false, showNarrationVolume: false,
+                    showMuteToggle: false, showGameSection: true, showBackToHub: false, showRestart: false, showRules: false,
+                    onBackToHub: function () { window.location.href = '../true-detective/index.html#minigames'; }
+                });
             }
 
             // Gestion de la navigation et du menu hamburger

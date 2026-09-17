@@ -6,8 +6,16 @@
     'use strict';
 
     function playSfx(name, opts) {
-    playMinigameMusic('jackpot');
-        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+        try {
+            var fx = window.TDSfx || (window.parent && window.parent.TDSfx);
+            if (fx) fx.play(name, opts);
+        } catch (e) {}
+    }
+    function playMinigameMusic(type) {
+        try {
+            var svc = window.TDAudioService || (window.parent && window.parent.TDAudioService);
+            if (svc && svc.playMinigameMusic) svc.playMinigameMusic(type);
+        } catch (e) {}
     }
 
     var SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '🔔', '💎', '7️⃣', '⭐'];
@@ -50,6 +58,7 @@
     }
 
     function init() {
+        playMinigameMusic('jackpot');
         var params = new URLSearchParams(window.location.search);
         var lang = params.get('lang') || 'fr';
         var spins = 8;

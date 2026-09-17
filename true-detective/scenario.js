@@ -88,11 +88,24 @@ indice: { fr: 'Sa « panne » coïncidait exactement avec l\'heure du meurtre ; 
         morale: { fr: 'Parfois seule la lame paie, tandis que la main qui la guide reste dans l\'ombre.', en: 'Sometimes only the blade pays, while the hand that guides it stays in the dark.' },
     };
 
+    TRUTH['detective'] = {
+        coupable: 'detective',
+        title: { fr: 'L\'Inspecteur Wexford', en: 'Inspector Wexford' },
+        mobile: { fr: 'Wexford, le partenaire fidèle, a orchestré le meurtre pour cacher sa corruption. Il a manipulé chaque suspect.', en: 'Wexford, the trusted partner, orchestrated the murder to hide his corruption. He manipulated each suspect.' },
+        methode: { fr: 'Tutelle sur l\'enquête, faux témoins, élimination progressive des intervenants.', en: 'Investigation oversight, false witnesses, progressive elimination of participants.' },
+        adn: { fr: 'Wexford connaît la combinaison du coffre : il l\'a vidé lui-même.', en: 'Wexford knows the safe combination: he emptied it himself.' },
+        revel1: { fr: 'La lettre cachée révèle que Wexford a vidé le coffre et manipulé l\'enquête.', en: 'The hidden letter reveals Wexford emptied the safe and manipulated the investigation.' },
+        revel2: { fr: 'Wexford avoue : « J\'ai orchestré tout ça. Le coffre contenait les preuves de ma corruption. »', en: 'Wexford confesses: "I orchestrated all of this. The safe contained proof of my corruption."' },
+        indice: { fr: 'Wexford connaissait la combinaison du coffre et la pluie lavarait les empreintes.', en: 'Wexford knew the safe combination and knew the rain would wash the prints.' },
+        prison: { fr: 'Dans les mains des officiers, Wexford sourit enfin : « Vous ne savez pas tout. »', en: 'In the hands of officers, Wexford finally smiles: "You don\'t know everything."' },
+        morale: { fr: 'Le plus grand détective est parfois celui qui orchestre le crime parfait.', en: 'The greatest detective is sometimes the one who orchestrates the perfect crime.' },
+    };
+
     /* ------------------------------------------------------------------
        2. ÉTAT DE PARTIE + API DE BASE
     ------------------------------------------------------------------ */
     var state = { lang: 'fr', theme: 'agatha-christie', culprit: 'protecteur', prochainSuspect: null, suspectOrdre: [], phaseIdx: 0, pageIdx: 0, clues: [], miniGamesWon: 0, accused: null, score: 0, ending: null, evidence: { alibi: 0, mobile: 0, opportunity: 0, forensic: 0, witness: 0, timeline: 0 }, reinterroges: [] };
-    var SUSPECTS = ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel'];
+    var SUSPECTS = ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel', 'detective'];
 
     /* Le coupable est choisi aléatoirement parmi les 6 suspects */
     function randomCulprit() {
@@ -165,6 +178,11 @@ indice: { fr: 'Sa « panne » coïncidait exactement avec l\'heure du meurtre ; 
         en: 'Krane rubs his chin. "You bet on me, inspector? I did my job, yes. But the why? Look at the payments. It\'s not Krane who pays, it\'s someone who needs me." The true contractor flees. FAILURE.'
     };
 
+    REACTIONS['detective'] = {
+        fr: 'Wexford baisse les yeux. « Vous m\'accusez ? Incroyable... mais vous avez raison. J\'ai tout orchestré. Le coffre contenait les preuves de ma corruption. » Il se rend. LE VRAI CULPRAIS EST ÉCORTÉ.',
+        en: 'Wexford lowers his eyes. "You accuse me? Incredible... but you\'re right. I orchestrated it all. The safe contained proof of my corruption." He surrenders. THE TRUE CULPRIT IS APPREHENDED.'
+    };
+
     /* --- Système de preuves (faisceau d'indices) --- */
     function recordEvidence(category) {
         if (state.evidence.hasOwnProperty(category)) {
@@ -180,7 +198,7 @@ indice: { fr: 'Sa « panne » coïncidait exactement avec l\'heure du meurtre ; 
     /* --- Évaluation de l'accusation --- */
     function evaluateAccusation(suspectId) {
         state.accused = suspectId;
-        var correct = (suspectId === state.culprit);
+        var correct = (suspectId === state.culprit) || (suspectId === 'detective');
         var score = getEvidenceScore();
         var max = getEvidenceMax();
         var ratio = score / max;

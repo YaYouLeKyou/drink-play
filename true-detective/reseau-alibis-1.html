@@ -220,10 +220,12 @@
             var backBtn = document.getElementById('back-to-minigame-btn');
             var continueBtn = document.getElementById('story-continue-btn');
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1' || new URLSearchParams(window.location.search).get('mode') === 'story';
+            var gameResult = null;
 
             function handleContinueNavigation() {
+                var won = (gameResult && typeof gameResult.won === 'boolean') ? gameResult.won : true;
                 try { 
-                    localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau_alibis', won: true, ts: Date.now() })); 
+                    localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau_alibis', won: won, ts: Date.now() })); 
                 } catch (e) {}
                 try {
                     var returnRaw = localStorage.getItem('td_standalone_game_return');
@@ -241,7 +243,7 @@
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
                 if (continueBtn) {
-                    continueBtn.style.display = 'block';
+                    continueBtn.style.display = 'none';
                     continueBtn.addEventListener('click', handleContinueNavigation);
                 }
             } else {
@@ -295,9 +297,8 @@
                 target.innerHTML = '';
                 if (window.TDMiniGames && typeof window.TDMiniGames.play === 'function') {
                     window.TDMiniGames.play(cfg, cfg.lang || 'fr', function(result) {
-                        if (result && result.won) {
-                            if (fromStory && continueBtn) continueBtn.style.display = 'block';
-                        }
+                        gameResult = result || null;
+                        if (fromStory && continueBtn) continueBtn.style.display = 'block';
                     }, target);
                 } else {
                     target.innerHTML = '<div style="color: #ff6b6b; text-align: center; padding: 20px;">Erreur : Le fichier de mini-jeux (minigames.js) est introuvable ou n\'a pas pu se charger correctement.</div>';

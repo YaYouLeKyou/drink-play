@@ -183,6 +183,14 @@
         },
         fail: function () {
             playSweep(200, 80, 0.2, 0.3, 'sawtooth');
+        },
+        paddle: function () {
+            playTone(440, 0.05, 'square', 0.3);
+            playNoise(0.03, 0.1, { filterFreq: 3000 });
+        },
+        score: function () {
+            playTone(880, 0.1, 'sine', 0.3);
+            playTone(1320, 0.12, 'sine', 0.2);
         }
     };
 

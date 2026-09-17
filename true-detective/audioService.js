@@ -287,6 +287,7 @@
         shooting: 'mini-jeux-cyberpunk.mp3',
         jackpot: 'Neon Paradise.mp3',
         connect4: 'enigme classic.mp3',
+        sudoku: 'enigme classic.mp3',
         'bataille-navale': 'bataille-navale.mp3',
         pong: 'pong.mp3',
         pacman: 'pacman.mp3',

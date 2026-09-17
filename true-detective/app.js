@@ -604,14 +604,28 @@ function saveSettings() {
                             try {
                                 var rp = JSON.parse(returnRaw);
                                 localStorage.removeItem('td_standalone_game_return');
-                                if (rp && typeof rp.phaseIdx === 'number') {
-                                    if (rp.lang === 'en' || rp.lang === 'fr') { ui.language = rp.lang; try { if (TDScenario && TDScenario.getState) TDScenario.getState().lang = rp.lang; } catch (eA) {} }
-                                    if (rp.theme && typeof setThemeId === 'function') { try { setThemeId(rp.theme); } catch (eB) {} }
-                                    if (rp.culprit && TDScenario && TDScenario.getState) { try { TDScenario.getState().culprit = rp.culprit; } catch (eC) {} }
-                                    scr.active = true; scr.awaitingChoice = false;
-                                    scr.phaseIdx = rp.phaseIdx; scr.pageIdx = (rp.pageIdx || 0) + 1;
-                                    scr.interro = { id: rp.interroId || 'standalone', questionRound: 99, minigameRound: 0, done: false, questionsDone: true, fromDuel: true };
-                                    scrEnsureThemeMusic();
+                                    if (rp && typeof rp.phaseIdx === 'number') {
+                                        if (rp.lang === 'en' || rp.lang === 'fr') { ui.language = rp.lang; try { if (TDScenario && TDScenario.getState) TDScenario.getState().lang = rp.lang; } catch (eA) {} }
+                                        if (rp.theme && typeof setThemeId === 'function') { try { setThemeId(rp.theme); } catch (eB) {} }
+                                        if (rp.culprit && TDScenario && TDScenario.getState) { try { TDScenario.getState().culprit = rp.culprit; } catch (eC) {} }
+                                        var sd = state();
+                                        scr.active = true; scr.awaitingChoice = false;
+                                        scr.phaseIdx = rp.phaseIdx; scr.pageIdx = (rp.pageIdx || 0) + 1;
+                                        scr.interro = { id: rp.interroId || 'standalone', questionRound: 99, minigameRound: 0, done: false, questionsDone: true, fromDuel: true };
+                                        if (result && result.won) {
+                                            if (typeof sd.miniGamesWon === 'number') sd.miniGamesWon++; else sd.miniGamesWon = 1;
+                                            if (typeof sd.score === 'number') sd.score += 10; else sd.score = 10;
+                                        }
+                                        if (result && result.clue) {
+                                            if (!sd.clues) sd.clues = [];
+                                            if (sd.clues.indexOf(result.clue) === -1) sd.clues.push(result.clue);
+                                            if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
+                                                window.TDNarrativeEngine.addClue(result.clue, 'dialogue');
+                                            }
+                                            showClueToast(result.clue);
+                                            updateNotebook();
+                                        }
+                                        scrEnsureThemeMusic();
                                     if ($.homeScreen) { $.homeScreen.classList.remove('active'); $.homeScreen.classList.add('hidden'); }
                                     if ($.themeScreen) { $.themeScreen.classList.remove('active'); $.themeScreen.classList.add('hidden'); }
                     if ($.gameScreen) { $.gameScreen.classList.remove('hidden'); $.gameScreen.classList.add('active'); }
@@ -3199,6 +3213,7 @@ function buildTransitionPages(sceneData) {
         'marginal': { fr: 'Silas Crane', en: 'Silas Crane' },
         'scientifique': { fr: 'Dr Whitmore', en: 'Dr Whitmore' },
         'criminel': { fr: 'Victor Krane', en: 'Victor Krane' },
+        'detective': { fr: 'L\'Inspecteur Wexford', en: 'Inspector Wexford' },
     };
 
     var THEME_NPC_NAMES = {
@@ -3212,6 +3227,7 @@ function buildTransitionPages(sceneData) {
             'marginal': { fr: 'Ghost', en: 'Ghost' },
             'scientifique': { fr: 'Dr. Synapse', en: 'Dr. Synapse' },
             'criminel': { fr: 'Razor', en: 'Razor' },
+            'detective': { fr: 'Inspector Cipher', en: 'Inspector Cipher' },
         },
         'film-noir': {
             'detective-partner': { fr: 'Détective Reeves', en: 'Detective Reeves' },
@@ -3222,6 +3238,7 @@ function buildTransitionPages(sceneData) {
             'marginal': { fr: 'Eddie', en: 'Eddie' },
             'scientifique': { fr: 'Dr. Coroner', en: 'Dr. Coroner' },
             'criminel': { fr: 'Louie the Blade', en: 'Louie the Blade' },
+            'detective': { fr: 'Inspector Crowe', en: 'Inspector Crowe' },
         },
     };
 
@@ -3281,6 +3298,7 @@ function buildTransitionPages(sceneData) {
             suspect: { fr: 'Ledger-9', en: 'Ledger-9' },
             marginal: { fr: 'Ghost', en: 'Ghost' },
             criminel: { fr: 'Razor', en: 'Razor' },
+            detective: { fr: 'Inspector Cipher', en: 'Inspector Cipher' },
         },
         'film-noir': {
             protecteur: { fr: 'Mike Malone', en: 'Mike Malone' },
@@ -3289,6 +3307,7 @@ function buildTransitionPages(sceneData) {
             suspect: { fr: 'Vincent Crowe', en: 'Vincent Crowe' },
             marginal: { fr: 'Eddie', en: 'Eddie' },
             criminel: { fr: 'Louie the Blade', en: 'Louie the Blade' },
+            detective: { fr: 'Inspector Crowe', en: 'Inspector Crowe' },
         },
     };
 
@@ -5100,7 +5119,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             if (page.choiceKey === 'accuser') {
                 var s2 = scrGetState();
                 var reinterroges2 = s2.reinterroges || [];
-                var suspects = ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel'];
+                var suspects = ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel', 'detective'];
                 suspects.forEach(function (suspectId) {
                     if (reinterroges2.indexOf(suspectId) >= 0) return;
                     var btn = document.createElement('button');
@@ -5173,7 +5192,7 @@ function scrApplyChoice(choiceKey, choiceId) {
             }
         } else if (choiceKey === 'choisirSuspect') {
             s.prochainSuspect = choiceId;
-            var all = ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel'];
+            var all = ['protecteur', 'femme-fatale', 'seducteur', 'suspect', 'marginal', 'criminel', 'detective'];
             var others = all.filter(function (x) { return x !== choiceId; });
             s.suspectOrdre = [choiceId].concat(others);
             if (!s.reinterroges) s.reinterroges = [];
@@ -5241,9 +5260,32 @@ function scrApplyChoice(choiceKey, choiceId) {
         var exileTxt = scrGetOutroText('exile', lang);
         var methodeTxt = scrSubstituteNames(TDScenario.t(truth.methode, lang), themeId);
         var prisonTxt = scrSubstituteNames(TDScenario.t(truth.prison, lang), themeId);
-
+        
         var pages = [];
-        if (good) {
+        if (s.accused === 'detective') {
+            /* Twist ending - Accusation de Wexford : 3 pages (prison → cellule du vrai coupable → photo) */
+            pages.push({
+                decor: 'prison', npc: 'detective-partner',
+                text: {
+                    fr: '<div class="accuse-screen"><div class="accuse-result success">✅ TWIST - LE PARTAIRE ÉTAIT LE CULPABLE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Wexford a vidé le coffre-fort lui-même. Derrière la reconstruction, il a manipulé l\'enquête dans son ensemble.</div></div><div class="ending-text">Face à vos preuves, Wexford avoue. « Vous ne comprendrez jamais tout… » Il est mené en prison, les mains liées.</div>',
+                    en: '<div class="accuse-screen"><div class="accuse-result success">✅ TWIST - THE PARTNER WAS THE CULPRIT</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Wexford emptied the safe himself. Behind the reconstruction, he manipulated the entire investigation.</div></div><div class="ending-text">Face to your evidence, Wexford confesses. "You will never understand everything…" He is led away to prison, hands bound.</div>'
+                }
+            });
+            pages.push({
+                decor: 'prison', npc: truth.culprit,
+                text: {
+                    fr: '<div class="ending-text">Le vrai meurtrier, ' + titleTxt + ', est finalement arrêté grâce à votre perspicacité. Wexford a orchestré son crime, mais vous avez percé le secret du coffre vide.</div>',
+                    en: '<div class="ending-text">The real murderer, ' + titleTxt + ', is finally arrested thanks to your insight. Wexford orchestrated his crime, but you pierced the secret of the emptied safe.</div>'
+                }
+            });
+            pages.push({
+                decor: 'sherlock', npc: null,
+                text: {
+                    fr: '<div class="ending-text">' + winTxt + ' ' + morale + '</div>',
+                    en: '<div class="ending-text">' + winTxt + ' ' + morale + '</div>'
+                }
+            });
+        } else if (good) {
             /* Fin 1 - Accusation juste : 3 pages (prison → QG extérieur → photo univers) */
             pages.push({
                 decor: 'prison', npc: truth.culprit,
@@ -5323,7 +5365,7 @@ function scrApplyChoice(choiceKey, choiceId) {
     function buildEnding(s) {
         var truth = TDScenario.getTruth();
         var evalResult = TDScenario.evaluateAccusation(s.accused);
-        var correct = (s.accused === s.culprit);
+        var correct = (s.accused === s.culprit) || (s.accused === 'detective');
         var lang = s.lang || ui.language;
         var themeId = getThemeId();
         var revealed = correct;

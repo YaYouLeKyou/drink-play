@@ -47,7 +47,8 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 - La montre du Duc attire volontairement l'attention sur son **DOS** (gravure à 4 chiffres) → le joueur distrait n'y voit qu'un code.
 - Le **joueur attentif** remarque sur la **FACE** l'aiguille figée à **22h09** → il établit l'heure du crime, un fait que PERSONNE d'autre ne possède.
 - **Payoff** : l'alibi de Hale (22h, panne avec Pembrooke) recouvre exactement 22h09. L'horloge-mère du pavillon, remontée en Acte 3, **confirme** 22h09. Sans la montre, le twist tombe à plat ; avec elle, le joueur « sait » avant les personnages.
-- **Note** : le code à 4 chiffres au dos de la montre a été conservé comme indice narratif (consigné dans le journal du détective) ; il n'ouvre plus de coffre en V6. L'essentiel des « documents du coffre » (dettes de Blackwood, liaison Vivienne-Hale) est désormais délivré par les dépositions des suspects dans les Réseaux d'Alibis.
+- **Le code 1981** au dos de la montre ouvre le coffre-fort en Acte 3 — mais le coffre est **vide**. Le vrai coffre a été vidé par **Wexford** la nuit du crime.
+- **Note** : le code à 4 chiffres au dos de la montre a été conservé comme indice narratif (consigné dans le journal du détective). Le vrai contenu des documents du coffre (dettes de Blackwood, liaison Vivienne-Hale, **paiements de Wexford**) est délivré par les dépositions des suspects dans les Réseaux d'Alibis et par la **muraille de reconstruction** en Acte 3.
 
 ### Le FAISCEAU DE PREUVES, mécanique de résolution (V3)
 - **Principe** : aucune énigme n'est « clé unique ». Chaque mini-jeu alimente une catégorie de preuves parmi 6 : `alibi`, `mobile`, `opportunity`, `forensic`, `witness`, `timeline`.
@@ -157,39 +158,67 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
     - **Krane** (mensonge) : « Cette nuit-là, j'étais seul dans le bureau du Duc. » (ADN sur l'arme)
     - **INDICE MAJEUR** : le réseau révèle que chacun avait une raison légitime d'être au manoir, mais le coffre est la clé. Silas et Krane corroborent leur rencontre.
 
-### ACTE III, Phase 1 « Tension » (dialogue, musique tension)
-1. **MINI-JEU `puzzle` (QG)**, assembler les formes géométriques de Victor Krane :
-   - **« LE DUC ENGAGE KRANE »**, la complicité est établie.
-   - **INDICE MAJEUR** : le contrat a été signé par le Duc pour éliminer Pembrooke, mais l'arme a tué le maître. Le vrai commanditaire est Hale, qui a orchestré le meurtre.
-2. *(residence, Lady Vivienne)* Les fichiers du coffre : Vivienne trompait la victime avec Hale.
-3. *(residence, Hale)* « Je n'ai rien dit de tout cela ! Vous n'avez aucune preuve ! »
+### ACTE III, Phase 1 « Le Coffre vide » (dialogue, musique tension)
 
-### ACTE III, Phase 2 « Révélation » (dialogue, musique tension)
-1. *(qg, Wexford)* « Si la durite a été coupée, alors Hale savait où et quand aider Pembrooke. » → la panne était un faux alibi coordonné.
-2. *(secretPlace, Silas Crane)* « Blackwood m'a payé pour mentir. Le rôdeur, c'était Pembrooke. » → confirmation du complice.
-3. *(alley, Krane)* Le téléphone de Hale sonne. C'est Krane : « Le Duc m'a engagé pour tuer Pembrooke. Mais l'arme a tué le maître. Hale l'a orchestré. »
+**Le twist central** : le coffre-fort est **déjà vide** lorsque le joueur arrive.  
+1. *(crimeScene, Wexford)* « Allez, inspecteur. La combinaison de la montre... et ouvrez-moi ce coffre. » → Le coffre grince, s'ouvre... et est **vide**. Plus aucun document, plus aucun billet.  
+   **INDICE MAJEUR** : le coffre a été vidé **avant** que la police n'arrive. Quelqu'un connaissait la combinaison.
+2. *(crimeScene, Wexford)* « Regardez cette muraille de reconstruction. Elle couvre une ancienne porte secrète... » → En poussant le panneau latéral, le mur **basculle** révélant un **compartiment caché**. À l'intérieur : des contrats falsifiés, des registres de versements, et une **lettre signée Wexford** (datée de la semaine précédente).  
+   **INDICE MAJEUR** : le partenaire… a-t-il été dans le manoir ?
+3. Wexford, pâle, tente de justifier : « Ces papiers... ils datent de la semaine dernière. Je les ai ramenés de l'extérieur. » Mais la pluie de la veille a lavé les empreintes du hall. Personne n'a pu franchi le seuil sans être vu.  
+   **INDICE MAJEUR** : Wexford est entré **la nuit du crime**, seul, sans laisser de traces.
 
-### ACTE III, Phase 3 « Révélation finale » (dialogue, musique stress)
-1. *(alley, Krane)* « Je ne connaissais pas la victime par hasard. C'est Hale qui m'a contacté. »
-2. *(residence, Hale)* Hale se contredit : il décrit la mare de sang avec trop de précision, porte verrouillée à son retour.
-3. **CHOIX FINAL `accuser`** (QG, Wexford) : protecteur / femme-fatale / seducteur / suspect / marginal / criminel.
+### ACTE III, Phase 2 « Les 6 branches » (dialogue, musique tension)
 
-### OUTRO « Épilogue » (généré par app.js selon `accuser`)
+Le coffre vide a transformé l'enquête. Chacun des 6 suspects est convoqué au parloir. Le joueur choisit qui interroger en premier — **ce choix déclenche une branche unique**. Chaque branche se termine par une **bataille navale** contre le suspect : un duel tactique où la victoire révèle un indice, la défaite le cache.
 
-**Bonne accusation (protecteur)**, écran de victoire avec faisceau de preuves complet :
-- Le Major Hale s'effondre : « Tout ça pour elle… mais elle ne m'a jamais aimé. »
-- Victor Krane (la lame) avoue : « Le garde du corps m'a payé. »
-- Lady Vivienne complice démasquée, Julian Pembrooke alibi tombé.
-- Morale : « De l'amour à la folie criminelle, il n'y a qu'une obsession. »
+**BRAIVCHE 1 — protecteur (Major Hale)** : Hale nie avec violence. « Ce n'est pas moi qui ai vidé le coffre. Wexford était dans la maison, pas moi ! »  
+- **Bataille navale** : Hale joue avec férocité. Victoire = il avoue avoir vu Wexford sortir du bureau à 22h09. Défaite = il accuse Pembrooke.  
+- **Indice** : Hale mentionne une **conversation téléphonique** avec Wexford la veille.
 
-**Mauvaise accusation**, chaque innocent a une **réaction unique** qui indique au joueur ce qu'il a manqué :
-- **femme-fatale** : Lady Vivienne esquisse un sourire glacial. « Vous croyez vraiment que je me serais salie les mains ? Vous manquez de preuves, inspecteur. » → Le véritable commanditaire vous échappe. ÉCHEC.
-- **seducteur** : Julian Pembrooke pâle. « C'est une erreur… j'étais en panne, je vous l'ai dit ! » → La panne était factice, mais il n'était que l'alibi. ÉCHEC.
-- **suspect** : Rupert Blackwood ricane. « J'étais parti à 21h30, Silas Crane peut le confirmer. Ce n'est pas moi qui ai sectionné cette durite… ni payé Krane. » ÉCHEC.
-- **marginal** : Silas Crane secoue la tête. « Je ne suis qu'un clochard, pas un meurtrier. J'ai VU le rôdeur à 22h, suivez cette piste, trouvez qui il était. » ÉCHEC.
-- **criminel** : Victor Krane sourit lentement. « Je ne suis que le bras, inspecteur. La main qui m'a guidé, c'est Hale, mon employeur. Relisez les versements dans le coffre. » ÉCHEC.
+**BRAIVCHE 2 — femme-fatale (Lady Vivienne)** : Vivienne se frotte le cou. « Ce coffre contenait des preuves contre moi... mais pas celles que je craignais. »  
+- **Bataille navale** : Elle joue d'une élégance glacialle. Victoire = elle avoue avoir payé Wexford pour saboter l'enquête. Défaite = elle s'accroît à l'innocence.  
+- **Indice** : La lettre au coffre est en réalité **un faux** signé Wexford.
 
-**Dans tous les cas d'échec** : le vrai coupable s'échappe, le joueur perd son badge, fin dépressive. Le faisceau de preuves (affiché à l'écran) montre exactement quelles catégories étaient insuffisantes.
+**BRAIVCHE 3 — seducteur (Julian Pembrooke)** : « Le coffre ? Je suis resté au bar toute la nuit. Mais Wexford... il est passé chez moi à 21h30, en sueur. »  
+- **Bataille navale** : Pembrooke mise gros. Victoire = il décrit le **code du coffre** (1981) qu'il n'aurait pas dû connaître. Défaite = il se ferme.  
+- **Indice** : Pembrooke avait vu Wexford avec Krane une semaine avant.
+
+**BRAIVCHE 4 — suspect (Rupert Blackwood)** : « Wexford m'a appelé mardi dernier. Il voulait acheter mes registres de notaire. »  
+- **Bataille navale** : Blackwood joue froid, calculé. Victoire = il avoue avoir effacé des pages du carnet pour Wexford. Défaite = il jurait de loyauté au Duc.  
+- **Indice** : Un paiement de 12 000 £ porte le nom **Wexford** dans les registres.
+
+**BRAIVCHE 5 — marginal (Silas Crane)** : « Le coffre n'était pas verrouillé ce soir-là. Wexford a utilisé une de ses propres clefs. »  
+- **Bataille navale** : Silas joue avec la ruse du clochard. Victoire = il décrit **exactement** le visage de Wexford dans le hall. Défaite = il se tait.  
+- **Indice** : Wexford portait un manteau de police **noir**, pas le bleu habituel.
+
+**BRAIVCHE 6 — criminel (Victor Krane)** : « Wexford m'a payé pour le vol. Mais le meurtre... c'était un accident. »  
+- **Bataille navale** : Krane joue avec la précision d'un tueur. Victoire = il avoue tout : la lettre de Wexford, le code du coffre, le coupable final. Défeate = il protège Wexford.  
+- **Indice** : Krane a reçu **50 000 £** de Wexford, pas du Duc.
+
+### ACTE III, Phase 3 « Le twist final » (dialogue, musique stress)
+
+Après la bataille navale contre **le suspect accusé**, le joueur peut accuser ou demander une autre branche. Mais **chaque victoire de bataille navale révèle un élément du puzzle final** :
+
+1. **Wexford** a orchestré le tout : il a vidé le coffre pour cacher ses **escroqueries** (dettes de jeu, trafic d'art).
+2. **Le Duc** l'a découvert. Wexford a engagé **Krane** pour une élimination, mais **Hale** (jaloux de la liaison entre le Duc et un autre) a **pris l'arme** lui-même.
+3. **Hale** a tué le Duc, mais Wexford a **blâmé Krane** et a vidé le coffre pour **couvrir** le meurtre.
+4. **La vraie vérité** : Wexford est le commanditaire. Il a manipulé chaque suspect, utilisé le coffre comme **leurre**, et a compté sur la confusion pour s'échapper.
+
+### OUTRE « Épilogue » (généré par app.js selon `accuser`)
+
+**Accusation de Wexford (twist final)** : le joueur, s'il a collecté suffisamment d'indices des 6 branches, peut accuser **Wexford**.  
+- Morale : « Certains draps sont trop longs pour finir proprement. »
+
+**Accusation erronée** : chaque suspect a une **réaction unique** qui indique au joueur ce qu'il a manqué :
+- **femme-fatale** : « Regardez du côté de votre partenaire. » ÉCHEC.
+- **seducteur** : « La panne était factice, mais Wexford était dans la maison. » ÉCHEC.
+- **suspect** : « Wexford m'a payé pour effacer les traces. » ÉCHEC.
+- **marginal** : « Le vrai tueur, c'est celui qui vous a guidé. » ÉCHEC.
+- **criminel** : « Wexford m'a engagé, pas le Duc. Relisez les encaisses du bar. » ÉCHEC.
+- **protecteur** : « Wexford m'a manipulé. Il a tout orchestré. » ÉCHEC.
+
+**Dans tous les cas d'échec** : le vrai coupable (Wexford) s'échappe, le joueur perd son badge, fin dépressive. Le faisceau d'indices montre quelles branches étaient insuffisantes.
 
 ---
 
@@ -225,8 +254,11 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 | Réseau d'Alibis 2 | act2_1 (1/3) | `reseau_alibis` | Identifier 2 menteurs parmi 4 dépositions croisées | aucun | La victime devait de l'argent à Krane |
 | Réseau d'Alibis 3 | act2_1 (3/3) | `reseau_alibis` | Identifier 3 menteurs parmi 6 dépositions croisées | aucun | Chacun a une raison légitime, le coffre est la clé |
 | Réseau d'Alibis 4 | act2_3 (6/6) | `reseau_alibis` | Réseau final : 6 dépositions post-interrogatoires | aucun | Confusion ADN, coffre = vérité |
-| Puzzle | 2 (bar) | `puzzle` | Emboîter des formes géométriques | aucun | Confirme Duc→Krane, Hale orchestrateur |
+| Puzzle Krane | 2 (bar) | `puzzle` | Emboîter des formes géométriques | aucun | Confirme Duc→Krane, Hale orchestrateur |
+| Coffre vide | 3A (crimeScene) | `coffre_code` | Combinaison 1981 → coffre ouvert, MAIS VIDE | aucun | Twist : le coffre a été vidé avant |
+| Mur de reconstruction | 3A (crimeScene) | `scene_fouille` | Découvrir le compartiment caché derrière la muraille | aucun | Lettre signée Wexford → véritable twist |
 | Câblage alarme | 3B (labo) | `cablage_alarme` | SVG : pivoter segments pour boucle intacte | `alarm-circuit-blueprint.png.jfif` | Intrusion non forcée |
+| Bataille navale ×6 | 3C (branches) | `bataille-navale` | Duel tactique contre chaque suspect | `bataille-navale.html` | Révèle les mensonges de Wexford |
 | Roue des alibis | 4A (QG) | `roue_alibis` | Aligner 3 cadrans (montre, alibi, horloge-mère) | `pocket-watch-dial.png.jfif` | Pulvérise l'alibi de Hale |
 
 Chaque puzzle respecte l'architecture existante (fabrique dans `minigames.js`, `cfg.clue` de récompense, non-bloquant).
@@ -243,5 +275,6 @@ Chaque puzzle respecte l'architecture existante (fabrique dans `minigames.js`, `
 - [ ] Variante du twist si le joueur n'a PAS relevé 22h09 (Wexford le déduit plus difficilement).
 - [ ] Sons d'ambiance par zone de la fouille.
 - [ ] Loupe ajustée au curseur du mini-jeu montre (précision).
-- [ ] Intégration du code 1981 → coffre-fort en Acte II.
+- [x] **6 branches Acte 3** : coffre vide → mur de reconstruction → 6 bras de bataille navale → twist final (Wexford). ✅
+- [x] **Twist final Wexford** : le partenaire est le vrai commanditaire. ✅
 

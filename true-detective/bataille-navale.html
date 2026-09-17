@@ -527,12 +527,31 @@
                     } else {
                         statusEl.textContent = "💥 Tir direct ! Bien joué.";
                     }
-
+                    
                     if (enemyShips.every(s => s.hits === s.coords.length)) {
                         gameState = 'GAMEOVER';
                         statusEl.textContent = "🏆 VICTOIRE TOTALE ! Vous avez détruit toute la flotte ennemie.";
                         turnIndicator.style.display = 'none';
-                        renderBoards();
+                        setTimeout(function () {
+                            try {
+                                var configRaw = localStorage.getItem('td_standalone_game_config');
+                                var clue = '';
+                                if (configRaw) {
+                                    try {
+                                        var cfg = JSON.parse(configRaw);
+                                        if (cfg && cfg.clue) clue = (cfg.clue[lang === 'fr' ? 'fr' : 'en'] || cfg.clue.fr || cfg.clue.en || '');
+                                    } catch(e2) {}
+                                }
+                                localStorage.setItem('td_standalone_game_result', JSON.stringify({
+                                    type: 'bataille-navale',
+                                    won: true,
+                                    ts: Date.now(),
+                                    clue: clue || (lang === 'fr' ? 'Le suspect a perdu le contrôle : ses réactions trahissent sa connaissance trouble de cette affaire.' : 'The suspect lost composure: their reactions betray troubling familiarity with this case.')
+                                }));
+                            } catch (e) {}
+                            var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                            window.location.href = fromStory ? '../true-detective/index.html?standalone=bataille-navale' : '../true-detective/index.html#minigames';
+                        }, 1500);
                         return;
                     }
                 } else {
@@ -602,12 +621,31 @@
                             statusEl.textContent = "🔥 L'ennemi a touché l'un de vos navires !";
                             addAdjacentTargets(targetR, targetC);
                         }
-
+                        
                         if (playerShips.every(s => s.hits === s.coords.length)) {
                             gameState = 'GAMEOVER';
                             statusEl.textContent = "💀 DÉFAITE... Votre flotte a été entièrement anéantie.";
                             turnIndicator.style.display = 'none';
-                            renderBoards();
+                            setTimeout(function () {
+                                try {
+                                    var configRaw = localStorage.getItem('td_standalone_game_config');
+                                    var failClue = '';
+                                    if (configRaw) {
+                                        try {
+                                            var cfg = JSON.parse(configRaw);
+                                            if (cfg && cfg.failClue) failClue = (cfg.failClue[lang === 'fr' ? 'fr' : 'en'] || cfg.failClue.fr || cfg.failClue.en || '');
+                                        } catch(e2) {}
+                                    }
+                                    localStorage.setItem('td_standalone_game_result', JSON.stringify({
+                                        type: 'bataille-navale',
+                                        won: false,
+                                        ts: Date.now(),
+                                        clue: failClue || (lang === 'fr' ? 'Le suspect triomphe : il connaît trop bien les eaux de cette affaire.' : 'The suspect triumphs: they know these waters far too well.')
+                                    }));
+                                } catch (e) {}
+                                var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                                window.location.href = fromStory ? '../true-detective/index.html?standalone=bataille-navale' : '../true-detective/index.html#minigames';
+                            }, 1500);
                             return;
                         }
                     } else {

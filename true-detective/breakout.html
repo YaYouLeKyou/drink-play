@@ -7,6 +7,7 @@
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
+    <link rel="stylesheet" href="../settings-menu.css">
     <style>
         :root {
             --bg-dark: #070712;
@@ -168,6 +169,8 @@
 
     <script src="../settings-menu.js"></script>
     <script src="standalone-theme.js"></script>
+    <script src="sfx.js"></script>
+    <script src="minigame-audio.js" data-minigame="breakout"></script>
     <script>
         function getLevel() {
             var level = parseInt(new URLSearchParams(window.location.search).get('level') || '1', 10);
@@ -287,6 +290,7 @@
                                 ball.dy = -ball.dy;
                                 b.status = 0;
                                 score += 50;
+                                playSfx('paddle');
 
                                 // Vérifier si toutes les briques sont détruites
                                 checkWinCondition();

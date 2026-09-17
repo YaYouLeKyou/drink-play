@@ -1,13 +1,21 @@
 /* =====================================================================
    TRUE DETECTIVE - PUISSANCE 4 DÉTECTIVE (Connect 4)
-   Replace Sudoku in mini-games gallery and suspect challenges.
+   Connect 4 mini-game for suspect challenges and mini-games gallery.
 ===================================================================== */
 (function (global) {
     'use strict';
 
     function playSfx(name, opts) {
-    playMinigameMusic('connect4');
-        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+        try {
+            var fx = window.TDSfx || (window.parent && window.parent.TDSfx);
+            if (fx) fx.play(name, opts);
+        } catch (e) {}
+    }
+    function playMinigameMusic(type) {
+        try {
+            var svc = window.TDAudioService || (window.parent && window.parent.TDAudioService);
+            if (svc && svc.playMinigameMusic) svc.playMinigameMusic(type);
+        } catch (e) {}
     }
 
     function t(obj, lang) {
@@ -18,6 +26,7 @@
 
     function Connect4Game(container, options) {
         options = options || {};
+        playMinigameMusic('connect4');
         this.container = container;
         this.lang = options.lang || 'fr';
         this.onComplete = options.onComplete || function () {};

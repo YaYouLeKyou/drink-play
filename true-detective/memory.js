@@ -248,6 +248,7 @@
 
                     flipped.push(idx);
                     cardEl.classList.add('flipped');
+                    playSfx('card_flip');
 
                     if (flipped.length === 2) {
                         locked = true;

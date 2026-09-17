@@ -7,8 +7,16 @@
     'use strict';
 
     function playSfx(name, opts) {
-    playMinigameMusic('marginal-tower');
-        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+        try {
+            var fx = window.TDSfx || (window.parent && window.parent.TDSfx);
+            if (fx) fx.play(name, opts);
+        } catch (e) {}
+    }
+    function playMinigameMusic(type) {
+        try {
+            var svc = window.TDAudioService || (window.parent && window.parent.TDAudioService);
+            if (svc && svc.playMinigameMusic) svc.playMinigameMusic(type);
+        } catch (e) {}
     }
 
     if (!window.Matter) {
@@ -196,6 +204,7 @@
 
     // ===== INIT =====
     function init() {
+        playMinigameMusic('marginal-tower');
         canvas = document.getElementById('tower-canvas');
         if (!canvas) return;
         ctx = canvas.getContext('2d');

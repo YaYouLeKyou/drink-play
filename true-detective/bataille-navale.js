@@ -6,8 +6,16 @@
     'use strict';
 
     function playSfx(name, opts) {
-    playMinigameMusic('bataille-navale');
-        try { if (window.TDSfx) window.TDSfx.play(name, opts); } catch (e) {}
+        try {
+            var fx = window.TDSfx || (window.parent && window.parent.TDSfx);
+            if (fx) fx.play(name, opts);
+        } catch (e) {}
+    }
+    function playMinigameMusic(type) {
+        try {
+            var svc = window.TDAudioService || (window.parent && window.parent.TDAudioService);
+            if (svc && svc.playMinigameMusic) svc.playMinigameMusic(type);
+        } catch (e) {}
     }
 
     var SIZE = 10;
@@ -18,6 +26,7 @@
     var MISS = 3;
 
     function init() {
+        playMinigameMusic('bataille-navale');
         var params = new URLSearchParams(window.location.search);
         var lang = params.get('lang') || 'fr';
 

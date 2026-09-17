@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>True Detective - Sudoku de Blackwood</title>
+    <link rel="icon" href="../icon/Logo%20d%26p.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #f0d890; --cyan: #00d4ff; --red: #ff5a5a; }
+        html, body { height: 100%; margin: 0; background: radial-gradient(circle at 50% 15%, #171426 0%, #05050a 100%); color: #f0f4f8; font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; display: flex; flex-direction: column; }
+        .sg-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: rgba(10,10,18,.9); border-bottom: 1px solid rgba(0,212,255,.2); }
+        .sg-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--gold); margin: 0; letter-spacing: .05em; }
+        .btn { font-family: inherit; cursor: pointer; border-radius: 8px; padding: 8px 16px; border: 1px solid rgba(0,212,255,.4); background: rgba(0,212,255,.08); color: var(--cyan); font-weight: 600; }
+        .btn-continue { padding: 12px 28px; font-size: 1rem; }
+        .sg-main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px; box-sizing: border-box; }
+        .sudoku-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; max-width: 560px; }
+        .sudoku-head { text-align: center; background: rgba(12,16,24,.85); border: 1px solid rgba(0,212,255,.25); border-radius: 12px; padding: 10px 16px; width: 100%; box-sizing: border-box; }
+        .sudoku-title { font-family: 'Playfair Display', serif; color: var(--gold); margin: 0 0 4px; font-size: 1.25rem; letter-spacing: .03em; }
+        .sudoku-quote { font-style: italic; opacity: .75; font-size: .85rem; margin: 0; }
+        .sudoku-stats { display: flex; gap: 18px; justify-content: center; font-size: .9rem; color: var(--cyan); margin-top: 6px; flex-wrap: wrap; }
+        .sudoku-board { display: grid; grid-template-columns: repeat(9, 1fr); gap: 2px; background: #1a2130; border: 3px solid #2c3852; border-radius: 8px; padding: 4px; width: 100%; aspect-ratio: 1 / 1; box-sizing: border-box; touch-action: manipulation; }
+        .sudoku-cell { background: #0d1220; border: 1px solid #232e44; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: clamp(14px, 4.2vw, 22px); font-weight: 600; cursor: pointer; user-select: none; }
+        .sudoku-cell.given { background: #131a2c; color: var(--cyan); cursor: default; }
+        .sudoku-cell.sel { background: rgba(0,212,255,.22); box-shadow: 0 0 0 2px var(--cyan) inset; }
+        .sudoku-cell.err { color: var(--red); }
+        .sudoku-pad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; width: 100%; }
+        .sudoku-pad button { background: rgba(10,14,24,.9); color: var(--gold); border: 1px solid rgba(0,212,255,.35); border-radius: 10px; padding: 12px 0; font-size: 1.1rem; font-weight: 700; cursor: pointer; font-family: inherit; }
+        .sudoku-pad button:active { background: rgba(0,212,255,.18); }
+        .sudoku-pad button.clear { color: var(--red); border-color: rgba(255,90,90,.4); }
+        .sg-footer-note { font-size: .78rem; opacity: .6; text-align: center; }
+        .sudoku-end { position: fixed; inset: 0; background: rgba(3,5,10,.92); display: none; align-items: center; justify-content: center; flex-direction: column; gap: 16px; text-align: center; padding: 24px; z-index: 50; }
+        .sudoku-end.show { display: flex; }
+        .sudoku-end h2 { font-family: 'Playfair Display', serif; color: var(--gold); margin: 0; }
+        .sudoku-end p { margin: 0; max-width: 460px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <header class="sg-header">
+        <h1 class="sg-title" id="sgTitle">Sudoku de Blackwood</h1>
+        <button id="back-to-minigame-btn" class="btn">Retour</button>
+    </header>
+    <main class="sg-main">
+        <div class="sudoku-wrap">
+            <div class="sudoku-head">
+                <h2 class="sudoku-title" id="sudokuTitle">La grille du notaire</h2>
+                <p class="sudoku-quote" id="sudokuQuote"></p>
+                <div class="sudoku-stats">
+                    <span id="statTime"></span>
+                    <span id="statLeft"></span>
+                    <span id="statErr"></span>
+                </div>
+            </div>
+            <div class="sudoku-board" id="board" aria-label="Grille de sudoku"></div>
+            <div class="sudoku-pad" id="pad"></div>
+            <p class="sg-footer-note" id="hint"></p>
+        </div>
+    </main>
+    <div class="sudoku-end" id="endScreen">
+        <h2 id="endTitle"></h2>
+        <p id="endText"></p>
+        <button class="btn btn-continue" id="endBtn">Continuer</button>
+    </div>
+    <script>
+    (function () {
+        'use strict';
+        var params = new URLSearchParams(window.location.search);
+        var lang = params.get('lang') === 'en' ? 'en' : 'fr';
+        var story = params.get('story') === '1';
+        var diff = parseInt(params.get('difficulty') || '1', 10);
+        if (isNaN(diff) || diff < 1) diff = 1; if (diff > 4) diff = 4;
+
+        /* Config du mode histoire (td_standalone_game_config) sinon difficulté */
+        var holes = 40 - diff * 5;      // 35, 30, 25, 20 cases retirées
+        var timeLeft = 90 + diff * 30;  // 2 min .. 3 min 30
+        try {
+            var cfgRaw = localStorage.getItem('td_standalone_game_config');
+            if (cfgRaw) {
+                var cfg = JSON.parse(cfgRaw);
+                if (cfg && cfg.type === 'sudoku') {
+                    if (cfg.holes) holes = cfg.holes;
+                    if (cfg.time) timeLeft = cfg.time;
+                }
+            }
+        } catch (e) {}
+
+        var T = {
+            fr: { title: 'La grille du notaire', quote: '« Chaque ligne, chaque colonne, chaque carré : un chiffre unique. Comme la vérité. »',
+                  left: 'Cases vides : ', err: 'Erreurs : ', win: 'La grille est complète',
+                  winText: 'Blackwood range ses lunettes. « Irréprochable. J\'ai compté : aucune faute. Alors écoutons la vôtre, inspecteur... Hale m\'a payé pour fermer les yeux. »',
+                  lose: 'La trame s\'est rompue',
+                  loseText: 'Blackwood reprend la grille d\'un geste sec. « Une grille inachevée, un raisonnement inachevé. Revenez quand vos chiffres tiendront debout. »',
+                  over: 'Le temps est écoulé',
+                  hint: 'Sélectionnez une case vide, puis un chiffre. Les chiffres de Blackwood ne se modifient pas.',
+                  clear: 'Effacer', back: 'Accueil' },
+            en: { title: "The Notary's Grid", quote: '"Every row, every column, every square: one unique digit. Like truth."',
+                  left: 'Empty cells: ', err: 'Mistakes: ', win: 'The grid is complete',
+                  winText: 'Blackwood folds his glasses away. "Flawless. I counted: not one mistake. Then let us hear yours, inspector... Hale paid me to look away."',
+                  lose: 'The weave has broken',
+                  loseText: 'Blackwood snatches the grid back. "An unfinished grid, an unfinished argument. Come back when your figures hold."',
+                  over: 'Time is up',
+                  hint: 'Select an empty cell, then a digit. Blackwood\'s givens cannot be changed.',
+                  clear: 'Clear', back: 'Home' }
+        };
+
+        /* ---------- Génération (backtracking) ---------- */
+        var solution = [], grid = [];
+        function ok(g, i, v) {
+            var r = Math.floor(i / 9), c = i % 9, br = r - r % 3, bc = c - c % 3;
+            for (var k = 0; k < 9; k++) {
+                if (g[r * 9 + k] === v) return false;
+                if (g[k * 9 + c] === v) return false;
+                if (g[(br + Math.floor(k / 3)) * 9 + bc + k % 3] === v) return false;
+            }
+            return true;
+        }
+        function fill(g, i) {
+            if (i === 81) return true;
+            var nums = [1,2,3,4,5,6,7,8,9];
+            for (var s = nums.length - 1; s > 0; s--) { var j = Math.floor(Math.random() * (s + 1)); var t = nums[s]; nums[s] = nums[j]; nums[j] = t; }
+            for (var n = 0; n < 9; n++) {
+                if (ok(g, i, nums[n])) {
+                    g[i] = nums[n];
+                    if (fill(g, i + 1)) return true;
+                    g[i] = 0;
+                }
+            }
+            return false;
+        }
+        solution = new Array(81).fill(0);
+        fill(solution, 0);
+        grid = solution.slice();
+
+        /* Retire des cases (par paires symétriques pour l'esthétique) */
+        var shuffled = [];
+        for (var i = 0; i < 81; i++) shuffled.push(i);
+        for (var s = shuffled.length - 1; s > 0; s--) { var j2 = Math.floor(Math.random() * (s + 1)); var t2 = shuffled[s]; shuffled[s] = shuffled[j2]; shuffled[j2] = t2; }
+        var removed = 0;
+        for (var k = 0; k < shuffled.length && removed < holes; k++) {
+            var idx = shuffled[k];
+            if (grid[idx] === 0) continue;
+            grid[idx] = 0; removed++;
+            var mirror = 80 - idx;
+            if (grid[mirror] !== 0 && removed < holes) { grid[mirror] = 0; removed++; }
+        }
+        var totalEmpty = 81 - grid.filter(function (v) { return v !== 0; }).length;
+
+        /* ---------- UI ---------- */
+        var boardEl = document.getElementById('board');
+        var cells = [];
+        var selected = -1, mistakes = 0, solvedCells = 0;
+        var MAX_MISTAKES = 5;
+
+        for (var c = 0; c < 81; c++) {
+            var d = document.createElement('div');
+            d.className = 'sudoku-cell';
+            var row = Math.floor(c / 9);
+            if (row === 2 || row === 5) d.style.borderBottom = '3px solid #3a4a6e';
+            if (grid[c] !== 0) { d.textContent = grid[c]; d.classList.add('given'); }
+            d.dataset.i = c;
+            boardEl.appendChild(d);
+            cells.push(d);
+        }
+        var padEl = document.getElementById('pad');
+        for (var n = 1; n <= 9; n++) {
+            var b = document.createElement('button');
+            b.textContent = n;
+            b.addEventListener('click', (function (num) { return function () { place(num); }; })(n));
+            padEl.appendChild(b);
+        }
+        var clearBtn = document.createElement('button');
+        clearBtn.className = 'clear'; clearBtn.textContent = T.clear;
+        clearBtn.addEventListener('click', function () { place(0); });
+        padEl.appendChild(clearBtn);
+
+        boardEl.addEventListener('click', function (e) {
+            var t = e.target.closest('.sudoku-cell');
+            if (!t || t.classList.contains('given')) return;
+            if (selected >= 0) cells[selected].classList.remove('sel');
+            selected = parseInt(t.dataset.i, 10);
+            t.classList.add('sel');
+        });
+
+        function place(num) {
+            if (selected < 0) return;
+            var cell = cells[selected], i = selected;
+            if (grid[i] !== 0) return;
+            if (num === 0) { cell.textContent = ''; cell.classList.remove('err'); return; }
+            cell.textContent = num;
+            if (num === solution[i]) {
+                cell.classList.remove('err');
+                grid[i] = num;
+                solvedCells++;
+                updateStats();
+                if (solvedCells === totalEmpty) finish(true, T.win, T.winText);
+            } else {
+                mistakes++;
+                cell.classList.add('err');
+                updateStats();
+                if (mistakes >= MAX_MISTAKES) finish(false, T.lose, T.loseText);
+            }
+        }
+        function updateStats() {
+            document.getElementById('statLeft').textContent = T.left + (totalEmpty - solvedCells);
+            document.getElementById('statErr').textContent = T.err + mistakes + '/' + MAX_MISTAKES;
+        }
+
+        /* ---------- Chrono ---------- */
+        var timeEl = document.getElementById('statTime');
+        var timer = setInterval(function () {
+            timeLeft--;
+            var m = Math.floor(timeLeft / 60), s2 = timeLeft % 60;
+            timeEl.textContent = '⏱ ' + (m < 10 ? '0' : '') + m + ':' + (s2 < 10 ? '0' : '') + s2;
+            if (timeLeft <= 0) { clearInterval(timer); finish(false, T.over, T.loseText); }
+        }, 1000);
+        timeEl.textContent = '⏱ 0' + Math.floor(timeLeft / 60) + ':0' + (timeLeft % 60);
+        updateStats();
+
+        /* ---------- Fin (mode histoire) ---------- */
+        var ended = false;
+        function finish(won, title, text) {
+            if (ended) return; ended = true;
+            clearInterval(timer);
+            document.getElementById('endTitle').textContent = title;
+            document.getElementById('endText').textContent = text;
+            document.getElementById('endScreen').classList.add('show');
+            try {
+                localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'sudoku', won: won, ts: Date.now() }));
+            } catch (e) {}
+        }
+        document.getElementById('endBtn').addEventListener('click', function () {
+            var returnUrl = '../true-detective/index.html?standalone=sudoku';
+            try {
+                var raw = localStorage.getItem('td_standalone_game_return');
+                if (raw) { var rp = JSON.parse(raw); if (rp && rp.returnUrl) returnUrl = rp.returnUrl; }
+            } catch (e) {}
+            window.location.href = returnUrl;
+        });
+
+        /* ---------- Textes & navigation ---------- */
+        document.getElementById('sgTitle').textContent = lang === 'fr' ? 'Sudoku de Blackwood' : "Blackwood's Sudoku";
+        document.getElementById('sudokuTitle').textContent = T.title;
+        document.getElementById('sudokuQuote').textContent = T.quote;
+        document.getElementById('hint').textContent = T.hint;
+        var backBtn = document.getElementById('back-to-minigame-btn');
+        if (story) { backBtn.style.display = 'none'; }
+        else { backBtn.textContent = T.back; backBtn.addEventListener('click', function () { window.location.href = '../true-detective/index.html#minigames'; }); }
+    })();
+    </script>
+    <script src="sfx.js"></script>
+    <script src="minigame-audio.js" data-minigame="sudoku"></script>
+</body>
+</html>

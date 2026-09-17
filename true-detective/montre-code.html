@@ -16,6 +16,8 @@
 
     <link rel="stylesheet" href="standalone-game.css">
 
+    <link rel="stylesheet" href="../settings-menu.css">
+
     <link rel="stylesheet" href="styles.css">
 
     <style>
@@ -661,7 +663,7 @@
             <div class="montre-intro">Examinez minutieusement cette vieille montre gousset retrouvée sur la scène de crime.</div>
 
             <div id="montre-status" class="montre-status">Approchez la loupe de la face. Une aiguille s'y est figée…</div>
-    <button id="story-continue-btn" class="btn btn-continue" style="position:fixed;bottom:calc(20px + env(safe-area-inset-bottom, 0px));left:50%;transform:translateX(-50%);z-index:9997;display:none;">Continuer</button>
+    <button id="story-continue-btn" class="btn btn-continue" style="display:none;">Continuer</button>
 
 
 
@@ -782,6 +784,8 @@
 
     <script src="../settings-menu.js"></script>
     <script src="standalone-theme.js"></script>
+    <script src="sfx.js"></script>
+    <script src="minigame-audio.js" data-minigame="montre_code"></script>
 
     <script>
 
@@ -939,6 +943,8 @@
 
                         status.textContent = 'Code correct. Indiquez l\'heure relevée sur la face, puis validez.';
 
+                        playSfx('success');
+
                     }
 
                 }
@@ -959,17 +965,23 @@
 
                             validateBtn.classList.add('correct');
 
+                            playSfx('click');
+
                             showSincerityQuestion(time);
 
                         } else {
 
                             status.textContent = 'Indiquez aussi l\'heure relevée sur la face de la montre.';
 
+                            playSfx('fail');
+
                         }
 
                     } else {
 
                         validateBtn.classList.add('wrong');
+
+                        playSfx('fail');
 
                         setTimeout(function () { validateBtn.classList.remove('wrong'); }, 500);
 
@@ -1011,9 +1023,7 @@
 
                         var continueButtonElem = document.getElementById('story-continue-btn');
 
-                        var urlParams = new URLSearchParams(window.location.search);
-
-                        if (urlParams.get('story') === '1' && continueButtonElem) {
+                        if (continueButtonElem && urlParams.get('story') === '1') {
 
                             continueButtonElem.style.display = 'inline-block';
 
@@ -1434,8 +1444,58 @@
             function playMinigameMusic(type) {
                 try { if (parent.TDAudioService && parent.TDAudioService.playMinigameMusic) parent.TDAudioService.playMinigameMusic(type); } catch (e) {}
             }
-            window._tdPlaySfx = playSfx;
+             window._tdPlaySfx = playSfx;
             window._tdPlayMinigameMusic = playMinigameMusic;
+        })();
+    </script>
+
+    <script>
+        (function () {
+            'use strict';
+            if (window.DPSettings && window.DPSettings.init) {
+                window.DPSettings.init({
+                    showMusicToggle: false,
+                    showMusicVolume: false,
+                    showNarrationVolume: false,
+                    showMuteToggle: false,
+                    showGameSection: true,
+                    showBackToHub: true,
+                    showRestart: false,
+                    showRules: false,
+                    customButtons: [],
+                    onBackToHub: function () {
+                        window.location.href = '../true-detective/index.html#minigames';
+                    }
+                });
+            }
+            var hamburgerBtn = document.getElementById('hamburger-btn');
+            var menu = document.getElementById('hamburger-menu');
+            if (hamburgerBtn && menu) {
+                hamburgerBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    menu.classList.toggle('open');
+                });
+                document.addEventListener('click', function (e) {
+                    if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
+                        menu.classList.remove('open');
+                    }
+                });
+            }
+            var menuHome = document.getElementById('menu-home');
+            var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+            if (menuHome) {
+                menuHome.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    window.location.href = fromStory ? '../true-detective/index.html?standalone=montre_code' : '../true-detective/index.html#minigames';
+                });
+            }
+            var menuSettings = document.getElementById('menu-settings');
+            if (menuSettings) {
+                menuSettings.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres'); }
+                });
+            }
         })();
     </script>
 </body>

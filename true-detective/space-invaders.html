@@ -7,6 +7,7 @@
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
+    <link rel="stylesheet" href="../settings-menu.css">
     <style>
         :root {
             --bg-dark: #03040a;
@@ -76,7 +77,6 @@
             box-shadow: 0 0 25px rgba(255, 0, 110, 0.25);
         }
 
-        /* Commandes tactiles de secours pour mobile */
         .si-touch-controls {
             display: none;
             gap: 10px;
@@ -137,9 +137,8 @@
                 <div class="si-info" id="si-lives">Vies: 3</div>
             </div>
             
-            <canvas id="si-canvas"></canvas>
+            <canvas id="si-canvas" width="600" height="400"></canvas>
 
-            <!-- Boutons tactiles pour les joueurs sur smartphone -->
             <div class="si-touch-controls">
                 <button class="touch-btn" id="btn-left">◀</button>
                 <button class="touch-btn" id="btn-fire" style="background:rgba(0,240,255,0.1); border-color:var(--neon-blue);">TIR</button>
@@ -148,7 +147,6 @@
         </div>
     </main>
 
-    <!-- Script Helper corrigé -->
     <script>
         function getLevel() {
             var level = parseInt(new URLSearchParams(window.location.search).get('level') || '1', 10);
@@ -158,29 +156,256 @@
         }
     </script>
 
-    <!-- Script principal du jeu -->
-    <script src="space-invaders.js"></script>
+    <!-- Script principal du jeu intégré avec tirs ennemis -->
+    <script>
+        (function() {
+            const canvas = document.getElementById('si-canvas');
+            const ctx = canvas.getContext('2d');
+            const currentLevel = getLevel();
+
+            let score = 0;
+            let lives = 3;
+            let gameState = 'PLAYING'; // PLAYING, WIN, GAMEOVER
+
+            // Joueur
+            let player = {
+                x: canvas.width / 2 - 15,
+                y: canvas.height - 35,
+                width: 30,
+                height: 16,
+                speed: 5
+            };
+
+            let bullets = [];       // Tirs du joueur
+            let enemyBullets = [];   // Tirs des ennemis
+            let enemies = [];
+
+            // Configuration des vagues d'ennemis selon le niveau
+            const rows = 3 + currentLevel; 
+            const cols = 8;
+            const enemyWidth = 32;
+            const enemyHeight = 20;
+            const padding = 12;
+            const offsetTop = 40;
+            const offsetLeft = 50;
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    enemies.push({
+                        x: offsetLeft + c * (enemyWidth + padding),
+                        y: offsetTop + r * (enemyHeight + padding),
+                        width: enemyWidth,
+                        height: enemyHeight,
+                        alive: true,
+                        type: r
+                    });
+                }
+            }
+
+            let enemyDirection = 1;
+            let enemySpeed = 1 + (currentLevel * 0.4);
+            let keys = {};
+
+            window.addEventListener('keydown', e => { keys[e.key] = true; if(e.key === ' ' || e.key === 'ArrowUp') shoot(); });
+            window.addEventListener('keyup', e => { keys[e.key] = false; });
+
+            // Contrôles tactiles
+            let leftPressed = false, rightPressed = false;
+            document.getElementById('btn-left').addEventListener('touchstart', () => { leftPressed = true; });
+            document.getElementById('btn-left').addEventListener('touchend', () => { leftPressed = false; });
+            document.getElementById('btn-right').addEventListener('touchstart', () => { rightPressed = true; });
+            document.getElementById('btn-right').addEventListener('touchend', () => { rightPressed = false; });
+            document.getElementById('btn-fire').addEventListener('click', () => { shoot(); });
+
+            function shoot() {
+                if (gameState !== 'PLAYING') return;
+                if (bullets.length < 3) { // Max 3 tirs simultanés
+                    bullets.push({
+                        x: player.x + player.width / 2 - 2,
+                        y: player.y,
+                        width: 4,
+                        height: 10,
+                        speed: 7
+                    });
+                }
+            }
+
+            function update() {
+                if (gameState !== 'PLAYING') return;
+
+                // Mouvements du joueur
+                if ((keys['ArrowLeft'] || keys['q'] || leftPressed) && player.x > 10) {
+                    player.x -= player.speed;
+                }
+                if ((keys['ArrowRight'] || keys['d'] || rightPressed) && player.x < canvas.width - player.width - 10) {
+                    player.x += player.speed;
+                }
+
+                // Mouvement des tirs du joueur
+                for (let i = bullets.length - 1; i >= 0; i--) {
+                    bullets[i].y -= bullets[i].speed;
+                    if (bullets[i].y < 0) {
+                        bullets.splice(i, 1);
+                    }
+                }
+
+                // Mouvement des tirs ennemis
+                for (let i = enemyBullets.length - 1; i >= 0; i--) {
+                    enemyBullets[i].y += enemyBullets[i].speed;
+                    
+                    // Collision tir ennemi -> Joueur
+                    if (
+                        enemyBullets[i].x < player.x + player.width &&
+                        enemyBullets[i].x + enemyBullets[i].width > player.x &&
+                        enemyBullets[i].y < player.y + player.height &&
+                        enemyBullets[i].y + enemyBullets[i].height > player.y
+                    ) {
+                        enemyBullets.splice(i, 1);
+                        lives--;
+                        document.getElementById('si-lives').textContent = "Vies: " + lives;
+                        if (lives <= 0) {
+                            gameState = 'GAMEOVER';
+                        }
+                        continue;
+                    }
+
+                    if (enemyBullets[i].y > canvas.height) {
+                        enemyBullets.splice(i, 1);
+                    }
+                }
+
+                // IA de tir des ennemis (fréquence ajustée selon le niveau)
+                let aliveEnemies = enemies.filter(e => e.alive);
+                if (aliveEnemies.length > 0 && Math.random() < (0.02 + currentLevel * 0.015)) {
+                    let shooter = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
+                    enemyBullets.push({
+                        x: shooter.x + shooter.width / 2 - 2,
+                        y: shooter.y + shooter.height,
+                        width: 4,
+                        height: 10,
+                        speed: 3 + currentLevel * 0.5
+                    });
+                }
+
+                // Déplacement des ennemis
+                let hitEdge = false;
+                aliveEnemies.forEach(e => {
+                    e.x += enemySpeed * enemyDirection;
+                    if (e.x + e.width > canvas.width - 10 || e.x < 10) {
+                        hitEdge = true;
+                    }
+                });
+
+                if (hitEdge) {
+                    enemyDirection *= -1;
+                    enemies.forEach(e => {
+                        e.y += 12;
+                        // Si un ennemi atteint le bas -> Game Over
+                        if (e.alive && e.y + e.height >= player.y) {
+                            gameState = 'GAMEOVER';
+                        }
+                    });
+                }
+
+                // Collisions tirs joueur -> ennemis
+                for (let i = bullets.length - 1; i >= 0; i--) {
+                    for (let j = 0; j < enemies.length; j++) {
+                        let e = enemies[j];
+                        if (e.alive &&
+                            bullets[i].x < e.x + e.width &&
+                            bullets[i].x + bullets[i].width > e.x &&
+                            bullets[i].y < e.y + e.height &&
+                            bullets[i].y + bullets[i].height > e.y
+                        ) {
+                            e.alive = false;
+                            bullets.splice(i, 1);
+                            score += (e.type + 1) * 10;
+                            playSfx('explosion');
+                            document.getElementById('si-info').textContent = "Score: " + score;
+                            break;
+                        }
+                    }
+                }
+
+                // Vérification de la victoire
+                if (enemies.every(e => !e.alive)) {
+                    gameState = 'WIN';
+                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'space-invaders', won: true, ts: Date.now() })); } catch (e) {}
+                }
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Dessin du joueur
+                ctx.fillStyle = '#00f0ff';
+                ctx.fillRect(player.x, player.y + 6, player.width, player.height - 6);
+                ctx.fillRect(player.x + player.width / 2 - 3, player.y, 6, 8);
+
+                // Dessin des tirs du joueur
+                ctx.fillStyle = '#00ff88';
+                bullets.forEach(b => {
+                    ctx.fillRect(b.x, b.y, b.width, b.height);
+                });
+
+                // Dessin des tirs ennemis
+                ctx.fillStyle = '#ff006e';
+                enemyBullets.forEach(b => {
+                    ctx.fillRect(b.x, b.y, b.width, b.height);
+                });
+
+                // Dessin des ennemis
+                enemies.forEach(e => {
+                    if (e.alive) {
+                        ctx.fillStyle = e.type === 0 ? '#ff006e' : (e.type === 1 ? '#ffb852' : '#00f0ff');
+                        ctx.fillRect(e.x, e.y, e.width, e.height);
+                        // Petits détails visuels pour les ennemis
+                        ctx.fillStyle = '#03040a';
+                        ctx.fillRect(e.x + 6, e.y + 5, 4, 4);
+                        ctx.fillRect(e.x + e.width - 10, e.y + 5, 4, 4);
+                    }
+                });
+
+                // Messages de fin de partie
+                if (gameState !== 'PLAYING') {
+                    ctx.fillStyle = 'rgba(3, 4, 10, 0.85)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    ctx.font = 'bold 24px Montserrat, sans-serif';
+                    ctx.textAlign = 'center';
+                    if (gameState === 'WIN') {
+                        ctx.fillStyle = '#00ff88';
+                        ctx.fillText("VICTOIRE !", canvas.width / 2, canvas.height / 2);
+                    } else {
+                        ctx.fillStyle = '#ff006e';
+                        ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
+                    }
+                }
+            }
+
+            function loop() {
+                update();
+                draw();
+                requestAnimationFrame(loop);
+            }
+
+            loop();
+        })();
+    </script>
+
     <script src="../settings-menu.js"></script>
     <script src="standalone-theme.js"></script>
-    
+    <script src="sfx.js"></script>
+    <script src="minigame-audio.js" data-minigame="space-invaders"></script>
     <script>
         (function () {
             'use strict';
-
             if (window.DPSettings && window.DPSettings.init) {
                 window.DPSettings.init({
-                    showMusicToggle: true,
-                    showMusicVolume: true,
-                    showNarrationVolume: false,
-                    showMuteToggle: false,
-                    showGameSection: true,
-                    showBackToHub: false,
-                    showRestart: false,
-                    showRules: false,
-                    customButtons: [],
-                    onBackToHub: function () {
-                        window.location.href = '../true-detective/index.html#minigames';
-                    }
+                    showMusicToggle: true, showMusicVolume: true, showNarrationVolume: false,
+                    showMuteToggle: false, showGameSection: true, showBackToHub: false,
+                    showRestart: false, showRules: false, customButtons: [],
+                    onBackToHub: function () { window.location.href = '../true-detective/index.html#minigames'; }
                 });
             }
 
@@ -214,13 +439,9 @@
                         var returnRaw = localStorage.getItem('td_standalone_game_return');
                         if (returnRaw) {
                             var rp = JSON.parse(returnRaw);
-                            if (rp && rp.returnUrl) {
-                                window.location.href = rp.returnUrl;
-                                return;
-                            }
+                            if (rp && rp.returnUrl) { window.location.href = rp.returnUrl; return; }
                         }
                     } catch (e) {}
-                    var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
                     window.location.href = fromStory ? '../true-detective/index.html?standalone=space-invaders' : '../true-detective/index.html#minigames';
                 });
                 var header = document.querySelector('.sg-header');

@@ -178,16 +178,18 @@
 
             var backBtn = document.getElementById('back-to-minigame-btn');
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1' || new URLSearchParams(window.location.search).get('mode') === 'story';
+            var gameResult = null;
 
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
                 var continueBtn = document.createElement('button');
                 continueBtn.id = 'story-continue-btn';
-                continueBtn.className = 'btn btn-continue reseau-alibis-continue';
+                continueBtn.className = 'btn btn-continue resea-alibis-continue';
                 continueBtn.textContent = 'Continuer l\'Enquête';
                 continueBtn.addEventListener('click', function () {
+                    var won = (gameResult && typeof gameResult.won === 'boolean') ? gameResult.won : true;
                     try { 
-                        localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau_alibis', won: true, ts: Date.now() })); 
+                        localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau_alibis', won: won, ts: Date.now() })); 
                     } catch (e) {}
                     try {
                         var returnRaw = localStorage.getItem('td_standalone_game_return');
@@ -233,7 +235,7 @@
             }
 
             var testimonies = [
-                {"witness":{"en":"Major Hale","fr":"Major Hale"},"id":"hale","statement":{"en":"I was broken down with Pembrooke at 10pm. The manor lock was opened with a key, not forced. The victim didn't resist. But the weapon bore Krane's DNA.","fr":"J'étais en panne avec Pembrooke à 22h. Le verrou du manoir a été ouvert avec une clé, pas forcé. La victime n'a pas opposé de résistance, mais l'arme portait l'ADN de Krane."}, "isLie":false},
+                {"witness":{"en":"Major Hale","fr":"Major Hale"},"id":"hale","statement":{"en":"I was broken down with Pembrooke at 10pm. The manor lock was opened with a key, not forced. The victim didn't resist. But the weapon bore Krane's DNA.","fr":"J'étais en panne avec Pembrooke à 22h. Le verrou du manoir a été ouvert avec une clé, pas forcé. La victime n'a pas opposé de résistance, mais l'arme portait l'ADN de Krane."}, "isLie":true},
                 {"witness":{"en":"Lady Vivienne","fr":"Lady Vivienne"},"id":"vivienne","statement":{"en":"I was at the theatre with friends, then alone at the manor. My husband and I had a relationship based on money, not love, I had no reason to kill him.","fr":"J'étais au théâtre avec des amies, puis seule au manoir. Mon mari et moi avions une relation basée sur l'argent, pas l'amour, je n'avais aucune raison de le tuer."}, "isLie":true},
                 {"witness":{"en":"Julian Pembrooke","fr":"Julian Pembrooke"},"id":"pembrooke","statement":{"en":"My car broke down, Hale joined me at 10pm. I was ALONE waiting, no prowler passed near the manor that night. But the Duke hired me for someone else, not me.","fr":"Ma voiture est tombée en panne, Hale m'a rejoint à 22h. J'étais SEUL à attendre, aucun rôdeur n'est passé près du manoir cette nuit-là. Mais le Duc m'avait engagé pour un autre, pas pour moi."}, "isLie":true},
                 {"witness":{"en":"Rupert Blackwood","fr":"Rupert Blackwood"},"id":"blackwood","statement":{"en":"I dined with the Duke at 7pm, he wanted to withdraw funds. I left around 8pm, Silas saw me pass the gate. The will matters little to me, it's the heir that matters.","fr":"J'ai dîné avec le Duc à 19h, il voulait retirer des fonds. Je suis parti vers 20h, Silas m'a vu passer au portail. Le testament m'importe peu, c'est l'héritier qui compte."}, "isLie":false},
@@ -255,11 +257,10 @@
             
             var minigame = TDNarrativeEngine.createMinigame('reseau_alibis', cfg);
             minigame.onComplete(function(result) {
-                if (result && result.won) {
-                    var continueButtonElem = document.getElementById('story-continue-btn');
-                    if (fromStory && continueButtonElem) {
-                        continueButtonElem.style.display = 'block';
-                    }
+                gameResult = result || null;
+                var continueButtonElem = document.getElementById('story-continue-btn');
+                if (fromStory && continueButtonElem) {
+                    continueButtonElem.style.display = 'block';
                 }
             });
             minigame.start();

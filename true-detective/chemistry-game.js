@@ -9,9 +9,16 @@
     function playSfx(name, opts) {
         try { if (global.TDSfx) global.TDSfx.play(name, opts); } catch (e) {}
     }
+    function playMinigameMusic(type) {
+        try {
+            var svc = window.TDAudioService || (window.parent && window.parent.TDAudioService);
+            if (svc && svc.playMinigameMusic) svc.playMinigameMusic(type);
+        } catch (e) {}
+    }
 
     function ChemistryGame(container, options) {
         options = options || {};
+        playMinigameMusic('chemistry');
         this.container = container;
         this.lang = options.lang || 'fr';
         this.onComplete = options.onComplete || function () {};

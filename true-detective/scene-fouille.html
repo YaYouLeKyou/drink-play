@@ -7,6 +7,7 @@
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
+    <link rel="stylesheet" href="../settings-menu.css">
     <link rel="stylesheet" href="styles.css">
     <style>
         .fouille-scene {
@@ -149,6 +150,8 @@
     <script src="minigames.js"></script>
     <script src="../settings-menu.js"></script>
     <script src="standalone-theme.js"></script>
+    <script src="sfx.js"></script>
+    <script src="minigame-audio.js" data-minigame="scene_fouille"></script>
     <script>
         (function () {
             'use strict';
@@ -188,6 +191,13 @@
 
             function init() {
                 var sceneImageUrl = 'assets/image true detective/lieux/classic/scene de crime manoir.png';
+                if (typeof window !== 'undefined' && window.getThemeId && window.THEME_ASSETS) {
+                    var themeId = window.getThemeId();
+                    var assets = window.THEME_ASSETS[themeId] || window.THEME_ASSETS['agatha-christie'];
+                    if (assets && assets.crimeScene) {
+                        sceneImageUrl = assets.crimeScene;
+                    }
+                }
                 $container.style.backgroundImage = 'url("' + sceneImageUrl + '")';
 
                 var loupe = document.createElement('div');
@@ -221,6 +231,7 @@
                     });
                     btn.addEventListener('click', function () {
                         btn.classList.toggle('found');
+                        playSfx('click');
                         saveEvidenceToJournal(spot);
                     });
                     $container.appendChild(btn);

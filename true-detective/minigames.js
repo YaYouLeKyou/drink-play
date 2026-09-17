@@ -502,6 +502,13 @@
             wrap.className = 'fouille-scene';
             if (editMode) wrap.classList.add('fouille-edit');
             var sceneImageUrl = cfg.sceneImage || 'assets/image true detective/lieux/classic/scene de crime manoir.png';
+            if (!cfg.sceneImage && typeof window !== 'undefined' && window.getThemeId && window.THEME_ASSETS) {
+                var themeId = window.getThemeId();
+                var assets = window.THEME_ASSETS[themeId] || window.THEME_ASSETS['agatha-christie'];
+                if (assets && assets.crimeScene) {
+                    sceneImageUrl = assets.crimeScene;
+                }
+            }
             wrap.style.backgroundImage = 'url("' + sceneImageUrl + '")';
             body.appendChild(wrap);
 
@@ -890,14 +897,15 @@
                                     }
                                 }
                             });
-                            if (perfectRun) {
+            if (perfectRun) {
                                 showEndMessage(lang === 'fr' ? 'Indice obtenu !' : 'Clue obtained!');
                                 complete(true);
+                                addContinueButton(true);
                             } else {
                                 showEndMessage(lang === 'fr' ? 'Vous avez identifié les mensonges mais avez fait des erreurs. Pas d\'indice.' : 'You found the lies but made errors. No clue.');
                                 complete(false);
+                                addContinueButton(false);
                             }
-                            addContinueButton();
                         }
                     } else {
                         mistakes++;
@@ -918,8 +926,8 @@
                             tag.classList.add('tag-true');
                             locked = true;
                             showEndMessage(lang === 'fr' ? 'Trop d\'erreurs. Pas d\'indice.' : 'Too many errors. No clue.');
-                            complete(false);
-                            addContinueButton();
+                                complete(false);
+                                addContinueButton(false);
                         }
                     }
                 });
@@ -947,13 +955,13 @@
             });
             updateCarousel();
 
-            function addContinueButton() {
-                if (board.querySelector('.reseau-alibis-continue')) return;
+            function addContinueButton(won) {
+                if (board.querySelector('.resea-alibis-continue')) return;
                 var btn = document.createElement('button');
-                btn.className = 'btn reseau-alibis-continue';
-                btn.textContent = lang === 'fr' ? 'Continuer' : 'Continue';
+                btn.className = 'btn resea-alibis-continue';
+                btn.textContent = lang === 'fr' ? 'Continuer' : 'Continuer';
                 btn.addEventListener('click', function () {
-                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau_alibis', won: true, ts: Date.now() })); } catch (e) {}
+                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau_alibis', won: !!won, ts: Date.now() })); } catch (e) {}
                     try {
                         var returnRaw = localStorage.getItem('td_standalone_game_return');
                         if (returnRaw) {

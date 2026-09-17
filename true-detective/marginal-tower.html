@@ -6,6 +6,7 @@
     <title>True Detective - La Tour de Silas</title>
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../settings-menu.css">
     <style>
         :root {
             --bg-dark: #03040a;
@@ -408,8 +409,12 @@
         </div>
     </div>
 
+    <!-- Éléments audio et bruitages (musique : player parent, SFX : TDSfx généré) -->
+    <audio id="game-music" src="music true detective/mini-jeux/tower.mp3" loop preload="auto"></audio>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="standalone-theme.js"></script>
+    <script src="sfx.js"></script>
     <script>
         (function() {
             'use strict';
@@ -418,6 +423,24 @@
 
             const container = document.getElementById('game-container');
             const canvas = document.getElementById('tower-canvas');
+            
+            // Gestion des sources audio
+            const bgMusic = document.getElementById('game-music');
+
+            // Bridge vers TDSfx (local ou iframe parent)
+            function playSfx(name, opts) {
+                try {
+                    var fx = window.TDSfx || (window.parent && window.parent.TDSfx);
+                    if (fx) fx.play(name, opts);
+                } catch (e) {}
+            }
+            function playMinigameMusic(type) {
+                try {
+                    var svc = window.TDAudioService || (window.parent && window.parent.TDAudioService);
+                    if (svc && svc.playMinigameMusic) { svc.playMinigameMusic(type); return true; }
+                } catch (e) {}
+                return false;
+            }
             
             let blockCounts = {
                 wood: 8,
@@ -433,7 +456,7 @@
             let groundY = 600;
             let targetHeightY = 200;
             let isGameOver = false;
-            let framesStable = 0; // Compteur pour forcer la stabilité dans le temps
+            let framesStable = 0;
 
             const blockProperties = {
                 wood: { width: 80, height: 28, density: 0.0012, friction: 0.6, restitution: 0.05, color: '#d9822b', stroke: '#ffaa54' },
@@ -443,6 +466,34 @@
                 cardboard: { width: 85, height: 30, density: 0.0004, friction: 0.85, restitution: 0.01, color: '#c49a65', stroke: '#e8c499' },
                 brick: { width: 75, height: 30, density: 0.0025, friction: 0.6, restitution: 0.05, color: '#a84d43', stroke: '#e07d73' }
             };
+
+            function playMusic() {
+                // Priorité au lecteur du parent (crossfade global), sinon audio local
+                if (playMinigameMusic('marginal-tower')) return;
+                if (bgMusic) {
+                    bgMusic.volume = 0.4;
+                    bgMusic.play().catch(() => {
+                        document.addEventListener('click', () => {
+                            bgMusic.play().catch(() => {});
+                        }, { once: true });
+                    });
+                }
+            }
+
+            function stopMusic() {
+                if (bgMusic) {
+                    bgMusic.pause();
+                    bgMusic.currentTime = 0;
+                }
+            }
+
+            function playSound(soundElement) {
+                // Fallback conservé : élément audio local s'il existe encore
+                if (soundElement) {
+                    soundElement.currentTime = 0;
+                    soundElement.play().catch(() => {});
+                }
+            }
 
             function initPhysics() {
                 engine = Engine.create({
@@ -475,6 +526,7 @@
 
                 setTimeout(() => {
                     document.getElementById('loading-overlay').classList.add('hidden');
+                    playMusic();
                 }, 400);
             }
 
@@ -498,7 +550,6 @@
 
                     ctx.save();
                     
-                    // Couleur de la ligne change si la tour est en train de se stabiliser
                     if(framesStable > 10) {
                         ctx.strokeStyle = '#ffea00';
                         ctx.shadowColor = '#ffea00';
@@ -540,8 +591,7 @@
                         if (topY < highestY) {
                             highestY = topY;
                         }
-                        // Vérification de la vitesse (Matter.js gère 'body.speed')
-                        if (body.speed > 0.2) {
+                        if (body.speed > 0.3) {
                             allStable = false;
                         }
                     }
@@ -556,20 +606,39 @@
                     fillEl.style.width = percentage + '%';
                 }
 
-                // SI on est au-dessus de la cible ET qu'absolument rien ne bouge
-                if (activeBlocksCount > 0 && highestY <= targetHeightY && highestY < groundY - 40 && allStable) {
-                    framesStable++; // On incrémente le chronomètre de stabilité
-                    
+                // Condition de Victoire
+                if (activeBlocksCount > 0 && highestY <= targetHeightY && allStable) {
+                    framesStable++;
                     if (fillEl) fillEl.classList.add('stabilizing');
 
-                    // Si ça tient pendant ~1 seconde complète (60 frames), c'est gagné !
-                    if (framesStable >= 60) {
+                    if (framesStable >= 45) {
                         isGameOver = true;
+                        stopMusic();
+                        playSfx('success');
                         document.getElementById('victory-overlay').classList.remove('hidden');
                     }
                 } else {
-                    framesStable = 0; // Dès qu'un bloc bouge ou tombe, on remet le chrono à 0
+                    framesStable = 0;
                     if (fillEl) fillEl.classList.remove('stabilizing');
+                }
+
+                // Condition de Défaite (plus de blocs en stock, tour stable mais sous la ligne)
+                let totalRemainingBlocks = Object.values(blockCounts).reduce((a, b) => a + b, 0);
+                if (totalRemainingBlocks === 0 && activeBlocksCount > 0 && allStable && highestY > targetHeightY) {
+                    setTimeout(() => {
+                        if (!isGameOver && Object.values(blockCounts).reduce((a, b) => a + b, 0) === 0) {
+                            let checkStable = true;
+                            Composite.allBodies(engine.world).forEach(b => {
+                                if (!b.isStatic && b.speed > 0.1) checkStable = false;
+                            });
+                            if (checkStable && highestY > targetHeightY) {
+                                isGameOver = true;
+                                stopMusic();
+                                playSfx('fail');
+                                document.getElementById('defeat-overlay').classList.remove('hidden');
+                            }
+                        }
+                    }, 1500);
                 }
             }
 
@@ -587,8 +656,6 @@
                     if (isGameOver) return;
                     const rect = canvas.getBoundingClientRect();
                     const x = event.clientX - rect.left;
-                    
-                    // Fait apparaître le bloc au-dessus de la limite visible
                     const y = 35; 
 
                     spawnBlock(x, y, selectedBlockType);
@@ -599,14 +666,17 @@
                 });
 
                 document.getElementById('victory-continue-btn').addEventListener('click', () => {
+                    stopMusic();
                     window.location.href = '../true-detective/index.html';
                 });
 
                 document.getElementById('defeat-continue-btn').addEventListener('click', () => {
+                    stopMusic();
                     window.location.href = '../true-detective/index.html';
                 });
 
                 document.getElementById('back-to-minigame-btn').addEventListener('click', () => {
+                    stopMusic();
                     window.location.href = '../true-detective/index.html';
                 });
 
@@ -631,6 +701,7 @@
                 });
 
                 Composite.add(engine.world, block);
+                playSfx('material_fall', { material: selectedBlockType }); // Bruitage de la chute du bloc
 
                 blockCounts[type]--;
                 updateCounters();
@@ -646,6 +717,28 @@
             }
 
             window.addEventListener('load', initPhysics);
+        })();
+    </script>
+    <script src="../settings-menu.js"></script>
+    <script>
+        (function () {
+            'use strict';
+            if (window.DPSettings && window.DPSettings.init) {
+                window.DPSettings.init({
+                    showMusicToggle: false,
+                    showMusicVolume: false,
+                    showNarrationVolume: false,
+                    showMuteToggle: false,
+                    showGameSection: true,
+                    showBackToHub: true,
+                    showRestart: false,
+                    showRules: false,
+                    customButtons: [],
+                    onBackToHub: function () {
+                        window.location.href = '../true-detective/index.html';
+                    }
+                });
+            }
         })();
     </script>
 </body>
