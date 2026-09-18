@@ -189,7 +189,12 @@
                         var raw = localStorage.getItem('td_jackpot_clues');
                         if (raw) { clues = JSON.parse(raw) || []; localStorage.removeItem('td_jackpot_clues'); }
                     } catch (e) {}
-                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'jackpot', won: true, clues: clues, clue: clues.join(' '), ts: Date.now() })); } catch (e) {}
+                    try {
+                        var existingRaw = localStorage.getItem('td_standalone_game_result');
+                        if (!existingRaw) {
+                            localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'jackpot', won: false, clues: clues, clue: clues.join(' '), ts: Date.now() }));
+                        }
+                    } catch (e) {}
                     try {
                         var returnRaw = localStorage.getItem('td_standalone_game_return');
                         if (returnRaw) {

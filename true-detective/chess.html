@@ -300,7 +300,7 @@
 
             function handleContinueNavigation() {
                 try { 
-                    localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'chess', won: true, ts: Date.now() })); 
+                    localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'chess', won: chessWon, ts: Date.now() })); 
                 } catch (e) {}
                 
                 try {
@@ -363,11 +363,14 @@
                 clue: { fr: "Vivienne montre une nervosité inhabituelle.", en: "Vivienne shows unusual nervousness." }
             };
 
+            var chessWon = false;
+
             // Chargement ultra-fluide synchronisé avec l'affichage de l'écran
             function initChessGame() {
                 if (window.TDChessGame && window.TDChessGame.play) {
                     window.TDChessGame.play(cfg, 'fr', function (result) {
                         if (result && result.won) {
+                            chessWon = true;
                             var wrap = document.getElementById('story-continue-wrap');
                             if (wrap) wrap.style.display = 'flex';
                         }

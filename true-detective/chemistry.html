@@ -463,6 +463,7 @@
 
             var $backBtn = document.getElementById('back-to-minigame-btn');
             var $continueBtn = document.getElementById('story-continue-btn');
+            var chemistrySolved = false;
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1' || new URLSearchParams(window.location.search).get('mode') === 'story';
 
             if (fromStory) {
@@ -478,7 +479,7 @@
             }
 
             function handleContinueNavigation() {
-                try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'chemistry', won: true, ts: Date.now() })); } catch (e) {}
+                try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'chemistry', won: chemistrySolved, ts: Date.now() })); } catch (e) {}
                 try {
                     var returnRaw = localStorage.getItem('td_standalone_game_return');
                     if (returnRaw) {
@@ -620,8 +621,9 @@
                     consoleEl.style.color = 'var(--accent-green)';
                     consoleEl.textContent = `🎉 SUCCÈS : Profil ADN de ${suspect.name} extrait avec succès !`;
 
-                    let allSolved = suspectsData.every(s => s.solved);
+                     let allSolved = suspectsData.every(s => s.solved);
                     if (allSolved) {
+                        chemistrySolved = true;
                         document.getElementById('mission-board').innerHTML = "🏆 <b>TOUS LES SUSPECTS ONT ÉTÉ ANALYSÉS !</b> Séquençage complet terminé.";
                         const fromStory = new URLSearchParams(window.location.search).get('story') === '1' || new URLSearchParams(window.location.search).get('mode') === 'story';
                         if (fromStory) {

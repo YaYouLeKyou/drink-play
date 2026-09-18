@@ -4375,7 +4375,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                     if ($.typeCursor) $.typeCursor.classList.add('hidden');
                     $.continueBtn.classList.remove('hidden');
                     $.continueBtn.disabled = false;
-                    $.continueBtn.textContent = lang === 'fr' ? '🎯 Lancer le défi' : '🎯 Face the challenge';
+                    $.continueBtn.textContent = getText('continue') || 'Continuer';
                     $.continueBtn.onclick = function () {
                         $.continueBtn.disabled = true;
                         window.location.href = getMinigameStandaloneUrl(standaloneType, diff, langParam, 'story', getThemeId());

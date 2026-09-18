@@ -723,6 +723,12 @@
                 
                 continueBtn.addEventListener('click', function () {
                     try {
+                        var existingRaw = localStorage.getItem('td_standalone_game_result');
+                        if (!existingRaw) {
+                            localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'bataille-navale', won: false, ts: Date.now() }));
+                        }
+                    } catch (e) {}
+                    try {
                         var returnRaw = localStorage.getItem('td_standalone_game_return');
                         if (returnRaw) {
                             var rp = JSON.parse(returnRaw);

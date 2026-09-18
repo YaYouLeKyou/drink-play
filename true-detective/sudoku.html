@@ -39,6 +39,7 @@
     <header class="sg-header">
         <h1 class="sg-title" id="sgTitle">Sudoku de Blackwood</h1>
         <button id="back-to-minigame-btn" class="btn">Retour</button>
+        <button id="story-continue-btn" class="btn-continue" style="display:none;">Continuer</button>
     </header>
     <main class="sg-main">
         <div class="sudoku-wrap">
@@ -236,6 +237,27 @@
             } catch (e) {}
             window.location.href = returnUrl;
         });
+
+        /* Bouton Continuer toujours visible (mode histoire) */
+        var storyContinueBtn = document.getElementById('story-continue-btn');
+        if (story && storyContinueBtn) {
+            storyContinueBtn.style.display = 'inline-block';
+            storyContinueBtn.addEventListener('click', function () {
+                if (ended) return;
+                try {
+                    var existingRaw = localStorage.getItem('td_standalone_game_result');
+                    if (!existingRaw) {
+                        localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'sudoku', won: false, ts: Date.now() }));
+                    }
+                } catch (e) {}
+                var returnUrl = '../true-detective/index.html?standalone=sudoku';
+                try {
+                    var raw = localStorage.getItem('td_standalone_game_return');
+                    if (raw) { var rp = JSON.parse(raw); if (rp && rp.returnUrl) returnUrl = rp.returnUrl; }
+                } catch (e) {}
+                window.location.href = returnUrl;
+            });
+        }
 
         /* ---------- Textes & navigation ---------- */
         document.getElementById('sgTitle').textContent = lang === 'fr' ? 'Sudoku de Blackwood' : "Blackwood's Sudoku";

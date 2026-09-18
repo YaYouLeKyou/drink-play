@@ -457,8 +457,9 @@
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
                 if (storyContinueBtn) {
+                    storyContinueBtn.style.display = 'inline-block';
                     storyContinueBtn.addEventListener('click', function () {
-                        try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'puzzle', won: true, clue: "Derrière la boiserie, un mur latéral bascule révélant un compartiment caché. Les documents falsifiés y sont stockés.", ts: Date.now() })); } catch (e) {}
+                        try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'puzzle', won: solved, clue: solved ? "Derrière la boiserie, un mur latéral bascule révélant un compartiment caché. Les documents falsifiés y sont stockés." : "", ts: Date.now() })); } catch (e) {}
                         try {
                             var returnRaw = localStorage.getItem('td_standalone_game_return');
                             if (returnRaw) {

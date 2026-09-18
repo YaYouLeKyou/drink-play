@@ -1307,6 +1307,11 @@
 
                     if (backBtn) backBtn.style.display = 'none';
 
+                    var storyContinueBtn = document.getElementById('story-continue-btn');
+                    if (storyContinueBtn) {
+                        storyContinueBtn.style.display = 'inline-block';
+                    }
+
                 } else {
 
                     if (backBtn) {
@@ -1333,7 +1338,12 @@
 
                     storyContinueBtn.addEventListener('click', function () {
 
-                        try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'montre_code', won: true, ts: Date.now() })); } catch (e) {}
+                        try {
+                            var existingRaw = localStorage.getItem('td_standalone_game_result');
+                            if (!existingRaw) {
+                                localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'montre_code', won: false, ts: Date.now() }));
+                            }
+                        } catch (e) {}
 
                         try {
 

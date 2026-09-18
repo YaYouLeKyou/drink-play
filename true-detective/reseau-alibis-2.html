@@ -116,6 +116,7 @@
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
         <h2 class="sg-title" style="color:#f0d890;font-family:'Playfair Display',serif;">🕸️ Réseau d'alibis - 4 cartes</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
+        <button id="story-continue-btn" class="btn-continue" style="display:none;">Continuer</button>
     </header>
 
     <nav id="hamburger-menu" class="sg-menu">
@@ -203,6 +204,24 @@
             if (backBtn) {
                 if (fromStory) {
                     backBtn.style.display = 'none';
+                    var storyContinueBtn = document.getElementById('story-continue-btn');
+                    if (storyContinueBtn) {
+                        storyContinueBtn.style.display = 'inline-block';
+                        storyContinueBtn.addEventListener('click', function () {
+                            try {
+                                var existingRaw = localStorage.getItem('td_standalone_game_result');
+                                if (!existingRaw) {
+                                    localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau_alibis', won: false, ts: Date.now() }));
+                                }
+                            } catch (e) {}
+                            var returnUrl = '../true-detective/index.html?standalone=reseau_alibis';
+                            try {
+                                var rr = localStorage.getItem('td_standalone_game_return');
+                                if (rr) { var rp = JSON.parse(rr); if (rp && rp.returnUrl) returnUrl = rp.returnUrl; }
+                            } catch (e2) {}
+                            window.location.href = returnUrl;
+                        });
+                    }
                 } else {
                     backBtn.textContent = 'Accueil';
                     backBtn.addEventListener('click', function () {

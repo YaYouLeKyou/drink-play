@@ -474,7 +474,16 @@
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
                 if (storyContinueBtn) {
-                    storyContinueBtn.addEventListener('click', proceedToNext);
+                    storyContinueBtn.style.display = 'inline-block';
+                    storyContinueBtn.addEventListener('click', function () {
+                        try {
+                            var existingRaw = localStorage.getItem('td_standalone_game_result');
+                            if (!existingRaw) {
+                                localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'pong', won: false, ts: Date.now() }));
+                            }
+                        } catch (e) {}
+                        proceedToNext();
+                    });
                 }
             } else {
                 if (storyContinueBtn) storyContinueBtn.style.display = 'none';

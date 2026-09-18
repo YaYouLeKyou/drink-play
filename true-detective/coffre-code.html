@@ -464,6 +464,14 @@
             function proceedToNext() {
                 var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
                 try {
+                    var resultRaw = localStorage.getItem('td_standalone_game_result');
+                    if (!resultRaw) {
+                        localStorage.setItem('td_standalone_game_result', JSON.stringify({
+                            type: 'coffre_code', won: false, ts: Date.now()
+                        }));
+                    }
+                } catch (e) {}
+                try {
                     var returnRaw = localStorage.getItem('td_standalone_game_return');
                     if (returnRaw) {
                         var rp = JSON.parse(returnRaw);
@@ -506,6 +514,7 @@
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
                 if (storyContinueBtn) {
+                    storyContinueBtn.style.display = 'inline-block';
                     storyContinueBtn.addEventListener('click', proceedToNext);
                 }
             } else {

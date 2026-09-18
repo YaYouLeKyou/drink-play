@@ -457,7 +457,9 @@
                 if (backBtn) backBtn.style.display = 'none';
                 var storyContinueBtn = document.getElementById('story-continue-btn');
                 if (storyContinueBtn) {
+                    storyContinueBtn.style.display = 'inline-block';
                     storyContinueBtn.addEventListener('click', function () {
+                        try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'connect4', won: false, ts: Date.now() })); } catch (e) {}
                         try {
                             var returnRaw = localStorage.getItem('td_standalone_game_return');
                             if (returnRaw) {

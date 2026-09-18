@@ -330,6 +330,7 @@
             <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu" style="background:none;border:none;color:var(--neon-blue);font-size:1.3rem;cursor:pointer;">☰</button>
             <h1 class="tower-title">La Tour de Silas</h1>
             <button id="back-to-minigame-btn" class="btn btn-secondary" style="margin-top:0;padding:6px 14px;font-size:0.75rem;">Retour</button>
+            <button id="story-continue-btn" class="btn btn-continue" style="display:none;margin-top:0;padding:6px 14px;font-size:0.75rem;">Continuer</button>
         </header>
 
         <main class="tower-main">
@@ -631,6 +632,10 @@
             }
 
             function initUI() {
+                if (fromStory) {
+                    var backBtn = document.getElementById('back-to-minigame-btn');
+                    if (backBtn) backBtn.style.display = 'none';
+                }
                 const paletteBtns = document.querySelectorAll('.palette-btn');
                 paletteBtns.forEach(btn => {
                     btn.addEventListener('click', () => {
@@ -655,18 +660,40 @@
 
                 document.getElementById('victory-continue-btn').addEventListener('click', () => {
                     stopMusic();
-                    window.location.href = '../true-detective/index.html';
+                    try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: true, ts: Date.now() })); } catch (e) {}
+                    window.location.href = fromStory ? '../true-detective/index.html?marginalTower=complete' : '../true-detective/index.html';
                 });
 
                 document.getElementById('defeat-continue-btn').addEventListener('click', () => {
                     stopMusic();
-                    window.location.href = '../true-detective/index.html';
+                    try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: false, ts: Date.now() })); } catch (e) {}
+                    window.location.href = fromStory ? '../true-detective/index.html?marginalTower=complete' : '../true-detective/index.html';
                 });
 
                 document.getElementById('back-to-minigame-btn').addEventListener('click', () => {
                     stopMusic();
                     window.location.href = '../true-detective/index.html';
                 });
+
+                var storyBtn = document.getElementById('story-continue-btn');
+                if (fromStory && storyBtn) {
+                    storyBtn.style.display = 'inline-block';
+                    storyBtn.addEventListener('click', function () {
+                        stopMusic();
+                        try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: false, ts: Date.now() })); } catch (e) {}
+                        try {
+                            var returnRaw = localStorage.getItem('td_standalone_game_return');
+                            if (returnRaw) {
+                                var rp = JSON.parse(returnRaw);
+                                if (rp && rp.returnUrl) {
+                                    window.location.href = rp.returnUrl;
+                                    return;
+                                }
+                            }
+                        } catch (e) {}
+                        window.location.href = '../true-detective/index.html?marginalTower=complete';
+                    });
+                }
 
                 updateCounters();
             }
@@ -712,6 +739,7 @@
     <script>
         (function () {
             'use strict';
+            var fromStory = new URLSearchParams(window.location.search).get('story') === '1' || (function () { try { return !!localStorage.getItem('td_marginal_tower_return'); } catch (e) { return false; } })();
             if (window.DPSettings && window.DPSettings.init) {
                 window.DPSettings.init({
                     showMusicToggle: false,
@@ -719,12 +747,12 @@
                     showNarrationVolume: false,
                     showMuteToggle: false,
                     showGameSection: true,
-                    showBackToHub: true,
+                    showBackToHub: !fromStory,
                     showRestart: false,
                     showRules: false,
                     customButtons: [],
                     onBackToHub: function () {
-                        window.location.href = '../true-detective/index.html';
+                        window.location.href = fromStory ? '../true-detective/index.html?standalone=marginal-tower' : '../true-detective/index.html';
                     }
                 });
             }
