@@ -287,6 +287,7 @@
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
 
             if (fromStory) {
+                if ($backBtn) $backBtn.style.display = 'none';
                 var wrap = document.getElementById('story-continue-wrap');
                 if (wrap) wrap.style.display = 'flex';
             } else {
