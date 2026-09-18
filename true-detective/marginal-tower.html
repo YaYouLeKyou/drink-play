@@ -468,23 +468,11 @@
             };
 
             function playMusic() {
-                // Priorité au lecteur du parent (crossfade global), sinon audio local
-                if (playMinigameMusic('marginal-tower')) return;
-                if (bgMusic) {
-                    bgMusic.volume = 0.4;
-                    bgMusic.play().catch(() => {
-                        document.addEventListener('click', () => {
-                            bgMusic.play().catch(() => {});
-                        }, { once: true });
-                    });
-                }
+                window.playMinigameMusic('marginal-tower');
             }
 
             function stopMusic() {
-                if (bgMusic) {
-                    bgMusic.pause();
-                    bgMusic.currentTime = 0;
-                }
+                window.stopMinigameMusic();
             }
 
             function playSound(soundElement) {
@@ -719,6 +707,7 @@
             window.addEventListener('load', initPhysics);
         })();
     </script>
+    <script src="minigame-audio.js" data-minigame="marginal-tower"></script>
     <script src="../settings-menu.js"></script>
     <script>
         (function () {

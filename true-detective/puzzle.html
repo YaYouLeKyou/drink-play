@@ -210,7 +210,7 @@
 <body>
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
-        <h2 class="sg-title" style="color:var(--accent-orange);font-family:'Playfair Display',serif;">Reconstitution Coulissante</h2>
+        <h2 class="sg-title" style="color:var(--accent-orange);font-family:'Playfair Display',serif;">Anomalie Murale</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
     
@@ -237,20 +237,19 @@
             
             <div class="puzzle-grid" id="puzzle-grid"></div>
             
-            <div class="puzzle-status" id="puzzle-status">Glissez les tuiles adjacentes vers la case vide pour reconstituer le dossier.</div>
+            <div class="puzzle-status" id="puzzle-status">Examinez le mur de boiserie. Assemblez les anomalies pour localiser le compartiment caché.</div>
             
             <div class="puzzle-controls">
                 <button class="puzzle-btn" id="reset-puzzle-btn">Réinitialiser</button>
             </div>
             
             <div class="puzzle-hint">
-                Cliquez sur une pièce voisine de la case vide pour la faire coulisser. Classez les indices de 1 à 8 dans l'ordre croissant.
+                Cliquez sur une tuile adjacente à la case vide pour la faire glisser. Assemblez les indices de 1 à 8 pour révéler l'emplacement du compartiment caché derrière la boiserie.
             </div>
         </div>
     </main>
 
     <script src="minigames.js"></script>
-    <script src="standalone-game.js"></script>
     <script src="../settings-menu.js"></script>
     <script src="standalone-theme.js"></script>
     <script src="sfx.js"></script>
@@ -267,14 +266,14 @@
 
             // 8 pièces + 1 case vide (représentée par la valeur 0)
             var tileData = [
-                { id: 1, text: 'Rapport Initial' },
-                { id: 2, text: 'Scène de Crime' },
-                { id: 3, text: 'Relevé Empreintes' },
-                { id: 4, text: 'Analyse Balistique' },
-                { id: 5, text: 'Témoignage Clé' },
-                { id: 6, text: 'Aveux du Suspect' },
-                { id: 7, text: 'Mandat de Perqu\'' },
-                { id: 8, text: 'Pièce à Conviction' }
+                { id: 1, text: 'Joints de bois lâches' },
+                { id: 2, text: 'Vis anormales' },
+                { id: 3, text: 'Trace d\'humidité' },
+                { id: 4, text: 'Craquelure discrète' },
+                { id: 5, text: 'Boîtier vide derrière la plaque' },
+                { id: 6, text: 'Mécanisme de verrouillage' },
+                { id: 7, text: 'Mur latéral mobile' },
+                { id: 8, text: 'Compartiment caché révélé' }
             ];
 
             var board = []; // Tableau de 9 éléments contenant les IDs (1 à 8, et 0 pour le vide)
@@ -356,7 +355,7 @@
                 failed = false;
                 moves = 0;
                 movesEl.textContent = 'Mouvements : 0';
-                statusEl.textContent = 'Glissez les tuiles adjacentes vers la case vide.';
+                statusEl.textContent = 'Assemblez les tuiles pour découvrir l\'anomalie derrière la boiserie.';
                 shuffleBoard();
                 renderGrid();
                 startTimer();
@@ -420,11 +419,11 @@
 
                 solved = true;
                 clearInterval(timerInterval);
-                statusEl.innerHTML = '<span style="color:var(--accent-green); font-weight:700;">Dossier parfaitement reconstitué ! Affaire classée.</span>';
+                statusEl.innerHTML = '<span style="color:var(--accent-green); font-weight:700;">Compartiment caché découvert ! Un mur bascule derrière la boiserie.</span>';
 
                 try {
                     localStorage.setItem('td_standalone_game_result', JSON.stringify({
-                        type: 'puzzle', won: true, score: timeLeft, ts: Date.now()
+                        type: 'puzzle', won: true, score: timeLeft, clue: "Derrière la boiserie, un mur latéral bascule révélant un compartiment caché. Les documents falsifiés y sont stockés.", ts: Date.now()
                     }));
                 } catch (e) {}
 
@@ -459,7 +458,7 @@
                 if (backBtn) backBtn.style.display = 'none';
                 if (storyContinueBtn) {
                     storyContinueBtn.addEventListener('click', function () {
-                        try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'puzzle', won: true, ts: Date.now() })); } catch (e) {}
+                        try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'puzzle', won: true, clue: "Derrière la boiserie, un mur latéral bascule révélant un compartiment caché. Les documents falsifiés y sont stockés.", ts: Date.now() })); } catch (e) {}
                         try {
                             var returnRaw = localStorage.getItem('td_standalone_game_return');
                             if (returnRaw) {
@@ -494,6 +493,7 @@
             }
 
             var menuHome = document.getElementById('menu-home');
+            if (fromStory && menuHome) menuHome.style.display = 'none';
             if (menuHome) {
                 menuHome.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');

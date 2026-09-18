@@ -102,29 +102,6 @@
         
         .reseau-alibis-message { position: relative; margin: 12px auto 0; padding: 8px 14px; max-width: 480px; text-align: center; font-size: 0.88rem; color: #f0d890; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(240, 216, 144, 0.4); border-radius: 8px; z-index: 1; }
         
-        #story-continue-btn {
-            position: fixed !important;
-            top: 14px !important;
-            right: 20px !important;
-            /* Annule bottom/left/transform heritees de styles.css (.btn-continue) :
-               avec top + bottom definis, le bouton fixed s'etirerait sur toute la
-               hauteur de l'ecran et masquerait le mini-jeu. */
-            bottom: auto !important;
-            left: auto !important;
-            transform: none !important;
-            max-width: none !important;
-            padding: 8px 18px !important;
-            font-size: 0.85rem !important;
-            font-weight: 700 !important;
-            background: rgba(0, 255, 136, 0.12) !important;
-            border: 2px solid var(--accent-green) !important;
-            border-radius: 8px !important;
-            color: var(--accent-green) !important;
-            cursor: pointer !important;
-            z-index: 100 !important;
-            display: none;
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
-        }
     </style>
 </head>
 <body>
@@ -155,9 +132,9 @@
         </div>
     </main>
 
-    <button id="story-continue-btn" class="btn btn-continue">Continuer l'Enquête</button>
 
     <script src="minigames.js"></script>
+    <script src="alibi-navigation.js"></script>
     <script src="sfx.js"></script>
     <script src="minigame-audio.js" data-minigame="reseau_alibis"></script>
     <script src="../settings-menu.js"></script>
@@ -218,45 +195,20 @@
             }
 
             var backBtn = document.getElementById('back-to-minigame-btn');
-            var continueBtn = document.getElementById('story-continue-btn');
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1' || new URLSearchParams(window.location.search).get('mode') === 'story';
-            var gameResult = null;
-
-            function handleContinueNavigation() {
-                var won = (gameResult && typeof gameResult.won === 'boolean') ? gameResult.won : true;
-                try { 
-                    localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau_alibis', won: won, ts: Date.now() })); 
-                } catch (e) {}
-                try {
-                    var returnRaw = localStorage.getItem('td_standalone_game_return');
-                    if (returnRaw) {
-                        var rp = JSON.parse(returnRaw);
-                        if (rp && rp.returnUrl) {
-                            window.location.href = rp.returnUrl;
-                            return;
-                        }
-                    }
-                } catch (e) {}
-                window.location.href = fromStory ? '../true-detective/index.html?standalone=reseau_alibis' : '../true-detective/index.html#minigames';
-            }
-
-            if (fromStory) {
-                if (backBtn) backBtn.style.display = 'none';
-                if (continueBtn) {
-                    continueBtn.style.display = 'none';
-                    continueBtn.addEventListener('click', handleContinueNavigation);
-                }
-            } else {
-                if (backBtn) {
+            if (backBtn) {
+                if (fromStory) {
+                    backBtn.style.display = 'none';
+                } else {
                     backBtn.textContent = 'Accueil';
                     backBtn.addEventListener('click', function () {
-                        if (menu) menu.classList.remove('open');
                         window.location.href = '../true-detective/index.html#minigames';
                     });
                 }
             }
 
             var menuHome = document.getElementById('menu-home');
+            if (fromStory && menuHome) menuHome.style.display = 'none';
             if (menuHome) {
                 menuHome.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
@@ -296,10 +248,7 @@
             if (target) {
                 target.innerHTML = '';
                 if (window.TDMiniGames && typeof window.TDMiniGames.play === 'function') {
-                    window.TDMiniGames.play(cfg, cfg.lang || 'fr', function(result) {
-                        gameResult = result || null;
-                        if (fromStory && continueBtn) continueBtn.style.display = 'block';
-                    }, target);
+                    window.TDMiniGames.play(cfg, cfg.lang || 'fr', window.TDAlibiNavigation, target);
                 } else {
                     target.innerHTML = '<div style="color: #ff6b6b; text-align: center; padding: 20px;">Erreur : Le fichier de mini-jeux (minigames.js) est introuvable ou n\'a pas pu se charger correctement.</div>';
                 }

@@ -139,12 +139,22 @@
                 }
                 content.appendChild(reward);
             }
+            var isAlibi = cfg.type === 'reseau_alibis';
+            if (isAlibi) {
+                content.querySelectorAll('.reseau-alibis-card').forEach(function (card) {
+                    card.disabled = true;
+                });
+            }
+            var continued = false;
             var btn = document.createElement('button');
-            btn.className = 'btn btn-primary';
-            btn.textContent = won
+            btn.className = isAlibi ? 'btn btn-primary reseau-alibis-continue' : 'btn btn-primary';
+            btn.type = 'button';
+            btn.textContent = won && !isAlibi
                 ? (lang === 'fr' ? 'Consigner l\u2019indice' : 'Record the clue')
                 : (lang === 'fr' ? 'Continuer' : 'Continue');
             btn.addEventListener('click', function () {
+                if (continued) return;
+                continued = true;
                 if (useOverlay) {
                     layer.classList.remove('active');
                     layer.innerHTML = '';
@@ -899,13 +909,9 @@
                             });
             if (perfectRun) {
                                 showEndMessage(lang === 'fr' ? 'Indice obtenu !' : 'Clue obtained!');
-                                complete(true);
-                                addContinueButton(true);
-                            } else {
+                                complete(true);                            } else {
                                 showEndMessage(lang === 'fr' ? 'Vous avez identifié les mensonges mais avez fait des erreurs. Pas d\'indice.' : 'You found the lies but made errors. No clue.');
-                                complete(false);
-                                addContinueButton(false);
-                            }
+                                complete(false);                            }
                         }
                     } else {
                         mistakes++;
@@ -926,9 +932,7 @@
                             tag.classList.add('tag-true');
                             locked = true;
                             showEndMessage(lang === 'fr' ? 'Trop d\'erreurs. Pas d\'indice.' : 'Too many errors. No clue.');
-                                complete(false);
-                                addContinueButton(false);
-                        }
+                                complete(false);                        }
                     }
                 });
                 carouselTrack.appendChild(card);
@@ -954,29 +958,6 @@
                 }
             });
             updateCarousel();
-
-            function addContinueButton(won) {
-                if (board.querySelector('.resea-alibis-continue')) return;
-                var btn = document.createElement('button');
-                btn.className = 'btn resea-alibis-continue';
-                btn.textContent = lang === 'fr' ? 'Continuer' : 'Continuer';
-                btn.addEventListener('click', function () {
-                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau_alibis', won: !!won, ts: Date.now() })); } catch (e) {}
-                    try {
-                        var returnRaw = localStorage.getItem('td_standalone_game_return');
-                        if (returnRaw) {
-                            var rp = JSON.parse(returnRaw);
-                            if (rp && rp.returnUrl) {
-                                window.location.href = rp.returnUrl;
-                                return;
-                            }
-                        }
-                    } catch (e) {}
-                    var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
-                    window.location.href = fromStory ? '../true-detective/index.html?standalone=reseau_alibis' : '../true-detective/index.html#minigames';
-                });
-                board.appendChild(btn);
-            }
 
             /* Hint adaptatif : à 40% du temps, illumine les cartes
                qui contiennent un mensonge.                          */

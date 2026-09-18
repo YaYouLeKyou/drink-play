@@ -325,6 +325,7 @@
         </div>
     </main>
 
+    <script src="minigame-audio.js" data-minigame="bataille-navale"></script>
     <script src="../settings-menu.js"></script>
     <script src="standalone-theme.js"></script>
     <script>
@@ -744,6 +745,7 @@
             }
 
             var menuHome = document.getElementById('menu-home');
+            if (fromStory && menuHome) menuHome.style.display = 'none';
             if (menuHome) {
                 menuHome.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');

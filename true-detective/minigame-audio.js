@@ -34,80 +34,83 @@
 
     var currentType = null;
     var localAudio = null;
-    var started = false;
+    var localType = null;
+    var pending = false;
+    var stopped = false;
 
-    function getSfx() {
+    function getService() {
         try {
-            return window.TDSfx || (window.parent && window.parent.TDSfx) || null;
+            return window.TDAudioService || (window.parent !== window && window.parent.TDAudioService);
         } catch (e) { return null; }
     }
 
     window.playSfx = function (name, opts) {
         try {
-            var fx = getSfx();
+            var fx = window.TDSfx || (window.parent && window.parent.TDSfx);
             if (fx) fx.play(name, opts);
         } catch (e) {}
     };
 
-    function startLocalMusic(type) {
-        var track = TRACKS[type];
-        if (!track) return;
-        try {
-            localAudio = new Audio('music true detective/mini-jeux/' + track);
+    function startMusic() {
+        if (stopped || !currentType || !TRACKS[currentType]) return;
+        var svc = getService();
+        // A service without a ready player must not swallow the local fallback.
+        if (svc && svc.playMinigameMusic && svc.playMinigameMusic(currentType) === true) {
+            if (localAudio) localAudio.pause();
+            return;
+        }
+        if (localType !== currentType) {
+            if (localAudio) localAudio.pause();
+            localAudio = document.getElementById('game-music') || new Audio();
+            localAudio.src = new URL('music true detective/mini-jeux/' + TRACKS[currentType], document.baseURI).href;
             localAudio.loop = true;
+            localAudio.preload = 'auto';
+            localAudio.controls = false;
+            localAudio.hidden = true;
             localAudio.volume = 0.4;
-            var p = localAudio.play();
-            if (p && typeof p.catch === 'function') p.catch(function () {});
-        } catch (e) {}
+            localType = currentType;
+            pending = false;
+        }
+        if (pending || !localAudio.paused) return;
+        pending = true;
+        try {
+            var promise = localAudio.play();
+            if (promise && promise.then) {
+                promise.then(function () { pending = false; }, function () {
+                    // Keep gesture listeners armed after every rejected attempt.
+                    pending = false;
+                });
+            } else {
+                pending = false;
+            }
+        } catch (e) { pending = false; }
     }
 
     window.playMinigameMusic = function (type) {
-        if (!type || !TRACKS[type]) return;
+        if (!TRACKS[type]) return false;
         currentType = type;
-        // 1) Service du parent si iframe
-        try {
-            var svc = window.TDAudioService || (window.parent && window.parent.TDAudioService);
-            if (svc && svc.playMinigameMusic) { svc.playMinigameMusic(type); started = true; return; }
-        } catch (e) {}
-        // 2) Fallback local (page ouverte hors iframe)
-        //    Le navigateur bloque l'autoplay sans geste utilisateur :
-        //    on ne lance pas la musique ici, on laisse onFirstGesture le faire.
-        if (localAudio) { try { localAudio.pause(); } catch (e) {} localAudio = null; }
-        started = false; // réautoriser le démarrage au prochain geste
+        stopped = false;
+        startMusic();
+        return true;
+    };
+    window.stopMinigameMusic = function () {
+        stopped = true;
+        if (localAudio) localAudio.pause();
     };
 
-    // Autoplay : la musique ne peut démarrer qu'après un geste utilisateur.
-    function onFirstGesture() {
-        if (started || !currentType) return;
-        started = true;
-        try {
-            var svc = window.TDAudioService || (window.parent && window.parent.TDAudioService);
-            if (svc && svc.playMinigameMusic) { svc.playMinigameMusic(currentType); return; }
-        } catch (e) {}
-        if (!localAudio) startLocalMusic(currentType);
-    }
-    // Capture phase so stopPropagation() on child elements doesn't block autoplay unlock.
-    document.addEventListener('click', onFirstGesture, true);
-    document.addEventListener('mousedown', onFirstGesture, true);
-    document.addEventListener('keydown', onFirstGesture, true);
-    document.addEventListener('touchstart', onFirstGesture, { capture: true, passive: true });
+    // Capture also sees gestures intercepted by canvas/game handlers.
+    ['pointerdown', 'click', 'keydown', 'touchend'].forEach(function (event) {
+        document.addEventListener(event, startMusic, true);
+    });
+    window.addEventListener('pagehide', window.stopMinigameMusic);
+    window.addEventListener('pageshow', function () {
+        stopped = false;
+        startMusic();
+    });
 
-    // Type de mini-jeu lu depuis l'attribut data-minigame du script,
-    // sinon depuis l'URL (?game= ou ?type=)
-    try {
-        var script = document.currentScript;
-        var urlType = null;
-        try {
-            var qs = new URLSearchParams(window.location.search);
-            urlType = qs.get('game') || qs.get('type');
-        } catch (e) {}
-        currentType = (script && script.getAttribute('data-minigame')) || urlType || null;
-        if (currentType && TRACKS[currentType]) {
-            // Si le parent est déjà là (iframe), lancer direct ; sinon attendre le geste
-            try {
-                var svc0 = window.TDAudioService || (window.parent && window.parent.TDAudioService);
-                if (svc0 && svc0.playMinigameMusic) { svc0.playMinigameMusic(currentType); started = true; }
-            } catch (e) {}
-        }
-    } catch (e) {}
+    var script = document.currentScript;
+    var params = new URLSearchParams(window.location.search);
+    currentType = (script && script.getAttribute('data-minigame')) || params.get('game') || params.get('type');
+    if (!currentType && /\/standalone-game\.html$/.test(window.location.pathname)) currentType = 'scene_fouille';
+    startMusic();
 })();

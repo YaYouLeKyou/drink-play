@@ -446,6 +446,7 @@
 
     <button id="story-continue-btn" class="btn btn-continue">Continuer l'Enquête</button>
 
+    <script src="minigame-audio.js" data-minigame="chemistry"></script>
     <script src="../settings-menu.js"></script>
     <script src="standalone-theme.js"></script>
     <script>
@@ -491,6 +492,7 @@
             if ($continueBtn) { $continueBtn.addEventListener('click', handleContinueNavigation); }
 
             var menuHome = document.getElementById('menu-home');
+            if (fromStory && menuHome) menuHome.style.display = 'none';
             if (menuHome) {
                 menuHome.addEventListener('click', function () {
                     window.location.href = fromStory ? '../true-detective/index.html?standalone=chemistry' : '../true-detective/index.html#minigames';

@@ -18,19 +18,49 @@
         } catch (e) {}
     }
 
-    var SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '🔔', '💎', '7️⃣', '⭐'];
-    var WEIGHTS = [25, 22, 18, 14, 10, 5, 3, 3];
-    var PAYOUTS = {
-        '7️⃣7️⃣7️⃣': 10,
-        '💎💎💎': 8,
-        '⭐⭐⭐': 7,
-        '🔔🔔🔔': 5,
-        '🍇🍇🍇': 4,
-        '🍊🍊🍊': 3,
-        '🍋🍋🍋': 2,
-        '🍒🍒': 1,
-        '🍒🍒🍒': 2
+    /* Rouleaux thématiques : coeur = liaison, coeur brisé = inimitié,
+       dollar = histoire d'argent. Le jackpot tombe à 40 % par tour. */
+    var SYMBOLS = ['❤️', '💔', '💲'];
+    var JACKPOT_CHANCE = 0.40;
+
+    /* Indices ancrés dans l'enquête du Duc (scenario.js / phases.js). */
+    var CLUES = {
+        fr: {
+            heart: [
+                "Liaison secrète : Lady Vivienne et Julian Pembrooke se retrouvaient à l'abri des regards, au grand dam du Major Hale.",
+                "Le Major Hale courtisait Lady Vivienne depuis des mois — elle ne lui a jamais rien promis.",
+                "Le peigne de Lady Vivienne porte une gravure « J.P. » : un cadeau de Pembrooke, visiblement offert en cachette."
+            ],
+            broken: [
+                "Inimitié ouverte : le Major Hale voue une haine farouche à Julian Pembrooke, son rival auprès de Vivienne.",
+                "Silas Crane n'a jamais pardonné au Duc de l'avoir humilié publiquement lors d'une partie de cartes.",
+                "Victor Krane jure que le Major Hale lui a passé commande — lui, l'assassin à gage, contre Pembrooke."
+            ],
+            money: [
+                "Rupert Blackwood, le notaire, devait une fortune au Duc : seule la mort du créancier pouvait effacer la dette.",
+                "Des versements réguliers du compte de Hale alimentaient une tirelire au nom de Victor Krane.",
+                "Le coffre du Duc a été fouillé : les reçus de prêt signés par Blackwood ont disparu."
+            ]
+        },
+        en: {
+            heart: [
+                "Secret affair: Lady Vivienne and Julian Pembrooke met away from prying eyes, much to Major Hale's despair.",
+                "Major Hale has been courting Lady Vivienne for months — she never promised him anything.",
+                "Lady Vivienne's comb bears the engraving \"J.P.\": a gift from Pembrooke, clearly given in secret."
+            ],
+            broken: [
+                "Open enmity: Major Hale harbours fierce hatred for Julian Pembrooke, his rival for Vivienne.",
+                "Silas Crane never forgave the Duke for publicly humiliating him during a card game.",
+                "Victor Krane swears Major Hale placed the order — he, the hired killer, against Pembrooke."
+            ],
+            money: [
+                "Rupert Blackwood, the notary, owed the Duke a fortune: only the creditor's death could erase the debt.",
+                "Regular payments from Hale's account fed a stash under Victor Krane's name.",
+                "The Duke's safe was searched: loan receipts signed by Blackwood have vanished."
+            ]
+        }
     };
+    var TYPE_BY_SYMBOL = { '❤️': 'heart', '💔': 'broken', '💲': 'money' };
 
     var PHRASES = {
         fr: [
@@ -47,14 +77,18 @@
         ]
     };
 
-    function weightedRandom() {
-        var total = WEIGHTS.reduce(function (a, b) { return a + b; }, 0);
-        var r = Math.random() * total;
-        for (var i = 0; i < SYMBOLS.length; i++) {
-            r -= WEIGHTS[i];
-            if (r <= 0) return SYMBOLS[i];
+    /* Le jackpot est décidé d'avance (40 %) : en cas de gain, les trois
+       rouleaux s'alignent sur le même symbole thématique. Sinon, au moins
+       un symbole diffère, sans jamais former un trio gagnant. */
+    function rollReels() {
+        if (Math.random() < JACKPOT_CHANCE) {
+            var sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+            return [sym, sym, sym];
         }
-        return SYMBOLS[0];
+        var pick = function () { return SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]; };
+        var a = pick(), b = pick(), c = pick();
+        while (a === b && b === c) { c = pick(); }
+        return [a, b, c];
     }
 
     function init() {
@@ -71,20 +105,31 @@
         var $spins = document.getElementById('jackpot-spins');
         var $btn = document.getElementById('jackpot-btn');
         var $machine = document.querySelector('.jackpot-machine');
+        var $clue = document.getElementById('jackpot-clue');
+        var collectedClues = [];
+        var clueCursor = { heart: 0, broken: 0, money: 0 };
+
+        function showClue(type) {
+            var pool = CLUES[lang === 'en' ? 'en' : 'fr'][type];
+            if (!pool || !pool.length) return null;
+            var idx = clueCursor[type] % pool.length;
+            clueCursor[type]++;
+            return pool[idx];
+        }
 
         function updateSpins() {
             if ($spins) $spins.textContent = (lang === 'fr' ? 'Tours: ' : 'Spins: ') + spinsLeft;
         }
 
-        function spinReel(reel, delay) {
+        function spinReel(reel, delay, finalSymbol) {
             return new Promise(function (resolve) {
                 var interval = setInterval(function () {
                     reel.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
                 }, 80);
                 setTimeout(function () {
                     clearInterval(interval);
-                    reel.textContent = weightedRandom();
-                    resolve();
+                    reel.textContent = finalSymbol;
+                    resolve(finalSymbol);
                 }, delay);
             });
         }
@@ -106,28 +151,29 @@
 
             playSfx('spin');
 
+            var outcome = rollReels();
             var results = await Promise.all([
-                spinReel($reel1, 600),
-                spinReel($reel2, 900),
-                spinReel($reel3, 1200)
+                spinReel($reel1, 600, outcome[0]),
+                spinReel($reel2, 900, outcome[1]),
+                spinReel($reel3, 1200, outcome[2])
             ]);
 
-            var combo = results.join('');
-            var won = false;
-            var payout = 0;
-
-            if (results[0] === results[1] && results[1] === results[2]) {
-                won = true;
-                payout = PAYOUTS[combo] || 5;
-            } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
-                won = true;
-                payout = 1;
-            }
+            var won = results[0] === results[1] && results[1] === results[2];
+            var clueText = null;
 
             flashMachine(won);
 
             if (won) {
                 playSfx('jackpot');
+                clueText = showClue(TYPE_BY_SYMBOL[results[0]] || 'money');
+                if (clueText) {
+                    collectedClues.push(clueText);
+                    try { localStorage.setItem('td_jackpot_clues', JSON.stringify(collectedClues)); } catch (e) {}
+                    if ($clue) {
+                        $clue.textContent = '🔎 ' + clueText;
+                        $clue.classList.remove('hidden');
+                    }
+                }
             }
 
             if (spinsLeft <= 0) {
@@ -136,8 +182,9 @@
                     try {
                         localStorage.setItem('td_standalone_game_result', JSON.stringify({
                             type: 'jackpot',
-                            won: !!won,
-                            payout: payout,
+                            won: collectedClues.length > 0,
+                            clues: collectedClues,
+                            clue: collectedClues.join(' '),
                             ts: Date.now()
                         }));
                     } catch (e) {}

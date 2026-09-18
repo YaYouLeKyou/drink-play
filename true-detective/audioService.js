@@ -298,11 +298,12 @@
     };
 
     function playMinigameMusic(minigameType) {
-        if (typeof window === 'undefined' || !window.DPMusicPlayer) return;
+        if (typeof window === 'undefined' || !window.DPMusicPlayer) return false;
         var track = MINIGAME_MUSIC[minigameType];
-        if (track) {
-            window.DPMusicPlayer.playTrack(track);
-        }
+        if (!track) return false;
+        window.DPMusicPlayer.setHidden(true);
+        window.DPMusicPlayer.setLoop(true);
+        return window.DPMusicPlayer.playTrack(track);
     }
 
 
@@ -653,6 +654,8 @@
         var valid = MUSIC_PHASES[phase] || MUSIC_PHASES.investigation;
         currentMusicPhase = phase;
         if (typeof window !== 'undefined' && window.DPMusicPlayer) {
+            window.DPMusicPlayer.setHidden(phase === 'puzzle');
+            window.DPMusicPlayer.setLoop(phase === 'puzzle');
             var track = MUSIC_PHASE_TRACKS[phase] || MUSIC_PHASE_TRACKS.investigation;
             window.DPMusicPlayer.playTrack(track);
         }

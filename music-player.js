@@ -114,7 +114,13 @@
 
     function loadTrack(index) {
         currentIndex = (index + PLAYLIST.length) % PLAYLIST.length;
-        audio.src = trackUrl(PLAYLIST[currentIndex]);
+        var track = PLAYLIST[currentIndex];
+        // Story pages can select puzzle tracks directly, without AudioService.
+        if (track.indexOf('/mini-jeux/') !== -1 || /(^|\/)enigme\.mp3$/i.test(track)) {
+            playerRoot.hidden = true;
+            loopCurrentTrack = true;
+        }
+        audio.src = trackUrl(track);
         updateTitle();
     }
 
@@ -168,6 +174,11 @@
 
     var playerRoot = document.createElement('div');
     playerRoot.id = 'dp-music-player';
+    // Visibility is independent from playback, including before the first paint.
+    playerRoot.hidden = scriptEl.hasAttribute('data-hidden');
+    var hiddenStyle = document.createElement('style');
+    hiddenStyle.textContent = '#dp-music-player[hidden] { display: none !important; }';
+    document.head.appendChild(hiddenStyle);
 
     var titleEl = document.createElement('span');
     titleEl.className = 'dp-music-title';
@@ -312,7 +323,7 @@
     // anywhere on the page (except the player's own buttons, which manage
     // playback themselves). Once unlocked, remember it for the session.
     function unlockAutoplay(e) {
-        if (!pendingAutoplay) {
+        if (userPaused || !pendingAutoplay) {
             return;
         }
         if (e && e.target && playerRoot.contains(e.target)) {
@@ -324,15 +335,11 @@
         pendingAutoplay = false;
         userPaused = false;
         play();
-        document.removeEventListener('pointerdown', unlockAutoplay);
-        document.removeEventListener('keydown', unlockAutoplay);
-        document.removeEventListener('touchstart', unlockAutoplay);
-        document.removeEventListener('click', unlockAutoplay);
     }
-    document.addEventListener('pointerdown', unlockAutoplay);
-    document.addEventListener('keydown', unlockAutoplay);
-    document.addEventListener('touchstart', unlockAutoplay);
-    document.addEventListener('click', unlockAutoplay);
+    document.addEventListener('pointerdown', unlockAutoplay, true);
+    document.addEventListener('keydown', unlockAutoplay, true);
+    document.addEventListener('touchend', unlockAutoplay, true);
+    document.addEventListener('click', unlockAutoplay, true);
 
     /* ---------- Boot ---------- */
 
@@ -345,6 +352,8 @@
     /* ---------- Public API (used by game scripts) ---------- */
 
     window.DPMusicPlayer = {
+        setHidden: function (hidden) { playerRoot.hidden = !!hidden; },
+        setLoop: function (loop) { loopCurrentTrack = !!loop; },
         // Jump straight to a track by file name, e.g. playTrack('night ride.mp3')
         // Also matches by filename suffix, so playTrack('generique.mp3') finds
         // true-detective/music true detective/phases/generique.mp3

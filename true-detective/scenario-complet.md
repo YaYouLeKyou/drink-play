@@ -160,12 +160,14 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 
 ### ACTE III, Phase 1 « Le Coffre vide » (dialogue, musique tension)
 
-**Le twist central** : le coffre-fort est **déjà vide** lorsque le joueur arrive.  
-1. *(crimeScene, Wexford)* « Allez, inspecteur. La combinaison de la montre... et ouvrez-moi ce coffre. » → Le coffre grince, s'ouvre... et est **vide**. Plus aucun document, plus aucun billet.  
-   **INDICE MAJEUR** : le coffre a été vidé **avant** que la police n'arrive. Quelqu'un connaissait la combinaison.
-2. *(crimeScene, Wexford)* « Regardez cette muraille de reconstruction. Elle couvre une ancienne porte secrète... » → En poussant le panneau latéral, le mur **basculle** révélant un **compartiment caché**. À l'intérieur : des contrats falsifiés, des registres de versements, et une **lettre signée Wexford** (datée de la semaine précédente).  
+**Le twist central** : le coffre-fort est **vide**, mais le mur cache une vérité encore plus grande.
+1. *(crimeScene, Wexford)* « Allez, inspecteur. La combinaison de la montre... et ouvrez-moi ce coffre. » → Le panneau de boiserie porte des anomalies. Un premier **mini-jeu `puzzle`** (standalone) fait découvrir un mécanisme secondaire derrière la boiserie — le mur cache plus que le coffre.
+   **INDICE MAJEUR** : au-delà du coffre, un compartiment caché pourrait exister.
+2. *(crimeScene, **mini-jeu `coffre_code`** standalone)* Le code 1981 de la montre ouvre le coffre-fort... et révèle un **contenu vide**. Plus aucun document, plus aucun billet.
+   **INDICE MAJEUR** : le coffre a été vidé **avant** l'arrivée de la police. Quelqu'un connaissait la combinaison.
+3. *(crimeScene, Wexford)* Guidé par le puzzle, Wexford pousse le panneau latéral. Le mur **basculle**, révélant un **compartiment caché** : contrats falsifiés, registres de versements, **lettre signée Wexford**.
    **INDICE MAJEUR** : le partenaire… a-t-il été dans le manoir ?
-3. Wexford, pâle, tente de justifier : « Ces papiers... ils datent de la semaine dernière. Je les ai ramenés de l'extérieur. » Mais la pluie de la veille a lavé les empreintes du hall. Personne n'a pu franchi le seuil sans être vu.  
+4. Wexford, pâle : « Ces papiers... ils datent de la semaine dernière. » La pluie a lavé les empreintes du hall. « Le coffre a été vidé avant notre arrivée. Quelqu'un connaissait la combinaison... **et vous aussi, Wexford.** »
    **INDICE MAJEUR** : Wexford est entré **la nuit du crime**, seul, sans laisser de traces.
 
 ### ACTE III, Phase 2 « Les 6 branches » (dialogue, musique tension)
@@ -255,8 +257,9 @@ Après la bataille navale contre **le suspect accusé**, le joueur peut accuser 
 | Réseau d'Alibis 3 | act2_1 (3/3) | `reseau_alibis` | Identifier 3 menteurs parmi 6 dépositions croisées | aucun | Chacun a une raison légitime, le coffre est la clé |
 | Réseau d'Alibis 4 | act2_3 (6/6) | `reseau_alibis` | Réseau final : 6 dépositions post-interrogatoires | aucun | Confusion ADN, coffre = vérité |
 | Puzzle Krane | 2 (bar) | `puzzle` | Emboîter des formes géométriques | aucun | Confirme Duc→Krane, Hale orchestrateur |
-| Coffre vide | 3A (crimeScene) | `coffre_code` | Combinaison 1981 → coffre ouvert, MAIS VIDE | aucun | Twist : le coffre a été vidé avant |
-| Mur de reconstruction | 3A (crimeScene) | `scene_fouille` | Découvrir le compartiment caché derrière la muraille | aucun | Lettre signée Wexford → véritable twist |
+| Anomalie Murale | 3A (crimeScene) | `puzzle` (standalone) | Assembler pièces d'un mur de boiserie pour localiser un compartiment caché | aucun | Localise le compartiment secret derrière la muraille |
+| Coffre vide | 3A (crimeScene) | `coffre_code` (standalone) | Combinaison 1981 → coffre ouvert, MAIS VIDE | aucun | Twist : le coffre a été vidé avant |
+| Coffre-fort | 3A (crimeScene) | `coffre_code` (standalone) | Code 1981 du coffre → ouverture révélant un compartiment | aucun | Documents falsifiés + lettre Wexford |
 | Câblage alarme | 3B (labo) | `cablage_alarme` | SVG : pivoter segments pour boucle intacte | `alarm-circuit-blueprint.png.jfif` | Intrusion non forcée |
 | Bataille navale ×6 | 3C (branches) | `bataille-navale` | Duel tactique contre chaque suspect | `bataille-navale.html` | Révèle les mensonges de Wexford |
 | Roue des alibis | 4A (QG) | `roue_alibis` | Aligner 3 cadrans (montre, alibi, horloge-mère) | `pocket-watch-dial.png.jfif` | Pulvérise l'alibi de Hale |

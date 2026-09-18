@@ -541,6 +541,10 @@ function saveSettings() {
                     if (rp0.theme && typeof setThemeId === 'function') { try { setThemeId(rp0.theme); } catch (eB) {} }
                     if (rp0.culprit && TDScenario && TDScenario.getState) { try { TDScenario.getState().culprit = rp0.culprit; } catch (eC) {} }
                     scr.active = true; scr.awaitingChoice = false;
+                    if ($.backToHubBtn) $.backToHubBtn.style.display = 'none';
+                    if ($.hubBtn) $.hubBtn.style.display = 'none';
+                    if ($.gameBackToHubBtn) $.gameBackToHubBtn.style.display = 'none';
+                    if ($.themeBackToHubBtn) $.themeBackToHubBtn.style.display = 'none';
                     scr.phaseIdx = rp0.phaseIdx; scr.pageIdx = rp0.pageIdx || 0;
                     scr.interro = { id: rp0.interroId || 'femme-fatale', questionRound: 99, minigameRound: 0, done: false, questionsDone: true, fromDuel: true };
                     if (window.history && window.history.replaceState) window.history.replaceState({}, '', window.location.pathname);
@@ -571,6 +575,10 @@ function saveSettings() {
                     if (rpT.theme && typeof setThemeId === 'function') { try { setThemeId(rpT.theme); } catch (eB) {} }
                     if (rpT.culprit && TDScenario && TDScenario.getState) { try { TDScenario.getState().culprit = rpT.culprit; } catch (eC) {} }
                     scr.active = true; scr.awaitingChoice = false;
+                    if ($.backToHubBtn) $.backToHubBtn.style.display = 'none';
+                    if ($.hubBtn) $.hubBtn.style.display = 'none';
+                    if ($.gameBackToHubBtn) $.gameBackToHubBtn.style.display = 'none';
+                    if ($.themeBackToHubBtn) $.themeBackToHubBtn.style.display = 'none';
                     scr.phaseIdx = rpT.phaseIdx; scr.pageIdx = rpT.pageIdx || 0;
                     scr.interro = { id: rpT.interroId || 'marginal', questionRound: 99, minigameRound: 0, done: false, questionsDone: true, fromDuel: true };
                     if (window.history && window.history.replaceState) window.history.replaceState({}, '', window.location.pathname);
@@ -610,6 +618,10 @@ function saveSettings() {
                                         if (rp.culprit && TDScenario && TDScenario.getState) { try { TDScenario.getState().culprit = rp.culprit; } catch (eC) {} }
                                         var sd = state();
                                         scr.active = true; scr.awaitingChoice = false;
+                                        if ($.backToHubBtn) $.backToHubBtn.style.display = 'none';
+                                        if ($.hubBtn) $.hubBtn.style.display = 'none';
+                                        if ($.gameBackToHubBtn) $.gameBackToHubBtn.style.display = 'none';
+                                        if ($.themeBackToHubBtn) $.themeBackToHubBtn.style.display = 'none';
                                         scr.phaseIdx = rp.phaseIdx; scr.pageIdx = (rp.pageIdx || 0) + 1;
                                         scr.interro = { id: rp.interroId || 'standalone', questionRound: 99, minigameRound: 0, done: false, questionsDone: true, fromDuel: true };
                                         if (result && result.won) {
@@ -3488,6 +3500,10 @@ function buildTransitionPages(sceneData) {
         scr.pageIdx = 0;
         scr.active = true;
         scr.awaitingChoice = false;
+        if ($.backToHubBtn) $.backToHubBtn.style.display = 'none';
+        if ($.hubBtn) $.hubBtn.style.display = 'none';
+        if ($.gameBackToHubBtn) $.gameBackToHubBtn.style.display = 'none';
+        if ($.themeBackToHubBtn) $.themeBackToHubBtn.style.display = 'none';
     }
 
     /* Génère un code à 4 chiffres pour la montre (entre 1842 et 1981).
@@ -3646,6 +3662,10 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                     if (rp.theme && typeof setThemeId === 'function') { try { setThemeId(rp.theme); } catch (e2) {} }
                     if (rp.culprit && TDScenario && TDScenario.getState) { try { TDScenario.getState().culprit = rp.culprit; } catch (e3) {} }
                     scr.active = true; scr.awaitingChoice = false;
+                    if ($.backToHubBtn) $.backToHubBtn.style.display = 'none';
+                    if ($.hubBtn) $.hubBtn.style.display = 'none';
+                    if ($.gameBackToHubBtn) $.gameBackToHubBtn.style.display = 'none';
+                    if ($.themeBackToHubBtn) $.themeBackToHubBtn.style.display = 'none';
                     scr.phaseIdx = rp.phaseIdx; scr.pageIdx = rp.pageIdx || 0;
                     scr.interro = { id: rp.interroId || 'femme-fatale', questionRound: 99, minigameRound: 0, done: false, questionsDone: true, fromDuel: true };
                 }
@@ -4985,6 +5005,11 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             }
             if (resultAnnounced) return;
             resultAnnounced = true;
+            window._storyMinigameCompleteHandler = null;
+            if (window._storyMinigameIframe) {
+                window._storyMinigameIframe.remove();
+                window._storyMinigameIframe = null;
+            }
             window._minigameSkipHandler = null;
             if ($.minigameOverlay) {
                 $.minigameOverlay.classList.add('hidden');
@@ -5025,6 +5050,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 iframe.allow = 'fullscreen';
                 document.body.appendChild(iframe);
                 window._storyMinigameIframe = iframe;
+                window._storyMinigameCompleteHandler = onMinigameDone;
                 window._minigameSkipHandler = function () {
                     if (window._storyMinigameIframe) {
                         window._storyMinigameIframe.remove();

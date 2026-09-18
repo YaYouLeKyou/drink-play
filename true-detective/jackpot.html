@@ -86,6 +86,20 @@
             font-weight: 700;
             font-size: 1.1rem;
         }
+        .jackpot-clue {
+            margin-top: 14px;
+            padding: 12px 14px;
+            background: rgba(255, 214, 0, 0.08);
+            border: 1px solid rgba(255, 214, 0, 0.4);
+            border-radius: 10px;
+            color: #ffd600;
+            font-size: 0.92rem;
+            line-height: 1.45;
+            text-align: center;
+        }
+        .jackpot-clue.hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -109,14 +123,15 @@
         <div class="jackpot-wrap">
             <div class="jackpot-machine">
                 <div class="jackpot-reels">
-                    <div class="jackpot-reel" id="reel1">🍒</div>
-                    <div class="jackpot-reel" id="reel2">🍒</div>
-                    <div class="jackpot-reel" id="reel3">🍒</div>
+                    <div class="jackpot-reel" id="reel1">❤️</div>
+                    <div class="jackpot-reel" id="reel2">💔</div>
+                    <div class="jackpot-reel" id="reel3">💲</div>
                 </div>
                 <div class="jackpot-info">
                     <div class="jackpot-spins" id="jackpot-spins">Spins: 6</div>
                 </div>
                 <button class="jackpot-btn" id="jackpot-btn">JOUER</button>
+                <div id="jackpot-clue" class="jackpot-clue hidden"></div>
             </div>
         </div>
     </main>
@@ -169,7 +184,12 @@
                 continueBtn.textContent = 'Continuer';
                 continueBtn.style.cssText = 'margin-left:8px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
                 continueBtn.addEventListener('click', function () {
-                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'jackpot', won: true, ts: Date.now() })); } catch (e) {}
+                    var clues = [];
+                    try {
+                        var raw = localStorage.getItem('td_jackpot_clues');
+                        if (raw) { clues = JSON.parse(raw) || []; localStorage.removeItem('td_jackpot_clues'); }
+                    } catch (e) {}
+                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'jackpot', won: true, clues: clues, clue: clues.join(' '), ts: Date.now() })); } catch (e) {}
                     try {
                         var returnRaw = localStorage.getItem('td_standalone_game_return');
                         if (returnRaw) {
@@ -195,6 +215,7 @@
                 }
             }
             var menuHome = document.getElementById('menu-home');
+            if (fromStory && menuHome) menuHome.style.display = 'none';
             if (menuHome) {
                 menuHome.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');

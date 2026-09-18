@@ -302,7 +302,7 @@
             </div>
 
             <div class="coffre-hint" id="coffre-hint">
-                Ajustez les 4 chiffres de la combinaison à l'aide des flèches, puis actionnez la poignée pour tenter d'ouvrir le coffre.
+                La combinaison de la montre (1-9-8-1) est gravée dans votre mémoire. Utilisez les flèches pour régler les chiffres, puis actionnez la poignée pour ouvrir le coffre.
             </div>
 
             <div class="coffre-status" id="coffre-status"></div>
@@ -330,11 +330,22 @@
                 return m ? decodeURIComponent(m[1]) : null;
             }
 
-            var safeState = getUrlParam('state') || 'clue';
+            var safeState = getUrlParam('state') || (getUrlParam('story') === '1' ? 'empty' : 'clue');
             var suspectId = getUrlParam('suspect') || '';
 
+            // Read story config for custom state (e.g. from phases.js minigame config)
+            try {
+                var cfgRaw = localStorage.getItem('td_standalone_game_config');
+                if (cfgRaw) {
+                    var cfg = JSON.parse(cfgRaw);
+                    if (cfg && cfg.type === 'coffre_code' && cfg.state) {
+                        safeState = cfg.state;
+                    }
+                }
+            } catch (e) {}
+
             var STATE_MESSAGES = {
-                empty: 'Le coffre est vide. Quelqu\'un est passé avant vous.',
+                empty: 'Le coffre est **VIDÉ**. Mais le compartiment caché derrière le mur — découvert grâce au puzzle — renferme les vrais documents !',
                 clue: 'Le coffre contient des documents compromettants.',
                 forced: 'Le coffre a été forcé. L\'intrus a tout emporté.'
             };
@@ -417,8 +428,9 @@
 
                 // Sauvegarde du résultat
                 try {
+                    var clueText = "Le coffre-fort est vide, mais le compartiment caché derrière le mur renferme les vrais documents : contrats falsifiés, registres de versements, et une lettre signée Wexford.";
                     localStorage.setItem('td_standalone_game_result', JSON.stringify({
-                        type: 'coffre_code', won: true, state: safeState, suspect: suspectId, ts: Date.now()
+                        type: 'coffre_code', won: true, state: safeState, suspect: suspectId, clue: clueText, ts: Date.now()
                     }));
                     var journal = JSON.parse(localStorage.getItem('td_journal') || '{}');
                     journal.coffreState = safeState;
@@ -508,6 +520,7 @@
             }
 
             var menuHome = document.getElementById('menu-home');
+            if (fromStory && menuHome) menuHome.style.display = 'none';
             if (menuHome) {
                 menuHome.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');

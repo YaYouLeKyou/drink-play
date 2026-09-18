@@ -588,6 +588,7 @@
         }
 
         var menuHome = document.getElementById('menu-home');
+        if (fromStory && menuHome) menuHome.style.display = 'none';
         if (menuHome) {
             menuHome.addEventListener('click', function () {
                 if (menu) menu.classList.remove('open');

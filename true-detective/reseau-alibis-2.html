@@ -139,6 +139,7 @@
     </main>
 
     <script src="minigames.js"></script>
+    <script src="alibi-navigation.js"></script>
     <script src="sfx.js"></script>
     <script src="minigame-audio.js" data-minigame="reseau_alibis"></script>
     <script src="../settings-menu.js"></script>
@@ -199,43 +200,19 @@
 
             var backBtn = document.getElementById('back-to-minigame-btn');
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1' || new URLSearchParams(window.location.search).get('mode') === 'story';
-            var gameResult = null;
-
-            if (fromStory) {
-                if (backBtn) backBtn.style.display = 'none';
-                var continueBtn = document.createElement('button');
-                continueBtn.id = 'story-continue-btn';
-                continueBtn.className = 'btn btn-continue resea-alibis-continue';
-                continueBtn.textContent = 'Continuer l\'Enquête';
-                continueBtn.addEventListener('click', function () {
-                    var won = (gameResult && typeof gameResult.won === 'boolean') ? gameResult.won : true;
-                    try { 
-                        localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'reseau_alibis', won: won, ts: Date.now() })); 
-                    } catch (e) {}
-                    try {
-                        var returnRaw = localStorage.getItem('td_standalone_game_return');
-                        if (returnRaw) {
-                            var rp = JSON.parse(returnRaw);
-                            if (rp && rp.returnUrl) {
-                                window.location.href = rp.returnUrl;
-                                return;
-                            }
-                        }
-                    } catch (e) {}
-                    window.location.href = '../true-detective/index.html?standalone=reseau_alibis';
-                });
-                document.body.appendChild(continueBtn);
-            } else {
-                if (backBtn) {
+            if (backBtn) {
+                if (fromStory) {
+                    backBtn.style.display = 'none';
+                } else {
                     backBtn.textContent = 'Accueil';
                     backBtn.addEventListener('click', function () {
-                        if (menu) menu.classList.remove('open');
                         window.location.href = '../true-detective/index.html#minigames';
                     });
                 }
             }
 
             var menuHome = document.getElementById('menu-home');
+            if (fromStory && menuHome) menuHome.style.display = 'none';
             if (menuHome) {
                 menuHome.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
@@ -278,13 +255,7 @@
             if (target) {
                 target.innerHTML = '';
                 if (window.TDMiniGames && typeof window.TDMiniGames.play === 'function') {
-                    window.TDMiniGames.play(cfg, cfg.lang || 'fr', function(result) {
-                        gameResult = result || null;
-                        var continueButtonElem = document.getElementById('story-continue-btn');
-                        if (fromStory && continueButtonElem) {
-                            continueButtonElem.style.display = 'block';
-                        }
-                    }, target);
+                    window.TDMiniGames.play(cfg, cfg.lang || 'fr', window.TDAlibiNavigation, target);
                 } else {
                     target.innerHTML = '<div style="color: #ff6b6b; text-align: center; padding: 20px;">Erreur : Le fichier de mini-jeux (minigames.js) est introuvable ou n\'a pas pu se charger correctement.</div>';
                 }
