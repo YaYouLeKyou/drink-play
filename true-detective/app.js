@@ -373,7 +373,7 @@
         var isNotebookOpen = notebook && notebook.classList.contains('open');
 
         if ($.continueBtn) {
-            if (isStoryScreen && !isActPageVisible) {
+            if (isStoryScreen && !isActPageVisible && !isNotebookOpen) {
                 $.continueBtn.classList.remove('hidden');
                 $.continueBtn.classList.add('always-active');
             } else {
@@ -382,7 +382,7 @@
             }
         }
         if ($.mobileContinueBtn) {
-            if (isStoryScreen && !isActPageVisible) {
+            if (isStoryScreen && !isActPageVisible && !isNotebookOpen) {
                 $.mobileContinueBtn.classList.remove('hidden');
                 $.mobileContinueBtn.classList.add('always-active');
             } else {

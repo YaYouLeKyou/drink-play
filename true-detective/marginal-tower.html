@@ -406,6 +406,7 @@
             <div class="loading-content">
                 <div class="spinner"></div>
                 <p class="loading-text" style="margin:0;color:var(--text-main);font-weight:500;">Initialisation du moteur physique...</p>
+                <button id="loading-continue-btn" class="btn btn-secondary" style="display:none;margin-top:15px;">Continuer sans le mini-jeu</button>
             </div>
         </div>
     </div>
@@ -419,6 +420,17 @@
     <script>
         (function() {
             'use strict';
+
+            if (!window.Matter) {
+                var loadingBtn = document.getElementById('loading-continue-btn');
+                if (loadingBtn) {
+                    loadingBtn.style.display = 'inline-block';
+                    loadingBtn.textContent = 'Continuer sans le mini-jeu';
+                }
+                var loadingText = document.querySelector('.loading-text');
+                if (loadingText) loadingText.textContent = 'Le moteur physique n\'a pas pu se charger.';
+                return;
+            }
 
             const { Engine, Render, Runner, Bodies, Composite, Events } = Matter;
 
@@ -467,6 +479,34 @@
                 cardboard: { width: 85, height: 30, density: 0.0004, friction: 0.85, restitution: 0.01, color: '#c49a65', stroke: '#e8c499' },
                 brick: { width: 75, height: 30, density: 0.0025, friction: 0.6, restitution: 0.05, color: '#a84d43', stroke: '#e07d73' }
             };
+
+            var fromStory = new URLSearchParams(window.location.search).get('story') === '1' || (function () { try { return !!localStorage.getItem('td_marginal_tower_return'); } catch (e) { return false; } })();
+
+            var loadingContinueBtn = document.getElementById('loading-continue-btn');
+            if (loadingContinueBtn) {
+                loadingContinueBtn.addEventListener('click', function () {
+                    try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: false, ts: Date.now() })); } catch (e) {}
+                    try {
+                        var returnRaw = localStorage.getItem('td_standalone_game_return');
+                        if (returnRaw) {
+                            var rp = JSON.parse(returnRaw);
+                            if (rp && rp.returnUrl) {
+                                window.location.href = rp.returnUrl;
+                                return;
+                            }
+                        }
+                    } catch (e) {}
+                    window.location.href = '../true-detective/index.html?marginalTower=complete';
+                });
+            }
+
+            setTimeout(function () {
+                var btn = document.getElementById('loading-continue-btn');
+                var overlay = document.getElementById('loading-overlay');
+                if (btn && overlay && !overlay.classList.contains('hidden')) {
+                    btn.style.display = 'inline-block';
+                }
+            }, 12000);
 
             function playMusic() {
                 window.playMinigameMusic('marginal-tower');

@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>True Detective - Reconstitution de Scellé</title>
+    <title>True Detective - Reconstitution de ScellÃ©</title>
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
@@ -204,12 +204,26 @@
             left: auto !important;
             transform: none !important;
             max-width: none !important;
+        }        @media (max-width: 600px) {
+            .puzzle-wrap {
+                padding: 10px !important;
+            }
+            .puzzle-grid {
+                gap: 4px !important;
+            }
+            .puzzle-hud {
+                font-size: 0.85rem !important;
+                padding: 8px !important;
+            }
+            .puzzle-tile {
+                font-size: 1.5rem !important;
+            }
         }
     </style>
 </head>
 <body>
     <header class="sg-header" style="position:relative;">
-        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
+        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">â˜°</button>
         <h2 class="sg-title" style="color:var(--accent-orange);font-family:'Playfair Display',serif;">Anomalie Murale</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
@@ -218,13 +232,13 @@
     
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
-            <span class="menu-icon">🏠</span>
+            <span class="menu-icon">ðŸ </span>
             <span>Menu principal</span>
         </button>
         <div class="sg-menu-divider"></div>
         <button class="sg-menu-item" id="menu-settings">
-            <span class="menu-icon">⚙</span>
-            <span>Paramètres</span>
+            <span class="menu-icon">âš™</span>
+            <span>ParamÃ¨tres</span>
         </button>
     </nav>
 
@@ -237,14 +251,14 @@
             
             <div class="puzzle-grid" id="puzzle-grid"></div>
             
-            <div class="puzzle-status" id="puzzle-status">Examinez le mur de boiserie. Assemblez les anomalies pour localiser le compartiment caché.</div>
+            <div class="puzzle-status" id="puzzle-status">Examinez le mur de boiserie. Assemblez les anomalies pour localiser le compartiment cachÃ©.</div>
             
             <div class="puzzle-controls">
-                <button class="puzzle-btn" id="reset-puzzle-btn">Réinitialiser</button>
+                <button class="puzzle-btn" id="reset-puzzle-btn">RÃ©initialiser</button>
             </div>
             
             <div class="puzzle-hint">
-                Cliquez sur une tuile adjacente à la case vide pour la faire glisser. Assemblez les indices de 1 à 8 pour révéler l'emplacement du compartiment caché derrière la boiserie.
+                Cliquez sur une tuile adjacente Ã  la case vide pour la faire glisser. Assemblez les indices de 1 Ã  8 pour rÃ©vÃ©ler l'emplacement du compartiment cachÃ© derriÃ¨re la boiserie.
             </div>
         </div>
     </main>
@@ -264,20 +278,20 @@
             var timerEl = document.getElementById('puzzle-timer');
             var movesEl = document.getElementById('moves-count');
 
-            // 8 pièces + 1 case vide (représentée par la valeur 0)
+            // 8 piÃ¨ces + 1 case vide (reprÃ©sentÃ©e par la valeur 0)
             var tileData = [
-                { id: 1, text: 'Joints de bois lâches' },
+                { id: 1, text: 'Joints de bois lÃ¢ches' },
                 { id: 2, text: 'Vis anormales' },
-                { id: 3, text: 'Trace d\'humidité' },
-                { id: 4, text: 'Craquelure discrète' },
-                { id: 5, text: 'Boîtier vide derrière la plaque' },
-                { id: 6, text: 'Mécanisme de verrouillage' },
-                { id: 7, text: 'Mur latéral mobile' },
-                { id: 8, text: 'Compartiment caché révélé' }
+                { id: 3, text: 'Trace d\'humiditÃ©' },
+                { id: 4, text: 'Craquelure discrÃ¨te' },
+                { id: 5, text: 'BoÃ®tier vide derriÃ¨re la plaque' },
+                { id: 6, text: 'MÃ©canisme de verrouillage' },
+                { id: 7, text: 'Mur latÃ©ral mobile' },
+                { id: 8, text: 'Compartiment cachÃ© rÃ©vÃ©lÃ©' }
             ];
 
-            var board = []; // Tableau de 9 éléments contenant les IDs (1 à 8, et 0 pour le vide)
-            var emptyIndex = 8; // La case vide commence en bas à droite (index 8)
+            var board = []; // Tableau de 9 Ã©lÃ©ments contenant les IDs (1 Ã  8, et 0 pour le vide)
+            var emptyIndex = 8; // La case vide commence en bas Ã  droite (index 8)
             var moves = 0;
             var solved = false;
             var failed = false;
@@ -317,10 +331,10 @@
 
             function failPuzzle() {
                 failed = true;
-                statusEl.innerHTML = '<span style="color:var(--accent-red); font-weight:700;">Temps écoulé ! L\'enquête est compromise.</span>';
+                statusEl.innerHTML = '<span style="color:var(--accent-red); font-weight:700;">Temps Ã©coulÃ© ! L\'enquÃªte est compromise.</span>';
             }
 
-            // Mélanger en effectuant des mouvements valides pour garantir la résolubilité
+            // MÃ©langer en effectuant des mouvements valides pour garantir la rÃ©solubilitÃ©
             function shuffleBoard() {
                 board = [1, 2, 3, 4, 5, 6, 7, 8, 0];
                 emptyIndex = 8;
@@ -330,7 +344,7 @@
                     var validMoves = getValidAdjacentIndices(emptyIndex);
                     var randomPos = validMoves[Math.floor(Math.random() * validMoves.length)];
                     
-                    // Échanger la case vide avec une voisine valide
+                    // Ã‰changer la case vide avec une voisine valide
                     board[emptyIndex] = board[randomPos];
                     board[randomPos] = 0;
                     emptyIndex = randomPos;
@@ -355,7 +369,7 @@
                 failed = false;
                 moves = 0;
                 movesEl.textContent = 'Mouvements : 0';
-                statusEl.textContent = 'Assemblez les tuiles pour découvrir l\'anomalie derrière la boiserie.';
+                statusEl.textContent = 'Assemblez les tuiles pour dÃ©couvrir l\'anomalie derriÃ¨re la boiserie.';
                 shuffleBoard();
                 renderGrid();
                 startTimer();
@@ -370,7 +384,7 @@
                         tile.className = 'puzzle-tile empty';
                     } else {
                         tile.className = 'puzzle-tile';
-                        // Vérifier si la pièce est à sa place correcte (index + 1)
+                        // VÃ©rifier si la piÃ¨ce est Ã  sa place correcte (index + 1)
                         if (tileId === index + 1) {
                             tile.classList.add('correct');
                         }
@@ -412,18 +426,18 @@
             }
 
             function checkWin() {
-                // Le puzzle est gagné si les tuiles 1 à 8 sont en place (la case 0 peut être à la fin)
+                // Le puzzle est gagnÃ© si les tuiles 1 Ã  8 sont en place (la case 0 peut Ãªtre Ã  la fin)
                 for (var i = 0; i < 8; i++) {
                     if (board[i] !== i + 1) return;
                 }
 
                 solved = true;
                 clearInterval(timerInterval);
-                statusEl.innerHTML = '<span style="color:var(--accent-green); font-weight:700;">Compartiment caché découvert ! Un mur bascule derrière la boiserie.</span>';
+                statusEl.innerHTML = '<span style="color:var(--accent-green); font-weight:700;">Compartiment cachÃ© dÃ©couvert ! Un mur bascule derriÃ¨re la boiserie.</span>';
 
                 try {
                     localStorage.setItem('td_standalone_game_result', JSON.stringify({
-                        type: 'puzzle', won: true, score: timeLeft, clue: "Derrière la boiserie, un mur latéral bascule révélant un compartiment caché. Les documents falsifiés y sont stockés.", ts: Date.now()
+                        type: 'puzzle', won: true, score: timeLeft, clue: "DerriÃ¨re la boiserie, un mur latÃ©ral bascule rÃ©vÃ©lant un compartiment cachÃ©. Les documents falsifiÃ©s y sont stockÃ©s.", ts: Date.now()
                     }));
                 } catch (e) {}
 
@@ -459,7 +473,7 @@
                 if (storyContinueBtn) {
                     storyContinueBtn.style.display = 'inline-block';
                     storyContinueBtn.addEventListener('click', function () {
-                        try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'puzzle', won: solved, clue: solved ? "Derrière la boiserie, un mur latéral bascule révélant un compartiment caché. Les documents falsifiés y sont stockés." : "", ts: Date.now() })); } catch (e) {}
+                        try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'puzzle', won: solved, clue: solved ? "DerriÃ¨re la boiserie, un mur latÃ©ral bascule rÃ©vÃ©lant un compartiment cachÃ©. Les documents falsifiÃ©s y sont stockÃ©s." : "", ts: Date.now() })); } catch (e) {}
                         try {
                             var returnRaw = localStorage.getItem('td_standalone_game_return');
                             if (returnRaw) {
@@ -506,7 +520,7 @@
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres'); }
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('ParamÃ¨tres'); }
                 });
             }
 

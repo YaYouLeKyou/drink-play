@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -69,7 +69,7 @@
             text-align: center;
         }
 
-        /* Cadran / Écran de combinaison à 4 rouleaux */
+        /* Cadran / Ã‰cran de combinaison Ã  4 rouleaux */
         .combination-pad {
             display: flex;
             gap: 10px;
@@ -121,7 +121,7 @@
             user-select: none;
         }
 
-        /* Poignée du coffre */
+        /* PoignÃ©e du coffre */
         .coffre-handle-container {
             display: flex;
             flex-direction: column;
@@ -243,12 +243,27 @@
 
         .shake {
             animation: shake 0.4s ease-in-out;
+        }        @media (max-width: 768px) {
+            .coffre-board {
+                padding: 10px !important;
+            }
+            .coffre-numpad {
+                gap: 6px !important;
+            }
+            .coffre-key {
+                min-height: 44px !important;
+                padding: 10px 0 !important;
+                font-size: 1.1rem !important;
+            }
+            .coffre-display {
+                font-size: 1.2rem !important;
+            }
         }
     </style>
 </head>
 <body>
     <header class="sg-header" style="position:relative;">
-        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
+        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">â˜°</button>
         <h2 class="sg-title" style="color:var(--accent-orange);font-family:'Playfair Display',serif;">Le Coffre-fort</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
@@ -257,57 +272,57 @@
     
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
-            <span class="menu-icon">🏠</span>
+            <span class="menu-icon">ðŸ </span>
             <span>Menu principal</span>
         </button>
         <div class="sg-menu-divider"></div>
         <button class="sg-menu-item" id="menu-settings">
-            <span class="menu-icon">⚙</span>
-            <span>Paramètres</span>
+            <span class="menu-icon">âš™</span>
+            <span>ParamÃ¨tres</span>
         </button>
     </nav>
 
     <main class="sg-main">
         <div class="coffre-wrap">
             <div class="coffre-safe" id="coffre-container">
-                <div class="coffre-brand">SÉCURITÉ BLINDÉE - MADIER</div>
+                <div class="coffre-brand">SÃ‰CURITÃ‰ BLINDÃ‰E - MADIER</div>
                 
                 <div class="combination-pad">
                     <div class="digit-box">
-                        <button class="digit-btn" data-index="0" data-dir="up">▲</button>
+                        <button class="digit-btn" data-index="0" data-dir="up">â–²</button>
                         <div class="digit-display" id="digit-0">0</div>
-                        <button class="digit-btn" data-index="0" data-dir="down">▼</button>
+                        <button class="digit-btn" data-index="0" data-dir="down">â–¼</button>
                     </div>
                     <div class="digit-box">
-                        <button class="digit-btn" data-index="1" data-dir="up">▲</button>
+                        <button class="digit-btn" data-index="1" data-dir="up">â–²</button>
                         <div class="digit-display" id="digit-1">0</div>
-                        <button class="digit-btn" data-index="1" data-dir="down">▼</button>
+                        <button class="digit-btn" data-index="1" data-dir="down">â–¼</button>
                     </div>
                     <div class="digit-box">
-                        <button class="digit-btn" data-index="2" data-dir="up">▲</button>
+                        <button class="digit-btn" data-index="2" data-dir="up">â–²</button>
                         <div class="digit-display" id="digit-2">0</div>
-                        <button class="digit-btn" data-index="2" data-dir="down">▼</button>
+                        <button class="digit-btn" data-index="2" data-dir="down">â–¼</button>
                     </div>
                     <div class="digit-box">
-                        <button class="digit-btn" data-index="3" data-dir="up">▲</button>
+                        <button class="digit-btn" data-index="3" data-dir="up">â–²</button>
                         <div class="digit-display" id="digit-3">0</div>
-                        <button class="digit-btn" data-index="3" data-dir="down">▼</button>
+                        <button class="digit-btn" data-index="3" data-dir="down">â–¼</button>
                     </div>
                 </div>
 
                 <div class="coffre-handle-container">
-                    <div class="coffre-handle locked" id="coffre-handle" title="Actionner la poignée"></div>
-                    <span class="coffre-handle-label" id="handle-label">Poignée verrouillée</span>
+                    <div class="coffre-handle locked" id="coffre-handle" title="Actionner la poignÃ©e"></div>
+                    <span class="coffre-handle-label" id="handle-label">PoignÃ©e verrouillÃ©e</span>
                 </div>
             </div>
 
             <div class="coffre-hint" id="coffre-hint">
-                La combinaison de la montre (1-9-8-1) est gravée dans votre mémoire. Utilisez les flèches pour régler les chiffres, puis actionnez la poignée pour ouvrir le coffre.
+                La combinaison de la montre (1-9-8-1) est gravÃ©e dans votre mÃ©moire. Utilisez les flÃ¨ches pour rÃ©gler les chiffres, puis actionnez la poignÃ©e pour ouvrir le coffre.
             </div>
 
             <div class="coffre-status" id="coffre-status"></div>
 
-            <button class="coffre-btn" id="validate-safe">Vérifier la combinaison</button>
+            <button class="coffre-btn" id="validate-safe">VÃ©rifier la combinaison</button>
         </div>
     </main>
 
@@ -321,10 +336,10 @@
             'use strict';
 
             var CORRECT_CODE = '1981';
-            var currentDigits = [0, 0, 0, 0]; // Initialisé à 0000
+            var currentDigits = [0, 0, 0, 0]; // InitialisÃ© Ã  0000
             var isUnlocked = false;
 
-            // Paramètres d'état de l'histoire
+            // ParamÃ¨tres d'Ã©tat de l'histoire
             function getUrlParam(name) {
                 var m = new RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
                 return m ? decodeURIComponent(m[1]) : null;
@@ -345,9 +360,9 @@
             } catch (e) {}
 
             var STATE_MESSAGES = {
-                empty: 'Le coffre est **VIDÉ**. Mais le compartiment caché derrière le mur — découvert grâce au puzzle — renferme les vrais documents !',
+                empty: 'Le coffre est **VIDÃ‰**. Mais le compartiment cachÃ© derriÃ¨re le mur â€” dÃ©couvert grÃ¢ce au puzzle â€” renferme les vrais documents !',
                 clue: 'Le coffre contient des documents compromettants.',
-                forced: 'Le coffre a été forcé. L\'intrus a tout emporté.'
+                forced: 'Le coffre a Ã©tÃ© forcÃ©. L\'intrus a tout emportÃ©.'
             };
 
             var SUSPECT_STATES = {
@@ -363,7 +378,7 @@
                 safeState = SUSPECT_STATES[suspectId];
             }
 
-            // Éléments DOM
+            // Ã‰lÃ©ments DOM
             var hintEl = document.getElementById('coffre-hint');
             var statusEl = document.getElementById('coffre-status');
             var validateBtn = document.getElementById('validate-safe');
@@ -412,7 +427,7 @@
                         containerEl.classList.remove('shake');
                     }, 400);
 
-                    statusEl.innerHTML = '<span style="color:var(--accent-red);">Combinaison incorrecte. Le mécanisme bloque.</span>';
+                    statusEl.innerHTML = '<span style="color:var(--accent-red);">Combinaison incorrecte. Le mÃ©canisme bloque.</span>';
                 }
             }
 
@@ -421,14 +436,14 @@
                 handleEl.classList.remove('locked');
                 handleEl.classList.add('unlocked');
                 handleLabel.textContent = 'Coffre ouvert';
-                statusEl.innerHTML = '<span style="color:var(--accent-green); font-weight:700;">Verrouillage sauté ! ' + (STATE_MESSAGES[safeState] || '') + '</span>';
+                statusEl.innerHTML = '<span style="color:var(--accent-green); font-weight:700;">Verrouillage sautÃ© ! ' + (STATE_MESSAGES[safeState] || '') + '</span>';
                 validateBtn.textContent = 'Terminer l\'investigation';
                 validateBtn.style.borderColor = 'var(--accent-green)';
                 validateBtn.style.color = 'var(--accent-green)';
 
-                // Sauvegarde du résultat
+                // Sauvegarde du rÃ©sultat
                 try {
-                    var clueText = "Le coffre-fort est vide, mais le compartiment caché derrière le mur renferme les vrais documents : contrats falsifiés, registres de versements, et une lettre signée Wexford.";
+                    var clueText = "Le coffre-fort est vide, mais le compartiment cachÃ© derriÃ¨re le mur renferme les vrais documents : contrats falsifiÃ©s, registres de versements, et une lettre signÃ©e Wexford.";
                     localStorage.setItem('td_standalone_game_result', JSON.stringify({
                         type: 'coffre_code', won: true, state: safeState, suspect: suspectId, clue: clueText, ts: Date.now()
                     }));
@@ -541,7 +556,7 @@
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres'); }
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('ParamÃ¨tres'); }
                 });
             }
         })();

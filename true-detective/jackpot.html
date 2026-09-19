@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -99,33 +99,48 @@
         }
         .jackpot-clue.hidden {
             display: none;
+        }        @media (max-width: 600px) {
+            .jackpot-machine {
+                padding: 12px !important;
+            }
+            .jackpot-reel {
+                width: 60px !important;
+                height: 80px !important;
+            }
+            .jackpot-symbol {
+                font-size: 2rem !important;
+            }
+            .jackpot-dialogue {
+                font-size: 0.8rem !important;
+                padding: 6px 10px !important;
+            }
         }
     </style>
 </head>
 <body>
     <header class="sg-header" style="position:relative;">
-        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
+        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">â˜°</button>
         <h2 class="sg-title" style="color:#ffd600;font-family:'Playfair Display',serif;">Jackpot</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
-            <span class="menu-icon">🏠</span>
+            <span class="menu-icon">ðŸ </span>
             <span>Menu principal</span>
         </button>
         <div class="sg-menu-divider"></div>
         <button class="sg-menu-item" id="menu-settings">
-            <span class="menu-icon">⚙</span>
-            <span>Paramètres</span>
+            <span class="menu-icon">âš™</span>
+            <span>ParamÃ¨tres</span>
         </button>
     </nav>
     <main class="sg-main">
         <div class="jackpot-wrap">
             <div class="jackpot-machine">
                 <div class="jackpot-reels">
-                    <div class="jackpot-reel" id="reel1">❤️</div>
-                    <div class="jackpot-reel" id="reel2">💔</div>
-                    <div class="jackpot-reel" id="reel3">💲</div>
+                    <div class="jackpot-reel" id="reel1">â¤ï¸</div>
+                    <div class="jackpot-reel" id="reel2">ðŸ’”</div>
+                    <div class="jackpot-reel" id="reel3">ðŸ’²</div>
                 </div>
                 <div class="jackpot-info">
                     <div class="jackpot-spins" id="jackpot-spins">Spins: 6</div>
@@ -231,12 +246,13 @@
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres : aucun réglage pour l\'instant.'); }
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('ParamÃ¨tres : aucun rÃ©glage pour l\'instant.'); }
                 });
             }
         })();
     </script>
 </body>
 </html>
+
 
 

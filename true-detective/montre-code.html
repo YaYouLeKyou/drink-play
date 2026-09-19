@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="fr">
 
@@ -8,7 +8,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
-    <title>True Detective - L'Énigme de la Montre</title>
+    <title>True Detective - L'Ã‰nigme de la Montre</title>
 
     <link rel="icon" href="../icon/Logo%20d%26p.png">
 
@@ -298,7 +298,7 @@
 
 
 
-        /* Contrôles & Formulaires */
+        /* ContrÃ´les & Formulaires */
 
         .montre-controls {
 
@@ -472,7 +472,7 @@
 
 
 
-        /* Modal Sincérité */
+        /* Modal SincÃ©ritÃ© */
 
         .sincerity-modal {
 
@@ -613,6 +613,23 @@
             box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
 
         }
+        @media (max-width: 768px) {
+            .watch-view-container {
+                width: 200px !important;
+                height: 200px !important;
+            }
+            .montre-board {
+                padding: 10px !important;
+            }
+            .montre-answers {
+                gap: 6px !important;
+            }
+            .montre-answer-btn {
+                padding: 8px 12px !important;
+                font-size: 0.85rem !important;
+            }
+        }
+    
 
     </style>
 
@@ -622,9 +639,9 @@
 
     <header class="sg-header" style="position:relative;">
 
-        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
+        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">â˜°</button>
 
-        <h2 class="sg-title" style="color:#f0d890;font-family:'Playfair Display',serif;">⏱️ L'Énigme de la Montre</h2>
+        <h2 class="sg-title" style="color:#f0d890;font-family:'Playfair Display',serif;">â±ï¸ L'Ã‰nigme de la Montre</h2>
 
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
 
@@ -636,7 +653,7 @@
 
         <button class="sg-menu-item" id="menu-home">
 
-            <span class="menu-icon">🏠</span>
+            <span class="menu-icon">ðŸ </span>
 
             <span>Menu principal</span>
 
@@ -646,9 +663,9 @@
 
         <button class="sg-menu-item" id="menu-settings">
 
-            <span class="menu-icon">⚙</span>
+            <span class="menu-icon">âš™</span>
 
-            <span>Paramètres</span>
+            <span>ParamÃ¨tres</span>
 
         </button>
 
@@ -660,9 +677,9 @@
 
         <div class="montre-board">
 
-            <div class="montre-intro">Examinez minutieusement cette vieille montre gousset retrouvée sur la scène de crime.</div>
+            <div class="montre-intro">Examinez minutieusement cette vieille montre gousset retrouvÃ©e sur la scÃ¨ne de crime.</div>
 
-            <div id="montre-status" class="montre-status">Approchez la loupe de la face. Une aiguille s'y est figée…</div>
+            <div id="montre-status" class="montre-status">Approchez la loupe de la face. Une aiguille s'y est figÃ©eâ€¦</div>
     <button id="story-continue-btn" class="btn btn-continue" style="display:none;">Continuer</button>
 
 
@@ -702,7 +719,7 @@
 
             <div class="montre-controls">
 
-                <button id="flip-btn" class="btn-custom">🔄 Retourner la montre</button>
+                <button id="flip-btn" class="btn-custom">ðŸ”„ Retourner la montre</button>
 
             </div>
 
@@ -712,7 +729,7 @@
 
             <div class="code-input-section">
 
-                <div style="font-size: 0.85rem; color: #f0d890; margin-bottom: 6px;">Gravures déchiffrées : <span id="engrave-counter">0</span> / 4</div>
+                <div style="font-size: 0.85rem; color: #f0d890; margin-bottom: 6px;">Gravures dÃ©chiffrÃ©es : <span id="engrave-counter">0</span> / 4</div>
 
                 <div id="code-row" class="code-row"></div>
 
@@ -720,7 +737,7 @@
 
                 <div class="time-input-group">
 
-                    <label style="font-size: 0.82rem; color: #d8c8a0; display:block; margin-bottom:4px;">Heure relevée sur la face :</label>
+                    <label style="font-size: 0.82rem; color: #d8c8a0; display:block; margin-bottom:4px;">Heure relevÃ©e sur la face :</label>
 
                     <input type="text" id="time-cell" placeholder="ex: 22h09" disabled>
 
@@ -742,11 +759,11 @@
 
             <div class="notes-section">
 
-                <label style="font-size: 0.82rem; color: #d8c8a0; display:block; margin-bottom:4px;">Carnet d'enquêteur :</label>
+                <label style="font-size: 0.82rem; color: #d8c8a0; display:block; margin-bottom:4px;">Carnet d'enquÃªteur :</label>
 
                 <textarea id="montre-notes" placeholder="Notez vos observations ici..."></textarea>
 
-                <button id="save-notes-btn" class="btn-custom" style="margin-top: 8px; font-size: 0.8rem;">💾 Consigner dans le carnet</button>
+                <button id="save-notes-btn" class="btn-custom" style="margin-top: 8px; font-size: 0.8rem;">ðŸ’¾ Consigner dans le carnet</button>
 
             </div>
 
@@ -756,7 +773,7 @@
 
 
 
-    <!-- MODAL SINCÉRITÉ / QUESTION FINALE -->
+    <!-- MODAL SINCÃ‰RITÃ‰ / QUESTION FINALE -->
 
     <div id="sincerity-modal" class="sincerity-modal hidden">
 
@@ -919,7 +936,7 @@
 
                     validateBtn.disabled = false;
 
-                    status.textContent = 'Les gravures sont déchiffrées. Saisissez le code à 4 chiffres.';
+                    status.textContent = 'Les gravures sont dÃ©chiffrÃ©es. Saisissez le code Ã  4 chiffres.';
 
                 }
 
@@ -943,7 +960,7 @@
 
                     if (entered === expected) {
 
-                        status.textContent = 'Code correct. Indiquez l\'heure relevée sur la face, puis validez.';
+                        status.textContent = 'Code correct. Indiquez l\'heure relevÃ©e sur la face, puis validez.';
 
                         playSfx('success');
 
@@ -973,7 +990,7 @@
 
                         } else {
 
-                            status.textContent = 'Indiquez aussi l\'heure relevée sur la face de la montre.';
+                            status.textContent = 'Indiquez aussi l\'heure relevÃ©e sur la face de la montre.';
 
                             playSfx('fail');
 
@@ -997,11 +1014,11 @@
 
                     var codeStr = CODE.join('');
 
-                    sincerityQuestion.textContent = '"' + codeStr + '", gravé au dos… Mais qu\'avez-vous remarqué SUR LA FACE de la montre ?';
+                    sincerityQuestion.textContent = '"' + codeStr + '", gravÃ© au dosâ€¦ Mais qu\'avez-vous remarquÃ© SUR LA FACE de la montre ?';
 
-                    sincerityYes.textContent = 'L\'aiguille figée à ' + TIME + ' : voilà l\'heure probable du crime, et ' + codeStr + ' ouvrira peut-être un coffre';
+                    sincerityYes.textContent = 'L\'aiguille figÃ©e Ã  ' + TIME + ' : voilÃ  l\'heure probable du crime, et ' + codeStr + ' ouvrira peut-Ãªtre un coffre';
 
-                    sincerityNo.textContent = 'Rien de plus : une montre cassée ne dit rien';
+                    sincerityNo.textContent = 'Rien de plus : une montre cassÃ©e ne dit rien';
 
 
 
@@ -1015,7 +1032,7 @@
 
                         sincerityModal.classList.add('hidden');
 
-                        status.textContent = 'Heure du crime établie : ' + TIME + ' (à confirmer). Ce détail sera décisif, et ' + codeStr + ' servira.';
+                        status.textContent = 'Heure du crime Ã©tablie : ' + TIME + ' (Ã  confirmer). Ce dÃ©tail sera dÃ©cisif, et ' + codeStr + ' servira.';
 
                         solved = true;
 
@@ -1061,7 +1078,7 @@
 
 
 
-                /* Face loupe - Corrigé pour s'aligner précisément sur l'image */
+                /* Face loupe - CorrigÃ© pour s'aligner prÃ©cisÃ©ment sur l'image */
 
                 function moveFaceLoupe(clientX, clientY) {
 
@@ -1163,7 +1180,7 @@
 
                     faceClicked = true;
 
-                    status.textContent = 'L\'aiguille est figée. Notez l\'heure dans la case, puis cliquez sur "Retourner la montre" pour examiner le dos.';
+                    status.textContent = 'L\'aiguille est figÃ©e. Notez l\'heure dans la case, puis cliquez sur "Retourner la montre" pour examiner le dos.';
 
                 });
 
@@ -1207,7 +1224,7 @@
 
                         dosLoupeActive = true;
 
-                        status.textContent = 'Examen du dos en cours…';
+                        status.textContent = 'Examen du dos en coursâ€¦';
 
                         dosLoupeTimer = setTimeout(function () {
 
@@ -1217,7 +1234,7 @@
 
                             unlockCodeCells();
 
-                            status.textContent = 'Les gravures sont déchiffrées. Saisissez le code à 4 chiffres.';
+                            status.textContent = 'Les gravures sont dÃ©chiffrÃ©es. Saisissez le code Ã  4 chiffres.';
 
                             dosLoupeTimer = null;
 
@@ -1269,9 +1286,9 @@
 
                         faceLoupe.style.display = 'none';
 
-                        flipBtn.textContent = '👁️ Voir la face';
+                        flipBtn.textContent = 'ðŸ‘ï¸ Voir la face';
 
-                        status.textContent = 'Passez la loupe sur le dos de la montre : les gravures ne sont lisibles qu\'au grossissement…';
+                        status.textContent = 'Passez la loupe sur le dos de la montre : les gravures ne sont lisibles qu\'au grossissementâ€¦';
 
                     } else {
 
@@ -1281,9 +1298,9 @@
 
                         faceLoupe.style.display = 'block';
 
-                        flipBtn.textContent = '🔄 Retourner la montre';
+                        flipBtn.textContent = 'ðŸ”„ Retourner la montre';
 
-                        status.textContent = 'Approchez la loupe de la face. Une aiguille s\'y est figée…';
+                        status.textContent = 'Approchez la loupe de la face. Une aiguille s\'y est figÃ©eâ€¦';
 
                         dosLoupeActive = false;
 
@@ -1379,11 +1396,11 @@
 
                     saveNotes();
 
-                    saveNotesBtn.textContent = '✅ Notes sauvegardées';
+                    saveNotesBtn.textContent = 'âœ… Notes sauvegardÃ©es';
 
                     setTimeout(function () {
 
-                        saveNotesBtn.textContent = '💾 Consigner dans le carnet';
+                        saveNotesBtn.textContent = 'ðŸ’¾ Consigner dans le carnet';
 
                     }, 2000);
 
@@ -1507,7 +1524,7 @@
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres'); }
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('ParamÃ¨tres'); }
                 });
             }
         })();

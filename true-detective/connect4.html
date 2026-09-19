@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -169,12 +169,33 @@
         .btn-continue:hover {
             background: rgba(0, 255, 136, 0.3);
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+        }        @media (max-width: 600px) {
+            .connect4-wrapper {
+                padding: 10px !important;
+                gap: 10px !important;
+            }
+            .connect4-board {
+                gap: 4px !important;
+            }
+            .connect4-cell {
+                width: 36px !important;
+                height: 36px !important;
+            }
+            .connect4-slot {
+                width: 30px !important;
+                height: 30px !important;
+            }
+            .connect4-arrow-btn {
+                width: 32px !important;
+                height: 32px !important;
+                font-size: 0.9rem !important;
+            }
         }
     </style>
 </head>
 <body>
     <header class="sg-header" style="position:relative;">
-        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
+        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">â˜°</button>
         <h2 class="sg-title" style="color:var(--accent-blue);font-family:'Playfair Display',serif;">Puissance 4</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
@@ -183,13 +204,13 @@
 
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
-            <span class="menu-icon">🏠</span>
+            <span class="menu-icon">ðŸ </span>
             <span>Menu principal</span>
         </button>
         <div class="sg-menu-divider"></div>
         <button class="sg-menu-item" id="menu-settings">
-            <span class="menu-icon">⚙</span>
-            <span>Paramètres</span>
+            <span class="menu-icon">âš™</span>
+            <span>ParamÃ¨tres</span>
         </button>
     </nav>
 
@@ -203,7 +224,7 @@
                         <button class="mode-btn" id="mode-pvp">2 Joueurs</button>
                     </div>
                 </div>
-                <div class="connect4-info" id="connect4-status">Tour : Enquêteur (Rouge)</div>
+                <div class="connect4-info" id="connect4-status">Tour : EnquÃªteur (Rouge)</div>
             </div>
             <div class="connect4-board" id="connect4-board"></div>
             <button class="connect4-btn" id="connect4-reset">Nouvelle partie</button>
@@ -235,7 +256,7 @@
                 board = Array(ROWS).fill(null).map(() => Array(COLS).fill(null));
                 gameActive = true;
                 currentPlayer = 'red';
-                statusEl.textContent = "Tour : Enquêteur (Rouge)";
+                statusEl.textContent = "Tour : EnquÃªteur (Rouge)";
                 renderBoard();
             }
 
@@ -274,7 +295,7 @@
                     updateStatus();
 
                     if (playAgainstAI && currentPlayer === 'yellow' && gameActive) {
-                        statusEl.textContent = "L'IA réfléchit...";
+                        statusEl.textContent = "L'IA rÃ©flÃ©chit...";
                         setTimeout(aiMove, 600);
                     }
                 }
@@ -304,7 +325,7 @@
                     renderBoard();
 
                     if (checkWin('yellow')) {
-                        statusEl.textContent = "L'IA a gagné l'enquête !";
+                        statusEl.textContent = "L'IA a gagnÃ© l'enquÃªte !";
                         gameActive = false;
                         handleEndGame(false);
                         return;
@@ -351,7 +372,7 @@
 
             function updateStatus() {
                 if (currentPlayer === 'red') {
-                    statusEl.textContent = "Tour : Enquêteur (Rouge)";
+                    statusEl.textContent = "Tour : EnquÃªteur (Rouge)";
                 } else {
                     statusEl.textContent = playAgainstAI ? "Tour : IA (Jaune)" : "Tour : Adversaire (Jaune)";
                 }
@@ -394,7 +415,7 @@
                 if (isAiWin) {
                     statusEl.textContent = "L'IA l'emporte !";
                 } else {
-                    statusEl.textContent = "Victoire ! Indice validé.";
+                    statusEl.textContent = "Victoire ! Indice validÃ©.";
                     handleEndGame(true);
                 }
             }
@@ -496,7 +517,7 @@
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres'); }
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('ParamÃ¨tres'); }
                 });
             }
 
