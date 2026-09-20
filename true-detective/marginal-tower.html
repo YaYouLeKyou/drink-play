@@ -489,11 +489,7 @@
                     try {
                         var returnRaw = localStorage.getItem('td_standalone_game_return');
                         if (returnRaw) {
-                            var rp = JSON.parse(returnRaw);
-                            if (rp && rp.returnUrl) {
-                                window.location.href = rp.returnUrl;
-                                return;
-                            }
+                            localStorage.setItem('td_marginal_tower_return', returnRaw);
                         }
                     } catch (e) {}
                     window.location.href = '../true-detective/index.html?marginalTower=complete';
