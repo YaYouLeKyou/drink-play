@@ -567,9 +567,13 @@ function saveSettings() {
             var qs2 = new URLSearchParams(window.location.search);
             var towerFlag = qs2.get('marginalTower');
             var towerRaw = localStorage.getItem('td_marginal_tower_return');
+            /* Filet de securite : si la page du mini-jeu n'a pose que le point de
+               reprise generique, on l'utilise comme point de reprise du recit. */
+            if (!towerRaw) towerRaw = localStorage.getItem('td_standalone_game_return');
             if (towerFlag === 'complete' && towerRaw) {
                 var rpT = JSON.parse(towerRaw);
                 localStorage.removeItem('td_marginal_tower_return');
+                localStorage.removeItem('td_standalone_game_return');
                 if (rpT && typeof rpT.phaseIdx === 'number') {
                     if (rpT.lang === 'en' || rpT.lang === 'fr') { ui.language = rpT.lang; try { if (TDScenario && TDScenario.getState) TDScenario.getState().lang = rpT.lang; } catch (eA) {} }
                     if (rpT.theme && typeof setThemeId === 'function') { try { setThemeId(rpT.theme); } catch (eB) {} }
@@ -4224,10 +4228,22 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         var themeId = (typeof getThemeId === 'function' ? getThemeId() : null) || 'agatha-christie';
         var diffIdx = (minigameCfg && minigameCfg.difficulty) ? 0 : 0;
         var diff = diffIdx + 1;
+        /* Sauvegarde du contexte de retour pour le mini-jeu standalone. */
         try {
-            var rp = { phaseIdx: scr.phaseIdx, pageIdx: scr.pageIdx, interroId: (it && it.id) || 'marginal', questionRound: (it && it.questionRound) || 0, lang: lang, theme: themeId, culprit: null, ts: Date.now() };
-            try { var st0 = scrGetState(); if (st0) rp.culprit = st0.culprit || null; } catch (e0) {}
-            localStorage.setItem('td_marginal_tower_return', JSON.stringify(rp));
+            var returnData = {
+                phaseIdx: scr.phaseIdx,
+                pageIdx: scr.pageIdx,
+                interroId: (it && it.id) || 'marginal',
+                questionRound: (it && it.questionRound) || 0,
+                lang: lang,
+                theme: themeId,
+                culprit: null,
+                ts: Date.now()
+            };
+            try { var st0 = scrGetState(); if (st0) returnData.culprit = st0.culprit || null; } catch (e0) {}
+            localStorage.setItem('td_marginal_tower_return', JSON.stringify(returnData));
+            /* Miroir generique : la page standalone lit td_standalone_game_return. */
+            try { localStorage.setItem('td_standalone_game_return', JSON.stringify(returnData)); } catch (e1) {}
         } catch (e) {}
         scr.awaitingChoice = false;
         $.choicesContainer.innerHTML = '';
@@ -4268,6 +4284,13 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             ? (mgCfg.clue && (mgCfg.clue[ui.language] || mgCfg.clue.fr || mgCfg.clue.en || ''))
             : (mgCfg.failClue && (mgCfg.failClue[ui.language] || mgCfg.failClue.fr || mgCfg.failClue.en || ''));
         scrHandleMinigameResult(0, { won: !!res.won, clue: clueText });
+        /* Le joueur a deja joue la manche dans la page standalone : on enchaine
+           directement sur la page suivante du recit, sans second clic. */
+        setTimeout(function () {
+            if (scr.interro && scr.interro.done && $.continueBtn && typeof $.continueBtn.onclick === 'function') {
+                $.continueBtn.onclick();
+            }
+        }, 250);
         return true;
     }
 

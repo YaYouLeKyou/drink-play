@@ -421,6 +421,44 @@
         (function() {
             'use strict';
 
+            /* Sortie unique du mini-jeu.
+               En mode recit : on memorise le resultat de la manche + le point de
+               reprise exact de l'enquete (td_marginal_tower_return), puis on
+               revient a l'histoire qui enchaine sur la page suivante.
+               Sinon : retour a l'accueil / au hub des mini-jeux. */
+            var tdFromStory = new URLSearchParams(window.location.search).get('story') === '1' || (function () { try { return !!localStorage.getItem('td_marginal_tower_return'); } catch (e) { return false; } })();
+
+            function tdLeaveMinigame(won, hubUrl) {
+                try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: !!won, ts: Date.now() })); } catch (e) {}
+                if (!tdFromStory) {
+                    window.location.href = hubUrl || '../true-detective/index.html';
+                    return;
+                }
+                try {
+                    var returnRaw = localStorage.getItem('td_standalone_game_return');
+                    if (returnRaw) {
+                        var point = JSON.parse(returnRaw);
+                        if (point && typeof point === 'object') {
+                            if (!point.interroId) point.interroId = 'marginal';
+                            var serialized = JSON.stringify(point);
+                            localStorage.setItem('td_marginal_tower_return', serialized);
+                            localStorage.setItem('td_standalone_game_return', serialized);
+                        }
+                    }
+                } catch (e) {}
+                window.location.href = '../true-detective/index.html?marginalTower=complete';
+            }
+            window.TDMarginalTowerLeave = tdLeaveMinigame;
+
+            /* Le bouton de secours de l'ecran de chargement doit toujours repondre,
+               meme si Matter.js n'a pas pu se charger (CDN injoignable, hors-ligne). */
+            var earlyContinueBtn = document.getElementById('loading-continue-btn');
+            if (earlyContinueBtn) {
+                earlyContinueBtn.addEventListener('click', function () {
+                    tdLeaveMinigame(false, '../true-detective/index.html#minigames');
+                });
+            }
+
             if (!window.Matter) {
                 var loadingBtn = document.getElementById('loading-continue-btn');
                 if (loadingBtn) {
@@ -480,15 +518,7 @@
                 brick: { width: 75, height: 30, density: 0.0025, friction: 0.6, restitution: 0.05, color: '#a84d43', stroke: '#e07d73' }
             };
 
-            var fromStory = new URLSearchParams(window.location.search).get('story') === '1' || (function () { try { return !!localStorage.getItem('td_marginal_tower_return'); } catch (e) { return false; } })();
-
-            var loadingContinueBtn = document.getElementById('loading-continue-btn');
-            if (loadingContinueBtn) {
-                loadingContinueBtn.addEventListener('click', function () {
-                    try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: false, ts: Date.now() })); } catch (e) {}
-                    window.location.href = '../true-detective/index.html?marginalTower=complete';
-                });
-            }
+            var fromStory = tdFromStory;
 
             setTimeout(function () {
                 var btn = document.getElementById('loading-continue-btn');
@@ -690,14 +720,12 @@
 
                 document.getElementById('victory-continue-btn').addEventListener('click', () => {
                     stopMusic();
-                    try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: true, ts: Date.now() })); } catch (e) {}
-                    window.location.href = fromStory ? '../true-detective/index.html?marginalTower=complete' : '../true-detective/index.html';
+                    tdLeaveMinigame(true);
                 });
 
                 document.getElementById('defeat-continue-btn').addEventListener('click', () => {
                     stopMusic();
-                    try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: false, ts: Date.now() })); } catch (e) {}
-                    window.location.href = fromStory ? '../true-detective/index.html?marginalTower=complete' : '../true-detective/index.html';
+                    tdLeaveMinigame(false);
                 });
 
                 document.getElementById('back-to-minigame-btn').addEventListener('click', () => {
@@ -710,18 +738,7 @@
                     storyBtn.style.display = 'inline-block';
                     storyBtn.addEventListener('click', function () {
                         stopMusic();
-                        try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: false, ts: Date.now() })); } catch (e) {}
-                        try {
-                            var returnRaw = localStorage.getItem('td_standalone_game_return');
-                            if (returnRaw) {
-                                var rp = JSON.parse(returnRaw);
-                                if (rp && rp.returnUrl) {
-                                    window.location.href = rp.returnUrl;
-                                    return;
-                                }
-                            }
-                        } catch (e) {}
-                        window.location.href = '../true-detective/index.html?marginalTower=complete';
+                        tdLeaveMinigame(false);
                     });
                 }
 
@@ -782,7 +799,11 @@
                     showRules: false,
                     customButtons: [],
                     onBackToHub: function () {
-                        window.location.href = fromStory ? '../true-detective/index.html?standalone=marginal-tower' : '../true-detective/index.html';
+                        if (typeof window.TDMarginalTowerLeave === 'function') {
+                            window.TDMarginalTowerLeave(false, '../true-detective/index.html#minigames');
+                            return;
+                        }
+                        window.location.href = fromStory ? '../true-detective/index.html?marginalTower=complete' : '../true-detective/index.html';
                     }
                 });
             }

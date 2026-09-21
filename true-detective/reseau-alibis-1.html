@@ -103,15 +103,40 @@
         
         .reseau-alibis-message { position: relative; margin: 12px auto 0; padding: 8px 14px; max-width: 480px; text-align: center; font-size: 0.88rem; color: #f0d890; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(240, 216, 144, 0.4); border-radius: 8px; z-index: 1; }
         
-        /* Mobile: cards stacked vertically, continue button at bottom */
+        /* Mobile : le plateau des cartes occupe toute la hauteur disponible
+           au-dessus du bouton Continuer (fixe en bas de l'écran), pour que les
+           cartes soient alignées en hauteur avec lui. */
         @media (max-width: 768px) {
+            .sg-main {
+                align-items: stretch !important;
+                padding: 12px 12px calc(92px + env(safe-area-inset-bottom, 0px)) 12px !important;
+            }
+            #reseau-alibis-app,
+            #reseau-alibis-app > .minigame-content,
+            #reseau-alibis-app .minigame-body {
+                flex: 1 1 auto !important;
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                min-height: 0 !important;
+            }
+            #reseau-alibis-app .reseau-alibis-board {
+                flex: 1 1 auto !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                min-height: 0 !important;
+                max-height: none !important;
+                overflow-y: auto !important;
+                padding-bottom: 12px !important;
+            }
+            .reseau-alibis-carousel-wrap {
+                width: 100% !important;
+            }
             .reseau-alibis-grid {
                 grid-template-columns: 1fr !important;
                 gap: 12px !important;
-            }
-            .reseau-alibis-board {
-                padding-bottom: 80px !important;
-                align-self: flex-start !important;
             }
         }
         
