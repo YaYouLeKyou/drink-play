@@ -3537,6 +3537,7 @@ function buildTransitionPages(sceneData) {
             alley: assets.alley,
             residence: assets.residence,
             bar: assets.publicPlace,
+            publicPlace: assets.publicPlace,
             barInterieur: assets.barInterieur,
             clandestine: assets.secretPlace,
             secretPlace: assets.secretPlace,
