@@ -99,24 +99,24 @@
        Single source of truth for minigame metadata.
     ============================================================ */
     var MINIGAME_REGISTRY = {
-        'scene_fouille': { name: 'Fouille de scene', type: 'scene_fouille', category: 'puzzle', script: null, standaloneUrl: null, difficultyLevels: 1, clueReward: 'forensic' },
+        'scene_fouille': { name: 'Fouille de la scène', type: 'scene_fouille', category: 'puzzle', script: null, standaloneUrl: null, difficultyLevels: 1, clueReward: 'forensic' },
         'montre_code': { name: 'La Montre du Duc', type: 'montre_code', category: 'puzzle', script: null, standaloneUrl: null, difficultyLevels: 1, clueReward: 'timeline' },
         'puzzle': { name: 'Le Puzzle', type: 'puzzle', category: 'puzzle', script: 'puzzle-game.js', standaloneUrl: 'puzzle.html', difficultyLevels: 3, clueReward: 'scene' },
         'coffre_code': { name: 'Coffre-fort', type: 'coffre_code', category: 'puzzle', script: null, standaloneUrl: null, difficultyLevels: 1, clueReward: 'mobile' },
         'reseau_alibis': { name: 'Reseau d\'alibis', type: 'reseau_alibis', category: 'puzzle', script: null, standaloneUrl: 'reseau-alibis.html', difficultyLevels: 4, clueReward: 'witness' },
         'chemistry': { name: 'Chimie', type: 'chemistry', category: 'puzzle', script: 'chemistry-game.js', standaloneUrl: 'chemistry.html', difficultyLevels: 3, clueReward: 'forensic' },
-        'chess': { name: 'Echecs', type: 'chess', category: 'classic', script: 'chess-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'psychological' },
+        'connect4': { name: 'Puissance 4', type: 'connect4', category: 'classic', script: 'connect4-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'scene' },
         'memory': { name: 'Memoire', type: 'memory', category: 'classic', script: 'memory-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'witness' },
         'shooting': { name: 'Tir forain', type: 'shooting', category: 'classic', script: 'shooting-gallery.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'psychological' },
         'jackpot': { name: 'Jackpot', type: 'jackpot', category: 'classic', script: null, standaloneUrl: null, difficultyLevels: 1, clueReward: 'mobile' },
-        'connect4': { name: 'Puissance 4', type: 'connect4', category: 'classic', script: 'connect4-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'scene' },
         'marginal-tower': { name: 'Tour de Silas', type: 'marginal-tower', category: 'classic', script: null, standaloneUrl: 'marginal-tower.html', difficultyLevels: 3, clueReward: 'scene' },
         'bataille-navale': { name: 'Bataille navale', type: 'bataille-navale', category: 'retro', script: 'bataille-navale.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'witness' },
         'pong': { name: 'Pong', type: 'pong', category: 'retro', script: 'pong-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'scene' },
         'pacman': { name: 'Pacman', type: 'pacman', category: 'retro', script: 'pacman-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'scene' },
         'space-invaders': { name: 'Space Invaders', type: 'space-invaders', category: 'retro', script: 'space-invaders.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'scene' },
         'breakout': { name: 'Breakout', type: 'breakout', category: 'retro', script: 'breakout-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'scene' },
-        'asteroids': { name: 'Asteroides', type: 'asteroids', category: 'retro', script: 'asteroids-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'scene' },
+        'asteroids': { name: 'Astéroïdes', type: 'asteroids', category: 'retro', script: 'asteroids-game.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'scene' },
+        'missile-command': { name: 'Missile Command', type: 'missile-command', category: 'retro', script: 'missile-command.js', standaloneUrl: null, difficultyLevels: 3, clueReward: 'scene' },
     };
 
     function getMinigameRegistry() { return MINIGAME_REGISTRY; }
@@ -4559,7 +4559,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         'protecteur':    { phase: 'act2_3', pageIdx: 1 },  // Acte 2, Interrogatoires P2 : tir forain
         'femme-fatale':  { phase: 'act1_1', pageIdx: 1 },  // Acte 1, Interrogatoires P2 : échecs
         'seducteur':     { phase: 'act2_3', pageIdx: 3 },  // Acte 2, Interrogatoires P4 : jackpot
-        'suspect':       { phase: 'act2_3', pageIdx: 5 },  // Acte 2, Interrogatoires P6 : sudoku
+        'suspect':       { phase: 'act2_3', pageIdx: 5 },  // Acte 2, Interrogatoires P6 : connect4
         'marginal':      { phase: 'act1_2', pageIdx: 3 },  // Acte 1, Témoignages P4 : tour de cartes
         'criminel':      { phase: 'act2_1', pageIdx: 2 }   // Acte 2, Piste du bar P3 : mémoire
     };
@@ -4568,10 +4568,10 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     // Classic et Film Noir utilisent les mini-jeux originaux (shooting, chess, jackpot, sudoku, memory, chemistry).
     var CYBERPUNK_RETRO_GAME_MAP = {
         'protecteur': 'asteroids',
-        'femme-fatale': 'pacman',
+        'femme-fatale': 'pong',
         'seducteur': 'breakout',
-        'suspect': 'bataille-navale',
-        'marginal': 'pong',
+        'suspect': 'missile-command',
+        'marginal': 'pacman',
         'criminel': 'space-invaders'
     };
 
@@ -4695,6 +4695,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         } else if (minigameType === 'connect4') {
             cfg.aiDepth = Math.min(tier, 4);
             cfg.winScore = 10;
+        } else if (minigameType === 'missile-command') {
+            cfg.missilesPerWave = 5 + tier * 2; // 7..11
+            cfg.missileSpeed = 2 + tier * 0.5;
         } else if (minigameType === 'sudoku') {
             cfg.holes = 40 - tier * 5;             // 35..25 cases à remplir
             cfg.time = 90 + tier * 30;             // 2..5 minutes
@@ -4725,6 +4728,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
               'shooting': 'shooting.html',
               'jackpot': 'jackpot.html',
               'connect4': 'connect4.html',
+              'missile-command': 'missile-command.html',
               'sudoku': 'sudoku.html',
               'bataille-navale': 'bataille-navale.html',
               'pong': 'pong.html',
@@ -4754,7 +4758,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
              return page + '?difficulty=' + diff + '&lang=' + lang + '&theme=' + encodeURIComponent(themeId || getThemeId()) + (mode === 'story' ? '&story=1' : '');
          }
 
-         if (['pong', 'pacman', 'space-invaders', 'breakout', 'asteroids'].indexOf(type) >= 0) {
+         if (['pong', 'pacman', 'space-invaders', 'breakout', 'asteroids', 'missile-command'].indexOf(type) >= 0) {
              return 'standalone-game.html?game=' + type + '&level=' + diff + '&lang=' + lang + '&theme=' + encodeURIComponent(themeId || getThemeId()) + (mode ? ('&mode=' + mode) : '');
          }
          return 'standalone-game.html?game=' + type + '&difficulty=' + diff + '&lang=' + lang + '&theme=' + encodeURIComponent(themeId || getThemeId()) + (mode ? ('&mode=' + mode) : '');

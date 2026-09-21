@@ -28,6 +28,7 @@
         'connect4': 'connect4-game.js',
         'chemistry': 'chemistry-game.js',
         'bataille-navale': 'bataille-navale.js',
+        'missile-command': 'missile-command.js',
         'pong': 'pong-game.js',
         'pacman': 'pacman-game.js',
         'space-invaders': 'space-invaders.js',
@@ -60,6 +61,7 @@
         'shooting': 'shooting.html',
         'jackpot': 'jackpot.html',
         'connect4': 'connect4.html',
+        'missile-command': 'missile-command.html',
         'bataille-navale': 'bataille-navale.html',
         'pong': 'pong.html',
         'pacman': 'pacman.html',
@@ -151,7 +153,7 @@
     }
 
     function isRetroGame(type) {
-        return ['pong', 'pacman', 'space-invaders', 'breakout', 'asteroids'].indexOf(type) >= 0;
+        return ['pong', 'pacman', 'space-invaders', 'breakout', 'asteroids', 'missile-command'].indexOf(type) >= 0;
     }
 
     var retroLevel = 1;
@@ -255,6 +257,10 @@
         }
         if (gameType === 'connect4' && global.Connect4Game) {
             loadConnect4();
+            return;
+        }
+        if (gameType === 'missile-command') {
+            window.location.href = 'missile-command.html?difficulty=' + difficulty + '&lang=' + lang;
             return;
         }
         if (gameType === 'chess' && global.TDChessGame) {

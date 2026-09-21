@@ -1991,6 +1991,9 @@ var dos = document.createElement('img');
                 complete(true);
             }
         },
+        'missile-command': function (body) {
+            complete(true);
+        },
         'chemistry': function (body) {
             if (global.TDChemistryGame) {
                 global.TDChemistryGame.play(cfg, lang, function (res) {

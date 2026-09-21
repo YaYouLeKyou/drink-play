@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>True Detective - Missile Command</title>
+    <link rel="icon" href="../icon/Logo%20d%26p.png">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="standalone-game.css">
+    <link rel="stylesheet" href="../settings-menu.css">
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --panel-bg: rgba(8, 12, 24, 0.92);
+            --neon-red: #ff0044;
+            --neon-blue: #00f0ff;
+            --neon-green: #00ff88;
+            --text-main: #e8f4ff;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% 20%, #1a0a1a 0%, #0a0a0a 100%),
+                linear-gradient(rgba(255, 0, 68, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 0, 68, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            color: var(--text-main);
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .mc-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            flex: 1;
+            box-sizing: border-box;
+            justify-content: center;
+        }
+
+        .mc-hud {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 700px;
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 0, 68, 0.3);
+            padding: 10px 18px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            font-size: 0.95rem;
+        }
+
+        .mc-info {
+            color: var(--text-main);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        #mc-canvas {
+            display: block;
+            width: 100%;
+            max-width: 700px;
+            height: 450px;
+            background: radial-gradient(circle at center, #0a0a1a 0%, #05050f 100%);
+            border: 2px solid var(--neon-red);
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(255, 0, 68, 0.25);
+            touch-action: none;
+        }
+
+        .mc-touch-controls {
+            display: none;
+            gap: 10px;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .touch-btn {
+            flex: 1;
+            background: rgba(255, 0, 68, 0.1);
+            border: 1px solid var(--neon-red);
+            color: var(--text-main);
+            padding: 15px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .touch-btn:active {
+            background: rgba(255, 0, 68, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .mc-touch-controls {
+                display: flex;
+            }
+            #mc-canvas {
+                height: 320px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="sg-header" style="position:relative; background: rgba(3, 4, 10, 0.95); border-bottom: 1px solid rgba(255, 0, 68, 0.3); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10;">
+        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu" style="background:none;border:none;color:var(--neon-red);font-size:1.3rem;cursor:pointer;">☰</button>
+        <h2 class="sg-title" style="color:var(--neon-red);font-family:'Playfair Display',serif;margin:0;font-size:1.3rem;text-shadow:0 0 10px rgba(255,0,68,0.4);">Missile Command</h2>
+        <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
+    </header>
+
+    <nav id="hamburger-menu" class="sg-menu">
+        <button class="sg-menu-item" id="menu-home">
+            <span class="menu-icon">🏠</span>
+            <span>Menu principal</span>
+        </button>
+        <div class="sg-menu-divider"></div>
+        <button class="sg-menu-item" id="menu-settings">
+            <span class="menu-icon">⚙</span>
+            <span>Paramètres</span>
+        </button>
+    </nav>
+
+    <main class="sg-main">
+        <div class="mc-wrap">
+            <div class="mc-hud">
+                <div class="mc-info" id="mc-score">Score: 0</div>
+                <div class="mc-info" id="mc-wave">Vague: 1</div>
+                <div class="mc-info" id="mc-cities">Villes: 6</div>
+            </div>
+            
+            <canvas id="mc-canvas" width="700" height="450"></canvas>
+
+            <div class="mc-touch-controls">
+                <button class="touch-btn" id="btn-left">◀</button>
+                <button class="touch-btn" id="btn-fire" style="background:rgba(0,240,255,0.1); border-color:var(--neon-blue);">TIR</button>
+                <button class="touch-btn" id="btn-right">▶</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function getLevel() {
+            var level = parseInt(new URLSearchParams(window.location.search).get('level') || '1', 10);
+            if (isNaN(level) || level < 1) level = 1;
+            if (level > 3) level = 3;
+            return level;
+        }
+    </script>
+
+    <!-- Script principal du jeu Missile Command -->
+    <script src="missile-command.js"></script>
+    <script>
+        (function() {
+            // Mobile touch controls
+            var touchX = 0, touchY = 0;
+            var canvas = document.getElementById('mc-canvas');
+            
+            if (canvas) {
+                canvas.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                }, { passive: false });
+
+                canvas.addEventListener('touchmove', function(e) {
+                    e.preventDefault();
+                    if (e.touches.length > 0) {
+                        touchX = e.touches[0].clientX;
+                        touchY = e.touches[0].clientY;
+                    }
+                }, { passive: false });
+            }
+
+            var leftBtn = document.getElementById('btn-left');
+            var rightBtn = document.getElementById('btn-right');
+            var fireBtn = document.getElementById('btn-fire');
+            
+            if (leftBtn) {
+                leftBtn.addEventListener('touchstart', function(e) { e.preventDefault(); });
+                leftBtn.addEventListener('touchend', function(e) { e.preventDefault(); });
+            }
+            if (rightBtn) {
+                rightBtn.addEventListener('touchstart', function(e) { e.preventDefault(); });
+                rightBtn.addEventListener('touchend', function(e) { e.preventDefault(); });
+            }
+            if (fireBtn) {
+                fireBtn.addEventListener('click', function(e) { e.preventDefault(); });
+            }
+        })();
+    </script>
+
+    <script src="../settings-menu.js"></script>
+    <script src="standalone-theme.js"></script>
+    <script src="sfx.js"></script>
+    <script src="minigame-audio.js" data-minigame="missile-command"></script>
+    <script>
+        (function () {
+            'use strict';
+            if (window.DPSettings && window.DPSettings.init) {
+                window.DPSettings.init({
+                    showMusicToggle: true, showMusicVolume: true, showNarrationVolume: false,
+                    showMuteToggle: false, showGameSection: true, showBackToHub: false,
+                    showRestart: false, showRules: false, customButtons: [],
+                    onBackToHub: function () { window.location.href = '../true-detective/index.html#minigames'; }
+                });
+            }
+
+            var hamburgerBtn = document.getElementById('hamburger-btn');
+            var menu = document.getElementById('hamburger-menu');
+            if (hamburgerBtn && menu) {
+                hamburgerBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    menu.classList.toggle('open');
+                });
+                document.addEventListener('click', function (e) {
+                    if (!menu.contains(e.target) && e.target !== hamburgerBtn) {
+                        menu.classList.remove('open');
+                    }
+                });
+            }
+
+            var backBtn = document.getElementById('back-to-minigame-btn');
+            var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+            
+            if (fromStory) {
+                if (backBtn) backBtn.style.display = 'none';
+                var continueBtn = document.createElement('button');
+                continueBtn.id = 'story-continue-btn';
+                continueBtn.className = 'btn btn-continue';
+                continueBtn.textContent = 'Continuer';
+                continueBtn.style.cssText = 'margin-left:8px;padding:6px 14px;font-size:0.75rem;font-weight:700;background:rgba(0,255,136,0.15);border:1px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
+                continueBtn.addEventListener('click', function () {
+                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'missile-command', won: false, ts: Date.now() })); } catch (e) {}
+                    try {
+                        var returnRaw = localStorage.getItem('td_standalone_game_return');
+                        if (returnRaw) {
+                            var rp = JSON.parse(returnRaw);
+                            if (rp && rp.returnUrl) { window.location.href = rp.returnUrl; return; }
+                        }
+                    } catch (e) {}
+                    window.location.href = fromStory ? '../true-detective/index.html?standalone=missile-command' : '../true-detective/index.html#minigames';
+                });
+                var header = document.querySelector('.sg-header');
+                if (header) header.appendChild(continueBtn);
+            } else {
+                if (backBtn) {
+                    backBtn.textContent = 'Accueil';
+                    backBtn.addEventListener('click', function () {
+                        if (menu) menu.classList.remove('open');
+                        window.location.href = '../true-detective/index.html#minigames';
+                    });
+                }
+            }
+
+            var menuHome = document.getElementById('menu-home');
+            if (fromStory && menuHome) menuHome.style.display = 'none';
+            if (menuHome) {
+                menuHome.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    window.location.href = fromStory ? '../true-detective/index.html?standalone=missile-command' : '../true-detective/index.html#minigames';
+                });
+            }
+
+            var menuSettings = document.getElementById('menu-settings');
+            if (menuSettings) {
+                menuSettings.addEventListener('click', function () {
+                    if (menu) menu.classList.remove('open');
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres : aucun réglage pour l\'instant.'); }
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

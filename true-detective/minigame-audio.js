@@ -29,6 +29,7 @@
         'space-invaders': 'space invader.mp3',
         'breakout': 'casse-brique.mp3',
         'asteroids': 'asteroid.mp3',
+        'missile-command': 'missile-command.mp3',
         'marginal-tower': 'tower.mp3'
     };
 
