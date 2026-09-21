@@ -4555,12 +4555,23 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     // Clé = id de l'interrogation, valeur = { phase: id de phase, pageIdx: index de page }.
     // Tout autre emplacement (Acte 1, Acte 2, Révélation...) reste en interrogation simple.
     var MINIGAME_LOCATIONS = {
-        'protecteur':    { phase: 'act2_3', pageIdx: 0 },  // Acte 2, Interrogatoires P1 : tir forain
+        'protecteur':    { phase: 'act2_3', pageIdx: 1 },  // Acte 2, Interrogatoires P2 : tir forain
         'femme-fatale':  { phase: 'act1_1', pageIdx: 1 },  // Acte 1, Interrogatoires P2 : échecs
-        'seducteur':     { phase: 'act2_3', pageIdx: 2 },  // Acte 2, Interrogatoires P3 : jackpot
-        'suspect':       { phase: 'act2_3', pageIdx: 4 },  // Acte 2, Interrogatoires P5 : sudoku
+        'seducteur':     { phase: 'act2_3', pageIdx: 3 },  // Acte 2, Interrogatoires P4 : jackpot
+        'suspect':       { phase: 'act2_3', pageIdx: 5 },  // Acte 2, Interrogatoires P6 : sudoku
         'marginal':      { phase: 'act1_2', pageIdx: 3 },  // Acte 1, Témoignages P4 : tour de cartes
         'criminel':      { phase: 'act2_1', pageIdx: 2 }   // Acte 2, Piste du bar P3 : mémoire
+    };
+
+    // Mappage des suspects vers leurs mini-jeux rétro préférés pour le thème Cyberpunk.
+    // Classic et Film Noir utilisent les mini-jeux originaux (shooting, chess, jackpot, sudoku, memory, chemistry).
+    var CYBERPUNK_RETRO_GAME_MAP = {
+        'protecteur': 'asteroids',
+        'femme-fatale': 'pacman',
+        'seducteur': 'breakout',
+        'suspect': 'bataille-navale',
+        'marginal': 'pong',
+        'criminel': 'space-invaders'
     };
 
     function scrMinigameAllowedHere(interroId) {
@@ -4583,9 +4594,13 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         if (!roundCfg) return null;
 
         var mgType = interro.minigame.type;
-        // Le jeu est propre à chaque suspect, quel que soit l'univers :
-        // protecteur = tir forain, seducteur = jackpot, etc. (pas de remap par thème).
         var themeId = (typeof getThemeId === 'function' ? getThemeId() : null) || 'agatha-christie';
+
+        // En thème Cyberpunk, chaque suspect joue à son mini-jeu rétro préféré
+        // au lieu du jeu classique (ex: protecteur → asteroids au lieu de shooting).
+        if (themeId === 'cyberpunk' && CYBERPUNK_RETRO_GAME_MAP[interroId]) {
+            mgType = CYBERPUNK_RETRO_GAME_MAP[interroId];
+        }
 
         var cfg = {
             type: mgType,

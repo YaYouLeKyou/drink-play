@@ -110,6 +110,15 @@
         detective: { fr: "Inspecteur Wexford, Votre partenaire de longue date, il connaît la victime mieux que quiconque.", en: "Inspector Wexford, Your long-time partner, he knows the victim better than anyone." }
     };
 
+    N.gamePreferences = {
+        protecteur: { fr: "Major Hale préfère la guerre spatiale et la précision tirée", en: "Major Hale prefers space warfare and precision shooting" },
+        "femme-fatale": { fr: "Lady Vivienne préfère le labyrinthe et la stratégie", en: "Lady Vivienne prefers maze and strategy" },
+        seducteur: { fr: "Julian Pembrooke préfère le breakout et le hasard", en: "Julian Pembrooke prefers breakout and chance" },
+        suspect: { fr: "Rupert Blackwood préfère la bataille navale et la grille stratégique", en: "Rupert Blackwood prefers battleship and strategic grid" },
+        marginal: { fr: "Silas Crane préfère le pong et le simple réflexe", en: "Silas Crane prefers pong and simple reflex" },
+        criminel: { fr: "Victor Krane préfère les astéroïdes et la survie", en: "Victor Krane prefers asteroids and survival" }
+    };
+
     /* =================================================================
        3. RÉACTIONS (échec d'accusation)
     ================================================================= */
