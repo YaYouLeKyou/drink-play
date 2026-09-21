@@ -486,12 +486,6 @@
             if (loadingContinueBtn) {
                 loadingContinueBtn.addEventListener('click', function () {
                     try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: false, ts: Date.now() })); } catch (e) {}
-                    try {
-                        var returnRaw = localStorage.getItem('td_standalone_game_return');
-                        if (returnRaw) {
-                            localStorage.setItem('td_marginal_tower_return', returnRaw);
-                        }
-                    } catch (e) {}
                     window.location.href = '../true-detective/index.html?marginalTower=complete';
                 });
             }
