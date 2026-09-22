@@ -3,28 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>True Detective - Missile Command</title>
+    <title>True Detective - Missile Command (Arcade Facile & Audio)</title>
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
     <link rel="stylesheet" href="../settings-menu.css">
     <style>
         :root {
-            --bg-dark: #0a0a0a;
-            --panel-bg: rgba(8, 12, 24, 0.92);
-            --neon-red: #ff0044;
-            --neon-blue: #00f0ff;
-            --neon-green: #00ff88;
-            --text-main: #e8f4ff;
+            --bg-dark: #030408;
+            --panel-bg: rgba(6, 10, 22, 0.95);
+            --neon-red: #ff1744;
+            --neon-blue: #00e5ff;
+            --neon-green: #00e676;
+            --text-main: #f0f4f8;
         }
 
         body {
             background-color: var(--bg-dark);
             background-image: 
-                radial-gradient(circle at 50% 20%, #1a0a1a 0%, #0a0a0a 100%),
-                linear-gradient(rgba(255, 0, 68, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 0, 68, 0.02) 1px, transparent 1px);
-            background-size: 100% 100%, 30px 30px, 30px 30px;
+                radial-gradient(circle at 50% 15%, #12051a 0%, #030408 100%),
+                linear-gradient(rgba(0, 229, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
             color: var(--text-main);
             font-family: 'Montserrat', sans-serif;
             margin: 0;
@@ -42,8 +42,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
-            padding: 15px;
+            gap: 12px;
+            padding: 12px;
             flex: 1;
             box-sizing: border-box;
             justify-content: center;
@@ -52,73 +52,49 @@
         .mc-hud {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             width: 100%;
-            max-width: 700px;
+            max-width: 720px;
             background: var(--panel-bg);
-            border: 1px solid rgba(255, 0, 68, 0.3);
-            padding: 10px 18px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 229, 255, 0.35);
+            padding: 12px 22px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(0, 229, 255, 0.08);
+            backdrop-filter: blur(12px);
             font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
         }
 
-        .mc-info {
-            color: var(--text-main);
-            font-weight: 600;
-            letter-spacing: 0.05em;
+        .mc-hud span {
+            color: var(--neon-blue);
+            text-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+        }
+
+        .mc-canvas-container {
+            position: relative;
+            width: 100%;
+            max-width: 720px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 35px rgba(0, 229, 255, 0.25), inset 0 0 20px rgba(0, 0, 0, 0.8);
         }
 
         #mc-canvas {
             display: block;
             width: 100%;
-            max-width: 700px;
-            height: 450px;
-            background: radial-gradient(circle at center, #0a0a1a 0%, #05050f 100%);
-            border: 2px solid var(--neon-red);
-            border-radius: 12px;
-            box-shadow: 0 0 25px rgba(255, 0, 68, 0.25);
+            height: 460px;
+            background: radial-gradient(circle at center, #0a0e1a 0%, #020307 100%);
+            cursor: crosshair;
             touch-action: none;
-        }
-
-        .mc-touch-controls {
-            display: none;
-            gap: 10px;
-            width: 100%;
-            max-width: 700px;
-        }
-
-        .touch-btn {
-            flex: 1;
-            background: rgba(255, 0, 68, 0.1);
-            border: 1px solid var(--neon-red);
-            color: var(--text-main);
-            padding: 15px;
-            font-size: 1.2rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-
-        .touch-btn:active {
-            background: rgba(255, 0, 68, 0.3);
-        }
-
-        @media (max-width: 768px) {
-            .mc-touch-controls {
-                display: flex;
-            }
-            #mc-canvas {
-                height: 320px;
-            }
         }
     </style>
 </head>
 <body>
-    <header class="sg-header" style="position:relative; background: rgba(3, 4, 10, 0.95); border-bottom: 1px solid rgba(255, 0, 68, 0.3); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10;">
-        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu" style="background:none;border:none;color:var(--neon-red);font-size:1.3rem;cursor:pointer;">☰</button>
-        <h2 class="sg-title" style="color:var(--neon-red);font-family:'Playfair Display',serif;margin:0;font-size:1.3rem;text-shadow:0 0 10px rgba(255,0,68,0.4);">Missile Command</h2>
+    <header class="sg-header" style="position:relative; background: rgba(3, 4, 10, 0.95); border-bottom: 1px solid rgba(0, 229, 255, 0.3); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10;">
+        <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu" style="background:none;border:none;color:var(--neon-blue);font-size:1.3rem;cursor:pointer;">☰</button>
+        <h2 class="sg-title" style="color:var(--neon-blue);font-family:'Playfair Display',serif;margin:0;font-size:1.3rem;text-shadow:0 0 12px rgba(0,229,255,0.5);">Missile Command</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
 
@@ -137,74 +113,431 @@
     <main class="sg-main">
         <div class="mc-wrap">
             <div class="mc-hud">
-                <div class="mc-info" id="mc-score">Score: 0</div>
-                <div class="mc-info" id="mc-wave">Vague: 1</div>
-                <div class="mc-info" id="mc-cities">Villes: 6</div>
+                <div>SCORE: <span id="hud-score">000000</span></div>
+                <div>VAGUE: <span id="hud-wave">1</span></div>
             </div>
             
-            <canvas id="mc-canvas" width="700" height="450"></canvas>
-
-            <div class="mc-touch-controls">
-                <button class="touch-btn" id="btn-left">◀</button>
-                <button class="touch-btn" id="btn-fire" style="background:rgba(0,240,255,0.1); border-color:var(--neon-blue);">TIR</button>
-                <button class="touch-btn" id="btn-right">▶</button>
+            <div class="mc-canvas-container">
+                <canvas id="mc-canvas" width="720" height="460"></canvas>
             </div>
         </div>
     </main>
 
-    <script>
-        function getLevel() {
-            var level = parseInt(new URLSearchParams(window.location.search).get('level') || '1', 10);
-            if (isNaN(level) || level < 1) level = 1;
-            if (level > 3) level = 3;
-            return level;
-        }
-    </script>
-
-    <!-- Script principal du jeu Missile Command -->
-    <script src="missile-command.js"></script>
-    <script>
-        (function() {
-            // Mobile touch controls
-            var touchX = 0, touchY = 0;
-            var canvas = document.getElementById('mc-canvas');
-            
-            if (canvas) {
-                canvas.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                }, { passive: false });
-
-                canvas.addEventListener('touchmove', function(e) {
-                    e.preventDefault();
-                    if (e.touches.length > 0) {
-                        touchX = e.touches[0].clientX;
-                        touchY = e.touches[0].clientY;
-                    }
-                }, { passive: false });
-            }
-
-            var leftBtn = document.getElementById('btn-left');
-            var rightBtn = document.getElementById('btn-right');
-            var fireBtn = document.getElementById('btn-fire');
-            
-            if (leftBtn) {
-                leftBtn.addEventListener('touchstart', function(e) { e.preventDefault(); });
-                leftBtn.addEventListener('touchend', function(e) { e.preventDefault(); });
-            }
-            if (rightBtn) {
-                rightBtn.addEventListener('touchstart', function(e) { e.preventDefault(); });
-                rightBtn.addEventListener('touchend', function(e) { e.preventDefault(); });
-            }
-            if (fireBtn) {
-                fireBtn.addEventListener('click', function(e) { e.preventDefault(); });
-            }
-        })();
-    </script>
-
+    <!-- Scripts utilitaires du site, SFX et Audio -->
     <script src="../settings-menu.js"></script>
     <script src="standalone-theme.js"></script>
     <script src="sfx.js"></script>
     <script src="minigame-audio.js" data-minigame="missile-command"></script>
+
+    <script>
+        const canvas = document.getElementById('mc-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let score = 0;
+        let wave = 1;
+        let gameState = 'PLAYING'; // 'PLAYING', 'GAMEOVER'
+        let audioUnlocked = false;
+
+        let cities = [];
+        let silos = [];
+        let enemyMissiles = [];
+        let playerMissiles = [];
+        let explosions = [];
+
+        // Fonction utilitaire sécurisée pour jouer les SFX via TDSfx
+        function playSound(soundName) {
+            try {
+                var fx = window.TDSfx;
+                if (fx && typeof fx.play === 'function') {
+                    fx.play(soundName);
+                } else if (fx && typeof fx[soundName] === 'function') {
+                    fx[soundName]();
+                }
+            } catch (e) {
+                // Ignore les erreurs silencieusement si un son manque
+            }
+        }
+
+        function unlockAudio() {
+            if (audioUnlocked) return;
+            audioUnlocked = true;
+            if (typeof window.playMinigameMusic === 'function') {
+                window.playMinigameMusic('missile-command');
+            }
+        }
+
+        function initGame() {
+            score = 0;
+            wave = 1;
+            setupLevel();
+        }
+
+        function setupLevel() {
+            cities = [];
+            const cityPositions = [110, 190, 270, 450, 530, 610];
+            cityPositions.forEach(x => {
+                cities.push({ x: x, y: 430, alive: true });
+            });
+
+            // Plus de munitions de départ pour aider le joueur
+            silos = [
+                { x: 55, y: 430, ammo: 12, alive: true },
+                { x: 360, y: 430, ammo: 12, alive: true },
+                { x: 665, y: 430, ammo: 12, alive: true }
+            ];
+
+            enemyMissiles = [];
+            playerMissiles = [];
+            explosions = [];
+
+            spawnEnemyWave();
+            gameState = 'PLAYING';
+        }
+
+        function spawnEnemyWave() {
+            // Vague plus douce et progressive
+            const count = Math.min(1 + Math.floor(wave * 0.8), 5);
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    if (gameState !== 'PLAYING') return;
+                    createEnemyMissile();
+                }, i * 2200 + Math.random() * 1000);
+            }
+        }
+
+        function createEnemyMissile() {
+            let targets = [...cities.filter(c => c.alive), ...silos.filter(s => s.alive)];
+            if (targets.length === 0) return;
+
+            let target = targets[Math.floor(Math.random() * targets.length)];
+            let startX = Math.random() * canvas.width;
+            let startY = 0;
+            // Vitesse réduite pour faciliter la visée et l'anticipation
+            let speed = 0.22 + wave * 0.025;
+
+            enemyMissiles.push({
+                x: startX,
+                y: startY,
+                destX: target.x,
+                destY: target.y,
+                speed: speed,
+                angle: Math.atan2(target.y - startY, target.x - startX)
+            });
+        }
+
+        function firePlayerMissile(targetX, targetY) {
+            if (gameState !== 'PLAYING') return;
+            unlockAudio();
+
+            let bestSilo = null;
+            let minDist = Infinity;
+
+            silos.forEach(silo => {
+                if (silo.alive && silo.ammo > 0) {
+                    let dist = Math.hypot(silo.x - targetX, silo.y - targetY);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        bestSilo = silo;
+                    }
+                }
+            });
+
+            if (bestSilo) {
+                bestSilo.ammo--;
+                let speed = 6.0;
+                let angle = Math.atan2(targetY - bestSilo.y, targetX - bestSilo.x);
+                playerMissiles.push({
+                    x: bestSilo.x,
+                    y: bestSilo.y,
+                    destX: targetX,
+                    destY: targetY,
+                    speed: speed,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed
+                });
+
+                // Déclenchement des sons de tir
+                playSound('shoot');
+                playSound('laser');
+                playSound('launch');
+            }
+        }
+
+        canvas.addEventListener('click', (e) => {
+            unlockAudio();
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            if (gameState === 'GAMEOVER') {
+                var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                if (fromStory) {
+                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'missile-command', won: false, ts: Date.now() })); } catch (e) {}
+                    try {
+                        var returnRaw = localStorage.getItem('td_standalone_game_return');
+                        if (returnRaw) {
+                            var rp = JSON.parse(returnRaw);
+                            if (rp && rp.returnUrl) { window.location.href = rp.returnUrl; return; }
+                        }
+                    } catch (e) {}
+                    window.location.href = '../true-detective/index.html?standalone=missile-command';
+                    return;
+                }
+                initGame();
+                return;
+            }
+            firePlayerMissile((e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY);
+        });
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            unlockAudio();
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const touch = e.touches[0];
+            if (gameState === 'GAMEOVER') {
+                var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+                if (fromStory) {
+                    try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'missile-command', won: false, ts: Date.now() })); } catch (e) {}
+                    try {
+                        var returnRaw = localStorage.getItem('td_standalone_game_return');
+                        if (returnRaw) {
+                            var rp = JSON.parse(returnRaw);
+                            if (rp && rp.returnUrl) { window.location.href = rp.returnUrl; return; }
+                        }
+                    } catch (e) {}
+                    window.location.href = '../true-detective/index.html?standalone=missile-command';
+                    return;
+                }
+                initGame();
+                return;
+            }
+            firePlayerMissile((touch.clientX - rect.left) * scaleX, (touch.clientY - rect.top) * scaleY);
+        }, { passive: false });
+
+        function update() {
+            if (gameState === 'PLAYING') {
+                enemyMissiles.forEach(m => {
+                    m.x += Math.cos(m.angle) * m.speed;
+                    m.y += Math.sin(m.angle) * m.speed;
+
+                    if (m.y >= m.destY) {
+                        explosions.push({ x: m.destX, y: m.destY, radius: 2, maxRadius: 45, expanding: true, type: 'enemy' });
+                        
+                        playSound('explosion');
+
+                        // Tolérance augmentée : les missiles ennemis détruisent les bâtiments uniquement s'ils sont très proches
+                        cities.forEach(c => { if (c.alive && Math.hypot(c.x - m.destX, c.y - m.destY) < 16) c.alive = false; });
+                        silos.forEach(s => { if (s.alive && Math.hypot(s.x - m.destX, s.y - m.destY) < 16) s.alive = false; });
+                        m.dead = true;
+                    }
+                });
+                enemyMissiles = enemyMissiles.filter(m => !m.dead);
+
+                playerMissiles.forEach(m => {
+                    m.x += m.vx;
+                    m.y += m.vy;
+
+                    if (Math.hypot(m.destX - m.x, m.destY - m.y) < m.speed) {
+                        // Explosion du joueur plus large pour détruire plus facilement
+                        explosions.push({ x: m.destX, y: m.destY, radius: 2, maxRadius: 50, expanding: true, type: 'player' });
+                        
+                        playSound('explosion');
+
+                        m.dead = true;
+                    }
+                });
+                playerMissiles = playerMissiles.filter(m => !m.dead);
+
+                explosions.forEach(exp => {
+                    if (exp.expanding) {
+                        exp.radius += 1.4;
+                        if (exp.radius >= exp.maxRadius) exp.expanding = false;
+                    } else {
+                        exp.radius -= 1.0;
+                    }
+
+                    enemyMissiles.forEach(m => {
+                        if (Math.hypot(exp.x - m.x, exp.y - m.y) < exp.radius) {
+                            m.dead = true;
+                            score += 25;
+                        }
+                    });
+                });
+                explosions = explosions.filter(exp => exp.radius > 0);
+                enemyMissiles = enemyMissiles.filter(m => !m.dead);
+
+                if (enemyMissiles.length === 0) {
+                    let survivingCities = cities.filter(c => c.alive).length;
+                    if (survivingCities === 0) {
+                        gameState = 'GAMEOVER';
+                    } else {
+                        wave++;
+                        // Rechargement plus généreux entre chaque vague (+8 munitions)
+                        silos.forEach(s => { if (s.alive) s.ammo = Math.min(12, s.ammo + 8); });
+                        spawnEnemyWave();
+                    }
+                }
+            }
+        }
+
+        function draw() {
+            ctx.fillStyle = '#030408';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Grille radar
+            ctx.strokeStyle = 'rgba(0, 229, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, 435);
+                ctx.stroke();
+            }
+
+            // Sol
+            ctx.fillStyle = '#060a16';
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height);
+            ctx.lineTo(0, 435);
+            ctx.lineTo(canvas.width, 435);
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.fill();
+
+            ctx.strokeStyle = '#00e5ff';
+            ctx.lineWidth = 2.5;
+            ctx.shadowColor = '#00e5ff';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.moveTo(0, 435);
+            ctx.lineTo(canvas.width, 435);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // Villes
+            cities.forEach(c => {
+                if (c.alive) {
+                    ctx.fillStyle = '#00e676';
+                    ctx.shadowColor = '#00e676';
+                    ctx.shadowBlur = 8;
+                    ctx.fillRect(c.x - 12, c.y - 18, 24, 18);
+                    ctx.fillStyle = '#030408';
+                    ctx.fillRect(c.x - 8, c.y - 14, 5, 5);
+                    ctx.fillRect(c.x + 3, c.y - 14, 5, 5);
+                    ctx.fillRect(c.x - 8, c.y - 7, 5, 5);
+                    ctx.fillRect(c.x + 3, c.y - 7, 5, 5);
+                    ctx.shadowBlur = 0;
+                } else {
+                    ctx.fillStyle = '#ff1744';
+                    ctx.fillRect(c.x - 10, c.y - 6, 20, 6);
+                    ctx.fillStyle = '#ff9100';
+                    ctx.fillRect(c.x - 6, c.y - 10, 12, 4);
+                }
+            });
+
+            // Silos
+            silos.forEach(s => {
+                if (s.alive) {
+                    ctx.fillStyle = '#00e5ff';
+                    ctx.shadowColor = '#00e5ff';
+                    ctx.shadowBlur = 10;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, 20, Math.PI, 0, false);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    ctx.fillStyle = '#030408';
+                    ctx.font = 'bold 11px Montserrat';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(s.ammo, s.x, s.y - 5);
+                }
+            });
+
+            // Missiles ennemis
+            enemyMissiles.forEach(m => {
+                ctx.strokeStyle = '#ff1744';
+                ctx.lineWidth = 2;
+                ctx.shadowColor = '#ff1744';
+                ctx.shadowBlur = 8;
+                ctx.beginPath();
+                ctx.moveTo(m.x, m.y);
+                ctx.lineTo(m.x - Math.cos(m.angle) * 16, m.y - Math.sin(m.angle) * 16);
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(m.x - 1.5, m.y - 1.5, 3, 3);
+            });
+
+            // Missiles du joueur
+            playerMissiles.forEach(m => {
+                ctx.strokeStyle = '#00e5ff';
+                ctx.lineWidth = 1.5;
+                ctx.shadowColor = '#00e5ff';
+                ctx.shadowBlur = 6;
+                ctx.beginPath();
+                ctx.moveTo(m.x, m.y);
+                ctx.lineTo(m.destX, m.destY);
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(m.destX - 2, m.destY - 2, 4, 4);
+            });
+
+            // Explosions
+            explosions.forEach(exp => {
+                const gradient = ctx.createRadialGradient(exp.x, exp.y, 0, exp.x, exp.y, exp.radius);
+                if (exp.type === 'player') {
+                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+                    gradient.addColorStop(0.4, 'rgba(0, 229, 255, 0.6)');
+                    gradient.addColorStop(1, 'rgba(0, 100, 255, 0)');
+                } else {
+                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+                    gradient.addColorStop(0.4, 'rgba(255, 23, 68, 0.6)');
+                    gradient.addColorStop(1, 'rgba(150, 0, 20, 0)');
+                }
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(exp.x, exp.y, exp.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // HUD
+            document.getElementById('hud-score').textContent = String(score).padStart(6, '0');
+            document.getElementById('hud-wave').textContent = wave;
+
+            // Game Over
+            if (gameState === 'GAMEOVER') {
+                ctx.fillStyle = 'rgba(3, 4, 10, 0.92)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#ff1744';
+                ctx.font = 'bold 40px Playfair Display, serif';
+                ctx.textAlign = 'center';
+                ctx.shadowColor = '#ff1744';
+                ctx.shadowBlur = 20;
+                ctx.fillText('SECTEUR PERDU', canvas.width / 2, canvas.height / 2 - 25);
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#f0f4f8';
+                ctx.font = '16px Montserrat, sans-serif';
+                ctx.fillText(`Score final : ${score}`, canvas.width / 2, canvas.height / 2 + 20);
+                ctx.fillStyle = '#00e5ff';
+                ctx.font = '13px Montserrat, sans-serif';
+                ctx.fillText('Touchez l\'écran pour relancer la défense', canvas.width / 2, canvas.height / 2 + 60);
+            }
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        initGame();
+        loop();
+    </script>
+
+    <!-- Scripts de gestion de navigation et interface -->
     <script>
         (function () {
             'use strict';
@@ -231,9 +564,9 @@
                 });
             }
 
-            var backBtn = document.getElementById('back-to-minigame-btn');
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
-            
+
+            var backBtn = document.getElementById('back-to-minigame-btn');
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
                 var continueBtn = document.createElement('button');
@@ -277,7 +610,7 @@
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres : aucun réglage pour l\'instant.'); }
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres indisponibles.'); }
                 });
             }
         })();
