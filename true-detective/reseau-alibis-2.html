@@ -272,24 +272,24 @@
                 });
             }
 
-            var testimonies = [
-                {"witness":{"en":"Julian Pembrooke","fr":"Julian Pembrooke"},"id":"pembrooke","statement":{"en":"Remember my interrogation: my car really broke down on the road at 10pm. I never left the manor that night, I couldn't have.","fr":"Rappelez-vous mon interrogatoire : ma voiture est réellement tombée en panne sur la route à 22h. Je n'ai pas quitté le manoir cette nuit-là, c'est impossible."}, "isLie":true},
-                {"witness":{"en":"Major Hale","fr":"Major Hale"},"id":"hale","statement":{"en":"I stayed helping Pembrooke with his car until 11:30pm. Nobody passed by the road near the manor, I can confirm it.","fr":"Je suis resté dépanner Pembrooke jusqu'à 23h30. Personne n'est passé par la route près du manoir, je peux le confirmer."}, "isLie":false},
-                {"witness":{"en":"Silas Crane","fr":"Silas Crane"},"id":"silas","statement":{"en":"From my spot under the bridge I saw two silhouettes at 10pm: a tall prowler near the pavilion, and a stopped car smoking on the road.","fr":"Depuis mon coin sous le pont, j'ai vu deux silhouettes à 22h : un grand rôdeur près du pavillon, et une voiture arrêtée qui fumait sur la route."}, "isLie":false},
-                {"witness":{"en":"Lady Vivienne","fr":"Lady Vivienne"},"id":"vivienne","statement":{"en":"The Duke and I were reconciled that evening. He called me at 10pm from his study. There were no debts, and the will never changed.","fr":"Le Duc et moi étions réconciliés ce soir-là. Il m'a téléphonée à 22h depuis son bureau. Il n'y avait aucune dette, et le testament n'a jamais changé."}, "isLie":true}
-            ];
-            
-             var cfg = {
-                type: 'reseau_alibis',
-                difficulty: 'medium',
-                time: 60,
-                evidence: 'witness',
-                title: { fr: 'Le Réseau d\'alibis — 4 cartes', en: 'The Alibi Network — 4 cards' },
-                desc: { fr: 'Quatre dépositions, deux se contredisent frontalement. Servez-vous de ce que vous avez appris lors des interrogatoires précédents. Cliquez sur chaque carte : Mensonge ou Vérité. Identifiez les menteurs.', en: 'Four testimonies, two openly contradict each other. Use what you learned in previous interrogations. Click each card : Lie or Truth. Identify the liars.' },
-                clue: { fr: 'Deux menteurs démasqués : Pembrooke prétend être resté au manoir alors que Hale et Silas confirment sa voiture en panne sur la route ; Vivienne prétend qu\u2019aucune dette n\u2019existait et que le testament n\u2019a jamais été modifié, contrairement à ce qu\u2019a révélé l\u2019interrogatoire du notaire.', en: 'Two liars exposed: Pembrooke claims he stayed at the manor while Hale and Silas confirm his car stalled on the road; Vivienne claims no debts existed and the will was never amended, contrary to what the notary\u2019s interrogation revealed.' },
-                testimonies: testimonies,
-                lang: 'fr'
-            };
+var testimonies = [
+    {"witness":{"en":"Major Hale","fr":"Major Hale"},"id":"hale","statement":{"en":"I was broken down with Pembrooke at 10pm. The manor lock was opened with a key, not forced. The victim didn't resist.","fr":"J'étais en panne avec Pembrooke à 22h. Le verrou du manoir a été ouvert avec une clé, pas forcé. La victime n'a pas opposé de résistance."}, "isLie":false},
+    {"witness":{"en":"Lady Vivienne","fr":"Lady Vivienne"},"id":"vivienne","statement":{"en":"I was at the theatre with friends, then alone at the manor. My husband and I had a relationship based on money, not love, I had no reason to kill him.","fr":"J'étais au théâtre avec des amies, puis seule au manoir. Mon mari et moi avions une relation basée sur l'argent, pas l'amour, je n'avais aucune raison de le tuer."}, "isLie":true},
+    {"witness":{"en":"Silas Crane","fr":"Silas Crane"},"id":"silas","statement":{"en":"I saw a prowler at 10pm near the pavilion, gold watch, nervous. And I saw Blackwood pass at 8pm, the notary has always been straight.","fr":"J'ai vu un rôdeur à 22h près du pavillon, montre en or, nerveux. Et j'ai vu Blackwood passer à 20h, le notaire a toujours été réglo."}, "isLie":false},
+    {"witness":{"en":"Victor Krane","fr":"Victor Krane"},"id":"krane","statement":{"en":"The Duke hired me for an elimination, but not against Pembrooke. I was somewhere else that night. Silas saw what he wanted to see.","fr":"Le Duc m'a engagé pour une élimination, mais pas contre Pembrooke. J'étais ailleurs cette nuit-là. Silas a vu ce qu'il voulait voir."}, "isLie":true}
+];
+
+var cfg = {
+    type: 'reseau_alibis',
+    difficulty: 'medium',
+    time: 60,
+    evidence: 'witness',
+    title: { fr: 'Le Réseau d\'alibis — 4 cartes', en: 'The Alibi Network — 4 cards' },
+    desc: { fr: 'Quatre dépositions, deux se contredisent frontalement. Servez-vous de ce que vous avez appris lors des interrogatoires précédents. Cliquez sur chaque carte : Mensonge ou Vérité. Identifiez les menteurs.', en: 'Four testimonies, two openly contradict each other. Use what you learned in previous interrogations. Click each card : Lie or Truth. Identify the liars.' },
+    clue: { fr: 'Deux menteurs démasqués : Vivienne prétend qu\'aucune dette n\'existait et que le testament n\'a jamais été modifié, alors que Hale confirme les faits ; Krane nie sa présence sur les lieux alors que Silas confirme avoir vu un rôdeur.', en: 'Two liars exposed: Vivienne claims no debts existed and the will was never amended, while Hale confirms the facts; Krane denies his presence on scene while Silas confirms seeing a prowler.' },
+    testimonies: testimonies,
+    lang: 'fr'
+};
             
             var target = document.getElementById('reseau-alibis-app');
             if (target) {
