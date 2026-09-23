@@ -3178,6 +3178,25 @@ function buildTransitionPages(sceneData) {
 
     function showClueToast(clue) {
         showToast('🔍 ' + clue);
+        // Rafraîchir le compteur de la top-bar et le carnet à chaque indice,
+        // quel que soit le point d'entrée (scène, dialogue, mini-jeu, interrogation).
+        try { updateIndicators(); } catch (e) { /* best effort */ }
+        try { updateNotebook(); } catch (e) { /* best effort */ }
+        // Informer le joueur du carnet d'enquête au premier indice
+        try {
+            if (!window._tdNotebookHintShown) {
+                window._tdNotebookHintShown = true;
+                setTimeout(function () {
+                    showToast('📓 Vos indices sont archivés dans le Carnet d\'enquête (bouton 📓 en haut).');
+                }, 4500);
+            }
+            // Faire pulser le bouton carnet quand un nouvel indice arrive
+            var nbBtn = document.getElementById('notebook-btn');
+            if (nbBtn) {
+                nbBtn.classList.add('has-new');
+                setTimeout(function () { nbBtn.classList.remove('has-new'); }, 6000);
+            }
+        } catch (e) { /* best effort */ }
     }
 
     function showEventToast(event) {
@@ -3411,6 +3430,17 @@ function buildTransitionPages(sceneData) {
                 title: { fr: 'Le Dernier Verre', en: 'The Last Drink' },
                 subtitle: { fr: 'Le coffre fort grince. Le coupable doit tomber avant l\'aube, sinon c\'est vous qui trinquez.', en: 'The safe creaks open. The culprit must fall before dawn, or it\'s you who buys the drink.' }
             },
+        },
+    };
+
+    var THEME_MINIGAME_INTRO = {
+        'cyberpunk': {
+            'protecteur': { fr: "Cipher-7 détourne le regard vers l'écran holographique. Des astéroïdes dérivent dans le néon. « Les mots, les chiffres, les alibis numériques... Moi, je survole les ceintures d'astéroïdes. Les rochers ne mentent jamais. » Il pointe du doigt un tableau de contrôle où des cibles pulsantes apparaissent.\n\n« Le Séducteur, le Notaire, l'Homme de main, le Clochard : quatre fragments à pulvériser. » Sa voix se fait étrangement douce. « La femme fatale n'est pas dans ce secteur. Elle n'y sera jamais. »\n\n« Vous voulez la vérité ? Prenez les commandes, inspecteur. Détruisez plus d'astéroïdes que moi, et je parlerai. »", en: "Cipher-7 turns to the holographic screen. Asteroids drift in the neon. \"Words, figures, digital alibis... Me, I fly through the asteroid belts. The rocks never lie.\" He points to a control panel where pulsing targets appear.\n\n\"The Seducer, the Notary, the Hired Hand, the Vagrant: four fragments to pulverize.\" His voice turns strangely soft. \"The femme fatale isn't in this sector. She never will be.\"\n\n\"You want the truth? Take the controls, inspector. Destroy more asteroids than me, and I'll talk.\"" },
+            'femme-fatale': { fr: "Lyra Noir repousse sa tasse de thé synthétique à moitié froide et fait glisser une manette néon entre vous deux. « Assez de mots, inspecteur. Les mots, tout le monde en gaspille. La balle, jamais : chaque rebond trahit son joueur. »\n\nElle positionne la raquette avec une précision chirurgicale. « J'ai appris à jouer contre mon époux. Il croyait me commander ; je voyais ses pièges trois coups avant lui. Le terrain, inspecteur, c'est la seule table où je n'ai jamais menti. »\n\n« Défiez-moi. Gagnez, et je vous dirai ce que vous voulez savoir. Perdez... et vous repartirez le bourse vide de vérité, comme un écolier. »", en: "Lyra Noir pushes aside her half-cold synth tea and slides a neon controller between you. \"Enough words, inspector. Words, everyone squanders. The ball, never: every bounce betrays its player.\"\n\nShe positions the paddle with surgical precision. \"I learned to play against my husband. He thought he commanded me; I saw his traps three moves ahead. The court, inspector, is the one table where I have never lied.\"\n\n\"Challenge me. Win, and I will tell you what you wish to know. Lose... and you will leave with an empty purse of truth, like a schoolboy.\"" },
+            'seducteur': { fr: "Dex Rook vous tire par la manche jusqu'à son stand d'arcade. Contre la brique, un mur de briques lumineuses : caisses à huître holographiques, boîtes de conserve lustrées, roues de vélo, le tout empilé avec une patience d'orfèvre. « On m'appelle le briseur. Les systèmes, je les casse. Chaque couche a sa place, monsieur l'inspecteur. »\n\nIl vous tend une manette. « Votre métier, c'est les mots. Le mien, c'est les murs. Si vous savez briser une paroi plus haute que la mienne sans tout faire tomber... alors vous avez de la réflexion. Pas juste de la langue. »\n\n« Montrez-moi. Après, je vous dirai ce que j'ai vu, cette nuit-là. »", en: "Dex Rook tugs your sleeve toward his arcade stand. Against the brick looms a glowing brick wall: holographic oyster crates, polished tin cans, bicycle wheels, all stacked with a jeweller's patience. \"They call me the Breaker. Systems, I break them. Every layer has its place, mister inspector.\"\n\nHe hands you a controller. \"Your trade is words. Mine is walls. If you can break a wall taller than mine without toppling it... then you have real thought. Not just a tongue.\"\n\n\"Show me. Then I'll tell you what I saw, that night.\"" },
+            'suspect': { fr: "Ledger-9 vous montre son écran de défense planétaire. Des missiles s'élèvent depuis la surface. « Qui écoute un clochard ? » ricane-t-il, puis se tait. « Les aliens ne négocient pas. »\n\nIl positionne les canons avec une précision chirurgicale. « J'ai appris à défendre contre les vagues. Je voyais les attaques trois vols avant elles. Le champ de bataille, inspecteur, c'est la seule zone où je n'ai jamais menti. »\n\n« Défiez-moi. Gagnez, et je vous dirai ce que vous voulez savoir. Perdez... et vous repartirez le bourse vide de vérité, comme un écolier. »", en: "Ledger-9 shows you his planetary defense screen. Missiles rise from the surface. \"Who listens to a homeless man?\" he smirks, then falls silent. \"The aliens don't negotiate.\"\n\nHe positions the cannons with surgical precision. \"I learned to defend against the waves. I saw the attacks three flights before them. The battlefield, inspector, is the only zone where I have never lied.\"\n\n\"Challenge me. Win, and I will tell you what you wish to know. Lose... and you will leave with an empty purse of truth, like a schoolboy.\"" },
+            'marginal': { fr: "Ghost vous tire par la manche jusqu'à son coin de ruelle. Contre la brique, un labyrinthe néon : caisses à huître holographiques, boîtes de conserve lustrées, roues de vélo, le tout empilé avec une patience d'orfèvre. « On m'appelle le fantôme. Les ghosts, je les évite. Chaque couloir a sa place, monsieur l'inspecteur. »\n\nIl vous tend une manette. « Votre métier, c'est les mots. Le mien, c'est les tunnels. Si vous savez naviguer un labyrinthe plus grand que le mien sans tout faire tomber... alors vous avez de la réflexion. Pas juste de la langue. »\n\n« Montrez-moi. Après, je vous dirai ce que j'ai vu, cette nuit-là. »", en: "Ghost tugs your sleeve toward his alley corner. Against the brick looms a neon maze: holographic oyster crates, polished tin cans, bicycle wheels, all stacked with a jeweller's patience. \"They call me the Ghost. The ghosts, I avoid them. Every corridor has its place, mister inspector.\"\n\nHe hands you a controller. \"Your trade is words. Mine is tunnels. If you can navigate a maze bigger than mine without toppling it... then you have real thought. Not just a tongue.\"\n\n\"Show me. Then I'll tell you what I saw, that night.\"" },
+            'criminel': { fr: "Razor ouvre un portail vers l'espace profond. Des vaisseaux ennemis descendent en formation. « Vous savez ce qui tient un tueur à gages en vie, inspecteur ? La mémoire. Où était la caméra. Qui a vu quoi. Combien de temps avant que la cible ne devienne un problème. »\n\nIl étale les trente-deux positions en un damier parfait, faces contre l'écran. « Je repousse les vagues chaque soir, dans ma cellule ou sur un banc de gare. Un professionnel qui oublie est un professionnel qui pourrit. »\n\nIl vous toise. « Retenez où passent les vagues, inspecteur. Retenez mieux que moi, et je vous dirai qui m'a payé. »", en: "Razor opens a portal to deep space. Enemy ships descend in formation. \"You know what keeps a hitman alive, inspector? Memory. Where the camera was. Who saw what. How long before the target becomes a problem.\"\n\nHe spreads the thirty-two positions into a perfect grid, faces down against the screen. \"I repel the waves every night, in my cell or on a station bench. A professional who forgets is a professional who rots.\"\n\nHe eyes you. \"Remember where the waves pass, inspector. Remember better than I do, and I'll tell you who paid me.\"" },
         },
     };
 
@@ -3684,6 +3714,15 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.endScreen.classList.add('hidden');
         renderScenarioPage();
         updateContinueBtnVisibility();
+        // Informer le joueur (une seule fois) de l'existence du carnet d'enquête
+        try {
+            if (!window._tdJournalIntroShown) {
+                window._tdJournalIntroShown = true;
+                setTimeout(function () {
+                    showToast('📓 Pensez à consulter votre Carnet d\'enquête (bouton 📓 en haut) : tous vos indices y sont archivés.');
+                }, 2500);
+            }
+        } catch (e) { /* best effort */ }
     }
 
     var EVIDENCE_HINTS = {
@@ -3902,9 +3941,19 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 if (mgCfg.clue.fr) mgCfg.clue.fr = scrSubstituteNames(mgCfg.clue.fr, mgThemeId);
                 if (mgCfg.clue.en) mgCfg.clue.en = scrSubstituteNames(mgCfg.clue.en, mgThemeId);
             }
-            if (mgCfg.testimonies) {
-                for (var ti = 0; ti < mgCfg.testimonies.length; ti++) {
-                    var tm = mgCfg.testimonies[ti];
+            if (mgCfg.type === 'reseau_alibis' && window.TDAlibiDuels && TDAlibiDuels.resolve) {
+                TDAlibiDuels.resolve(mgCfg);
+            }
+            var tdCardLists = [];
+            if (mgCfg.duels) {
+                for (var di = 0; di < mgCfg.duels.length; di++) tdCardLists.push(mgCfg.duels[di]);
+            } else if (mgCfg.testimonies) {
+                tdCardLists.push(mgCfg.testimonies);
+            }
+            for (var li2 = 0; li2 < tdCardLists.length; li2++) {
+                var tdList = tdCardLists[li2];
+                for (var ti = 0; ti < tdList.length; ti++) {
+                    var tm = tdList[ti];
                     if (tm.witness) {
                         if (tm.witness.fr) tm.witness.fr = scrSubstituteNames(tm.witness.fr, mgThemeId);
                         if (tm.witness.en) tm.witness.en = scrSubstituteNames(tm.witness.en, mgThemeId);
@@ -4024,12 +4073,26 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 if (mgCfg.clue.fr) mgCfg.clue.fr = scrSubstituteNames(mgCfg.clue.fr, mgThemeId);
                 if (mgCfg.clue.en) mgCfg.clue.en = scrSubstituteNames(mgCfg.clue.en, mgThemeId);
             }
-            if (mgCfg.testimonies) {
-                for (var ti = 0; ti < mgCfg.testimonies.length; ti++) {
-                    var tm = mgCfg.testimonies[ti];
-                    if (tm.witness) {
-                        if (tm.witness.fr) tm.witness.fr = scrSubstituteNames(tm.witness.fr, mgThemeId);
-                        if (tm.witness.en) tm.witness.en = scrSubstituteNames(tm.witness.en, mgThemeId);
+            if (mgCfg.type === 'reseau_alibis' && window.TDAlibiDuels && TDAlibiDuels.resolve) {
+                TDAlibiDuels.resolve(mgCfg);
+            }
+            var tdCardLists2 = [];
+            if (mgCfg.duels) {
+                for (var dj = 0; dj < mgCfg.duels.length; dj++) tdCardLists2.push(mgCfg.duels[dj]);
+            } else if (mgCfg.testimonies) {
+                tdCardLists2.push(mgCfg.testimonies);
+            }
+            for (var lj = 0; lj < tdCardLists2.length; lj++) {
+                var tdList2 = tdCardLists2[lj];
+                for (var tj = 0; tj < tdList2.length; tj++) {
+                    var tm2 = tdList2[tj];
+                    if (tm2.witness) {
+                        if (tm2.witness.fr) tm2.witness.fr = scrSubstituteNames(tm2.witness.fr, mgThemeId);
+                        if (tm2.witness.en) tm2.witness.en = scrSubstituteNames(tm2.witness.en, mgThemeId);
+                    }
+                    if (tm2.statement) {
+                        if (tm2.statement.fr) tm2.statement.fr = scrSubstituteNames(tm2.statement.fr, mgThemeId);
+                        if (tm2.statement.en) tm2.statement.en = scrSubstituteNames(tm2.statement.en, mgThemeId);
                     }
                 }
             }
@@ -4389,7 +4452,12 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             /* Page de dialogue de transition : le suspect introduit lui-même
                sa passion et le défi, avant que le joueur ne le relance. */
             var introTxt = null;
-            if (interroData && interroData.minigameIntro) {
+            var themeId = getThemeId();
+            var interroId = (it && it.id) || 'standalone';
+            if (themeId === 'cyberpunk' && THEME_MINIGAME_INTRO[themeId] && THEME_MINIGAME_INTRO[themeId][interroId]) {
+                introTxt = THEME_MINIGAME_INTRO[themeId][interroId][ui.language] || THEME_MINIGAME_INTRO[themeId][interroId].fr || THEME_MINIGAME_INTRO[themeId][interroId].en || null;
+            }
+            if (!introTxt && interroData && interroData.minigameIntro) {
                 introTxt = interroData.minigameIntro[ui.language] || interroData.minigameIntro.fr || interroData.minigameIntro.en || null;
             }
             if (introTxt) {
@@ -5521,6 +5589,9 @@ function scrApplyChoice(choiceKey, choiceId) {
     window.startScenarioGame = startScenarioGame;
     window.THEMES = THEMES;
     window.selectTheme = selectTheme;
+    window.showClueToast = showClueToast;
+    window.updateIndicators = updateIndicators;
+    window.updateNotebook = updateNotebook;
     window.toggleVoiceInputEnabled = toggleVoiceInputEnabled;
     window.isVoiceInputEnabled = function () { return ui.voiceInputEnabled; };
     window.updateVoiceButtonVisibility = updateVoiceButtonVisibility;

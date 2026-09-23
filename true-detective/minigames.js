@@ -751,12 +751,12 @@
 
 
 
-        /* Le Réseau d'Alibis (Cartographie mentale)
-           Le joueur dispose des dépositions des témoins. Chaque carte
-           peut être un VRAI ou un MENSONGE. Le joueur clique sur
-           chaque carte pour l'identifier ; il gagne quand toutes les
-           cartes sont correctement étiquetées.                    */
-        'reseau_alibis': function (body) {
+        /* Le Réseau d'Alibis — DUELS DE DÉPOSITIONS
+           Chaque manche présente exactement 2 cartes : l'une dit vrai,
+           l'autre ment. Le joueur clique sur le MENTEUR. Les duels sont
+           tirés au sort (pool cfg.duels / cfg.alibiPool, voir
+           alibi-duels.js) : chaque partie est différente.            */
+        'reseau_alibis': function (body, registerHint) {
             var WITNESS_ASSETS = {
                 hale: 'assets/image true detective/characteres/classic/Le_Protecteur.png',
                 vivienne: 'assets/image true detective/characteres/classic/femme-fatal.png',
@@ -766,12 +766,12 @@
                 krane: 'assets/image true detective/characteres/classic/le-criminel.png'
             };
 
-            var cards = (cfg.testimonies || []).map(function (c) {
-                var assetKey = c.id.toLowerCase().replace(/[^a-z]/g, '');
+            function mapCard(c) {
+                var assetKey = String(c.id).toLowerCase().replace(/[^a-z]/g, '');
                 var assetPath = WITNESS_ASSETS[c.id] || WITNESS_ASSETS[assetKey];
                 if (!assetPath) {
                     for (var k in WITNESS_ASSETS) {
-                        if (c.witness.fr && c.witness.fr.toLowerCase().indexOf(k) !== -1) {
+                        if (c.witness && c.witness.fr && c.witness.fr.toLowerCase().indexOf(k) !== -1) {
                             assetPath = WITNESS_ASSETS[k];
                             break;
                         }
@@ -784,18 +784,50 @@
                     isLie: !!c.isLie,
                     asset: assetPath
                 };
-            });
-            if (!cards.length) { complete(true); return; }
+            }
 
-            var lieCount = 0;
-            for (var j = 0; j < cards.length; j++) if (cards[j].isLie) lieCount++;
-            var totalCards = cards.length;
-            var lieIds = [];
-            for (var k = 0; k < cards.length; k++) if (cards[k].isLie) lieIds.push(cards[k].id);
+            /* Pool de duels (TDAlibiDuels), sinon repli rétrocompatible
+               sur l'ancien format `testimonies` : chaque mensonge est
+               apparié avec une vérité pour former des duels. */
+            if (!cfg.duels && cfg.alibiPool && global.TDAlibiDuels && global.TDAlibiDuels.resolve) {
+                global.TDAlibiDuels.resolve(cfg);
+            }
+            var rawDuels = (cfg.duels && cfg.duels.length) ? cfg.duels : null;
+            if (!rawDuels) {
+                var legacyLies = [];
+                var legacyTruths = [];
+                (cfg.testimonies || []).forEach(function (c) {
+                    if (c.isLie) legacyLies.push(c); else legacyTruths.push(c);
+                });
+                rawDuels = [];
+                for (var li = 0; li < Math.min(legacyLies.length, legacyTruths.length); li++) {
+                    rawDuels.push([legacyTruths[li], legacyLies[li]]);
+                }
+            }
+            if (!rawDuels.length) { complete(true); return; }
+
+            /* Tirage aléatoire : ordre des duels + ordre gauche/droite */
+            var order = rawDuels.map(function (_, i) { return i; });
+            for (var s = order.length - 1; s > 0; s--) {
+                var r = Math.floor(Math.random() * (s + 1));
+                var swap = order[s]; order[s] = order[r]; order[r] = swap;
+            }
+            var roundCount = Math.max(1, Math.min(cfg.rounds || rawDuels.length, rawDuels.length));
+            var rounds = [];
+            for (var ri = 0; ri < roundCount; ri++) {
+                var picked = rawDuels[order[ri]].slice();
+                if (Math.random() < 0.5) picked.reverse();
+                rounds.push(picked.map(mapCard));
+            }
+
+            /* Expose le tirage (manche par manche) à la couche test. */
+            try { cfg._alibiDraw = rounds; } catch (e) {}
+
+            var roundIdx = 0;
             var foundLies = 0;
             var mistakes = 0;
-            var perfectRun = true;
             var locked = false;
+            var gameOver = false;
             function showEndMessage(text) {
                 var msg = document.createElement('div');
                 msg.className = 'reseau-alibis-message';
@@ -814,91 +846,73 @@
             var intro = document.createElement('div');
             intro.className = 'reseau-alibis-intro';
             intro.textContent = (lang === 'fr'
-                ? (lieCount > 1
-                    ? 'Croisez les dépositions. Cliquez sur chaque carte : Mensonge ou Vérité. Identifiez les ' + lieCount + ' menteurs.'
-                    : 'Croisez les dépositions. Une carte contredit les autres : cliquez sur le MENSONGE.')
-                : (lieCount > 1
-                    ? 'Cross-reference the testimonies. Click each card : Lie or Truth. Identify the ' + lieCount + ' liars.'
-                    : 'Cross-reference the testimonies. One card contradicts the others : click on the LIE.'));
+                ? 'Un duo de dépositions à la fois : deux cartes, un seul menteur. Cliquez sur le MENTEUR.'
+                : 'One duo of testimonies at a time: two cards, only one liar. Click the LIAR.');
             board.appendChild(intro);
 
             var counter = document.createElement('div');
             counter.className = 'reseau-alibis-counter';
-            counter.textContent = (lang === 'fr'
-                ? 'Menteurs identifiés : 0 / ' + lieCount
-                : 'Liars found : 0 / ' + lieCount);
             board.appendChild(counter);
 
-            var carouselWrap = document.createElement('div');
-            carouselWrap.className = 'reseau-alibis-carousel-wrap';
-            var carouselTrack = document.createElement('div');
-            carouselTrack.className = 'reseau-alibis-carousel-track';
-            carouselWrap.appendChild(carouselTrack);
-            var prevBtn = document.createElement('button');
-            prevBtn.className = 'reseau-alibis-carousel-btn';
-            prevBtn.textContent = '◀';
-            prevBtn.setAttribute('aria-label', 'Previous');
-            var nextBtn = document.createElement('button');
-            nextBtn.className = 'reseau-alibis-carousel-btn';
-            nextBtn.textContent = '▶';
-            nextBtn.setAttribute('aria-label', 'Next');
-            carouselWrap.appendChild(prevBtn);
-            carouselWrap.appendChild(nextBtn);
-            board.appendChild(carouselWrap);
+            function updateCounter() {
+                counter.textContent = (lang === 'fr'
+                    ? 'Manche ' + (roundIdx + 1) + ' / ' + rounds.length + ' · Menteurs démasqués : ' + foundLies + ' / ' + rounds.length
+                    : 'Round ' + (roundIdx + 1) + ' / ' + rounds.length + ' · Liars found: ' + foundLies + ' / ' + rounds.length);
+            }
 
-            var cardEls = [];
-            var currentIndex = 0;
-            cards.forEach(function (c, idx) {
-                var card = document.createElement('button');
-                card.className = 'reseau-alibis-card';
-                card.type = 'button';
-                card.dataset.witnessId = c.id;
-                card.style.minWidth = '220px';
-                card.style.marginRight = '12px';
+            var grid = document.createElement('div');
+            grid.className = 'reseau-alibis-grid';
+            board.appendChild(grid);
 
-                var photoWrap = document.createElement('div');
-                photoWrap.className = 'reseau-alibis-photo';
-                if (c.asset) {
-                    var img = document.createElement('img');
-                    img.className = 'reseau-alibis-img';
-                    img.src = c.asset;
-                    img.alt = c.witness;
-                    photoWrap.appendChild(img);
-                } else {
-                    photoWrap.textContent = '?';
-                }
-                card.appendChild(photoWrap);
+            function renderRound() {
+                grid.innerHTML = '';
+                locked = false;
+                updateCounter();
+                rounds[roundIdx].forEach(function (c) {
+                    var card = document.createElement('button');
+                    card.className = 'reseau-alibis-card';
+                    card.type = 'button';
+                    card.dataset.witnessId = c.id;
 
-                var who = document.createElement('div');
-                who.className = 'reseau-alibis-who';
-                who.textContent = c.witness;
-                card.appendChild(who);
+                    var photoWrap = document.createElement('div');
+                    photoWrap.className = 'reseau-alibis-photo';
+                    if (c.asset) {
+                        var img = document.createElement('img');
+                        img.className = 'reseau-alibis-img';
+                        img.src = c.asset;
+                        img.alt = c.witness;
+                        photoWrap.appendChild(img);
+                    } else {
+                        photoWrap.textContent = '?';
+                    }
+                    card.appendChild(photoWrap);
 
-                var what = document.createElement('div');
-                what.className = 'reseau-alibis-what';
-                what.textContent = c.statement;
-                card.appendChild(what);
+                    var who = document.createElement('div');
+                    who.className = 'reseau-alibis-who';
+                    who.textContent = c.witness;
+                    card.appendChild(who);
 
-                var tag = document.createElement('div');
-                tag.className = 'reseau-alibis-tag';
-                tag.textContent = (lang === 'fr' ? 'À juger' : 'To judge');
-                card.appendChild(tag);
+                    var what = document.createElement('div');
+                    what.className = 'reseau-alibis-what';
+                    what.textContent = c.statement;
+                    card.appendChild(what);
 
-                card.addEventListener('click', function () {
-                    if (locked || card.dataset.done) return;
-                    if (c.isLie) {
-                        card.dataset.done = '1';
-                        card.classList.add('lie-found');
-                        tag.textContent = (lang === 'fr' ? 'Mensonge' : 'Lie');
-                        tag.classList.add('tag-lie');
-                        foundLies++;
-                        counter.textContent = (lang === 'fr'
-                            ? 'Menteurs identifiés : ' + foundLies + ' / ' + lieCount
-                            : 'Liars found : ' + foundLies + ' / ' + lieCount);
-                        if (foundLies >= lieCount) {
+                    var tag = document.createElement('div');
+                    tag.className = 'reseau-alibis-tag';
+                    tag.textContent = (lang === 'fr' ? 'À juger' : 'To judge');
+                    card.appendChild(tag);
+
+                    card.addEventListener('click', function () {
+                        if (locked || gameOver || card.dataset.done) return;
+                        if (c.isLie) {
                             locked = true;
-                            carouselTrack.querySelectorAll('.reseau-alibis-card').forEach(function (other) {
-                                if (other !== card && !other.classList.contains('lie-found')) {
+                            card.dataset.done = '1';
+                            card.classList.add('lie-found');
+                            tag.textContent = (lang === 'fr' ? 'Mensonge' : 'Lie');
+                            tag.classList.add('tag-lie');
+                            foundLies++;
+                            grid.querySelectorAll('.reseau-alibis-card').forEach(function (other) {
+                                if (other !== card) {
                                     other.classList.add('confirmed-true');
                                     var t2 = other.querySelector('.reseau-alibis-tag');
                                     if (t2) {
@@ -907,65 +921,72 @@
                                     }
                                 }
                             });
-            if (perfectRun) {
-                                showEndMessage(lang === 'fr' ? 'Indice obtenu !' : 'Clue obtained!');
-                                complete(true);                            } else {
-                                showEndMessage(lang === 'fr' ? 'Vous avez identifié les mensonges mais avez fait des erreurs. Pas d\'indice.' : 'You found the lies but made errors. No clue.');
-                                complete(false);                            }
+                            updateCounter();
+                            setTimeout(function () {
+                                if (gameOver) return;
+                                roundIdx++;
+                                if (roundIdx >= rounds.length) {
+                                    gameOver = true;
+                                    showEndMessage(lang === 'fr' ? 'Indice obtenu !' : 'Clue obtained!');
+                                    complete(true);
+                                } else {
+                                    renderRound();
+                                }
+                            }, 900);
+                        } else {
+                            mistakes++;
+                            playSfx('fail');
+                            card.classList.add('wrong');
+                            tag.textContent = (lang === 'fr' ? 'Erreur' : 'Wrong');
+                            tag.classList.add('tag-wrong');
+                            setTimeout(function () {
+                                if (card.dataset.done) return;
+                                card.classList.remove('wrong');
+                                tag.classList.remove('tag-wrong');
+                                tag.textContent = (lang === 'fr' ? 'À juger' : 'To judge');
+                            }, 700);
+                            if (mistakes >= 3) {
+                                gameOver = true;
+                                locked = true;
+                                card.dataset.done = '1';
+                                card.classList.remove('wrong');
+                                tag.classList.remove('tag-wrong');
+                                card.classList.add('confirmed-true');
+                                tag.textContent = (lang === 'fr' ? 'Vrai' : 'True');
+                                tag.classList.add('tag-true');
+                                /* Révélation du menteur du duo */
+                                rounds[roundIdx].forEach(function (lc) {
+                                    if (!lc.isLie) return;
+                                    grid.querySelectorAll('.reseau-alibis-card').forEach(function (el) {
+                                        if (el !== card && el.dataset.witnessId === lc.id) {
+                                            el.classList.add('lie-found');
+                                            var lt = el.querySelector('.reseau-alibis-tag');
+                                            if (lt) {
+                                                lt.textContent = (lang === 'fr' ? 'Mensonge' : 'Lie');
+                                                lt.classList.add('tag-lie');
+                                            }
+                                        }
+                                    });
+                                });
+                                showEndMessage(lang === 'fr' ? "Trop d'erreurs. Pas d'indice." : 'Too many errors. No clue.');
+                                complete(false);
+                            }
                         }
-                    } else {
-                        mistakes++;
-                        perfectRun = false;
-                        playSfx('fail');
-                        card.classList.add('wrong');
-                        tag.textContent = (lang === 'fr' ? 'Erreur' : 'Wrong');
-                        tag.classList.add('tag-wrong');
-                        setTimeout(function () {
-                            card.classList.remove('wrong');
-                            tag.classList.remove('tag-wrong');
-                            tag.textContent = (lang === 'fr' ? 'À juger' : 'To judge');
-                        }, 700);
-                        if (mistakes >= 3) {
-                            card.dataset.done = '1';
-                            card.classList.add('confirmed-true');
-                            tag.textContent = (lang === 'fr' ? 'Vrai' : 'True');
-                            tag.classList.add('tag-true');
-                            locked = true;
-                            showEndMessage(lang === 'fr' ? 'Trop d\'erreurs. Pas d\'indice.' : 'Too many errors. No clue.');
-                                complete(false);                        }
-                    }
+                    });
+                    grid.appendChild(card);
                 });
-                carouselTrack.appendChild(card);
-                cardEls.push(card);
-            });
-
-            function updateCarousel() {
-                var cardWidth = cardEls[0] ? cardEls[0].offsetWidth + 12 : 232;
-                carouselTrack.style.transform = 'translateX(' + (-currentIndex * cardWidth) + 'px)';
-                prevBtn.style.display = currentIndex === 0 ? 'none' : 'block';
-                nextBtn.style.display = currentIndex >= cardEls.length - 1 ? 'none' : 'block';
             }
-            prevBtn.addEventListener('click', function () {
-                if (currentIndex > 0) {
-                    currentIndex--;
-                    updateCarousel();
-                }
-            });
-            nextBtn.addEventListener('click', function () {
-                if (currentIndex < cardEls.length - 1) {
-                    currentIndex++;
-                    updateCarousel();
-                }
-            });
-            updateCarousel();
+            renderRound();
 
-            /* Hint adaptatif : à 40% du temps, illumine les cartes
-               qui contiennent un mensonge.                          */
+            /* Hint adaptatif : à 40% du temps, illumine la carte du
+               mensonge dans le duo actuel. */
             registerHint(function () {
-                cardEls.forEach(function (c, i) {
-                    if (cards[i].isLie) {
-                        c.classList.add('hint-glow');
-                    }
+                var pair = rounds[roundIdx];
+                if (!pair || gameOver) return;
+                var lieId = null;
+                for (var h = 0; h < pair.length; h++) if (pair[h].isLie) lieId = pair[h].id;
+                grid.querySelectorAll('.reseau-alibis-card').forEach(function (el) {
+                    if (el.dataset.witnessId === lieId) el.classList.add('hint-glow');
                 });
             });
         },
