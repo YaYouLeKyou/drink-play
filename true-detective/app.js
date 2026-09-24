@@ -16,7 +16,7 @@
     // Images CLASSIC (nouveaux assets lieux/classic + characteres/classic)
     var CLASSIC_ASSETS = {
         universe: ASSETS_BASE + 'lieux/classic/manoir.png',
-        universeImg: ASSETS_BASE + 'univers/sherlock.jfif',
+        universeImg: ASSETS_BASE + 'univers/sherlock.png',
         crimeScene: ASSETS_BASE + 'lieux/classic/scene de crime manoir.png',
         detective: ASSETS_BASE + 'characteres/classic/detective-partenaire.png',
         femmeFatale: ASSETS_BASE + 'characteres/classic/femme-fatal.png',
@@ -736,11 +736,20 @@ function saveSettings() {
                 card.style.backgroundSize = 'cover';
                 card.style.backgroundPosition = 'center';
             }
+            // Add retro gaming info to theme description
+            var retroInfo = '';
+            if (theme.id === 'cyberpunk') {
+                retroInfo = ' jeux retro';
+            } else if (theme.id === 'film-noir') {
+                retroInfo = ' mini jeux classique';
+            } else if (theme.id === 'agatha-christie') {
+                retroInfo = ' mini jeu classique';
+            }
             card.innerHTML =
                 '<div class="theme-card-inner">' +
                 '<div class="theme-emoji">' + theme.emoji + '</div>' +
                 '<div class="theme-name">' + theme.name + '</div>' +
-                '<div class="theme-desc">' + theme.desc + '</div>' +
+                '<div class="theme-desc">' + theme.desc + retroInfo + '</div>' +
                 '</div>';
             card.addEventListener('click', function () {
                 selectTheme(theme);
@@ -1558,6 +1567,9 @@ applyMusicHidden(true);
             ui.theme = themeObj || { id: themeId };
         }
         ui.sceneCounter = 0;
+        // Reset journal at start of each game
+        localStorage.removeItem('td_journal');
+
 
         $.themeScreen.classList.add('hidden');
         $.endScreen.classList.add('hidden');
@@ -1768,6 +1780,9 @@ applyMusicHidden(true);
     function startGame(script, themeId) {
         ui.theme = themeId;
         ui.sceneCounter = 0;
+
+        // Reset journal at start of each game
+        localStorage.removeItem('td_journal');
 
         $.themeScreen.classList.add('hidden');
         $.endScreen.classList.add('hidden');
