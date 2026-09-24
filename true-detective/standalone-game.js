@@ -196,7 +196,7 @@
 
         if (gameType === 'marginal-tower') {
             if (window.location.pathname.indexOf('marginal-tower.html') === -1) {
-                window.location.href = 'marginal-tower.html?difficulty=' + difficulty + '&lang=' + lang + (fromStory ? '&story=1' : '');
+                window.location.href = 'marginal-tower.html?difficulty=' + difficulty + '&lang=' + lang + '&theme=' + encodeURIComponent(themeId || 'agatha-christie') + (fromStory ? '&story=1' : '');
             }
             return;
         }
@@ -205,7 +205,7 @@
         if (isRetroGame(gameType)) {
             var retroTarget = STANDALONE_REDIRECT[gameType];
             if (retroTarget && window.location.pathname.indexOf(retroTarget) === -1) {
-                window.location.href = retroTarget + '?level=' + getRetroLevel() + '&lang=' + lang + (fromStory ? '&story=1' : '');
+                window.location.href = retroTarget + '?level=' + retroLevel + '&lang=' + lang + '&theme=' + encodeURIComponent(themeId || 'agatha-christie') + (fromStory ? '&story=1' : '');
             }
             return;
         }
@@ -213,7 +213,7 @@
         if (STANDALONE_REDIRECT[gameType]) {
             var redirectTarget = STANDALONE_REDIRECT[gameType];
             if (window.location.pathname.indexOf(redirectTarget) === -1) {
-                window.location.href = redirectTarget + '?difficulty=' + difficulty + '&lang=' + lang + (fromStory ? '&story=1' : '');
+                window.location.href = redirectTarget + '?difficulty=' + difficulty + '&lang=' + lang + '&theme=' + encodeURIComponent(themeId || 'agatha-christie') + (fromStory ? '&story=1' : '');
             }
             return;
         }

@@ -7,6 +7,7 @@
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
+    <link rel="stylesheet" href="story-chrome.css">
     <style>
         :root {
             --bg-dark: #05050f;
@@ -327,6 +328,7 @@
 
     <script src="minigame-audio.js" data-minigame="bataille-navale"></script>
     <script src="../settings-menu.js"></script>
+    <script src="story-chrome.js"></script>
     <script src="standalone-theme.js"></script>
     <script>
         (function() {
@@ -352,6 +354,8 @@
             let enemyShips = [];
 
             let aiTargetStack = [];
+            let storyPlayerHits = 0;
+            let storyAiTurn = 0;
 
             const statusEl = document.getElementById('battleship-status');
             const turnIndicator = document.getElementById('turn-indicator');
@@ -370,6 +374,8 @@
                 playerShips = [];
                 enemyShips = [];
                 aiTargetStack = [];
+                storyPlayerHits = 0;
+                storyAiTurn = 0;
 
                 turnIndicator.style.display = 'none';
                 statusEl.textContent = "Placez votre flotte : " + SHIPS_CONFIG[currentShipIndex].name + " (" + SHIPS_CONFIG[currentShipIndex].size + " cases)";
@@ -430,6 +436,8 @@
                     for (let c = 0; c < BOARD_SIZE; c++) {
                         let cell = document.createElement('div');
                         cell.className = 'battleship-cell';
+                        cell.dataset.row = String(r);
+                        cell.dataset.col = String(c);
                         let val = playerBoard[r][c];
                         if (val === 1) cell.classList.add('ship');
                         else if (val === 2) cell.classList.add('hit');
@@ -449,6 +457,8 @@
                     for (let c = 0; c < BOARD_SIZE; c++) {
                         let cell = document.createElement('div');
                         cell.className = 'battleship-cell';
+                        cell.dataset.row = String(r);
+                        cell.dataset.col = String(c);
                         let val = enemyBoard[r][c];
                         if (val === 2) cell.classList.add('hit');
                         else if (val === 3) cell.classList.add('miss');
@@ -496,6 +506,7 @@
 
                     if (currentShipIndex >= SHIPS_CONFIG.length) {
                         gameState = 'PLAYER_TURN';
+                        if (window.TDStoryChrome) window.TDStoryChrome.trigger('start');
                         statusEl.textContent = "La bataille commence ! Attaquez la flotte ennemie.";
                         turnIndicator.style.display = 'inline-block';
                         turnIndicator.className = 'turn-indicator player';
@@ -528,9 +539,17 @@
                     } else {
                         statusEl.textContent = "💥 Tir direct ! Bien joué.";
                     }
+                    if (window.TDStoryChrome) {
+                        storyPlayerHits++;
+                        window.TDStoryChrome.trigger('hit', { value: storyPlayerHits });
+                    }
                     
                     if (enemyShips.every(s => s.hits === s.coords.length)) {
                         gameState = 'GAMEOVER';
+                        if (window.TDStoryChrome) {
+                            window.TDStoryChrome.trigger('victory');
+                            window.TDStoryChrome.reportResult(true);
+                        }
                         statusEl.textContent = "🏆 VICTOIRE TOTALE ! Vous avez détruit toute la flotte ennemie.";
                         turnIndicator.style.display = 'none';
                         setTimeout(function () {
@@ -625,6 +644,10 @@
                         
                         if (playerShips.every(s => s.hits === s.coords.length)) {
                             gameState = 'GAMEOVER';
+                            if (window.TDStoryChrome) {
+                                window.TDStoryChrome.trigger('defeat');
+                                window.TDStoryChrome.reportResult(false);
+                            }
                             statusEl.textContent = "💀 DÉFAITE... Votre flotte a été entièrement anéantie.";
                             turnIndicator.style.display = 'none';
                             setTimeout(function () {
@@ -656,6 +679,10 @@
                 }
 
                 renderBoards();
+                if (window.TDStoryChrome) {
+                    storyAiTurn++;
+                    window.TDStoryChrome.trigger('enemyTurn', { value: storyAiTurn });
+                }
                 gameState = 'PLAYER_TURN';
                 turnIndicator.className = 'turn-indicator player';
                 turnIndicator.textContent = "À vous de jouer";

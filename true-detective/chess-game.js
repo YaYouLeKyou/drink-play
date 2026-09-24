@@ -449,6 +449,7 @@
         var interroData = null;
         var phraseInterval = null;
         var moveCount = 0;
+        var aiMoveCount = 0;
         var interroCompleted = false;
 
         if (sidePanel) {
@@ -700,6 +701,9 @@
                             var aiResult = game.aiMove();
                             renderBoard(game, boardEl, null, null, finish, cfg, lang);
                             advanceMoveDialogue();
+                            /* PLAN §3 : un event à CHAQUE coup de l'IA */
+                            aiMoveCount++;
+                            if (window.TDStoryChrome) window.TDStoryChrome.trigger('aiMove', { value: aiMoveCount });
                             if (game.gameOver) {
                                 setTimeout(function () {
                                     finish({ won: game.result === 'white', clue: game.result === 'white' ? cfg.clue : cfg.failClue });
@@ -777,6 +781,7 @@
     function play(cfg, lang, onDone, target) {
         playMinigameMusic('chess');
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
+        if (window.TDStoryChrome) window.TDStoryChrome.initFromCfg(cfg);
         if (!target) {
             var layer = document.getElementById('minigame-layer');
             if (!layer) { if (onDone) onDone({ won: false }); return; }

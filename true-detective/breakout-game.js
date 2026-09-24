@@ -75,6 +75,7 @@
 
     function play(cfg, lang, onDone, target) {
         playMinigameMusic('breakout');
+        if (window.TDStoryChrome) window.TDStoryChrome.initFromCfg(cfg);
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
 
         var overlay = document.getElementById('minigame-overlay');
@@ -123,6 +124,8 @@
         var keys = {};
         var colors = ['#ff00ff', '#00ffff', '#ffff00', '#ff6600', '#00ff66'];
         var phraseTimeout = null;
+        var BRICK_TIERS = [30, 60, 90];
+        var brickTierIdx = 0;
 
         for (var row = 0; row < 5; row++) {
             for (var col = 0; col < 8; col++) {
@@ -360,8 +363,14 @@
                 }
             });
             var remaining = bricks.filter(function (b) { return b.alive; }).length;
+            var brickPct = bricks.length ? Math.round((bricks.length - remaining) * 100 / bricks.length) : 0;
+            while (brickTierIdx < BRICK_TIERS.length && brickPct >= BRICK_TIERS[brickTierIdx]) {
+                if (window.TDStoryChrome) window.TDStoryChrome.trigger('bricks', { value: BRICK_TIERS[brickTierIdx] });
+                brickTierIdx++;
+            }
             if (remaining === 0) {
                 ended = true;
+                if (window.TDStoryChrome) window.TDStoryChrome.trigger('victory', { value: score });
                 if (phraseTimeout) clearTimeout(phraseTimeout);
                 setTimeout(function () {
                     cleanupInterro();
@@ -371,6 +380,7 @@
             }
             if (ball.y > ch) {
                 ended = true;
+                if (window.TDStoryChrome) window.TDStoryChrome.trigger('ballLost', { value: score });
                 if (phraseTimeout) clearTimeout(phraseTimeout);
                 setTimeout(function () {
                     cleanupInterro();

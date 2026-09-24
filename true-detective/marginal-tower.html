@@ -7,6 +7,7 @@
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../settings-menu.css">
+    <link rel="stylesheet" href="story-chrome.css">
     <style>
         :root {
             --bg-dark: #03040a;
@@ -415,6 +416,7 @@
     <audio id="game-music" src="music true detective/mini-jeux/tower.mp3" loop preload="auto"></audio>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="story-chrome.js"></script>
     <script src="standalone-theme.js"></script>
     <script src="sfx.js"></script>
     <script>
@@ -428,7 +430,19 @@
                Sinon : retour a l'accueil / au hub des mini-jeux. */
             var tdFromStory = new URLSearchParams(window.location.search).get('story') === '1' || (function () { try { return !!localStorage.getItem('td_marginal_tower_return'); } catch (e) { return false; } })();
 
+            var tdResultReported = false;
+            function tdReportResult(won) {
+                if (tdResultReported) return false;
+                tdResultReported = true;
+                if (window.TDStoryChrome) {
+                    window.TDStoryChrome.trigger(won ? 'victory' : 'defeat');
+                    return window.TDStoryChrome.reportResult(!!won);
+                }
+                return false;
+            }
+
             function tdLeaveMinigame(won, hubUrl) {
+                tdReportResult(won);
                 try { localStorage.setItem('td_marginal_tower_result', JSON.stringify({ won: !!won, ts: Date.now() })); } catch (e) {}
                 if (!tdFromStory) {
                     window.location.href = hubUrl || '../true-detective/index.html';
@@ -508,6 +522,7 @@
             let targetHeightY = 200;
             let isGameOver = false;
             let framesStable = 0;
+            let storyObjectsUsed = 0;
 
             const blockProperties = {
                 wood: { width: 80, height: 28, density: 0.0012, friction: 0.6, restitution: 0.05, color: '#d9822b', stroke: '#ffaa54' },
@@ -662,6 +677,7 @@
 
                     if (framesStable >= 45) {
                         isGameOver = true;
+                        tdReportResult(true);
                         stopMusic();
                         playSfx('success');
                         document.getElementById('victory-overlay').classList.remove('hidden');
@@ -682,6 +698,7 @@
                             });
                             if (checkStable && highestY > targetHeightY) {
                                 isGameOver = true;
+                                tdReportResult(false);
                                 stopMusic();
                                 playSfx('fail');
                                 document.getElementById('defeat-overlay').classList.remove('hidden');
@@ -766,6 +783,10 @@
                 playSfx('material_fall', { material: selectedBlockType }); // Bruitage de la chute du bloc
 
                 blockCounts[type]--;
+                if (window.TDStoryChrome) {
+                    storyObjectsUsed++;
+                    window.TDStoryChrome.trigger('object', { value: storyObjectsUsed, blockType: type });
+                }
                 updateCounters();
             }
 

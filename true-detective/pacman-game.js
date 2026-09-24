@@ -75,6 +75,7 @@
 
     function play(cfg, lang, onDone, target) {
         playMinigameMusic('pacman');
+        if (window.TDStoryChrome) window.TDStoryChrome.initFromCfg(cfg);
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
 
         var overlay = document.getElementById('minigame-overlay');
@@ -131,6 +132,8 @@
         var ghosts = [];
         var pacman = { x: 10, y: 15, dir: { x: 0, y: 0 }, nextDir: { x: 0, y: 0 } };
         var lastPhraseScore = 0;
+        var DOT_TIERS = [25, 50, 75];
+        var dotTierIdx = 0;
         var gameOver = false;
 
         var map = [
@@ -385,8 +388,14 @@
                 }
             });
             var remaining = dots.filter(function (d) { return !d.eaten; }).length;
+            var eatenPct = dots.length ? Math.round((dots.length - remaining) * 100 / dots.length) : 0;
+            while (dotTierIdx < DOT_TIERS.length && eatenPct >= DOT_TIERS[dotTierIdx]) {
+                if (window.TDStoryChrome) window.TDStoryChrome.trigger('dots', { value: DOT_TIERS[dotTierIdx] });
+                dotTierIdx++;
+            }
             if (remaining === 0) {
                 ended = true;
+                if (window.TDStoryChrome) window.TDStoryChrome.trigger('victory', { value: score });
                 setTimeout(function () {
                     cleanupInterro();
                     restoreOverlay();
@@ -403,7 +412,7 @@ ghosts.forEach(function (g) {
                      setTimeout(function () {
                          cleanupInterro();
                          restoreOverlay();
-                         if (onDone) onDone({ won: false, score: score });
+                         if (window.TDStoryChrome) window.TDStoryChrome.trigger('defeat', { value: score }); if (onDone) onDone({ won: false, score: score });
                      }, 500);
                  }
              });

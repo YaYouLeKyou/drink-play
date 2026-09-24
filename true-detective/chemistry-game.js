@@ -208,7 +208,7 @@
 
         playSfx('liquid_pour');
 
-        this.moves++;
+        this.moves++; if (window.TDStoryChrome) { var pure = 0; for (var ti = 0; ti < this.tubes.length; ti++) { var tb = this.tubes[ti]; if (tb.length === this.tubeCapacity && tb.every(function (c) { return c === tb[0]; })) pure++; } window.TDStoryChrome.trigger('moves', { value: this.moves }); if (pure > (this.pureTubesDone || 0)) window.TDStoryChrome.trigger('tubeDone', { value: pure }); this.pureTubesDone = pure; }
         this.selectedTubeIdx = null;
         this.isPouring = false;
         this.render();
@@ -233,6 +233,7 @@
 
     ChemistryGame.prototype.handleWin = function () {
         this.gameOver = true;
+        if (window.TDStoryChrome) window.TDStoryChrome.trigger('victory');
         if (this.statusEl) {
             this.statusEl.textContent = this.lang === 'fr'
                 ? '✨ ANALYSE REUSSIE ! Réactifs purifiés, spectre ADN isolé !'
@@ -262,6 +263,7 @@
     };
 
     ChemistryGame.play = function (cfg, lang, onDone, target) {
+        if (window.TDStoryChrome && cfg) window.TDStoryChrome.initFromCfg(cfg);
         if (!target) {
             target = document.getElementById('minigame-layer');
             if (target) {

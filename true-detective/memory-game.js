@@ -224,6 +224,7 @@
     function play(cfg, lang, onDone, target) {
         playMinigameMusic('memory');
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
+        if (window.TDStoryChrome) window.TDStoryChrome.initFromCfg(cfg);
         if (!target) {
             var layer = document.getElementById('minigame-layer');
             if (!layer) { if (onDone) onDone({ won: false }); return; }
@@ -604,6 +605,8 @@
 
                             if (card1.suspectId === card2.suspectId) {
                                 matched.push(idx1, idx2);
+                                /* PLAN §3 : un event à CHAQUE paire trouvée */
+                                if (window.TDStoryChrome) window.TDStoryChrome.trigger('pair', { value: matched.length / 2 });
                                 flipped = [];
                                 locked = false;
                                 pairsLeftEl.textContent = (lang === 'fr' ? 'Paires restantes : ' : 'Pairs left: ') + (gc.pairs - matched.length / 2);

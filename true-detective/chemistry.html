@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="standalone-game.css">
     <link rel="stylesheet" href="../settings-menu.css">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="story-chrome.css">
     <style>
         :root {
             --bg-deep: #030307;
@@ -472,6 +473,7 @@
 
     <script src="minigame-audio.js" data-minigame="chemistry"></script>
     <script src="../settings-menu.js"></script>
+    <script src="story-chrome.js"></script>
     <script src="standalone-theme.js"></script>
     <script>
         (function () {
@@ -503,7 +505,7 @@
             }
 
             function handleContinueNavigation() {
-                try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'chemistry', won: chemistrySolved, ts: Date.now() })); } catch (e) {}
+                try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'chemistry', won: chemistrySolved, ts: Date.now() })); } catch (e) {} if (window.TDStoryChrome) { window.TDStoryChrome.trigger(chemistrySolved ? 'victory' : 'defeat'); window.TDStoryChrome.reportResult(chemistrySolved); }
                 try {
                     var returnRaw = localStorage.getItem('td_standalone_game_return');
                     if (returnRaw) {

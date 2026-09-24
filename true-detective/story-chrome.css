@@ -1,0 +1,361 @@
+/* =====================================================================
+   TRUE DETECTIVE — Story Chrome (TDStoryChrome)
+   Chrome narratif des mini-jeux de scénario : décor + portrait + dialogue.
+   Deux modes : overlay (index.html) et standalone (pages mini-jeux).
+   Trois skins : .theme-classic / .theme-cyberpunk / .theme-noire
+   Les variables sont portées par la classe de thème elle-même : le skin
+   fonctionne donc aussi bien sur <html> (standalone) que sur
+   #minigame-overlay (overlay index.html).
+   ===================================================================== */
+
+/* ---------- 1. Variables par thème ---------- */
+.theme-classic {
+    --td-accent: #f0d890;
+    --td-accent-strong: #ffe9b0;
+    --td-border: rgba(240, 216, 144, 0.38);
+    --td-border-soft: rgba(240, 216, 144, 0.16);
+    --td-panel: rgba(18, 13, 8, 0.86);
+    --td-panel-soft: rgba(10, 7, 4, 0.62);
+    --td-text: #f6ecd8;
+    --td-muted: rgba(246, 236, 216, 0.6);
+    --td-font: 'Special Elite', 'Playfair Display', 'Courier New', monospace;
+    --td-glow: 0 0 22px rgba(240, 216, 144, 0.12);
+}
+
+.theme-cyberpunk {
+    --td-accent: #00f0ff;
+    --td-accent-strong: #7dfcff;
+    --td-border: rgba(0, 240, 255, 0.4);
+    --td-border-soft: rgba(0, 240, 255, 0.18);
+    --td-panel: rgba(6, 10, 24, 0.86);
+    --td-panel-soft: rgba(2, 4, 14, 0.66);
+    --td-text: #e6f7ff;
+    --td-muted: rgba(230, 247, 255, 0.6);
+    --td-font: 'Special Elite', 'Courier New', monospace;
+    --td-glow: 0 0 24px rgba(0, 240, 255, 0.22);
+}
+
+.theme-noire {
+    --td-accent: #e8e2d0;
+    --td-accent-strong: #fffaf0;
+    --td-border: rgba(232, 226, 208, 0.32);
+    --td-border-soft: rgba(232, 226, 208, 0.14);
+    --td-panel: rgba(12, 12, 14, 0.88);
+    --td-panel-soft: rgba(4, 4, 6, 0.7);
+    --td-text: #efece5;
+    --td-muted: rgba(239, 236, 229, 0.58);
+    --td-font: 'Special Elite', 'Courier New', monospace;
+    --td-glow: 0 0 20px rgba(255, 255, 255, 0.08);
+}
+
+/* ---------- 2. Mode standalone : décor plein écran + voile ---------- */
+html.td-story-chrome {
+    background-color: #04050b;
+}
+
+/* Le décor remplace le fond de page. Les couches fixes ci-dessous ont un
+   z-index négatif : elles passent derrière le contenu sans toucher à la
+   mise en page (aucun position/z-index à ajouter sur les blocs existants). */
+html.td-story-chrome body {
+    background-color: transparent !important;
+    background-image: none !important;
+}
+
+.td-sc-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -2;
+    pointer-events: none;
+    background-image: var(--td-sc-decor, none);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.td-sc-veil {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+        radial-gradient(ellipse at 50% 0%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.72) 100%),
+        linear-gradient(rgba(4, 5, 12, 0.5), rgba(4, 5, 12, 0.72));
+}
+
+.td-sc-bg.hidden,
+.td-sc-veil.hidden,
+.td-sc-bar.hidden,
+html.td-sc-hidden .td-sc-bar,
+html.td-sc-hidden .td-sc-bg,
+html.td-sc-hidden .td-sc-veil {
+    display: none !important;
+}
+
+/* ---------- 3. Peaux de thème ---------- */
+/* Cyberpunk : scanlines néon par-dessus le décor */
+.theme-cyberpunk .td-sc-bg::after,
+.theme-cyberpunk #minigame-bg-layer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: repeating-linear-gradient(rgba(0, 240, 255, 0.05) 0 1px, rgba(0, 0, 0, 0) 1px 3px);
+    mix-blend-mode: screen;
+    pointer-events: none;
+}
+
+/* Noire : polar filtré (grayscale + contraste) + pluie */
+.theme-noire .td-sc-bg,
+.theme-noire #minigame-bg-layer {
+    filter: grayscale(1) contrast(1.15) brightness(0.92);
+}
+
+.theme-noire .td-sc-veil::after,
+.theme-noire .minigame-overlay-backdrop::after {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: 0;
+    right: 0;
+    bottom: -10%;
+    background-image: repeating-linear-gradient(103deg, rgba(255, 255, 255, 0.055) 0 1px, rgba(255, 255, 255, 0) 1px 8px);
+    animation: td-sc-rain 1.2s linear infinite;
+    pointer-events: none;
+}
+
+/* Classic : vignette chaude de manoir */
+.theme-classic .td-sc-veil::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: radial-gradient(ellipse at 50% 40%, rgba(255, 224, 150, 0.06) 0%, rgba(0, 0, 0, 0.55) 100%);
+    pointer-events: none;
+}
+
+@keyframes td-sc-rain {
+    from { transform: translate3d(0, -10px, 0); }
+    to { transform: translate3d(-8px, 10px, 0); }
+}
+
+@keyframes td-sc-line-in {
+    from { opacity: 0.3; transform: translateY(3px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- 4. Barre de dialogue (mode standalone) ---------- */
+.td-sc-bar {
+    position: relative;
+    z-index: 5;
+    width: min(94%, 1040px);
+    margin: 10px auto 4px;
+    box-sizing: border-box;
+    border: 1px solid var(--td-border);
+    border-radius: 14px;
+    background-image:
+        linear-gradient(var(--td-panel), var(--td-panel)),
+        var(--td-sc-bar-decor, none);
+    background-size: 100% 100%, cover;
+    background-position: center, center;
+    background-repeat: no-repeat;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), var(--td-glow);
+    overflow: hidden;
+    animation: td-sc-line-in 0.3s ease-out;
+}
+
+.td-sc-bar-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+}
+
+.td-sc-portrait-frame {
+    flex: 0 0 auto;
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--td-border);
+    background: rgba(0, 0, 0, 0.55);
+    box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.6);
+}
+
+.td-sc-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+}
+
+.td-sc-dialogue-zone {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.td-sc-identity {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0 0 4px 2px;
+    flex-wrap: wrap;
+}
+
+.td-sc-name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--td-accent);
+    letter-spacing: 0.02em;
+}
+
+.td-sc-role {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--td-muted);
+}
+
+.td-sc-dialogue-box {
+    background: var(--td-panel-soft);
+    border: 1px solid var(--td-border-soft);
+    border-radius: 10px;
+    padding: 10px 14px;
+    min-height: 44px;
+    box-sizing: border-box;
+    color: var(--td-text);
+    font-family: var(--td-font);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.td-sc-dialogue-text {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.td-sc-dialogue-box.td-sc-line-in,
+.minigame-dialogue-box.td-sc-line-in {
+    animation: td-sc-line-in 0.35s ease-out;
+}
+
+/* ---------- 5. Habillage spécifique par thème ---------- */
+/* Cyberpunk : borne d'arcade, curseur clignotant */
+.theme-cyberpunk .td-sc-bar {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(255, 0, 110, 0.2), var(--td-glow);
+}
+
+.theme-cyberpunk .td-sc-name::after {
+    content: '▌';
+    margin-left: 6px;
+    color: #ff006e;
+    animation: td-sc-blink 1.1s steps(2, start) infinite;
+}
+
+@keyframes td-sc-blink {
+    to { visibility: hidden; }
+}
+
+/* Classic : cadre bois doré */
+.theme-classic .td-sc-bar {
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(255, 233, 176, 0.1);
+}
+
+.theme-classic .td-sc-name {
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85);
+}
+
+/* Noire : sobre, dialogue en italique */
+.theme-noire .td-sc-bar {
+    border-radius: 6px;
+}
+
+.theme-noire .td-sc-dialogue-box {
+    font-style: italic;
+}
+
+/* ---------- 6. Mode overlay (index.html) ---------- */
+.minigame-npc-name {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0 0 4px 2px;
+    flex-wrap: wrap;
+}
+
+.minigame-npc-name-text {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--td-accent, #f0d890);
+    letter-spacing: 0.02em;
+}
+
+.minigame-npc-role-text {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--td-muted, rgba(255, 255, 255, 0.6));
+}
+
+.minigame-overlay .minigame-dialogue-box {
+    color: var(--td-text, #e6f7ff);
+    font-family: var(--td-font, 'Special Elite', 'Courier New', monospace);
+}
+
+/* ---------- 7. Responsive / accessibilité ---------- */
+@media (max-width: 640px) {
+    .td-sc-bar {
+        width: 100%;
+        margin: 6px 0;
+        border-radius: 10px;
+    }
+
+    .td-sc-bar-inner {
+        gap: 8px;
+        padding: 8px 10px;
+    }
+
+    .td-sc-portrait-frame {
+        width: 48px;
+        height: 48px;
+    }
+
+    .td-sc-dialogue-box {
+        font-size: 0.85rem;
+        padding: 8px 10px;
+        min-height: 38px;
+    }
+
+    .td-sc-name {
+        font-size: 0.85rem;
+    }
+
+    .td-sc-role {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-noire .td-sc-veil::after,
+    .theme-noire .minigame-overlay-backdrop::after,
+    .theme-cyberpunk .td-sc-name::after,
+    .td-sc-bar,
+    .td-sc-dialogue-box.td-sc-line-in,
+    .minigame-dialogue-box.td-sc-line-in {
+        animation: none !important;
+    }
+}

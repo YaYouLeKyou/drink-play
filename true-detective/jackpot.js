@@ -146,6 +146,10 @@
         async function spin() {
             if (gameOver || spinsLeft <= 0) return;
             spinsLeft--;
+            if (window.TDStoryChrome) {
+                window.TDStoryChrome.trigger('spin', { value: spins - spinsLeft });
+                if (spinsLeft === 0) window.TDStoryChrome.trigger('tension', { value: spins });
+            }
             updateSpins();
             $btn.disabled = true;
 
@@ -165,6 +169,7 @@
 
             if (won) {
                 playSfx('jackpot');
+                if (window.TDStoryChrome) window.TDStoryChrome.trigger('smallWin', { value: collectedClues.length + 1 });
                 clueText = showClue(TYPE_BY_SYMBOL[results[0]] || 'money');
                 if (clueText) {
                     collectedClues.push(clueText);
@@ -178,6 +183,11 @@
 
             if (spinsLeft <= 0) {
                 gameOver = true;
+                var storyWon = collectedClues.length > 0;
+                if (window.TDStoryChrome) {
+                    window.TDStoryChrome.trigger(storyWon ? 'victory' : 'defeat', { value: collectedClues.length });
+                    if (window.TDStoryChrome.reportResult(storyWon)) return;
+                }
                 setTimeout(function () {
                     try {
                         localStorage.setItem('td_standalone_game_result', JSON.stringify({

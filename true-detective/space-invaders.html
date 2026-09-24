@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
     <link rel="stylesheet" href="../settings-menu.css">
+    <link rel="stylesheet" href="story-chrome.css">
     <style>
         :root {
             --bg-dark: #03040a;
@@ -165,6 +166,8 @@
 
             let score = 0;
             let lives = 3;
+            const SI_TIERS = [50, 80];
+            let enemyTierIdx = 0;
             let gameState = 'PLAYING'; // PLAYING, WIN, GAMEOVER
 
             // Joueur
@@ -261,10 +264,11 @@
                         enemyBullets[i].y + enemyBullets[i].height > player.y
                     ) {
                         enemyBullets.splice(i, 1);
-                        lives--;
+                        lives--; if (window.TDStoryChrome) window.TDStoryChrome.trigger('hit', { value: lives });
                         document.getElementById('si-lives').textContent = "Vies: " + lives;
                         if (lives <= 0) {
                             gameState = 'GAMEOVER';
+                            if (window.TDStoryChrome) { window.TDStoryChrome.trigger('defeat'); window.TDStoryChrome.reportResult(false); }
                         }
                         continue;
                     }
@@ -303,6 +307,7 @@
                         // Si un ennemi atteint le bas -> Game Over
                         if (e.alive && e.y + e.height >= player.y) {
                             gameState = 'GAMEOVER';
+                            if (window.TDStoryChrome) { window.TDStoryChrome.trigger('defeat'); window.TDStoryChrome.reportResult(false); }
                         }
                     });
                 }
@@ -319,7 +324,7 @@
                         ) {
                             e.alive = false;
                             bullets.splice(i, 1);
-                            score += (e.type + 1) * 10;
+                            score += (e.type + 1) * 10; if (window.TDStoryChrome && enemyTierIdx < SI_TIERS.length) { var killedPct = Math.round(enemies.filter(function (x) { return !x.alive; }).length * 100 / enemies.length); if (killedPct >= SI_TIERS[enemyTierIdx]) { enemyTierIdx++; window.TDStoryChrome.trigger('enemies', { value: SI_TIERS[enemyTierIdx - 1] }); } }
                             playSfx('explosion');
                             document.getElementById('si-info').textContent = "Score: " + score;
                             break;
@@ -330,6 +335,7 @@
                 // Vérification de la victoire
                 if (enemies.every(e => !e.alive)) {
                     gameState = 'WIN';
+                    if (window.TDStoryChrome) { window.TDStoryChrome.trigger('victory'); window.TDStoryChrome.reportResult(true); }
                     try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'space-invaders', won: true, ts: Date.now() })); } catch (e) {}
                 }
             }
@@ -394,6 +400,7 @@
     </script>
 
     <script src="../settings-menu.js"></script>
+    <script src="story-chrome.js"></script>
     <script src="standalone-theme.js"></script>
     <script src="sfx.js"></script>
     <script src="minigame-audio.js" data-minigame="space-invaders"></script>

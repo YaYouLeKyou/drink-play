@@ -546,6 +546,8 @@
         blockCounts[selectedBlock]--;
         totalPlaced++;
         placedBlockTypes[selectedBlock] = (placedBlockTypes[selectedBlock] || 0) + 1;
+        /* PLAN §3 : un event à CHAQUE objet utilisé (bloc posé) */
+        if (window.TDStoryChrome) window.TDStoryChrome.trigger('object', { value: totalPlaced });
 
         playSfx('material_fall', { material: selectedBlock });
 
@@ -673,6 +675,10 @@
         if (gameOver) return;
         gameOver = true;
         won = w;
+        if (window.TDStoryChrome) {
+            window.TDStoryChrome.trigger(w ? 'victory' : 'defeat');
+            window.TDStoryChrome.reportResult(!!w);
+        }
         if (windTimer) { clearInterval(windTimer); windTimer = null; }
         if (stableCheckTimer) { clearInterval(stableCheckTimer); stableCheckTimer = null; }
         if (victoryTimer) { clearTimeout(victoryTimer); victoryTimer = null; }

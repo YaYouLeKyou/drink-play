@@ -5168,8 +5168,15 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         playSfx('click');
 
         try {
-            if (roundCfg.type === 'reseau_alibis' || roundCfg.type === 'chemistry') {
+            /* Mini-jeux joués en iframe sur leur page dédiée : ceux qui n'ont
+               pas d'implémentation overlay (jackpot, bataille-navale finale,
+               marginal-tower, missile-command, space-invaders) + chimie et le
+               réseau d'alibis déjà présents. On transmet l'interro en cours :
+               la bataille navale finale a un suspect DYNAMIQUE (PLAN §4.2). */
+            var IFRAME_STANDALONE_TYPES = ['reseau_alibis', 'chemistry', 'jackpot', 'bataille-navale', 'marginal-tower', 'missile-command', 'space-invaders'];
+            if (IFRAME_STANDALONE_TYPES.indexOf(roundCfg.type) !== -1) {
                 var standaloneUrl = getMinigameStandaloneUrl(roundCfg.type, mgCfg.difficulty || 'medium', ui.language, 'story', getThemeId());
+                if (roundCfg.interroId) standaloneUrl += '&interroId=' + encodeURIComponent(roundCfg.interroId);
                 var iframe = document.createElement('iframe');
                 iframe.src = standaloneUrl;
                 iframe.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:none;background:#05050a;z-index:11050;';

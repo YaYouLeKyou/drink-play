@@ -75,6 +75,7 @@
 
     function play(cfg, lang, onDone, target) {
         playMinigameMusic('pong');
+        if (window.TDStoryChrome) window.TDStoryChrome.initFromCfg(cfg);
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
 
         // Read level from URL for standalone mode (used by standalone-game.html)
@@ -125,6 +126,7 @@
         var aiSpeed = cfg.aiSpeed || 0.08;
         var phraseTimeout = null;
         var lastPhraseTime = 0;
+        var tensionTriggered = false;
 
         var wrap = document.createElement('div');
         wrap.className = 'retro-wrap';
@@ -373,7 +375,7 @@
                 ball.vy = dy * 4;
             }
             if (ball.x < 0) {
-                aiScore++; playSfx("score");
+                aiScore++; playSfx("score"); if (window.TDStoryChrome) window.TDStoryChrome.trigger('enemyScore', { value: aiScore });
                 if (aiScore < winScore && !interroCompleted) {
                     showTaunt();
                     tryStartInterrogation();
@@ -382,7 +384,7 @@
                 resetBall(1);
             }
             if (ball.x > cw) {
-                playerScore++; playSfx("score");
+                playerScore++; playSfx("score"); if (window.TDStoryChrome) window.TDStoryChrome.trigger('score', { value: playerScore });
                 if (PHRASE_TRIGGERS.indexOf(playerScore) !== -1 && !interroCompleted) {
                     showNewPhrase();
                     tryStartInterrogation();
@@ -393,9 +395,14 @@
         }
 
         function checkEnd() {
+            if (!tensionTriggered && playerScore >= 9 && aiScore >= 9) {
+                tensionTriggered = true;
+                if (window.TDStoryChrome) window.TDStoryChrome.trigger('tension', { value: playerScore + aiScore });
+            }
             if (playerScore >= winScore || aiScore >= winScore) {
                 gameOver = true;
                 var won = playerScore >= winScore;
+                if (window.TDStoryChrome) window.TDStoryChrome.trigger(won ? 'victory' : 'defeat', { value: playerScore });
                 if (phraseTimeout) clearTimeout(phraseTimeout);
                 drawGameOver(won, playerScore, winScore);
                 showContinueBtn(won, playerScore);

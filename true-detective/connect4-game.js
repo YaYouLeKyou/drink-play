@@ -37,6 +37,8 @@
         this.currentPlayer = 1; // 1 = Player (Gold/Cyan), 2 = Opponent/AI (Dark/Magenta)
         this.gameOver = false;
         this.isAiTurn = false;
+        this.cfg = options.cfg || null;
+        this.aiMoveCount = 0;
 
         this.initBoard();
         this.render();
@@ -190,6 +192,10 @@
         playSfx('token_drop');
 
         this.updateBoardUI();
+
+        /* PLAN §3 : un event à CHAQUE tour où joue le computer */
+        this.aiMoveCount = (this.aiMoveCount || 0) + 1;
+        if (window.TDStoryChrome) window.TDStoryChrome.trigger('aiMove', { value: this.aiMoveCount });
 
         var winInfo = this.checkWin(2);
         if (winInfo) {
@@ -381,6 +387,7 @@
     };
 
     Connect4Game.play = function (cfg, lang, onDone, target) {
+        if (window.TDStoryChrome && cfg) window.TDStoryChrome.initFromCfg(cfg);
         if (!target) {
             target = document.getElementById('minigame-layer');
             if (target) {
@@ -396,6 +403,7 @@
         var game = new Connect4Game(container, {
             lang: lang || 'fr',
             difficulty: cfg ? cfg.difficulty : 'medium',
+            cfg: cfg || null,
             onComplete: function (won) {
                 if (onDone) onDone({ won: won });
             }

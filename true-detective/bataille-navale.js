@@ -51,6 +51,7 @@
         var enemyShipsPlaced = 0;
         var playerHits = 0;
         var enemyHits = 0;
+        var storyAiTurn = 0;
         var totalShipCells = SHIPS.reduce(function (a, b) { return a + b; }, 0);
 
         function createEmptyGrid() {
@@ -186,7 +187,7 @@
             placeShip(playerGrid, row, col, len, horizontal);
             playerShipsPlaced++;
             if (playerShipsPlaced >= SHIPS.length) {
-                phase = 'battle';
+                phase = 'battle'; if (window.TDStoryChrome) window.TDStoryChrome.trigger('start');
                 if ($shipSelector) $shipSelector.style.display = 'none';
                 if ($rotateBtn) $rotateBtn.style.display = 'none';
                 if ($resetBtn) $resetBtn.style.display = 'none';
@@ -213,7 +214,7 @@
 
             if (enemyGrid[row][col] === SHIP) {
                 playerShots[row][col] = HIT;
-                playerHits++;
+                playerHits++; if (window.TDStoryChrome) window.TDStoryChrome.trigger('hit', { value: playerHits });
                 playSfx('explosion');
             } else {
                 playerShots[row][col] = MISS;
@@ -225,6 +226,7 @@
             if (playerHits >= totalShipCells) {
                 phase = 'gameover';
                 if ($status) $status.textContent = lang === 'fr' ? 'Victoire ! Vous avez coulé la flotte ennemie.' : 'Victory! You sank the enemy fleet.';
+                if (window.TDStoryChrome) { window.TDStoryChrome.trigger('victory'); window.TDStoryChrome.reportResult(true); }
                 if ($turnIndicator) $turnIndicator.style.display = 'none';
                 setTimeout(function () {
                     try {
@@ -267,9 +269,14 @@
 
             renderPlayerBoard();
 
+            /* PLAN §3 : un event à CHAQUE tour de l'IA */
+            storyAiTurn++;
+            if (window.TDStoryChrome) window.TDStoryChrome.trigger('enemyTurn', { value: storyAiTurn });
+
             if (enemyHits >= totalShipCells) {
                 phase = 'gameover';
                 if ($status) $status.textContent = lang === 'fr' ? 'Défaite... Votre flotte a été coulée.' : 'Defeat... Your fleet has been sunk.';
+                if (window.TDStoryChrome) { window.TDStoryChrome.trigger('defeat'); window.TDStoryChrome.reportResult(false); }
                 if ($turnIndicator) $turnIndicator.style.display = 'none';
                 setTimeout(function () {
                     try {

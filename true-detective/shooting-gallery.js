@@ -124,6 +124,7 @@
     function play(cfg, lang, onDone, target) {
         playMinigameMusic('shooting');
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
+        if (window.TDStoryChrome) window.TDStoryChrome.initFromCfg(cfg);
 
         var overlay = document.getElementById('minigame-overlay');
         var overlayContent = overlay ? overlay.querySelector('#minigame-screen-content') : null;
@@ -223,6 +224,10 @@
         var phraseTimeout = null;
         var dialogueEl = null;
         var lastPhraseScore = 0;
+        /* PLAN §6 : seuil de victoire. Thème noire = 20 pts ; les autres
+           thèmes (0) gardent le comportement actuel : toutes les cibles. */
+        var winScore = (typeof cfg.winScore === 'number') ? cfg.winScore
+            : (themeId === 'film-noir' ? 20 : 0);
 
         function createTarget(type) {
             var name = suspectNames[type] || type;
@@ -382,10 +387,13 @@
             if (PHRASE_TRIGGERS.indexOf(score) !== -1 && score > lastPhraseScore) {
                 lastPhraseScore = score;
                 showNewPhrase();
+                /* PLAN §3 : un event au score, chaque 2 points */
+                if (window.TDStoryChrome) window.TDStoryChrome.trigger('score', { value: score });
             }
 
             var remaining = targets.filter(function (t) { return t.alive; }).length;
-            if (remaining === 0 && (!forbidden || !forbidden.alive)) {
+            var thresholdWon = (winScore > 0 && score >= winScore);
+            if (thresholdWon || (remaining === 0 && (!forbidden || !forbidden.alive))) {
                 ended = true;
                 won = true;
                 score += diffCfg.scoreBonus;

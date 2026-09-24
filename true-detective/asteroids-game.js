@@ -77,6 +77,7 @@
 
     function play(cfg, lang, onDone, target) {
         playMinigameMusic('asteroids');
+        if (window.TDStoryChrome) window.TDStoryChrome.initFromCfg(cfg);
         if (!cfg) { if (onDone) onDone({ won: false }); return; }
 
         var overlay = document.getElementById('minigame-overlay');
@@ -132,6 +133,7 @@
         var interroPause = false;
         var asteroidsDestroyed = 0;
         var lastInterroScore = -1;
+        var KILL_TIERS = [10, 25, 50];
 
         function createAsteroid(x, y, size) {
             var verts = [];
@@ -411,7 +413,7 @@
                         }
                         asteroids.splice(j, 1);
                         score += 10;
-                        asteroidsDestroyed++;
+                        asteroidsDestroyed++; if (KILL_TIERS.indexOf(asteroidsDestroyed) !== -1 && window.TDStoryChrome) window.TDStoryChrome.trigger('kills', { value: asteroidsDestroyed });
                         if (asteroidsDestroyed % 3 === 0 && score / 10 !== lastInterroScore) {
                             lastInterroScore = score / 10;
                             onScoreMilestone();
@@ -437,7 +439,7 @@
         function onGameEnd(resultWon) {
             cleanupInterro();
             restoreOverlay();
-            if (onDone) onDone({ won: resultWon, score: score });
+            if (window.TDStoryChrome) window.TDStoryChrome.trigger(resultWon ? 'victory' : 'defeat', { value: score }); if (onDone) onDone({ won: resultWon, score: score });
         }
 
         function drawScanlines() {
