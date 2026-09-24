@@ -105,6 +105,20 @@
 
         parseParams();
 
+        // Le chrome narratif doit connaître le contexte avant le moteur de jeu.
+        // Certaines pages dedicated chargent leur moteur inline avant de passer
+        // par standalone-game.js : l'init explicite évite une boîte vide.
+        try {
+            if (window.TDStoryChrome && window.TDStoryChrome.initFromCfg) {
+                var chromeCfg = storyConfig || { type: gameType, lang: lang, storyMode: fromStory };
+                window.TDStoryChrome.initFromCfg(chromeCfg, {
+                    gameType: gameType,
+                    lang: lang,
+                    storyMode: fromStory
+                });
+            }
+        } catch (e) {}
+
         // Expose theme globally for mini-games that use window.getThemeId / window.THEME_ASSETS
         try {
             if (typeof window !== 'undefined') {
@@ -344,15 +358,10 @@
             type: 'reseau_alibis',
             time: 90,
             evidence: 'witness',
+            alibiPool: difficulty === 'easy' ? 'act1_1' : (difficulty === 'medium' ? 'act1_2' : (difficulty === 'hard' ? 'act2_1' : 'act2_3')),
             title: { fr: 'Le Réseau d\'alibis', en: 'The Alibi Network' },
             desc: { fr: 'Identifiez les menteurs.', en: 'Identify the liars.' },
-            clue: { fr: 'Le réseau révèle des contradictions.', en: 'The network reveals contradictions.' },
-            testimonies: [
-                { id: 'hale', witness: { fr: 'Major Hale', en: 'Major Hale' }, statement: { fr: "J'étais en panne avec Pembrooke à 22h.", en: 'I was broken down with Pembrooke at 10pm.' }, isLie: false },
-                { id: 'vivienne', witness: { fr: 'Lady Vivienne', en: 'Lady Vivienne' }, statement: { fr: "J'étais seule au manoir.", en: 'I was alone at the manor.' }, isLie: true },
-                { id: 'blackwood', witness: { fr: 'Rupert Blackwood', en: 'Rupert Blackwood' }, statement: { fr: "Je suis parti vers 20h, Silas m'a vu.", en: 'I left around 8pm, Silas saw me.' }, isLie: false },
-                { id: 'silas', witness: { fr: 'Silas Crane', en: 'Silas Crane' }, statement: { fr: "J'ai vu Blackwood passer à 20h.", en: 'I saw Blackwood pass at 8pm.' }, isLie: false }
-            ]
+            clue: { fr: 'Le réseau révèle des contradictions.', en: 'The network reveals contradictions.' }
         };
         var cfg = storyConfig && storyConfig.type === 'reseau_alibis' ? storyConfig : defaultCfg;
         try {

@@ -116,7 +116,8 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 ### ACTE I, Phase 1 « Interrogatoires » (dialogue, musique recherche)
 1. *(residence, Hale)* Major Hale, **garde du corps et majordome en chef**, accueille le détective dans le salon du manoir. Vous l'interrogez : « Vous sembliez proche de la victime. Quel genre d'homme était-il ? » Hale hésite : « Distant. Il parlait souvent de changer le testament, c'est l'affaire de Blackwood. » **[Indice Témoin]** Hale mentionne le testament et Blackwood spontanément.
 2. *(residence, Lady Vivienne)* Dans le boudoir, vous la testez : « Votre mari voyait d'autres femmes ? » Elle sourit froidement : « Nous avions nos arrangements. » **[Indice Mobile]** Aucune émotion visible : à creuser.
-3. **MINI-JEU `reseau_alibis` (Cartographie mentale)** *(salon du manoir)*, Wexford étale les deux dépositions : « Deux visages, deux versions. À vous de croiser les informations et de trouver le mensonge. » Le joueur dispose de 2 cartes-témoins (Hale + Vivienne) et doit cliquer sur le MENSONGE.
+3. **MINI-JEU `montre_code`** *(salon du manoir)* La montre de poche brisée du Duc gît sur la table. **FACE** : aiguille figée à **22h09** (heure du crime, twist). **DOS** : gravure à 4 chiffres **1981** (code coffre). Le joueur examine la montre pour lire l'heure et le code.
+4. **MINI-JEU `reseau_alibis` (Cartographie mentale)** *(salon du manoir)*, Wexford étale les deux dépositions : « Deux visages, deux versions. À vous de croiser les informations et de trouver le mensonge. » Le joueur dispose de 2 cartes-témoins (Hale + Vivienne) et doit cliquer sur le MENSONGE.
     - **Hale** (vrai) : « J'étais en panne avec Pembrooke sur la route à 22h. Sa voiture, sa durite, son capot ouvert. »
     - **Vivienne** (mensonge) : « J'étais au théâtre avec des amies, puis ici, seule. Les domestiques avaient congé. Sauf un, qui rôdait près du pavillon vers 22h. » (incohérence avec l'alibi de Hale et l'heure du crime)
     - **INDICE MAJEUR** : le mensonge est identifié. Le Duc a engagé Krane pour liquider Pembrooke (le séducteur qui trompait Vivienne), mais l'arme a tué le VICTIME, pas Pembrooke. Krane a gardé l'arme car la victime la lui avait tendue. L'excuse s'effondre : « je travaillais pour le Duc » ne justifie pas le meurtre du mari.
@@ -172,7 +173,7 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 
 ### ACTE III, Phase 2 « Les 6 branches » (dialogue, musique tension)
 
-Le coffre vide a transformé l'enquête. Chacun des 6 suspects est convoqué au parloir. Le joueur choisit qui interroger en premier — **ce choix déclenche une branche unique**. Chaque branche se termine par une **bataille navale** contre le suspect : un duel tactique où la victoire révèle un indice, la défaite le cache.
+Le coffre vide a transformé l'enquête. Chacun des 6 suspects est convoqué au parloir. Le joueur choisit qui interroger en premier — **ce choix déclenche une branche unique**. Le choix narratif s'appelle `choisirSuspect` (6 options, une par suspect). Chaque branche se termine par un **MINI-JEU `bataille-navale`** contre le suspect : un duel tactique où la victoire révèle un indice, la défaite le cache.
 
 **BRAIVCHE 1 — protecteur (Major Hale)** : Hale nie avec violence. « Ce n'est pas moi qui ai vidé le coffre. Wexford était dans la maison, pas moi ! »  
 - **Bataille navale** : Hale joue avec férocité. Victoire = il avoue avoir vu Wexford sortir du bureau à 22h09. Défaite = il accuse Pembrooke.  
@@ -261,7 +262,7 @@ Après la bataille navale contre **le suspect accusé**, le joueur peut accuser 
 | Coffre vide | 3A (crimeScene) | `coffre_code` (standalone) | Combinaison 1981 → coffre ouvert, MAIS VIDE | aucun | Twist : le coffre a été vidé avant |
 | Coffre-fort | 3A (crimeScene) | `coffre_code` (standalone) | Code 1981 du coffre → ouverture révélant un compartiment | aucun | Documents falsifiés + lettre Wexford |
 | Câblage alarme | 3B (labo) | `cablage_alarme` | SVG : pivoter segments pour boucle intacte | `alarm-circuit-blueprint.png.jfif` | Intrusion non forcée |
-| Bataille navale ×6 | 3C (branches) | `bataille-navale` | Duel tactique contre chaque suspect | `bataille-navale.html` | Révèle les mensonges de Wexford |
+| **Bataille navale ×6** | 3C (branches) | `bataille-navale` | Duel tactique contre chaque suspect | `bataille-navale.html` | Révèle les mensonges de Wexford |
 | Roue des alibis | 4A (QG) | `roue_alibis` | Aligner 3 cadrans (montre, alibi, horloge-mère) | `pocket-watch-dial.png.jfif` | Pulvérise l'alibi de Hale |
 
 Chaque puzzle respecte l'architecture existante (fabrique dans `minigames.js`, `cfg.clue` de récompense, non-bloquant).

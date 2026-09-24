@@ -185,6 +185,19 @@
         (function () {
             'use strict';
 
+            // Les pages inline chargent le moteur avant standalone-game.js.
+            // Le chrome est donc initialisé ici avec la configuration narrative disponible.
+            try {
+                if (window.TDStoryChrome && window.TDStoryChrome.initFromCfg) {
+                    window.TDStoryChrome.initFromCfg({
+                        type: 'asteroids',
+                        interroId: new URLSearchParams(window.location.search).get('interroId') || null,
+                        lang: new URLSearchParams(window.location.search).get('lang') || 'fr',
+                        storyMode: new URLSearchParams(window.location.search).get('story') === '1'
+                    }, { gameType: 'asteroids' });
+                }
+            } catch (e) {}
+
             var canvas = document.getElementById('asteroids-canvas');
             var ctx = canvas.getContext('2d');
             var infoEl = document.getElementById('asteroids-info');

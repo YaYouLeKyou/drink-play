@@ -4648,13 +4648,13 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     };
 
     // Mappage des suspects vers leurs mini-jeux rétro préférés pour le thème Cyberpunk.
-    // Classic et Film Noir utilisent les mini-jeux originaux (shooting, chess, jackpot, sudoku, memory, chemistry).
+    // Classic et Film Noir utilisent les mini-jeux classiques (shooting, chess, jackpot, connect4, memory, chemistry).
     var CYBERPUNK_RETRO_GAME_MAP = {
         'protecteur': 'asteroids',
         'femme-fatale': 'pong',
         'seducteur': 'breakout',
         'suspect': 'missile-command',
-        'marginal': 'pacman',
+        'marginal': 'marginal-tower',
         'criminel': 'space-invaders'
     };
 
@@ -4781,9 +4781,6 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         } else if (minigameType === 'missile-command') {
             cfg.missilesPerWave = 5 + tier * 2; // 7..11
             cfg.missileSpeed = 2 + tier * 0.5;
-        } else if (minigameType === 'sudoku') {
-            cfg.holes = 40 - tier * 5;             // 35..25 cases à remplir
-            cfg.time = 90 + tier * 30;             // 2..5 minutes
         } else if (minigameType === 'bataille-navale') {
             cfg.shipCount = 3 + tier; // 4..6 ships per player
             cfg.gridSize = 6 + tier;  // 7..9 grid
@@ -4812,8 +4809,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
               'jackpot': 'jackpot.html',
               'connect4': 'connect4.html',
               'missile-command': 'missile-command.html',
-              'sudoku': 'sudoku.html',
-              'bataille-navale': 'bataille-navale.html',
+            'bataille-navale': 'bataille-navale.html',
               'pong': 'pong.html',
               'pacman': 'pacman.html',
               'space-invaders': 'space-invaders.html',
@@ -4885,7 +4881,6 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             shooting: { fr: 'Tir forain', en: 'Shooting Gallery' },
             jackpot: { fr: 'Jackpot', en: 'Jackpot' },
             connect4: { fr: 'Puissance 4', en: 'Connect 4' },
-            sudoku: { fr: 'Sudoku de Blackwood', en: "Blackwood's Sudoku" },
             chemistry: { fr: 'Analyse chimique', en: 'Chemistry' },
             pong: { fr: 'Pong', en: 'Pong' },
             pacman: { fr: 'Pacman', en: 'Pacman' },

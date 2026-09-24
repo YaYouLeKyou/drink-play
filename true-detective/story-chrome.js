@@ -213,7 +213,7 @@
         'memory': 'femme-fatale',
         'jackpot': 'seducteur',
         'marginal-tower': 'marginal',
-        'pong': 'marginal',
+        'pong': 'femme-fatale',
         'pacman': 'femme-fatale',
         'breakout': 'seducteur',
         'space-invaders': 'protecteur',
@@ -239,6 +239,55 @@
         'bataille-navale': 'headquarters',
         'scene_fouille': 'crimeScene'
     };
+
+    /* Répliques par défaut : les pages standalone chargent parfois le chrome
+       avant que la configuration d'interrogatoire ne soit disponible.
+       Elles restent événementielles et ne dépendent d'aucun timer. */
+    var GAME_DEFAULT_LINES = {
+        pong: {
+            start: { fr: 'Lady Vivienne : « Vous me confusez avec Silas ? Retournez donc me chercher un autre adversaire. »', en: 'Lady Vivienne: "You mistake me for Silas? Find yourself another opponent."' },
+            score: { fr: 'Lady Vivienne : « Chaque point vous rapproche de la vérité… et de ma patience. »', en: 'Lady Vivienne: "Every point brings you closer to the truth... and to the end of my patience."' },
+            victory: { fr: 'Lady Vivienne : « Vous avez gagné le duel, inspecteur. Mais pas encore la vérité. »', en: 'Lady Vivienne: "You won the duel, inspector. Not yet the truth."' }
+        },
+        'marginal-tower': {
+            start: { fr: 'Silas Crane : « Une pièce, un étage. Montez, et vous écoutez. »', en: 'Silas Crane: "One coin, one floor. Climb, and you listen."' },
+            object: { fr: 'Silas Crane : « Encore un objet. La tour se souvient de tout. »', en: 'Silas Crane: "One more object. The tower remembers everything."' },
+            victory: { fr: 'Silas Crane : « Vous avez tenu la tour. La ruelle vous pertenece enfin. »', en: 'Silas Crane: "You held the tower. The alley is finally yours."' }
+        },
+        connect4: {
+            start: { fr: 'Rupert Blackwood : « Alignez quatre pièces si vous voulez ouvrir mes registres. »', en: 'Rupert Blackwood: "Align four pieces if you want my ledgers opened."' },
+            aiMove: { fr: 'Rupert Blackwood : « Vous croyez avoir trouvé une ligne ? J’en ai trouvé une autre. »', en: 'Rupert Blackwood: "You think you found a line? I found another."' },
+            victory: { fr: 'Rupert Blackwood : « Bien joué. Les versements de Hale apparaissent enfin dans mes registres. »', en: 'Rupert Blackwood: "Well played. Hale’s payments finally appear in my ledgers."' }
+        },
+        chess: {
+            start: { fr: 'Lady Vivienne : « Vous croyez me battre aux échecs ? Commencez par vous maîtriser. »', en: 'Lady Vivienne: "You think you can beat me at chess? Master yourself first."' },
+            aiMove: { fr: 'Lady Vivienne : « Un coup. Pas une hésitation. Vous voyez la différence ? »', en: 'Lady Vivienne: "One move. No hesitation. Do you see the difference?"' },
+            victory: { fr: 'Lady Vivienne : « Votre stratégie est meilleure… mais vous ne connaissez pas encore ma version des faits. »', en: 'Lady Vivienne: "Your strategy is better... but you still do not know my version of events."' }
+        },
+        memory: {
+            start: { fr: 'Lady Vivienne : « Retenez ce visage. Une mémoire qui oublie ne vaut rien. »', en: 'Lady Vivienne: "Remember this face. A memory that forgets is worthless."' },
+            pair: { fr: 'Lady Vivienne : « Une paire. Vous vous souvenez de moi… ou de mes mensonges ? »', en: 'Lady Vivienne: "A pair. Do you remember me... or my lies?"' },
+            victory: { fr: 'Lady Vivienne : « Vous avez retrouvé chaque paire. La dernière était l’alibi, non ? »', en: 'Lady Vivienne: "You found every pair. The last one was the alibi, wasn’t it?"' }
+        },
+        jackpot: {
+            start: { fr: 'Julian Pembrooke : « Faites tourner la machine. La chance a parfois des noms. »', en: 'Julian Pembrooke: "Spin the machine. Fortune sometimes has a name."' },
+            spin: { fr: 'Julian Pembrooke : « Encore un tour. Je sais où sont cachés les paiements. »', en: 'Julian Pembrooke: "One more spin. I know where the payments are hidden."' },
+            victory: { fr: 'Julian Pembrooke : « Vous avez gagné… et avec moi, les paiements de Hale. »', en: 'Julian Pembrooke: "You won... and with me, Hale’s payments."' }
+        },
+        physics: {
+            start: { fr: 'Gardez vos réflexes. La vérité ne se laisse pas attraper facilement. »', en: 'Keep your reflexes. Truth is not easily caught.' }
+        },
+        chemistry: {
+            start: { fr: 'Dr Whitmore : « Chaque réactif a sa couleur. Ne les confondez pas. »', en: 'Dr Whitmore: "Every reagent has its colour. Do not confuse them."' },
+            victory: { fr: 'Dr Whitmore : « Spectre isolé. C’est bien ce poison. »', en: 'Dr Whitmore: "Spectrum isolated. It is indeed that poison."' }
+        },
+        asteroids: {
+            start: { fr: 'Victor Krane : « Vous traquez des débris… ou des preuves ? »', en: 'Victor Krane: "Are you hunting debris... or evidence?"' },
+            kills: { fr: 'Victor Krane : « Chaque débris détruit réduit le silence. »', en: 'Victor Krane: "Every destroyed debris breaks the silence."' },
+            victory: { fr: 'Victor Krane : « Vous avez nettoyé l’orbite. Je reste la seule variable. »', en: 'Victor Krane: "You cleaned the orbit. I remain the only variable."' }
+        }
+    };
+
 
     /* ===================== ÉTAT ===================== */
     var state = {
@@ -733,7 +782,13 @@
         var story = isStoryContext(opts, params, cfg);
         state.suspectId = resolveSuspectId(opts, params, cfg, story);
         state.lines = normalizeLines(opts.lines || opts.storyLines || cfg.lines || cfg.storyLines);
+        if (!state.lines.length && GAME_DEFAULT_LINES[state.gameType]) {
+            state.lines = normalizeLines(GAME_DEFAULT_LINES[state.gameType]);
+        }
         state.fallback = normalizeStrings(opts.fallback || opts.dialogues || cfg.dialogues);
+        if (!state.fallback.length && state.lines.length) {
+            state.fallback = state.lines.map(function (line) { return line.text; });
+        }
         state.hooks = {
             onSay: opts.onSay,
             onVictory: opts.onVictory,
