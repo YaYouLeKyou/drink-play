@@ -198,7 +198,7 @@ indice: { fr: 'Sa « panne » coïncidait exactement avec l\'heure du meurtre ; 
     /* --- Évaluation de l'accusation --- */
     function evaluateAccusation(suspectId) {
         state.accused = suspectId;
-        var correct = (suspectId === state.culprit) || (suspectId === 'detective');
+        var correct = suspectId === state.culprit;
         var score = getEvidenceScore();
         var max = getEvidenceMax();
         var ratio = score / max;

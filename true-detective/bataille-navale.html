@@ -331,6 +331,19 @@
     <script src="story-chrome.js"></script>
     <script src="standalone-theme.js"></script>
     <script>
+        (function () {
+            var params = new URLSearchParams(window.location.search);
+            var cfg = null;
+            try { cfg = JSON.parse(localStorage.getItem('td_standalone_game_config') || 'null'); } catch (e) {}
+            if (window.TDStoryChrome && cfg) {
+                cfg.type = 'bataille-navale';
+                cfg.storyMode = params.get('story') === '1';
+                cfg.lang = params.get('lang') || cfg.lang || 'fr';
+                window.TDStoryChrome.initFromCfg(cfg);
+            }
+        })();
+    </script>
+    <script>
         (function() {
             'use strict';
 

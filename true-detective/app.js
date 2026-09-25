@@ -632,13 +632,25 @@ function saveSettings() {
                                             if (typeof sd.miniGamesWon === 'number') sd.miniGamesWon++; else sd.miniGamesWon = 1;
                                             if (typeof sd.score === 'number') sd.score += 10; else sd.score = 10;
                                         }
-                                        if (result && result.clue) {
-                                            if (!sd.clues) sd.clues = [];
-                                            if (sd.clues.indexOf(result.clue) === -1) sd.clues.push(result.clue);
-                                            if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
-                                                window.TDNarrativeEngine.addClue(result.clue, 'dialogue');
+                                        var resultClue = result.clue || '';
+                                        if (!resultClue && rp.interroId && window.TDNarration && window.TDNarration.interrogations) {
+                                            var returnInterro = window.TDNarration.interrogations[rp.interroId];
+                                            var returnCfg = returnInterro && returnInterro.minigame;
+                                            if (returnCfg) {
+                                                var returnDiff = returnCfg.difficulty && returnCfg.difficulty[0];
+                                                resultClue = returnDiff && ((result.won && returnDiff.clue) || (!result.won && returnDiff.failClue)) || '';
+                                                if (resultClue && resultClue[ui.language]) resultClue = resultClue[ui.language];
+                                                else if (resultClue && resultClue.fr) resultClue = resultClue.fr;
+                                                else if (resultClue && resultClue.en) resultClue = resultClue.en;
                                             }
-                                            showClueToast(result.clue);
+                                        }
+                                        if (resultClue) {
+                                            if (!sd.clues) sd.clues = [];
+                                            if (sd.clues.indexOf(resultClue) === -1) sd.clues.push(resultClue);
+                                            if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
+                                                window.TDNarrativeEngine.addClue(resultClue, 'dialogue');
+                                            }
+                                            showClueToast(resultClue);
                                             updateNotebook();
                                         }
                                         scrEnsureThemeMusic();
@@ -4176,7 +4188,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             var returnData = {
                 phaseIdx: scr.phaseIdx,
                 pageIdx: scr.pageIdx,
-                interroId: 'page',
+                interroId: page.interrogation || 'page',
                 questionRound: 0,
                 lang: langParam,
                 theme: (typeof getThemeId === 'function' ? getThemeId() : null) || 'agatha-christie',
@@ -4190,7 +4202,15 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         /* Store story minigame config so standalone pages can use exact story settings. */
         try {
             if (page.minigame && standaloneType) {
-                localStorage.setItem('td_standalone_game_config', JSON.stringify(page.minigame));
+                var interroData = page.interrogation && window.TDNarration && window.TDNarration.interrogations
+                    ? window.TDNarration.interrogations[page.interrogation]
+                    : null;
+                var storyConfig = Object.assign({}, page.minigame, {
+                    interroId: page.interrogation || 'page',
+                    minigameIntro: (interroData && interroData.minigameIntro) || page.minigame.minigameIntro || null,
+                    dialogues: interroData ? extractInterrogationDialogues(interroData) : page.minigame.dialogues || []
+                });
+                localStorage.setItem('td_standalone_game_config', JSON.stringify(storyConfig));
             }
         } catch (e) {}
 
@@ -4240,13 +4260,41 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         return rounds.length ? rounds : [[]];
     }
 
+    function scrFinalInterroRounds(interroId) {
+        var names = {
+            protecteur: 'Major Hale', 'femme-fatale': 'Lady Vivienne', seducteur: 'Julian Pembrooke',
+            suspect: 'Rupert Blackwood', marginal: 'Silas Crane', criminel: 'Victor Krane', detective: 'Inspecteur Wexford'
+        };
+        var name = names[interroId] || 'Le suspect';
+        return [[{
+            id: 'final_' + interroId,
+            label: { fr: '« L\'ADN vous place sur les lieux. Pourquoi continuez-vous de nier ? »', en: '"DNA places you at the scene. Why do you keep denying it?"' },
+            response: { fr: name + ' baisse les yeux : « Parce que l\'ADN prouve une présence, pas l\'ordre des coups. Cette fois, je veux la vérité entière. »\n\n[Pression finale] Le suspect admet que sa version ne peut plus tenir seule.', en: name + ' looks down: "Because DNA proves presence, not the order of the blows. This time, I want the whole truth."\n\n[Final pressure] The suspect admits their version can no longer stand alone.' },
+            evidence: 'forensic'
+        }]];
+    }
+
+    function scrInterroRoundsFor(it) {
+        if (it && it.finalInterrogation) return scrFinalInterroRounds(it.id);
+        var data = window.TDNarration && window.TDNarration.interrogations ? window.TDNarration.interrogations[it.id] : null;
+        if (it && scrCurrentPhase() && scrCurrentPhase().id === 'act2_3' && data) {
+            var second = data.rounds2 && data.rounds2.length ? data.rounds2 : [data.questions];
+            return [second.map(function (q) {
+                var copy = Object.assign({}, q);
+                copy.label = { fr: '[ADN sur les lieux] ' + itl(q.label), en: '[DNA at the scene] ' + itl(q.label) };
+                return copy;
+            })];
+        }
+        return scrInterroRounds(data);
+    }
+
     function scrStartInterrogation(page) {
         var interroId = page.interrogation;
         if (interroId === 'dynamic') {
             var s = scrGetState();
             interroId = s.prochainSuspect || 'suspect';
         }
-        scr.interro = { id: interroId, questionRound: 0, minigameRound: 0, done: false, questionsDone: false };
+        scr.interro = { id: interroId, questionRound: 0, minigameRound: 0, done: false, questionsDone: false, finalInterrogation: !!(page && page.finalInterrogation) };
         // « Continuer » reste à l'écran mais reste inactif pendant l'interrogatoire
         $.continueBtn.classList.remove('hidden');
         $.continueBtn.disabled = true;
@@ -4258,7 +4306,14 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         var lang = ui.language || 'fr';
         var themeId = (typeof getThemeId === 'function' ? getThemeId() : null) || 'agatha-christie';
         var diff = (minigameCfg && minigameCfg.difficulty) || 'medium';
-        var cfg = { type: 'chess-duel', lang: lang, theme: themeId, difficulty: diff, interroId: (it && it.id) || 'femme-fatale' };
+        var cfg = {
+            type: 'chess-duel',
+            lang: lang,
+            theme: themeId,
+            difficulty: diff,
+            interroId: (it && it.id) || 'femme-fatale',
+            minigameIntro: minigameCfg && minigameCfg.minigameIntro ? minigameCfg.minigameIntro : null
+        };
         try {
             var clue = minigameCfg && minigameCfg.clue ? (minigameCfg.clue[lang] || minigameCfg.clue.fr || minigameCfg.clue.en || '') : '';
             var fail = minigameCfg && minigameCfg.failClue ? (minigameCfg.failClue[lang] || minigameCfg.failClue.fr || minigameCfg.failClue.en || '') : '';
@@ -4281,8 +4336,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.continueBtn.disabled = false;
         $.continueBtn.textContent = getText('continue') || 'Continuer';
         $.continueBtn.onclick = function () {
-            var q = 'lang=' + lang + '&theme=' + themeId + '&difficulty=' + diff;
-            window.location.href = 'echecs-duel.html?' + q;
+            window.location.href = 'chess.html?story=1&lang=' + lang + '&theme=' + themeId + '&difficulty=' + diff;
         };
     }
 
@@ -4379,8 +4433,15 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         if (!it) return;
 
         var interroData = window.TDNarration && window.TDNarration.interrogations ? window.TDNarration.interrogations[it.id] : null;
-        var rounds = interroData ? scrInterroRounds(interroData) : [];
+        var rounds = scrInterroRoundsFor(it);
         var hasMoreQuestions = !it.questionsDone && (it.questionRound + 1 < rounds.length) && rounds[it.questionRound + 1] && rounds[it.questionRound + 1].length;
+
+        if ((it.finalInterrogation || (scrCurrentPhase() && scrCurrentPhase().id === 'act2_3')) && !it.questionsDone) {
+            scr.awaitingChoice = false;
+            $.choicesContainer.innerHTML = '';
+            scrShowInterroQuestions();
+            return;
+        }
 
         if (hasMoreQuestions) {
             scr.awaitingChoice = true;
@@ -4434,7 +4495,16 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         }
 
         if (minigameCfg) {
-            /* Tous les mini-jeux sont maintenant des pages standalone. */
+            /* Conserver l'introduction narrative du suspect pour la box de dialogue. */
+            minigameCfg.minigameIntro = interroData && interroData.minigameIntro ? interroData.minigameIntro : null;
+            /* Le duel de Vivienne possède une page narrative dédiée et un retour
+               spécifique : ne pas le traiter comme un mini-jeu overlay générique. */
+            if (minigameCfg.type === 'chess' && it.id === 'femme-fatale') {
+                scrChessRedirect(it, minigameCfg);
+                return;
+            }
+
+            /* Tous les autres mini-jeux sont maintenant des pages standalone. */
             var standaloneType = minigameCfg.type;
             var langParam = ui.language === 'en' ? 'en' : 'fr';
             var themeId = (typeof getThemeId === 'function' ? getThemeId() : null) || 'agatha-christie';
@@ -4509,7 +4579,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     function scrShowInterroQuestions() {
         var it = scr.interro;
         if (!it) { return; }
-        var rounds = scrInterroRounds(window.TDNarration.interrogations[it.id]);
+        var rounds = scrInterroRoundsFor(it);
         var qs = rounds[it.questionRound] || [];
         if (!qs.length) {
             scrEndInterrogation();
@@ -4564,7 +4634,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         var it = scr.interro;
         if (!it.answeredQuestions) { it.answeredQuestions = []; }
         it.answeredQuestions.push(q.id || q.label);
-        var rounds = scrInterroRounds(window.TDNarration.interrogations[it.id]);
+        var rounds = scrInterroRoundsFor(it);
         if (it.questionRound + 1 < rounds.length && rounds[it.questionRound + 1] && rounds[it.questionRound + 1].length) {
             it.questionRound++;
             scrShowInterroAskButton();
@@ -4640,7 +4710,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     // Tout autre emplacement (Acte 1, Acte 2, Révélation...) reste en interrogation simple.
     var MINIGAME_LOCATIONS = {
         'protecteur':    { phase: 'act2_3', pageIdx: 1 },  // Acte 2, Interrogatoires P2 : tir forain
-        'femme-fatale':  { phase: 'act1_1', pageIdx: 1 },  // Acte 1, Interrogatoires P2 : échecs
+        'femme-fatale':  { phase: 'act1_1', pageIdx: 4 },  // Acte 1, Interrogatoires P5 : échecs
         'seducteur':     { phase: 'act2_3', pageIdx: 3 },  // Acte 2, Interrogatoires P4 : jackpot
         'suspect':       { phase: 'act2_3', pageIdx: 5 },  // Acte 2, Interrogatoires P6 : connect4
         'marginal':      { phase: 'act1_2', pageIdx: 3 },  // Acte 1, Témoignages P4 : tour de cartes
@@ -4686,11 +4756,12 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             mgType = CYBERPUNK_RETRO_GAME_MAP[interroId];
         }
 
-        var cfg = {
+            var cfg = {
             type: mgType,
             act: act,
             clue: diff.clue,
             failClue: diff.failClue,
+            minigameIntro: interro.minigameIntro || null,
             dialogues: extractInterrogationDialogues(interro),
             interroId: interroId
         };
@@ -5010,6 +5081,44 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
     }
 
     function scrHandleMinigameResult(roundIndex, result) {
+        var it = scr.interro;
+        if (!it) return;
+
+        var won = result && result.won;
+        var cfgNow = scrGetMinigameRoundConfig(it.id, roundIndex) || {};
+        /* Le jeu renvoie l'indice ; sinon on utilise l'indice de la manche. */
+        var clueText = (result && result.clue) ? result.clue : (won
+            ? (itl(cfgNow.clue) || '')
+            : (itl(cfgNow.failClue) || ''));
+
+        if (clueText) {
+            var s = scrGetState();
+            if (!s.clues) s.clues = [];
+            if (s.clues.indexOf(clueText) === -1) s.clues.push(clueText);
+            if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
+                window.TDNarrativeEngine.addClue(clueText, 'dialogue');
+            }
+            showClueToast(clueText);
+            updateNotebook();
+        }
+
+        /* Laisser le suspect afficher sa réaction avant de fermer l'overlay. */
+        if (window.TDStoryChrome && window.TDStoryChrome.isActive && window.TDStoryChrome.isActive()) {
+            window.TDStoryChrome.trigger(won ? 'victory' : 'defeat', { text: clueText });
+            setTimeout(function () {
+                scrFinishMinigameOverlay();
+                it.minigameRound = roundIndex + 1;
+                scrEndInterrogation();
+            }, won ? 1800 : 1200);
+            return;
+        }
+
+        scrFinishMinigameOverlay();
+        it.minigameRound = roundIndex + 1;
+        scrEndInterrogation();
+    }
+
+    function scrFinishMinigameOverlay() {
         if (typeof window._interroSidebarCleanup === 'function') {
             window._interroSidebarCleanup();
             window._interroSidebarCleanup = null;
@@ -5033,30 +5142,6 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         if (TDAudioService && typeof TDAudioService.playThemeMusic === 'function') {
             TDAudioService.playThemeMusic(getThemeId());
         }
-
-        var it = scr.interro;
-        if (!it) return;
-
-        var won = result && result.won;
-        var cfgNow = scrGetMinigameRoundConfig(it.id, roundIndex);
-        /* Le duel standalone transmet son indice via result.clue (pont scenario). */
-        var clueText = (result && result.clue) ? result.clue : (won
-            ? (itl(cfgNow.clue) || '')
-            : (itl(cfgNow.failClue) || ''));
-
-        if (clueText) {
-            var s = scrGetState();
-            if (!s.clues) s.clues = [];
-            if (s.clues.indexOf(clueText) === -1) s.clues.push(clueText);
-            if (window.TDNarrativeEngine && typeof window.TDNarrativeEngine.addClue === 'function') {
-                window.TDNarrativeEngine.addClue(clueText, won ? 'dialogue' : 'dialogue');
-            }
-            showClueToast(clueText);
-            updateNotebook();
-        }
-
-        it.minigameRound = roundIndex + 1;
-        scrEndInterrogation();
     }
 
     function populateMinigameOverlayChrome(suspectId, dialogueText) {
@@ -5132,9 +5217,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 window._storyMinigameIframe = null;
             }
             window._minigameSkipHandler = null;
-            if ($.minigameOverlay) {
-                $.minigameOverlay.classList.add('hidden');
-            }
+            /* Laisser l'overlay narratif visible jusqu'à scrHandleMinigameResult. */
             scrHandleMinigameResult(roundIndex, result);
         }
         window._minigameSkipHandler = onMinigameDone;
@@ -5153,6 +5236,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             difficulty: roundCfg.difficulty,
             dialogues: roundCfg.dialogues,
             interroId: roundCfg.interroId,
+            minigameIntro: roundCfg.minigameIntro,
             storyMode: true
         };
         if (mgCfg.difficulty) applyDifficultyToCfg(mgCfg.type, mgCfg, mgCfg.difficulty);
@@ -5440,7 +5524,7 @@ function scrApplyChoice(choiceKey, choiceId) {
                 }
             });
         } else if (good) {
-            /* Fin 1 - Accusation juste : 3 pages (prison → QG extérieur → photo univers) */
+            /* Fin 1 - Accusation juste : 3 pages (prison → QG extérieur → île paradisiaque) */
             pages.push({
                 decor: 'prison', npc: truth.culprit,
                 text: {
@@ -5456,10 +5540,10 @@ function scrApplyChoice(choiceKey, choiceId) {
                 }
             });
             pages.push({
-                decor: 'sherlock', npc: null,
+                decor: 'exile', npc: null,
                 text: {
-                    fr: '<div class="ending-text">' + winTxt + ' ' + morale + '</div>',
-                    en: '<div class="ending-text">' + winTxt + ' ' + morale + '</div>'
+                    fr: '<div class="ending-text">Enfin la paix. Vous et Wexford vous offrez des vacances bien méritées sur une île paradisiaque. ' + morale + '</div>',
+                    en: '<div class="ending-text">Finally, peace. You and Wexford treat yourselves to a well-deserved vacation on a paradise island. ' + morale + '</div>'
                 }
             });
         } else if (evalResult.indirectConviction) {
@@ -5480,14 +5564,14 @@ function scrApplyChoice(choiceKey, choiceId) {
                 }
             });
             pages.push({
-                decor: 'sherlock', npc: null,
+                decor: 'exile', npc: null,
                 text: {
-                    fr: '<div class="ending-text">' + indirectTxt + ' ' + morale + '</div>',
-                    en: '<div class="ending-text">' + indirectTxt + ' ' + morale + '</div>'
+                    fr: '<div class="ending-text">Enfin la paix. Vous et Wexford vous offrez des vacances bien méritées sur une île paradisiaque. ' + morale + '</div>',
+                    en: '<div class="ending-text">Finally, peace. You and Wexford treat yourselves to a well-deserved vacation on a paradise island. ' + morale + '</div>'
                 }
             });
         } else {
-            /* Fin 2 - Accusation erronée : 3 pages (prison innocent → paradisiaque coupable → photo univers) */
+            /* Fin 2 - Accusation erronée : 3 pages (prison innocent → QG réprimande → paradisiaque coupable) */
             pages.push({
                 decor: 'prison', npc: s.accused,
                 text: {
@@ -5496,17 +5580,17 @@ function scrApplyChoice(choiceKey, choiceId) {
                 }
             });
             pages.push({
+                decor: 'qg', npc: 'detective-partner',
+                text: {
+                    fr: '<div class="ending-text">' + scrSubstituteNames('Votre partenaire vous fusille du regard. « Vous avez accusé un innocent. Le vrai coupable, ' + titleTxt + ', court toujours. »', themeId) + '</div>',
+                    en: '<div class="ending-text">' + scrSubstituteNames('Your partner glares at you. "You accused an innocent. The real culprit, ' + titleTxt + ', is still free."', themeId) + '</div>'
+                }
+            });
+            pages.push({
                 decor: 'exile', npc: truth.culprit,
                 text: {
                     fr: '<div class="ending-text">' + exileTxt + ' ' + titleTxt + ' vous nargue depuis l\'île paradisiaque. « Vous avez cru me coincer ? La justice des hommes est aussi faillible que votre raisonnement. »</div>',
                     en: '<div class="ending-text">' + exileTxt + ' ' + titleTxt + ' taunts you from the paradise island. "You thought you could corner me? Human justice is as fallible as your reasoning."</div>'
-                }
-            });
-            pages.push({
-                decor: 'sherlock', npc: null,
-                text: {
-                    fr: '<div class="ending-text">' + failTxt + ' ' + morale + '</div>',
-                    en: '<div class="ending-text">' + failTxt + ' ' + morale + '</div>'
                 }
             });
         }
