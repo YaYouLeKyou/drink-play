@@ -205,13 +205,13 @@
 
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
-            <span class="menu-icon">ðŸ </span>
+            <span class="menu-icon">🏠</span>
             <span>Menu principal</span>
         </button>
         <div class="sg-menu-divider"></div>
         <button class="sg-menu-item" id="menu-settings">
-            <span class="menu-icon">âš™</span>
-            <span>ParamÃ¨tres</span>
+            <span class="menu-icon">⚙</span>
+            <span>Paramètres</span>
         </button>
     </nav>
 
@@ -225,7 +225,7 @@
                         <button class="mode-btn" id="mode-pvp">2 Joueurs</button>
                     </div>
                 </div>
-                <div class="connect4-info" id="connect4-status">Tour : EnquÃªteur (Rouge)</div>
+                <div class="connect4-info" id="connect4-status">Tour : Enquêteur (Rouge)</div>
             </div>
             <div class="connect4-board" id="connect4-board"></div>
             <button class="connect4-btn" id="connect4-reset">Nouvelle partie</button>
@@ -247,6 +247,7 @@
             let currentPlayer = 'red'; // 'red' = Joueur 1, 'yellow' = Joueur 2 / IA
             let gameActive = true;
             let playAgainstAI = true;
+            let aiDialogueCount = 0;
 
             const boardEl = document.getElementById('connect4-board');
             const statusEl = document.getElementById('connect4-status');
@@ -258,7 +259,7 @@
                 board = Array(ROWS).fill(null).map(() => Array(COLS).fill(null));
                 gameActive = true;
                 currentPlayer = 'red';
-                statusEl.textContent = "Tour : EnquÃªteur (Rouge)";
+                statusEl.textContent = "Tour : Enquêteur (Rouge)";
                 renderBoard();
             }
 
@@ -283,7 +284,9 @@
                 if (playAgainstAI && currentPlayer === 'yellow') return; // Bloquer si c'est le tour de l'IA
 
                 if (makeMove(col)) {
+                    if (window.TDStoryChrome) window.TDStoryChrome.trigger('move', { value: 1 });
                     if (checkWin(currentPlayer)) {
+                        if (window.TDStoryChrome) window.TDStoryChrome.trigger('victory');
                         endGame(false); // Victoire joueur rouge
                         return;
                     }
@@ -297,7 +300,7 @@
                     updateStatus();
 
                     if (playAgainstAI && currentPlayer === 'yellow' && gameActive) {
-                        statusEl.textContent = "L'IA rÃ©flÃ©chit...";
+                        statusEl.textContent = "L'IA réfléchit...";
                         setTimeout(aiMove, 600);
                     }
                 }
@@ -323,11 +326,13 @@
                 
                 if (col !== null) {
                     board[getAvailableRow(col)][col] = 'yellow';
+                    if (window.TDStoryChrome) window.TDStoryChrome.trigger('aiMove', { value: ++aiDialogueCount });
                     playSfx('token_drop');
                     renderBoard();
 
                     if (checkWin('yellow')) {
-                        statusEl.textContent = "L'IA a gagnÃ© l'enquÃªte !";
+                        if (window.TDStoryChrome) window.TDStoryChrome.trigger('defeat');
+                        statusEl.textContent = "L'IA a gagné l'enquête !";
                         gameActive = false;
                         handleEndGame(false);
                         return;
@@ -374,7 +379,7 @@
 
             function updateStatus() {
                 if (currentPlayer === 'red') {
-                    statusEl.textContent = "Tour : EnquÃªteur (Rouge)";
+                    statusEl.textContent = "Tour : Enquêteur (Rouge)";
                 } else {
                     statusEl.textContent = playAgainstAI ? "Tour : IA (Jaune)" : "Tour : Adversaire (Jaune)";
                 }
@@ -475,6 +480,15 @@
 
             var backBtn = document.getElementById('back-to-minigame-btn');
             var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
+            var storyCfg = null;
+            try { storyCfg = JSON.parse(localStorage.getItem('td_standalone_game_config') || 'null'); } catch (e) {}
+            if (window.TDStoryChrome && storyCfg && fromStory) {
+                window.TDStoryChrome.initFromCfg(Object.assign({}, storyCfg, {
+                    type: 'connect4',
+                    storyMode: fromStory,
+                    lang: new URLSearchParams(window.location.search).get('lang') || 'fr'
+                }));
+            }
             
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
@@ -519,7 +533,7 @@
             if (menuSettings) {
                 menuSettings.addEventListener('click', function () {
                     if (menu) menu.classList.remove('open');
-                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('ParamÃ¨tres'); }
+                    if (window.DPSettings && window.DPSettings.open) { window.DPSettings.open(); } else { alert('Paramètres'); }
                 });
             }
 

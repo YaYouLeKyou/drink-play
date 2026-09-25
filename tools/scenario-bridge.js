@@ -72,7 +72,7 @@ function validate() {
     const docLower = doc.toLowerCase();
 
     /* 1. Chaque MINI-JEU `type` du doc existe dans l'app */
-    const re = /mini[-_\s]?jeu\s+`([a-z_]+)`/gi;
+    const re = /mini[-_\s]?jeu\s+`([a-z_-]+)`/gi;
     let m;
     const docTypes = new Set();
     while ((m = re.exec(doc)) !== null) docTypes.add(m[1]);

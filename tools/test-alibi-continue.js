@@ -111,10 +111,27 @@ async function newTestPage(browser) {
                 });
                 await page.goto(origin + '/true-detective/reseau-alibis-' + level + '.html');
                 await page.waitForSelector('.reseau-alibis-card');
-                await page.evaluate(() => {
-                    testConfig.testimonies.filter(c => c.isLie).forEach(c => {
-                        document.querySelector('[data-witness-id="' + c.id + '"]').click();
-                    });
+                await page.evaluate(async () => {
+                    const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+                    for (let guard = 0; guard < 25; guard++) {
+                        if (document.querySelector('.reseau-alibis-continue')) break;
+                        const cards = Array.from(document.querySelectorAll('.reseau-alibis-card'));
+                        if (cards.length !== 2 || !testConfig || !testConfig._alibiDraw) {
+                            await sleep(120);
+                            continue;
+                        }
+                        const ids = cards.map(el => el.dataset.witnessId).sort();
+                        const draw = (testConfig._alibiDraw || []).find(d => {
+                            const dIds = d.map(c => c.id).slice().sort();
+                            return dIds.length === 2 && dIds[0] === ids[0] && dIds[1] === ids[1];
+                        });
+                        const liar = draw && draw.find(c => c.isLie);
+                        if (liar) {
+                            const target = cards.find(el => el.dataset.witnessId === liar.id);
+                            if (target) target.click();
+                        }
+                        await sleep(1100);
+                    }
                 });
                 await page.waitForSelector('.reseau-alibis-continue', { visible: true });
                 const visible = await page.evaluate(() => {

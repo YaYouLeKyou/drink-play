@@ -325,6 +325,7 @@
                         ship.y = canvas.height / 2;
                         if (lives <= 0) {
                             gameOver = true;
+                             if (window.TDStoryChrome) window.TDStoryChrome.trigger('defeat', { value: score });
                             handleEndGame(false);
                         }
                     }

@@ -373,6 +373,7 @@
                     let survivingCities = cities.filter(c => c.alive).length;
                     if (survivingCities === 0) {
                         gameState = 'GAMEOVER';
+                        if (window.TDStoryChrome) window.TDStoryChrome.trigger('victory', { value: score });
                     } else {
                         wave++;
                         // Rechargement plus généreux entre chaque vague (+8 munitions)

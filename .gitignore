@@ -35,3 +35,13 @@ build/
 
 # Lock files for sub-projects (we use root package.json)
 drunkin-alienM-main/.package-lock.json
+
+# Plan local (non versionné)
+true-detective/PLAN-mix-minijeux.md
+
+# Temporary/artifact files
+tools/tmp-*
+tools/audit-*
+tools/*.bak
+true-detective/*.bak
+tmp_diff_*.txt

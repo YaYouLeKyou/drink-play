@@ -920,10 +920,23 @@
     function initFromCfg(cfg, extra) {
         cfg = cfg || {};
         extra = extra || {};
+        var configuredLines = cfg.lines || cfg.storyLines;
+        /* Les jeux anciens ne fournissent pas toujours les événements de fin.
+           On crée donc une ligne de victoire/défaite à partir de leur indice,
+           afin que le suspect révèle toujours la bonne récompense. */
+        var resultLines = normalizeLines(configuredLines);
+        var winClue = cfg.clue || cfg.clueWin;
+        var loseClue = cfg.failClue || cfg.clueLose;
+        if (winClue && !resultLines.some(function (line) { return line.on === 'victory'; })) {
+            resultLines.push({ on: 'victory', at: null, text: winClue });
+        }
+        if (loseClue && !resultLines.some(function (line) { return line.on === 'defeat'; })) {
+            resultLines.push({ on: 'defeat', at: null, text: loseClue });
+        }
         var opts = {
             suspectId: cfg.interroId,
             decorKey: cfg.decorKey,
-            lines: cfg.lines || cfg.storyLines,
+            lines: resultLines,
             fallback: cfg.dialogues,
             story: cfg.storyMode === true || cfg.story === true,
             gameType: cfg.type,

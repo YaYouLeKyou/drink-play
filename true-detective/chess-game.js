@@ -796,6 +796,11 @@
 
         var wrappedOnDone = function (result) {
             if (characterPresence) characterPresence.destroy();
+            if (window.TDStoryChrome && window.TDStoryChrome.isActive && window.TDStoryChrome.isActive()) {
+                window.TDStoryChrome.trigger(result && result.won ? 'victory' : 'defeat', {
+                    text: result && result.clue ? result.clue : ''
+                });
+            }
             if (onDone) onDone(result);
         };
 

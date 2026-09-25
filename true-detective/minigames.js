@@ -789,7 +789,7 @@
             /* Pool de duels (TDAlibiDuels), sinon repli rétrocompatible
                sur l'ancien format `testimonies` : chaque mensonge est
                apparié avec une vérité pour former des duels. */
-            if (!cfg.duels && cfg.alibiPool && global.TDAlibiDuels && global.TDAlibiDuels.resolve) {
+            if (global.TDAlibiDuels && global.TDAlibiDuels.resolve) {
                 global.TDAlibiDuels.resolve(cfg);
             }
             var rawDuels = (cfg.duels && cfg.duels.length) ? cfg.duels : null;

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>True Detective - Réseau d'Alibis (4 cartes)</title>
+    <title>True Detective - Réseau d'Alibis (Duels croisés)</title>
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
@@ -151,7 +151,7 @@
 <body>
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
-        <h2 class="sg-title" style="color:#f0d890;font-family:'Playfair Display',serif;">🕸️ Réseau d'alibis - 4 cartes</h2>
+        <h2 class="sg-title" style="color:#f0d890;font-family:'Playfair Display',serif;">🕸️ Réseau d'alibis — Duels croisés</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
 
@@ -175,6 +175,7 @@
         </div>
     </main>
 
+    <script src="alibi-duels.js"></script>
     <script src="minigames.js"></script>
     <script src="alibi-navigation.js"></script>
     <script src="sfx.js"></script>
@@ -272,22 +273,15 @@
                 });
             }
 
-var testimonies = [
-    {"witness":{"en":"Major Hale","fr":"Major Hale"},"id":"hale","statement":{"en":"I was broken down with Pembrooke at 10pm. The manor lock was opened with a key, not forced. The victim didn't resist.","fr":"J'étais en panne avec Pembrooke à 22h. Le verrou du manoir a été ouvert avec une clé, pas forcé. La victime n'a pas opposé de résistance."}, "isLie":false},
-    {"witness":{"en":"Lady Vivienne","fr":"Lady Vivienne"},"id":"vivienne","statement":{"en":"I was at the theatre with friends, then alone at the manor. My husband and I had a relationship based on money, not love, I had no reason to kill him.","fr":"J'étais au théâtre avec des amies, puis seule au manoir. Mon mari et moi avions une relation basée sur l'argent, pas l'amour, je n'avais aucune raison de le tuer."}, "isLie":true},
-    {"witness":{"en":"Silas Crane","fr":"Silas Crane"},"id":"silas","statement":{"en":"I saw a prowler at 10pm near the pavilion, gold watch, nervous. And I saw Blackwood pass at 8pm, the notary has always been straight.","fr":"J'ai vu un rôdeur à 22h près du pavillon, montre en or, nerveux. Et j'ai vu Blackwood passer à 20h, le notaire a toujours été réglo."}, "isLie":false},
-    {"witness":{"en":"Victor Krane","fr":"Victor Krane"},"id":"krane","statement":{"en":"The Duke hired me for an elimination, but not against Pembrooke. I was somewhere else that night. Silas saw what he wanted to see.","fr":"Le Duc m'a engagé pour une élimination, mais pas contre Pembrooke. J'étais ailleurs cette nuit-là. Silas a vu ce qu'il voulait voir."}, "isLie":true}
-];
-
 var cfg = {
     type: 'reseau_alibis',
     difficulty: 'medium',
     time: 60,
     evidence: 'witness',
-    title: { fr: 'Le Réseau d\'alibis — 4 cartes', en: 'The Alibi Network — 4 cards' },
-    desc: { fr: 'Quatre dépositions, deux se contredisent frontalement. Servez-vous de ce que vous avez appris lors des interrogatoires précédents. Cliquez sur chaque carte : Mensonge ou Vérité. Identifiez les menteurs.', en: 'Four testimonies, two openly contradict each other. Use what you learned in previous interrogations. Click each card : Lie or Truth. Identify the liars.' },
-    clue: { fr: 'Deux menteurs démasqués : Vivienne prétend qu\'aucune dette n\'existait et que le testament n\'a jamais été modifié, alors que Hale confirme les faits ; Krane nie sa présence sur les lieux alors que Silas confirme avoir vu un rôdeur.', en: 'Two liars exposed: Vivienne claims no debts existed and the will was never amended, while Hale confirms the facts; Krane denies his presence on scene while Silas confirms seeing a prowler.' },
-    testimonies: testimonies,
+    alibiPool: 'act1_2',
+    title: { fr: 'Le Réseau d\'alibis — Duels croisés', en: 'The Alibi Network — Crossed Duels' },
+    desc: { fr: 'Deux manches, deux duels tirés au sort. Une carte ment à chaque fois — démasquez-la.', en: 'Two rounds, two randomly drawn duels. One card lies each time — unmask it.' },
+    clue: { fr: 'Silas dit vrai sur le rôdeur, Blackwood a bien quitté le manoir à 20h — et l\'alibi de Hale recouvre exactement 22h09.', en: 'Silas tells the truth about the prowler, Blackwood did leave the manor at 8pm — and Hale\'s alibi covers exactly 10:09pm.' },
     lang: 'fr'
 };
             

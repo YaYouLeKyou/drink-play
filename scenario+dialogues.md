@@ -219,10 +219,10 @@ Chaque exécution crée un backup horodaté de `phases.js`/`scenario.js` (jamais
 
 | Puzzle | Phase | Type | Mécanique | Asset utilisé | Récompense |
 |---|---|---|---|---|---|
-| Réseau d'Alibis 1 | 1A (3/4) | `reseau_alibis` | Identifier le mensonge parmi 2 dépositions | aucun | Point d'entrée dans le réseau |
-| Réseau d'Alibis 2 | 2A (1/3) | `reseau_alibis` | Identifier 2 menteurs parmi 4 dépositions croisées | aucun | La victime devait de l'argent à Krane |
-| Réseau d'Alibis 3 | 2A (3/3) | `reseau_alibis` | Identifier 3 menteurs parmi 6 dépositions croisées | aucun | Chacun a une raison légitime, le coffre est la clé |
-| Réseau d'Alibis 4 | 2C (6/6) | `reseau_alibis` | Réseau final : 6 dépositions post-interrogatoires | aucun | Confusion ADN, coffre = vérité |
+| Réseau d'Alibis 1 | 1A (3/4) | `reseau_alibis` | Duel : 2 cartes (1 menteur), 1 manche tirée de 3 paires (`act1_1`) | aucun | Point d'entrée dans le réseau |
+| Réseau d'Alibis 2 | 2A (1/3) | `reseau_alibis` | Duels croisés : 2 manches × 2 cartes tirées de 4 paires (`act1_2`) | aucun | Silas dit vrai, Blackwood 20h, alibi Hale = 22h09 |
+| Réseau d'Alibis 3 | 2A (3/3) | `reseau_alibis` | Duels du bar : 3 manches × 2 cartes tirées de 5 paires (`act2_1`) | aucun | Reçus V.K. + dettes du Duc contre les dénégations |
+| Réseau d'Alibis 4 | 2C (6/6) | `reseau_alibis` | Duels finaux : 3 manches × 2 cartes tirées de 5 paires (`act2_3`) | aucun | ADN, coffre = vérité, clés du Major |
 | Carnet déchiré | 1B | `carnet_dechire` | Reconstituer 4 bandes + loupe pour empreintes | `prescription-eliane.png` | Mobile financier + empreintes |
 | Cryptogramme | 2 (bar) | `cryptogramme` | Substitution de César à décoder | `krane-coded-note.png.jfif` | Confirme Duc→Krane, Hale orchestrateur |
 | Câblage alarme | 3B (labo) | `cablage_alarme` | SVG : pivoter segments pour boucle intacte | `alarm-circuit-blueprint.png.jfif` | Intrusion non forcée |
@@ -238,7 +238,7 @@ Chaque puzzle respecte l'architecture existante (fabrique dans `minigames.js`, `
 - [x] **Réactions d'accusation** — 5 innocents avec réaction unique indiquant l'indice manqué. ✅
 - [x] **Heure du crime reconstruisable** — montre (raccourci) OU croisement Silas + verrou + horloge-mère. ✅
 - [x] **4 mini-puzzles logiques** — Carnet, Cryptogramme, Câblage, Roue. ✅
-- [x] **4 Réseaux d'Alibis** — 2 cartes (act1_1), 4 cartes (act2_1), 6 cartes (act2_1 + act2_3), 6 cartes final. ✅
+- [x] **4 Réseaux d'Alibis** — duels de 2 cartes (1 menteur) tirés au sort depuis `alibi-duels.js` : `act1_1` (1 manche/3 paires), `act1_2` (2/4), `act2_1` (3/5), `act2_3` (3/5). ✅
 - [x] **Intégration prescription-eliane** — reconstitution page + empreintes à la loupe. ✅
 - [ ] Textes détaillés par zone zoomée de la fouille (à fournir ultérieurement).
 - [ ] Variante du twist si le joueur n'a PAS relevé 22h09 (Wexford le déduit plus difficilement).

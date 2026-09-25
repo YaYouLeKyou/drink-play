@@ -392,6 +392,7 @@
                 }
                 if (dotsLeft === 0) {
                     gameState = 'WIN';
+                    if (window.TDStoryChrome) window.TDStoryChrome.trigger('victory', { value: score });
                     try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'pacman', won: true, ts: Date.now() })); } catch (e) {}
                 }
 
@@ -430,6 +431,7 @@
                             document.getElementById('lives-val').textContent = lives;
                             if (lives <= 0) {
                                 gameState = 'GAMEOVER';
+                                if (window.TDStoryChrome) window.TDStoryChrome.trigger('defeat', { value: score });
                             } else {
                                 resetPositions();
                             }

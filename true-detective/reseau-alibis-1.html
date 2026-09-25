@@ -145,7 +145,7 @@
 <body>
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
-        <h2 class="sg-title" style="color:#f0d890;font-family:'Playfair Display',serif;">🕸️ Réseau d'alibis</h2>
+        <h2 class="sg-title" style="color:#f0d890;font-family:'Playfair Display',serif;">🕸️ Réseau d'alibis — Duel</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
 
@@ -171,6 +171,7 @@
     </main>
 
 
+    <script src="alibi-duels.js"></script>
     <script src="minigames.js"></script>
     <script src="alibi-navigation.js"></script>
     <script src="sfx.js"></script>
@@ -270,20 +271,15 @@
             }
 
             // Lancement sécurisé du jeu
-            var testimonies = [
-                {"witness":{"en":"Major Hale","fr":"Major Hale"},"id":"hale","statement":{"en":"I was broken down with Pembrooke at 10pm. The manor lock was opened with a key, not forced. The victim didn't resist.","fr":"J'étais en panne avec Pembrooke à 22h. Le verrou du manoir a été ouvert avec une clé, pas forcé. La victime n'a pas opposé de résistance."}, "isLie":false},
-                {"witness":{"en":"Lady Vivienne","fr":"Lady Vivienne"},"id":"vivienne","statement":{"en":"I was at the theatre with friends, then alone at the manor. My husband and I had a relationship based on money, not love, I had no reason to kill him.","fr":"J'étais au théâtre avec des amies, puis seule au manoir. Mon mari et moi avions une relation basée sur l'argent, pas l'amour, je n'avais aucune raison de le tuer."}, "isLie":true}
-            ];
-            
-             var cfg = {
+            var cfg = {
                 type: 'reseau_alibis',
                 difficulty: 'easy',
                 time: 60,
                 evidence: 'witness',
-                title: { fr: 'Le Réseau d\'alibis — 2 cartes', en: 'The Alibi Network — 2 cards' },
-                desc: { fr: 'Deux dépositions se contredisent déjà. Cliquez sur chaque carte : Mensonge ou Vérité. Identifiez le menteur.', en: 'Two testimonies already contradict each other. Click each card : Lie or Truth. Identify the liar.' },
-                clue: { fr: 'Le réseau des deux premiers témoins révèle une contradiction : l\'un ment sur sa présence sur les lieux.', en: 'The network of the first two witnesses reveals a contradiction: one lies about being on scene.' },
-                testimonies: testimonies,
+                alibiPool: 'act1_1',
+                title: { fr: 'Le Réseau d\'alibis — Duel', en: 'The Alibi Network — Duel' },
+                desc: { fr: 'Un duo de dépositions par manche : deux cartes, un seul menteur. Cliquez sur le MENTEUR.', en: 'One duo of testimonies per round: two cards, only one liar. Click the LIAR.' },
+                clue: { fr: 'Le réseau s\'ouvre : la panne de Hale et le verrou ouvert à la clé sont les premières failles.', en: 'The network opens up: Hale\'s breakdown and the key-opened lock are the first cracks.' },
                 lang: 'fr'
             };
             

@@ -178,6 +178,7 @@
         }
 
         var self = this;
+        if (window.TDStoryChrome) window.TDStoryChrome.trigger('move', { value: 1 });
         setTimeout(function () {
             self.aiMove();
         }, 600);
@@ -345,7 +346,14 @@
             }
             var self = this;
             setTimeout(function () {
-                if (self.onComplete) self.onComplete(true);
+                if (self.onComplete) {
+                    if (window.TDStoryChrome) {
+                        window.TDStoryChrome.trigger('victory', {
+                            text: self.cfg && (self.cfg.clue || self.cfg.clueWin) || ''
+                        });
+                    }
+                    self.onComplete(true, self.cfg && (self.cfg.clue || self.cfg.clueWin) || '');
+                }
             }, 1200);
         } else {
             if (this.statusEl) {
@@ -356,7 +364,14 @@
             }
             var self = this;
             setTimeout(function () {
-                if (self.onComplete) self.onComplete(false);
+                if (self.onComplete) {
+                    if (window.TDStoryChrome) {
+                        window.TDStoryChrome.trigger('defeat', {
+                            text: self.cfg && (self.cfg.failClue || self.cfg.clueLose) || ''
+                        });
+                    }
+                    self.onComplete(false, self.cfg && (self.cfg.failClue || self.cfg.clueLose) || '');
+                }
             }, 1400);
         }
     };
@@ -382,7 +397,14 @@
         }
         var self = this;
         setTimeout(function () {
-            if (self.onComplete) self.onComplete(false);
+            if (self.onComplete) {
+                if (window.TDStoryChrome) {
+                    window.TDStoryChrome.trigger('defeat', {
+                        text: self.cfg && (self.cfg.failClue || self.cfg.clueLose) || ''
+                    });
+                }
+                self.onComplete(false, self.cfg && (self.cfg.failClue || self.cfg.clueLose) || '');
+            }
         }, 1200);
     };
 
@@ -404,8 +426,8 @@
             lang: lang || 'fr',
             difficulty: cfg ? cfg.difficulty : 'medium',
             cfg: cfg || null,
-            onComplete: function (won) {
-                if (onDone) onDone({ won: won });
+            onComplete: function (won, clue) {
+                if (onDone) onDone({ won: won, clue: clue || '' });
             }
         });
         return game;

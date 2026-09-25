@@ -302,22 +302,16 @@
             }
 
             function handleContinueNavigation() {
-                try { 
-                    localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'chess', won: chessWon, ts: Date.now() })); 
-                } catch (e) {}
-                
                 try {
-                    var returnRaw = localStorage.getItem('td_standalone_game_return');
-                    if (returnRaw) {
-                        var rp = JSON.parse(returnRaw);
-                        if (rp && rp.returnUrl) {
-                            window.location.href = rp.returnUrl;
-                            return;
-                        }
-                    }
+                    localStorage.setItem('td_echecs_duel_result', JSON.stringify({
+                        won: chessWon,
+                        ts: Date.now()
+                    }));
                 } catch (e) {}
-                
-                window.location.href = fromStory ? '../true-detective/index.html?standalone=chess' : '../true-detective/index.html#minigames';
+
+                window.location.href = fromStory
+                    ? '../true-detective/index.html?chess=' + (chessWon ? 'won' : 'lost')
+                    : '../true-detective/index.html#minigames';
             }
 
             if ($continueBtn) {
@@ -357,13 +351,19 @@
                 });
             }
 
+            var savedCfg = null;
+            try { savedCfg = JSON.parse(localStorage.getItem('td_echecs_duel_cfg') || 'null'); } catch (e) {}
             var cfg = {
                 type: 'chess',
                 time: 90,
                 evidence: 'psychological',
+                storyMode: fromStory,
+                interroId: savedCfg && savedCfg.interroId ? savedCfg.interroId : 'femme-fatale',
+                minigameIntro: savedCfg && savedCfg.minigameIntro ? savedCfg.minigameIntro : null,
+                clue: savedCfg && savedCfg.clueWin ? savedCfg.clueWin : { fr: "Vivienne montre une nervosité inhabituelle.", en: "Vivienne shows unusual nervousness." },
+                failClue: savedCfg && savedCfg.clueLose ? savedCfg.clueLose : { fr: "Vivienne refuse de répondre.", en: "Vivienne refuses to answer." },
                 title: { fr: 'Échec Fatale', en: 'Fatal Chess' },
-                desc: { fr: 'Gagnez la partie d\'échecs.', en: 'Win the chess game.' },
-                clue: { fr: "Vivienne montre une nervosité inhabituelle.", en: "Vivienne shows unusual nervousness." }
+                desc: { fr: 'Gagnez la partie d\'échecs.', en: 'Win the chess game.' }
             };
 
             var chessWon = false;

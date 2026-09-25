@@ -268,6 +268,9 @@
 
         function triggerGameOver(won) {
             gameOver = true;
+            if (window.TDStoryChrome) {
+                window.TDStoryChrome.trigger(won ? 'victory' : 'defeat', { value: score });
+            }
             setTimeout(function () {
                 try {
                     localStorage.setItem('td_standalone_game_result', JSON.stringify({ 

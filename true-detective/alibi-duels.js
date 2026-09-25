@@ -231,12 +231,17 @@
         return POOLS[poolId] || null;
     }
 
-    /* Injecte le pool dans la cfg du mini-jeu (idempotent). */
+    /* Injecte le pool dans la cfg du mini-jeu. La source de vérité est
+       toujours alibiPool : une ancienne valeur cfg.duels ne doit jamais
+       faire revenir les cartes d'un autre réseau. */
     function resolve(cfg) {
-        if (cfg && !cfg.duels && cfg.alibiPool && POOLS[cfg.alibiPool]) {
-            cfg.duels = POOLS[cfg.alibiPool].pairs;
-            cfg.rounds = POOLS[cfg.alibiPool].rounds;
-        }
+        if (!cfg || !cfg.alibiPool || !POOLS[cfg.alibiPool]) return cfg;
+        var pool = POOLS[cfg.alibiPool];
+        cfg.duels = pool.pairs.map(function (duel) {
+            return duel.slice();
+        });
+        cfg.rounds = pool.rounds;
+        cfg._alibiPool = cfg.alibiPool;
         return cfg;
     }
 

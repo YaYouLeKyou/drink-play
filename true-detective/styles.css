@@ -3383,6 +3383,38 @@ html {
 
 /* ===== Responsive ===== */
 
+@media (min-width: 769px) and (max-width: 1199px) {
+    #game-screen .dialogue-container {
+        top: 70px;
+        bottom: auto;
+        height: auto;
+        max-height: none;
+        overflow: visible;
+        max-width: 860px;
+        margin-left: calc(50% - 430px);
+        margin-right: calc(50% - 430px);
+        padding: 12px 18px;
+    }
+
+    #game-screen .dialogue-box {
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        padding: 20px 26px;
+        overflow: visible;
+        flex: 0 0 auto;
+    }
+
+    #game-screen .dialogue-text {
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+}
+
+
 @media (max-width: 1024px) {
     .dialogue-container {
         max-width: 100%;

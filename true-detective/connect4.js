@@ -193,7 +193,7 @@
             }
 
             currentPlayer = AI;
-            if ($status) $status.textContent = lang === 'fr' ? 'Tour: IA...' : 'Turn: AI...';
+            if ($status) $status.textContent = lang === 'fr' ? 'Tour : IA...' : 'Turn: AI...';
 
             setTimeout(function () {
                 if (gameOver) return;
@@ -236,7 +236,7 @@
                 }
 
                 currentPlayer = PLAYER;
-                if ($status) $status.textContent = lang === 'fr' ? 'Tour: Rouge' : 'Turn: Red';
+                if ($status) $status.textContent = lang === 'fr' ? 'Tour : Rouge' : 'Turn: Red';
             }, 500);
         }
 
@@ -252,7 +252,7 @@
                 currentPlayer = PLAYER;
                 gameOver = false;
                 moves = 0;
-                if ($status) $status.textContent = lang === 'fr' ? 'Tour: Rouge' : 'Turn: Red';
+                if ($status) $status.textContent = lang === 'fr' ? 'Tour : Rouge' : 'Turn: Red';
                 render();
             });
         }

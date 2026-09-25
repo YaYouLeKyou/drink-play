@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>True Detective - reseau-alibis-3.html</title>
+    <title>True Detective - Réseau d'Alibis (Duels du bar)</title>
     <link rel="icon" href="../icon/Logo%20d%26p.png">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Special+Elite&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="standalone-game.css">
@@ -130,7 +130,7 @@
 <body>
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
-        <h2 class="sg-title" style="color:#f0d890;font-family:'Playfair Display',serif;">🕸️ Réseau d'alibis - 6 cartes</h2>
+        <h2 class="sg-title" style="color:#f0d890;font-family:'Playfair Display',serif;">🕸️ Réseau d'alibis — Duels du bar</h2>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
 
@@ -154,6 +154,7 @@
         </div>
     </main>
 
+    <script src="alibi-duels.js"></script>
     <script src="minigames.js"></script>
     <script src="alibi-navigation.js"></script>
     <script src="sfx.js"></script>
@@ -251,24 +252,15 @@
                 });
             }
 
-var testimonies = [
-    {"witness":{"en":"Major Hale","fr":"Major Hale"},"id":"hale","statement":{"en":"I was broken down with Pembrooke at 10pm. The manor lock was opened with a key, not forced. The victim didn't resist. I handled the weapon to check security.","fr":"J'étais en panne avec Pembrooke à 22h. Le verrou du manoir a été ouvert avec une clé, pas forcé. La victime n'a pas opposé de résistance. J'ai manié l'arme pour vérifier la sécurité."}, "isLie":true},
-    {"witness":{"en":"Lady Vivienne","fr":"Lady Vivienne"},"id":"vivienne","statement":{"en":"I was at the theatre with friends, then alone at the manor. My husband and I had a relationship based on money, not love, I had no reason to kill him.","fr":"J'étais au théâtre avec des amies, puis seule au manoir. Mon mari et moi avions une relation basée sur l'argent, pas l'amour, je n'avais aucune raison de le tuer."}, "isLie":true},
-    {"witness":{"en":"Julian Pembrooke","fr":"Julian Pembrooke"},"id":"pembrooke","statement":{"en":"My car broke down, Hale joined me at 10pm. I was ALONE waiting, no prowler passed near the manor that night.","fr":"Ma voiture est tombée en panne, Hale m'a rejoint à 22h. J'étais SEUL à attendre, aucun rôdeur n'est passé près du manoir cette nuit-là."}, "isLie":true},
-    {"witness":{"en":"Rupert Blackwood","fr":"Rupert Blackwood"},"id":"blackwood","statement":{"en":"I dined with the Duke at 7pm, he wanted to withdraw funds. I left around 8pm, Silas saw me pass the gate. The will matters little to me, it's the heir that matters.","fr":"J'ai dîné avec le Duc à 19h, il voulait retirer des fonds. Je suis parti vers 20h, Silas m'a vu passer au portail. Le testament m'importe peu, c'est l'héritier qui compte."}, "isLie":false},
-    {"witness":{"en":"Silas Crane","fr":"Silas Crane"},"id":"silas","statement":{"en":"I saw a prowler at 10pm near the pavilion, gold watch, nervous. And I saw Blackwood pass at 8pm, the notary has always been straight.","fr":"J'ai vu un rôdeur à 22h près du pavillon, montre en or, nerveux. Et j'ai vu Blackwood passer à 20h, le notaire a toujours été réglo."}, "isLie":false},
-    {"witness":{"en":"Victor Krane","fr":"Victor Krane"},"id":"krane","statement":{"en":"For whoever pays. That night, I was alone. The homeless make up anything, especially that Silas, a vagrant with a murky past.","fr":"Pour qui paye. Cette nuit-là, j'étais seul. Les clochards racontent n'importe quoi, surtout ce Silas, un vagabond au passé trouble."}, "isLie":true}
-];
-            
-            var cfg = {
+var cfg = {
                 type: 'reseau_alibis',
                 difficulty: 'hard',
                 time: 60,
                 evidence: 'witness',
-                title: { fr: 'Le Réseau d\'alibis — 6 cartes', en: 'The Alibi Network — 6 cards' },
-                desc: { fr: 'Six dépositions. Toutes se répondent ou se contredisent. Cliquez sur chaque carte : Mensonge ou Vérité. Identifiez les menteurs.', en: 'Six testimonies. They all answer or contradict each other. Click each card : Lie or Truth. Identify the liars.' },
-                clue: { fr: 'Le réseau complet révèle trois menteurs (Vivienne + Pembrooke + Krane) qui se couvrent mutuellement. Le Duc a engagé Krane pour tuer Pembrooke, mais l\'arme a tué le maître.', en: 'The complete network reveals three liars (Vivienne + Pembrooke + Krane) who cover for each other. The Duke hired Krane to kill Pembrooke, but the weapon killed the master.' },
-                testimonies: testimonies,
+                alibiPool: 'act2_1',
+                title: { fr: 'Le Réseau d\'alibis — Duels du bar', en: 'The Alibi Network — Bar Duels' },
+                desc: { fr: 'Trois duels tirés au sort parmi les dépositions du bar. À chaque manche, trouvez le menteur.', en: 'Three randomly drawn duels from the bar testimonies. Find the liar each round.' },
+                clue: { fr: 'Les duels du bar scellent les contradictions : Pembrooke nie le rôdeur, Krane nie sa présence, mais les reçus V.K. disent le contraire.', en: 'The bar duels seal the contradictions: Pembrooke denies the prowler, Krane denies his presence, but the V.K. receipts say otherwise.' },
                 lang: 'fr'
             };
             

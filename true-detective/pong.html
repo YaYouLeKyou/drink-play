@@ -360,6 +360,7 @@
                 if (player.score >= winningScore || ai.score >= winningScore) {
                     gameOver = true;
                     var won = player.score > ai.score;
+                    if (window.TDStoryChrome) window.TDStoryChrome.trigger(won ? 'victory' : 'defeat', { value: player.score });
                     
                     if (instructionsEl) {
                         instructionsEl.innerHTML = won ? 
