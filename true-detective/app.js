@@ -4221,7 +4221,10 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.continueBtn.onclick = function () {
             $.continueBtn.disabled = true;
             if (standaloneType) {
-                window.location.href = getMinigameStandaloneUrl(standaloneType, diff, langParam, 'story', getThemeId());
+                /* On transmet le pool de duels de la page de scenario pour que
+                   la page standalone charge le bon contenu (act1_1, act1_2,
+                   act2_1, act2_3) au lieu de son pool par defaut. */
+                window.location.href = getMinigameStandaloneUrl(standaloneType, mgCfg.difficulty || diff, langParam, 'story', getThemeId(), mgCfg.alibiPool);
             } else {
                 scrLaunchMinigame(page);
             }
@@ -4556,7 +4559,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                     $.continueBtn.textContent = getText('continue') || 'Continuer';
                     $.continueBtn.onclick = function () {
                         $.continueBtn.disabled = true;
-                        window.location.href = getMinigameStandaloneUrl(standaloneType, diff, langParam, 'story', getThemeId());
+                        window.location.href = getMinigameStandaloneUrl(standaloneType, diff, langParam, 'story', getThemeId(), minigameCfg.alibiPool);
                     };
                 });
             } else {
@@ -4568,7 +4571,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 $.continueBtn.disabled = false;
                 $.continueBtn.textContent = getText('continue') || 'Continuer';
                 $.continueBtn.onclick = function () {
-                    window.location.href = getMinigameStandaloneUrl(standaloneType, diff, langParam, 'story', getThemeId());
+                    window.location.href = getMinigameStandaloneUrl(standaloneType, diff, langParam, 'story', getThemeId(), minigameCfg.alibiPool);
                 };
             }
             return;
@@ -4878,7 +4881,22 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         return cfg;
     }
 
-      function getMinigameStandaloneUrl(type, diff, lang, mode, themeId) {
+      /* Normalise une difficulte de mini-jeu vers un niveau 1..4.
+        Les appelants utilisent deux formes : une chaine ('easy', 'medium',
+        'hard', 'extreme') pour les pages de scenario, et un index numerique
+        1..4 pour la selection manuelle. Les deux doivent aboutir au meme
+        choix de page, sinon la scene jouait toujours le niveau 1. */
+    function normalizeMinigameDifficulty(diff) {
+        var byName = { easy: 1, medium: 2, hard: 3, extreme: 4 };
+        if (typeof diff === 'string' && byName[diff.toLowerCase()]) {
+            return byName[diff.toLowerCase()];
+        }
+        var n = parseInt(diff, 10);
+        if (!isNaN(n) && n >= 1 && n <= 4) return n;
+        return 1;
+    }
+
+     function getMinigameStandaloneUrl(type, diff, lang, mode, themeId, alibiPool) {
           var standalonePages = {
               'marginal-tower': 'marginal-tower.html',
               'memory': 'memory.html',
@@ -4907,13 +4925,20 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
          }
 
           if (type === 'reseau_alibis') {
-              var page = 'reseau-alibis-1.html';
-              if (diff === 'medium') page = 'reseau-alibis-2.html';
-              else if (diff === 'hard') page = 'reseau-alibis-3.html';
-              else if (diff === 'extreme') page = 'reseau-alibis-4.html';
-              var url = page + '?difficulty=' + diff + '&lang=' + lang + '&theme=' + encodeURIComponent(themeId || getThemeId()) + (mode === 'story' ? '&story=1' : '');
-              if (mgCfg && mgCfg.alibiPool) url += '&alibiPool=' + encodeURIComponent(mgCfg.alibiPool);
-              return url;
+              /* La difficulte arrive soit en chaine ('easy'..'extreme', cas
+                 scenario), soit en index numerique 1..4 (cas selection) :
+                 on normalise avant de choisir la page. */
+              var level = normalizeMinigameDifficulty(diff);
+              var page = 'reseau-alibis-' + level + '.html';
+              /* `alibiUrl` (et non `url`) : la variable `url` de la branche
+                 ci-dessus est propre a cette fonction, on evite de la
+                 reutiliser pour ne pas dependre de l'ordre des branches. */
+              var alibiUrl = page + '?difficulty=' + diff + '&lang=' + lang + '&theme=' + encodeURIComponent(themeId || getThemeId()) + (mode === 'story' ? '&story=1' : '');
+              /* Le pool de duels vient de la page de scenario : sans lui, la
+                 page standalone retombait sur son pool par defaut et la
+                 scene jouait le mauvais contenu. */
+              if (alibiPool) alibiUrl += '&alibiPool=' + encodeURIComponent(alibiPool);
+              return alibiUrl;
           }
 
          if (['pong', 'pacman', 'space-invaders', 'breakout', 'asteroids', 'missile-command'].indexOf(type) >= 0) {
@@ -5249,6 +5274,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             failClue: roundCfg.failClue,
             act: roundCfg.act,
             difficulty: roundCfg.difficulty,
+            alibiPool: roundCfg.alibiPool,
             dialogues: roundCfg.dialogues,
             interroId: roundCfg.interroId,
             minigameIntro: roundCfg.minigameIntro,
@@ -5270,7 +5296,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                la bataille navale finale a un suspect DYNAMIQUE (PLAN §4.2). */
             var IFRAME_STANDALONE_TYPES = ['reseau_alibis', 'chemistry', 'jackpot', 'bataille-navale', 'marginal-tower', 'missile-command', 'space-invaders'];
             if (IFRAME_STANDALONE_TYPES.indexOf(roundCfg.type) !== -1) {
-                var standaloneUrl = getMinigameStandaloneUrl(roundCfg.type, mgCfg.difficulty || 'medium', ui.language, 'story', getThemeId());
+                var standaloneUrl = getMinigameStandaloneUrl(roundCfg.type, mgCfg.difficulty || 'medium', ui.language, 'story', getThemeId(), roundCfg.alibiPool || mgCfg.alibiPool);
                 if (roundCfg.interroId) standaloneUrl += '&interroId=' + encodeURIComponent(roundCfg.interroId);
                 var iframe = document.createElement('iframe');
                 iframe.src = standaloneUrl;

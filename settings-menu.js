@@ -7,6 +7,10 @@
     let panel = null, backdrop = null, btn = null;
     let cfg = {};
 
+    /* En dessous de cette largeur libre, on ne tente plus de mettre le bouton
+       Continue à côté du ⚙ mais en dessous (écrans étroits / paysage). */
+    var MIN_CONTINUE_WIDTH = 120;
+
     /* Résolution du conteneur d'accueil du bouton. Les pages de mini-jeux
        n'ont pas toutes la même classe de barre de titre : on liste les
        variantes connues plutôt que d'exiger btnMount sur chaque page. */
@@ -17,6 +21,84 @@
             if (found) return found;
         }
         return null;
+    }
+
+    /* Le bouton « Continuer » du mode scénario est en `position: fixed`
+       en haut à droite sur plusieurs mini-jeux (puzzle, chemistry, shooting,
+       breakout…), exactement là où le ⚙ est monté dans la barre de titre.
+       Résultat : les deux se chevauchent et le ⚙ devient incliquable.
+
+       On ne peut pas faire dependre chaque page de ce réglage, donc on déplace
+       le bouton Continue à côté du ⚙ dès qu'on constate un chevauchement, puis
+       on rejoue le calcul au redimensionnement. On ne touche que le bouton
+       Continue : sa logique et son gestionnaire de clic restent inchangés. */
+    function continueButtons() {
+        return Array.prototype.slice.call(document.querySelectorAll(
+            '#story-continue-btn, .reseau-alibis-continue, .btn-continue'
+        )).filter(function (el) {
+            if (el === btn) return false;
+            // Ignore les boutons d'accueil (ceux de l'index) : ils ne sont pas
+            // dans un mini-jeu et n'ont pas de barre de titre à partager.
+            if (!document.querySelector('.sg-header, .sg-header-actions, .tower-header')) return false;
+            var r = el.getBoundingClientRect();
+            return r.width > 0 && r.height > 0;
+        });
+    }
+
+    function overlapsRect(a, b) {
+        return !(a.right <= b.left || a.left >= b.right ||
+                 a.bottom <= b.top || a.top >= b.bottom);
+    }
+
+    /* Garde-fou : l'observateur se re declenche sur les styles qu'on pose
+       lui-meme. Sans ce drapeau, on mesurerait/reecrirait en boucle. */
+    var adjusting = false;
+
+    function keepContinueButtonClear() {
+        if (adjusting) return;
+        if (!btn || !btn.parentNode) return;
+        var settingsRect = btn.getBoundingClientRect();
+        if (!settingsRect.width) return;
+
+        adjusting = true;
+        try {
+            continueButtons().forEach(function (cont) {
+                if (!overlapsRect(cont.getBoundingClientRect(), settingsRect)) return;
+                // Place le bouton Continue à gauche du ⚙, sur la même ligne.
+                var cr = cont.getBoundingClientRect();
+                var gap = 10;
+                // On ne peut pas déborder à gauche de la fenêtre : si le bouton est
+                // plus large que la place disponible (boutons pleine largeur), on le
+                // resserre sur cette place au lieu de le pousser hors écran.
+                var available = settingsRect.left - gap;
+                if (available < MIN_CONTINUE_WIDTH) {
+                    // Pas assez de place à côté du ⚙ (écran très étroit) : on le
+                    // passe sous le ⚙ plutôt que de le superposer.
+                    cont.style.setProperty('left', '8px', 'important');
+                    cont.style.setProperty('right', '8px', 'important');
+                    cont.style.setProperty('width', 'auto', 'important');
+                    cont.style.setProperty('max-width', 'none', 'important');
+                    cont.style.setProperty('top',
+                        Math.round(settingsRect.bottom + gap) + 'px', 'important');
+                    cont.style.setProperty('bottom', 'auto', 'important');
+                    cont.style.setProperty('transform', 'none', 'important');
+                    return;
+                }
+                if (cr.width > available) {
+                    cont.style.setProperty('max-width', Math.round(available) + 'px', 'important');
+                } else {
+                    cont.style.setProperty('max-width', 'none', 'important');
+                }
+                cont.style.setProperty('right', 'auto', 'important');
+                cont.style.setProperty('left', Math.max(8, Math.round(available - Math.min(cr.width, available))) + 'px', 'important');
+                cont.style.setProperty('top',
+                    Math.round(settingsRect.top + (settingsRect.height - cr.height) / 2) + 'px', 'important');
+                cont.style.setProperty('bottom', 'auto', 'important');
+                cont.style.setProperty('transform', 'none', 'important');
+            });
+        } finally {
+            adjusting = false;
+        }
     }
 
     function createElements() {
@@ -75,6 +157,22 @@
             document.body.appendChild(btn);
         }
         document.body.appendChild(panel);
+
+        /* Le bouton Continue n'apparait souvent qu'a la fin de la partie :
+           on rejoue donc le calcul au demarrage, a chaque resize, et a chaque
+           mutation de style/classe (c'est ce qui couvre son apparition). */
+        keepContinueButtonClear();
+        window.addEventListener('resize', keepContinueButtonClear);
+        window.addEventListener('orientationchange', keepContinueButtonClear);
+        if (typeof MutationObserver === 'function') {
+            var observer = new MutationObserver(function () {
+                keepContinueButtonClear();
+            });
+            observer.observe(document.body, {
+                childList: true, subtree: true, attributes: true,
+                attributeFilter: ['style', 'class']
+            });
+        }
     }
 
     function el(tag, cls, html) {
