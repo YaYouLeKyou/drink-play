@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -362,7 +362,7 @@
             var STATE_MESSAGES = {
                 empty: 'Le coffre est **VIDÉ**. Mais le compartiment caché derrière le mur — découvert grâce au puzzle — renferme les vrais documents !',
                 clue: 'Le coffre contient des documents compromettants.',
-                forced: 'Le coffre a été forcé. L’intrus a tout emporté.'
+                forced: 'Le coffre a été forcé. L'intrus a tout emporté.'
             };
 
             var SUSPECT_STATES = {
@@ -441,7 +441,7 @@
                 validateBtn.style.borderColor = 'var(--accent-green)';
                 validateBtn.style.color = 'var(--accent-green)';
 
-                // Sauvegarde du rÃ©sultat
+                // Sauvegarde du résultat
                 try {
                     var clueText = "Le coffre-fort est vide, mais le compartiment caché derrière le mur renferme les vrais documents : contrats falsifiés, registres de versements, et une lettre signée Wexford.";
                     localStorage.setItem('td_standalone_game_result', JSON.stringify({
