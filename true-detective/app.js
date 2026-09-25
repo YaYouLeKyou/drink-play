@@ -4725,10 +4725,9 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         'femme-fatale': 'pong',
         'seducteur': 'breakout',
         'suspect': 'missile-command',
-        // Le marginal (Ghost) joue à Pac-Man : un vrai jeu rétro de labyrinthe
-        // (il gardait sa "Tour de Silas" en thème classique, pas en cyberpunk).
         'marginal': 'pacman',
-        'criminel': 'space-invaders'
+        'criminel': 'space-invaders',
+        'reseau_alibis': 'reseau_alibis'
     };
 
     function scrMinigameAllowedHere(interroId) {

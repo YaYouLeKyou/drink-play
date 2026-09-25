@@ -308,6 +308,59 @@
         }
     };
 
+    /* Répliques par défaut des jeux qui n'en avaient aucune (breakout,
+       missile-command, space-invaders) : sans elles la talkbox restait vide.
+       Le nom du locuteur est résolu à l'init via le suspect courant, donc ces
+       répliques restent cohérentes dans les trois thèmes. */
+    var GAME_DEFAULT_SPEECH = {
+        breakout: {
+            start: { fr: 'Détruisez ce que je vous montre, inspecteur. Le reste est du secret.', en: 'Break what I show you, inspector. The rest is classified.' },
+            score: { fr: 'Encore des briques. Vous croyez vraiment que je tremble ?', en: 'More bricks. You really think I am shaking?' },
+            victory: { fr: 'Vous avez tout fait sauter. Il ne reste qu’une chose à faire : parler.', en: 'You blew it all up. One thing left to do: talk.' },
+            defeat: { fr: 'Ratée. Revenez avec de la précision, pas de la chance.', en: 'Miss. Come back with precision, not luck.' }
+        },
+        'missile-command': {
+            start: { fr: 'Vos missiles ne mentent jamais. Les miens, si. Interceptez-les.', en: 'Your missiles never lie. Mine do. Intercept them.' },
+            score: { fr: 'Chaque interception me rapproche de la sortie. Vous le savez.', en: 'Every interception brings me closer to the exit. You know that.' },
+            victory: { fr: 'Vous avez tenu la ligne. Dommage que je connaisse la prochaine attaque.', en: 'You held the line. Shame I know the next attack.' },
+            defeat: { fr: 'La ligne a cédé. Vous préférez que je parle, ou que je tire ?', en: 'The line broke. Would you rather I talk, or fire?' }
+        },
+        'space-invaders': {
+            start: { fr: 'Ils arrivent par vagues. Moi, je reste. Choisissez votre ordre d’attaque.', en: 'They come in waves. I stay. Choose your attack order.' },
+            score: { fr: 'Vous en abattez plus que mes scripts ne le prévoient.', en: 'You are downing more than my scripts predicted.' },
+            victory: { fr: 'Espace dégagé. Il ne reste que nous deux et le registre.', en: 'Clear space. Only the two of us and the ledger remain.' },
+            defeat: { fr: 'Vos vies sont parties. Les miennes sont dans les données.', en: 'Your lives are gone. Mine are in the data.' }
+        }
+    };
+
+    /* Préfixe les répliques par le nom du suspect courant. */
+    function withSpeaker(text, lang) {
+        if (!text) return text;
+        var name = npcName(state.suspectId, lang);
+        if (!name) return text;
+        return lang === 'en' ? (name + ': "' + text + '"') : (name + ' : « ' + text + ' »');
+    }
+
+    /* Retrait du nom d'auteur codé en dur dans une réplique par défaut
+       (« Lady Vivienne : "..." » -> "..."), avant réattribution au suspect
+       courant. Les guillemets de citation sont retirés eux aussi : withSpeaker()
+       les repose avec le bon nom. */
+    function stripSpeaker(text) {
+        if (!text) return text;
+        var m = String(text).match(/^\s*[^:«"]{1,40}:\s*[«"]?\s*([\s\S]*?)\s*[»"]?\s*$/);
+        if (!m) return text;
+        return m[1].replace(/[«»"]/g, '').trim();
+    }
+
+    /* Variantes thémées : mêmes répliques, nom du suspect résolu au moment de
+       l'init (évite qu'un jeu cyberpunk annonce « Lady Vivienne »). */
+    var GAME_DEFAULT_LINES_THEMED = {
+        pong: true, pacman: true, asteroids: true, connect4: true, chess: true,
+        memory: true, jackpot: true, chemistry: true, 'marginal-tower': true,
+        shooting: true, 'bataille-navale': true,
+        breakout: true, 'missile-command': true, 'space-invaders': true
+    };
+
 
     /* ===================== ÉTAT ===================== */
     var state = {
@@ -630,6 +683,37 @@
         return dom;
     }
 
+    /* Bouton Paramètres dans la navbar des pages mini-jeux (mode standalone).
+       settings-menu.js monte déjà son propre ⚙ dans la navbar via
+       DPSettings.init() : on le RÉUTILISE plutôt que d'en créer un second
+       (deux boutons pour la même action). Le fallback ci-dessous ne sert que
+       si la page ne charge pas settings-menu.js. */
+    function findNavbarSettingsBtn() {
+        return document.querySelector('.sg-header .dp-settings-btn, ' +
+            '.sg-header-actions .dp-settings-btn, .tower-header .dp-settings-btn');
+    }
+
+    function ensureHeaderSettingsBtn() {
+        try {
+            var existing = findNavbarSettingsBtn();
+            if (existing) return existing;
+            var header = document.querySelector('.sg-header') ||
+                document.querySelector('.tower-header');
+            if (!header) return null;
+            var created = document.createElement('button');
+            created.id = 'td-sc-settings-btn';
+            created.className = 'td-sc-settings-btn';
+            created.type = 'button';
+            created.setAttribute('aria-label', 'Paramètres');
+            created.setAttribute('title', 'Paramètres');
+            created.textContent = '⚙';
+            header.appendChild(created);
+            return created;
+        } catch (e) {
+            return null;
+        }
+    }
+
     /* Pages standalone : décor plein écran fixe (z-index négatif = zéro impact layout)
        + barre de dialogue insérée en tête du conteneur de jeu (jamais superposée). */
     function ensureStandaloneDom(opts) {
@@ -805,11 +889,27 @@
         var story = isStoryContext(opts, params, cfg);
         state.suspectId = resolveSuspectId(opts, params, cfg, story);
         state.lines = normalizeLines(opts.lines || opts.storyLines || cfg.lines || cfg.storyLines);
-        if (GAME_DEFAULT_LINES[state.gameType]) {
+        var defaults = normalizeLines(GAME_DEFAULT_LINES[state.gameType])
+            .concat(normalizeLines(GAME_DEFAULT_SPEECH[state.gameType]));
+        if (defaults.length) {
             var configuredEvents = {};
             state.lines.forEach(function (line) { configuredEvents[line.on] = true; });
-            normalizeLines(GAME_DEFAULT_LINES[state.gameType]).forEach(function (line) {
-                if (!configuredEvents[line.on]) state.lines.push(line);
+            defaults.forEach(function (line) {
+                if (configuredEvents[line.on]) return;
+                /* Les répliques écrites pour le thème classic sont réattribuées
+                   au suspect courant : sans cela un jeu cyberpunk annonce encore
+                   « Lady Vivienne » alors que le portrait affiché est Lyra Noir. */
+                if (GAME_DEFAULT_LINES_THEMED[state.gameType] && line.text) {
+                    line = {
+                        on: line.on,
+                        at: line.at,
+                        text: {
+                            fr: withSpeaker(stripSpeaker(tx(line.text, 'fr')), 'fr'),
+                            en: withSpeaker(stripSpeaker(tx(line.text, 'en')), 'en')
+                        }
+                    };
+                }
+                state.lines.push(line);
             });
         }
         state.fallback = normalizeStrings(opts.fallback || opts.dialogues || cfg.dialogues);
@@ -845,10 +945,15 @@
         document.documentElement.classList.add('td-sc-' + state.mode);
         paint();
         if (state.mode === 'standalone') {
+            /* Listener paresseux : la décision se prend AU CLIC, pas ici.
+               settings-menu.js peut monter son ⚙ (et poser son toggle) après
+               story-chrome : tester au clic garantit qu'un seul des deux agit,
+               sinon le panneau s'ouvre puis se referme dans la même frame. */
             var settingsBtn = document.getElementById('td-sc-settings-btn');
             if (settingsBtn && !settingsBtn._tdScBound) {
                 settingsBtn._tdScBound = true;
                 settingsBtn.addEventListener('click', function () {
+                    if (settingsBtn.classList.contains('dp-settings-btn')) return;
                     if (window.DPSettings && typeof window.DPSettings.open === 'function') {
                         window.DPSettings.open();
                     }

@@ -271,5 +271,20 @@
     </script>
     <script src="sfx.js"></script>
     <script src="minigame-audio.js" data-minigame="sudoku"></script>
+    <script src="../settings-menu.js"></script>
+    <script>
+        /* Bouton Paramètres dans la navbar (comme les autres mini-jeux). */
+        (function () {
+            'use strict';
+            if (window.DPSettings && window.DPSettings.init) {
+                window.DPSettings.init({
+                    showMusicToggle: true, showMusicVolume: true, showNarrationVolume: false,
+                    showMuteToggle: false, showGameSection: true, showBackToHub: false,
+                    showRestart: false, showRules: false,
+                    onBackToHub: function () { window.location.href = '../true-detective/index.html#minigames'; }
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

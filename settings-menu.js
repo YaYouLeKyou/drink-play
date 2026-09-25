@@ -7,6 +7,18 @@
     let panel = null, backdrop = null, btn = null;
     let cfg = {};
 
+    /* Résolution du conteneur d'accueil du bouton. Les pages de mini-jeux
+       n'ont pas toutes la même classe de barre de titre : on liste les
+       variantes connues plutôt que d'exiger btnMount sur chaque page. */
+    function resolveMount() {
+        var selectors = ['.sg-header-actions', '.sg-header', '.tower-header'];
+        for (var i = 0; i < selectors.length; i++) {
+            var found = document.querySelector(selectors[i]);
+            if (found) return found;
+        }
+        return null;
+    }
+
     function createElements() {
         if (panel) panel.remove();
         if (backdrop) backdrop.remove();
@@ -16,11 +28,20 @@
         backdrop.className = 'dp-settings-backdrop';
         backdrop.addEventListener('click', closePanel);
 
-        btn = document.createElement('button');
-        btn.className = 'dp-settings-btn';
+        /* Si story-chrome.js a déjà monté son propre bouton dans la navbar
+           (minijeux en mode scénario), on le réutilise au lieu d'en créer un
+           second : un seul ⚙ dans la barre de titre. */
+        var preexisting = document.getElementById('td-sc-settings-btn');
+        if (preexisting && preexisting.parentNode) {
+            btn = preexisting;
+            btn.classList.add('dp-settings-btn');
+        } else {
+            btn = document.createElement('button');
+            btn.className = 'dp-settings-btn';
+        }
         btn.setAttribute('aria-label', 'Paramètres');
         btn.setAttribute('title', 'Paramètres');
-        btn.innerHTML = '⚙️';
+        if (!btn.textContent) btn.textContent = '⚙';
         btn.addEventListener('click', togglePanel);
 
         panel = document.createElement('div');
@@ -30,12 +51,20 @@
 
         /* Option btnMount : montage du bouton dans un conteneur existant
            (navbar) au lieu du positionnement fixe par défaut dans <body>.
-           Accepte un sélecteur CSS ou un élément. */
+           Accepte un sélecteur CSS ou un élément.
+
+           Auto-détection : sans btnMount explicite, on monte le bouton dans la
+           navbar de mini-jeu. Cela évite d'avoir à dupliquer l'option dans
+           chaque page, et surtout évite que la roue flottante en haut à droite
+           (.dp-settings-btn fixed) ne recouvre le bouton « Continuer » du mode
+           scénario, lui aussi positionné en fixed au même endroit. */
         var mount = null;
         if (cfg.btnMount) {
             mount = (typeof cfg.btnMount === 'string')
                 ? document.querySelector(cfg.btnMount)
                 : cfg.btnMount;
+        } else {
+            mount = resolveMount();
         }
 
         document.body.appendChild(backdrop);
