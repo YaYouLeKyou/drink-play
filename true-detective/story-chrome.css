@@ -171,6 +171,7 @@ html.td-sc-hidden .td-sc-veil {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), var(--td-glow);
     overflow: hidden;
     animation: td-sc-line-in 0.3s ease-out;
+    flex: 0 0 auto;
 }
 
 .td-sc-bar-inner {

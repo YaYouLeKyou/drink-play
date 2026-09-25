@@ -159,6 +159,61 @@
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
         }
 
+        /* Shooter du protecteur sur laptop : dialogue latéral compact,
+           plateau centré dans l'espace restant. */
+        @media (min-width: 769px) {
+            html.td-story-chrome .sg-main {
+                display: grid;
+                grid-template-columns: minmax(240px, 280px) minmax(0, 800px);
+                grid-template-rows: minmax(0, 1fr);
+                align-items: center;
+                justify-content: center;
+                gap: 20px;
+                padding: 10px 20px;
+                overflow: hidden;
+            }
+
+            html.td-story-chrome .td-sc-bar {
+                width: 100%;
+                max-width: 280px;
+                margin: 0;
+                justify-self: start;
+                align-self: center;
+            }
+
+            html.td-story-chrome .td-sc-bar-inner {
+                align-items: flex-start;
+                padding: 8px;
+                gap: 8px;
+            }
+
+            html.td-story-chrome .td-sc-portrait-frame {
+                width: 44px;
+                height: 44px;
+            }
+
+            html.td-story-chrome .td-sc-dialogue-box {
+                padding: 8px 9px;
+                max-height: 150px;
+                overflow-y: auto;
+                font-size: 0.82rem;
+                line-height: 1.4;
+            }
+
+            html.td-story-chrome .shooting-wrap {
+                width: 100%;
+                max-width: 800px;
+                margin: 0;
+                padding: 8px 0;
+                align-self: center;
+            }
+
+            html.td-story-chrome #shooting-canvas {
+                height: min(420px, calc(100vh - 245px));
+                min-height: 280px;
+            }
+        }
+
         @media (max-width: 600px) {
             #shooting-canvas {
                 height: 320px;
@@ -218,6 +273,7 @@
 
             var canvas = document.getElementById('shooting-canvas');
             var ctx = canvas.getContext('2d');
+            var victoryScore = 20;
             var scoreEl = document.getElementById('shooting-score');
             var targetsEl = document.getElementById('shooting-targets');
             var missesEl = document.getElementById('shooting-misses');
@@ -367,6 +423,8 @@
             function checkGameStatus() {
                 if (targetsHit >= targetGoal) {
                     gameOver = true;
+                    score = victoryScore;
+                    updateUI();
                     dialogueEl.innerHTML = '<strong style="color:var(--accent-green);">Enquête réussie ! Le domaine est sécurisé.</strong>';
                     saveResult(true);
                 } else if (misses >= 3) {

@@ -42,25 +42,29 @@
 
         .sg-main {
             flex: 1;
+            min-height: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 15px;
+            padding: 8px 15px 12px;
+            overflow: auto;
         }
 
         .battleship-wrap {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 16px;
-            padding: 20px;
+            gap: 10px;
+            padding: 12px;
             width: 100%;
-            max-width: 950px;
+            max-width: 700px;
             background: var(--panel-bg);
             border: 1px solid rgba(0, 212, 255, 0.3);
             border-radius: 16px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 212, 255, 0.05);
             box-sizing: border-box;
+            max-height: calc(100vh - 190px);
+            overflow: auto;
         }
 
         .battleship-info {
@@ -130,7 +134,7 @@
 
         .battleship-boards {
             display: flex;
-            gap: 30px;
+            gap: 18px;
             flex-wrap: wrap;
             justify-content: center;
             width: 100%;
@@ -151,8 +155,10 @@
             padding: 10px;
             border-radius: 12px;
             border: 1px solid rgba(0, 212, 255, 0.2);
-            width: 320px;
-            height: 320px;
+            width: min(27vw, 240px);
+            height: min(27vw, 240px);
+            min-width: 180px;
+            min-height: 180px;
             box-sizing: border-box;
         }
 

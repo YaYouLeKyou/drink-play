@@ -231,16 +231,98 @@
         return POOLS[poolId] || null;
     }
 
+    var ROLE_POOLS = {
+        act1_1: ['vivienne', 'hale'],
+        act1_2: ['blackwood', 'silas'],
+        act2_1: ['pembrooke', 'krane']
+    };
+
+    var ALL_ROLES = ['vivienne', 'hale', 'blackwood', 'silas', 'pembrooke', 'krane'];
+
+    function cloneCard(card) {
+        return {
+            id: card.id,
+            witness: { fr: card.witness.fr, en: card.witness.en },
+            statement: { fr: card.statement.fr, en: card.statement.en },
+            isLie: !!card.isLie
+        };
+    }
+
+    function collectCards(pool) {
+        var byRole = {};
+        pool.pairs.forEach(function (duel) {
+            duel.forEach(function (card) {
+                if (!byRole[card.id]) byRole[card.id] = card;
+            });
+        });
+        return byRole;
+    }
+
+    function randomRoles(count) {
+        var roles = ALL_ROLES.slice();
+        for (var i = roles.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = roles[i];
+            roles[i] = roles[j];
+            roles[j] = tmp;
+        }
+        return roles.slice(0, count);
+    }
+
+    function buildRoleDuels(pool, roleIds, rounds) {
+        var cards = collectCards(pool);
+        var available = roleIds.filter(function (id) { return cards[id]; });
+        if (available.length < 2) return null;
+        var duels = [];
+        for (var i = 0; i < rounds; i++) {
+            var pair = [cloneCard(cards[available[i % available.length]]), cloneCard(cards[available[(i + 1) % available.length]])];
+            // Chaque duel doit conserver exactement un menteur.
+            if (pair[0].isLie === pair[1].isLie) pair[1].isLie = !pair[0].isLie;
+            duels.push(pair);
+        }
+        return duels;
+    }
+
+    function buildRandomDuels(pool, rounds) {
+        var cards = {};
+        Object.keys(POOLS).forEach(function (poolId) {
+            Object.keys(collectCards(POOLS[poolId])).forEach(function (role) {
+                if (!cards[role]) cards[role] = collectCards(POOLS[poolId])[role];
+            });
+        });
+        var duels = [];
+        var roles = randomRoles(2);
+        if (roles.some(function (id) { return !cards[id]; })) return null;
+        for (var i = 0; i < rounds; i++) {
+            var pair = [cloneCard(cards[roles[i % 2]]), cloneCard(cards[roles[(i + 1) % 2]])];
+            if (pair[0].isLie === pair[1].isLie) pair[1].isLie = !pair[0].isLie;
+            duels.push(pair);
+        }
+        return duels;
+    }
+
+
     /* Injecte le pool dans la cfg du mini-jeu. La source de vérité est
        toujours alibiPool : une ancienne valeur cfg.duels ne doit jamais
        faire revenir les cartes d'un autre réseau. */
     function resolve(cfg) {
         if (!cfg || !cfg.alibiPool || !POOLS[cfg.alibiPool]) return cfg;
         var pool = POOLS[cfg.alibiPool];
-        cfg.duels = pool.pairs.map(function (duel) {
-            return duel.slice();
-        });
-        cfg.rounds = pool.rounds;
+        var duels;
+        if (cfg.alibiPool === 'act2_3') {
+            duels = buildRandomDuels(pool, pool.rounds);
+            cfg.rounds = pool.rounds;
+        } else {
+            duels = buildRoleDuels(pool, ROLE_POOLS[cfg.alibiPool] || [], pool.rounds);
+            cfg.rounds = pool.rounds;
+        }
+        if (duels) cfg.duels = duels;
+        else {
+            cfg.duels = pool.pairs.map(function (duel) {
+                return duel.slice();
+            });
+            cfg.rounds = pool.rounds;
+        }
         cfg._alibiPool = cfg.alibiPool;
         return cfg;
     }

@@ -285,6 +285,13 @@
             start: { fr: 'Victor Krane : « Vous traquez des débris… ou des preuves ? »', en: 'Victor Krane: "Are you hunting debris... or evidence?"' },
             kills: { fr: 'Victor Krane : « Chaque débris détruit réduit le silence. »', en: 'Victor Krane: "Every destroyed debris breaks the silence."' },
             victory: { fr: 'Victor Krane : « Vous avez nettoyé l’orbite. Je reste la seule variable. »', en: 'Victor Krane: "You cleaned the orbit. I remain the only variable."' }
+        },
+        'bataille-navale': {
+            start: { fr: 'Capitaine Blackwood : « Tracez votre route… je connais déjà la mienne. »', en: 'Captain Blackwood: "Plot your course... I already know mine."' },
+            hit: { fr: 'Blackwood : « Un toucher. Votre obstination commence à laisser des traces. »', en: 'Blackwood: "A hit. Your persistence is beginning to leave marks."' },
+            enemyTurn: { fr: 'Blackwood : « À votre tour… si les vagues vous laissent le temps. »', en: 'Blackwood: "Your turn... if the waves leave you enough time."' },
+            victory: { fr: 'Blackwood : « Vous avez coulé ma flotte, mais la vérité reste sous l’eau. »', en: 'Blackwood: "You sank my fleet, but the truth remains under the water."' },
+            defeat: { fr: 'Blackwood : « Les eaux vous ont conservé… pour une prochaine tentative. »', en: "Blackwood: \"The waters kept you... for another attempt.\"" }
         }
     };
 
@@ -782,8 +789,12 @@
         var story = isStoryContext(opts, params, cfg);
         state.suspectId = resolveSuspectId(opts, params, cfg, story);
         state.lines = normalizeLines(opts.lines || opts.storyLines || cfg.lines || cfg.storyLines);
-        if (!state.lines.length && GAME_DEFAULT_LINES[state.gameType]) {
-            state.lines = normalizeLines(GAME_DEFAULT_LINES[state.gameType]);
+        if (GAME_DEFAULT_LINES[state.gameType]) {
+            var configuredEvents = {};
+            state.lines.forEach(function (line) { configuredEvents[line.on] = true; });
+            normalizeLines(GAME_DEFAULT_LINES[state.gameType]).forEach(function (line) {
+                if (!configuredEvents[line.on]) state.lines.push(line);
+            });
         }
         state.fallback = normalizeStrings(opts.fallback || opts.dialogues || cfg.dialogues);
         if (!state.fallback.length && state.lines.length) {

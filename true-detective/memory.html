@@ -251,6 +251,45 @@
             transform: translateY(-2px);
         }
 
+        /* Mode story sur laptop : dialogue à gauche, jeu Memory à droite. */
+        @media (min-width: 769px) {
+            html.td-story-chrome .sg-main {
+                min-height: 0;
+                overflow: hidden;
+            }
+
+            html.td-story-chrome #memory-app {
+                width: min(100%, 1080px);
+                height: 100%;
+                max-height: 100%;
+                display: grid;
+                grid-template-columns: 320px minmax(0, 620px);
+                grid-template-rows: minmax(0, 1fr);
+                align-items: center;
+                justify-content: center;
+                gap: 24px;
+                margin: 0 auto;
+                min-height: 0;
+            }
+
+            html.td-story-chrome #memory-app > .td-sc-bar {
+                width: 100%;
+                max-width: 320px;
+                margin: 0;
+                align-self: center;
+            }
+
+            html.td-story-chrome #memory-app > .memory-wrap {
+                width: 100%;
+                max-width: 620px;
+                min-width: 0;
+                max-height: 100%;
+                margin: 0;
+                align-self: center;
+            }
+        }
+
+
         @media (max-width: 480px) {
             .memory-grid {
                 gap: 6px;

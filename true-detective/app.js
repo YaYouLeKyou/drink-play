@@ -33,8 +33,8 @@
         secretPlace: ASSETS_BASE + 'lieux/classic/appartement suspect.png',
         laboratory: ASSETS_BASE + 'lieux/classic/laboratoire.png',
         headquarters: ASSETS_BASE + 'lieux/classic/quartier general.png',
-        prison: ASSETS_BASE + 'lieux/classic/prison.jfif',
-        exile: ASSETS_BASE + 'lieux/classic/paradisique.png',
+        prison: ASSETS_BASE + 'lieux/classic/prison.png',
+        exile: ASSETS_BASE + 'lieux/classic/paradisiaque.png',
         music: 'sherlock.mp3',
     };
 
@@ -58,7 +58,7 @@
         laboratory: ASSETS_BASE + 'lieux/cyberpunk/laboratoire.png',
         headquarters: ASSETS_BASE + 'lieux/cyberpunk/interieur-quartier-général.png',
         prison: ASSETS_BASE + 'lieux/cyberpunk/prison.png',
-        exile: ASSETS_BASE + 'lieux/cyberpunk/paradisique.png',
+        exile: ASSETS_BASE + 'lieux/cyberpunk/paradisiaque.png',
         music: 'cyberpunk.mp3',
     };
 

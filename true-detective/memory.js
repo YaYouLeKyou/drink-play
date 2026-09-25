@@ -142,6 +142,18 @@
         var diff = parseInt(params.get('difficulty'), 10);
         if (diff < 1 || diff > 3) diff = 1;
         var act = diff;
+        var fromStory = params.get('story') === '1' || params.get('mode') === 'story';
+        if (fromStory && window.TDStoryChrome) {
+            window.TDStoryChrome.initFromCfg({
+                type: 'memory',
+                interroId: 'criminel',
+                storyMode: true,
+                lang: lang
+            });
+        }
+
+
+        var act = diff;
 
         var $title = document.getElementById('memory-title');
         var $timer = document.getElementById('memory-timer');
