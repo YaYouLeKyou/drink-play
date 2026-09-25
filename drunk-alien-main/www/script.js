@@ -871,16 +871,16 @@ function update() {
 
         if (gameState.currentScore === 60 && !gameState.bossMode && !gameState.postBossDelayActive && !gameState.boss1Defeated) {
             spawnBoss(1);
-            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playBoss(); }
+            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playLevel('level2'); }
         }
         if (gameState.currentScore === 120 && !gameState.bossMode && !gameState.postBossDelayActive && !gameState.boss2Defeated) {
             spawnBoss(2);
-            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playBoss(); }
+            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playLevel('level3'); }
         }
         if (gameState.currentScore === 180 && !gameState.bossMode && !gameState.postBossDelayActive && !gameState.boss3AppearedOnce) {
             spawnBoss(3);
             gameState.boss3AppearedOnce = true;
-            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playBoss(); }
+            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playLevel('level4'); }
         }
         if (gameState.currentScore === 500 && !gameState.bossMode && !gameState.postBossDelayActive && gameState.boss3Defeated && !gameState.boss3AppearedTwice) {
             spawnBoss(3);
@@ -1427,9 +1427,9 @@ function renderBackground() {
 
 function startGameIfReady() {
     loadAllImages().then(() => {
-        setup();
-        gameState.index = 0;
-        gameState.animationFrameId = requestAnimationFrame(render)
+    setup();
+    gameState.index = 0;
+    gameState.animationFrameId = requestAnimationFrame(render)
     })
 }
 
