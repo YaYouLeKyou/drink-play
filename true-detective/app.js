@@ -1333,7 +1333,7 @@ applyMusicHidden(true);
         if (homeSubtitle) {
             homeSubtitle.textContent = ui.language === 'fr'
                 ? 'Enquête détective interactive avec 3 univers, 6 suspects et 1 seul coupable différent à chaque fois.'
-                : 'Interactive detective investigation with 3 universes, 6 suspects and 1 different culprit each time. Unmask the assassin through a thrilling investigation with its mini-games and puzzles.';
+                : 'Interactive detective investigation with 3 universes, 6 suspects and 1 different culprit each time.';
         }
         if ($.startBtn) {
             $.startBtn.textContent = ui.language === 'fr' ? "Commencer l'enquête" : 'Start Investigation';
