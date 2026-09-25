@@ -282,6 +282,7 @@
         characterLayer: document.getElementById('character-layer'),
         npcName: document.getElementById('npc-name'),
         dialogueText: document.getElementById('dialogue-text'),
+        dialogueBox: document.querySelector('.dialogue-box'),
         typeCursor: document.getElementById('type-cursor'),
         choicesContainer: document.getElementById('choices-container'),
         conversationInput: document.getElementById('conversation-input'),
@@ -338,6 +339,7 @@
         newInvestigationBtn: document.getElementById('new-investigation-btn'),
         hubBtn: document.getElementById('hub-btn'),
         backToHubBtn: document.getElementById('back-to-hub-btn'),
+        endMenuBtn: document.getElementById('end-menu-btn'),
         solutionCulprit: document.getElementById('solution-culprit'),
         solutionMotive: document.getElementById('solution-motive'),
         solutionMethod: document.getElementById('solution-method'),
@@ -1090,6 +1092,41 @@ applyMusicHidden(true);
             });
         }
 
+        /* Bouton « Menu principal » de l'ecran de fin : on revient au menu
+           d'accueil de True Detective (choix d'univers) SANS quitter le jeu.
+           A la difference de « Back to Hub », on ne recharge pas la page. */
+        if ($.endMenuBtn) {
+            $.endMenuBtn.addEventListener('click', function () {
+                if (TDNarrativeEngine) {
+                    TDNarrativeEngine.resetGame();
+                }
+                if (TDImageService) {
+                    TDImageService.clearCache();
+                }
+                if (TDAudioService) {
+                    TDAudioService.stopSpeaking();
+                }
+                /* L'enquête est terminee : on repart d'un etat neuf, sinon
+                   « Continuer » proposerait de reprendre une partie finie. */
+                try {
+                    if (typeof TDScenario !== 'undefined' && TDScenario.reset) {
+                        TDScenario.reset();
+                    }
+                } catch (e) { /* etat non critique */ }
+                try { localStorage.removeItem('td_scenario_save'); } catch (e) {}
+                scr.active = false;
+                scr.interro = null;
+                if ($.endScreen) { $.endScreen.classList.add('hidden'); $.endScreen.classList.remove('active'); }
+                if ($.gameScreen) { $.gameScreen.classList.add('hidden'); $.gameScreen.classList.remove('active'); }
+                if ($.themeScreen) { $.themeScreen.classList.add('hidden'); $.themeScreen.classList.remove('active'); }
+                if ($.homeScreen) { $.homeScreen.classList.remove('hidden'); $.homeScreen.classList.add('active'); }
+                hidePageNav();
+                checkSavedGame();
+                updateContinueBtnVisibility();
+                hideLoading();
+            });
+        }
+
         if ($.hubBtn) {
             $.hubBtn.addEventListener('click', function () {
                 if (TDNarrativeEngine) {
@@ -1295,8 +1332,8 @@ applyMusicHidden(true);
         var homeSubtitle = document.querySelector('.home-subtitle');
         if (homeSubtitle) {
             homeSubtitle.textContent = ui.language === 'fr'
-                ? 'Enquête détective interactive. 8 univers, PNJ dynamiques et narration immersive.'
-                : 'Interactive detective investigation. 8 universes, dynamic NPCs and immersive narration.';
+                ? 'Enquête détective interactive avec 3 univers, 6 suspects et 1 seul coupable différent à chaque fois. Démasquer l\'assassin au travers d\'une enquête palpitante avec ses mini-jeux et ses énigmes.'
+                : 'Interactive detective investigation with 3 universes, 6 suspects and 1 different culprit each time. Unmask the assassin through a thrilling investigation with its mini-games and puzzles.';
         }
         if ($.startBtn) {
             $.startBtn.textContent = ui.language === 'fr' ? "Commencer l'enquête" : 'Start Investigation';
@@ -3528,6 +3565,17 @@ function buildTransitionPages(sceneData) {
         return window.TDPhases[scr.phaseIdx - 1] || null;
     }
 
+    /* L'identifiant du coupable dans l'objet TRUTH de scenario.js s'appelle
+       `coupable` (et non `culprit`). Lire `truth.culprit` renvoyait
+       undefined : l'attribut `npc` des pages de l'epilogue etait donc vide
+       et AUCUNE image de suspect ne s'affichait en fin de partie, sur
+       aucune des quatre fins. Ce helper centralise l'acces. */
+    function scrTruthCulpritId() {
+        var truth = TDScenario.getTruth() || {};
+        var id = truth.coupable || truth.culprit || (scrGetState() || {}).culprit;
+        return id || null;
+    }
+
     function scrThemedTitle(culpritId, lang) {
         var themeId = getThemeId();
         var themedTitles = THEME_TRUTH_TITLES[themeId];
@@ -3536,7 +3584,7 @@ function buildTransitionPages(sceneData) {
             return entry[lang] || entry.fr || entry.en || '';
         }
         var truth = TDScenario.getTruth();
-        return truth.title ? TDScenario.t(truth.title, lang) : (truth.culprit || '');
+        return truth.title ? TDScenario.t(truth.title, lang) : (scrTruthCulpritId() || '');
     }
 
     function scrGetOutroText(key, lang) {
@@ -3787,6 +3835,13 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         return txt.replace('', enrichment);
     }
 
+    /* Une page d'epilogue est generative : buildOutroPages() y pose
+       `outro: true`. Ces pages n'ont pas d'objectif de scene (le bandeau
+       🎯 « objectif » est vide et inutile une fois l'enquête terminée) et
+       leur tableau d'accusation est plus haut que la dialogue-box : sans
+       cela, la fin du tableau etait coupee par le bas de l'ecran. */
+    function isOutroPage(page) { return !!(page && page.outro); }
+
     function renderScenarioPage() {
         if (!scr.active) return;
         var phase = scrCurrentPhase();
@@ -3802,6 +3857,15 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.continueBtn.onclick = handleContinue;
         $.npcName.textContent = '';
         hideNPC();
+
+        var isOutro = isOutroPage(page);
+        /* Le bandeau d'objectif n'a rien à afficher en epilogue. */
+        if (isOutro) {
+            updateObjective('');
+        }
+        if ($.dialogueBox) {
+            $.dialogueBox.classList.toggle('dialogue-box-outro', isOutro);
+        }
 
         if ((phase.id === 'act3_2' && page.npc === 'protecteur' && page.interrogation === 'protecteur') ||
             (phase.id === 'act3_3' && page.interrogation === 'dynamic')) {
@@ -5515,7 +5579,7 @@ function scrApplyChoice(choiceKey, choiceId) {
         var lang = ui.language;
         var evalResult = TDScenario.evaluateAccusation(s.accused);
         var good = evalResult.correct;
-        var titleTxt = scrThemedTitle(truth.culprit, lang);
+        var titleTxt = scrThemedTitle(scrTruthCulpritId(), lang);
         var innocentTitle = scrSubstituteNames(scrChoiceLabel(s.accused), themeId);
         var morale = scrSubstituteNames(truth.morale ? TDScenario.t(truth.morale, lang) : '', themeId);
         var score = evalResult.score;
@@ -5545,21 +5609,21 @@ function scrApplyChoice(choiceKey, choiceId) {
         if (s.accused === 'detective') {
             /* Twist ending - Accusation de Wexford : 3 pages (prison → cellule du vrai coupable → photo) */
             pages.push({
-                decor: 'prison', npc: 'detective-partner',
+                outro: true, decor: 'prison', npc: 'detective-partner',
                 text: {
                     fr: '<div class="accuse-screen"><div class="accuse-result success">✅ TWIST - LE PARTAIRE ÉTAIT LE CULPABLE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Wexford a vidé le coffre-fort lui-même. Derrière la reconstruction, il a manipulé l\'enquête dans son ensemble.</div></div><div class="ending-text">Face à vos preuves, Wexford avoue. « Vous ne comprendrez jamais tout… » Il est mené en prison, les mains liées.</div>',
                     en: '<div class="accuse-screen"><div class="accuse-result success">✅ TWIST - THE PARTNER WAS THE CULPRIT</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Wexford emptied the safe himself. Behind the reconstruction, he manipulated the entire investigation.</div></div><div class="ending-text">Face to your evidence, Wexford confesses. "You will never understand everything…" He is led away to prison, hands bound.</div>'
                 }
             });
             pages.push({
-                decor: 'prison', npc: truth.culprit,
+                outro: true, decor: 'prison', npc: scrTruthCulpritId(),
                 text: {
                     fr: '<div class="ending-text">Le vrai meurtrier, ' + titleTxt + ', est finalement arrêté grâce à votre perspicacité. Wexford a orchestré son crime, mais vous avez percé le secret du coffre vide.</div>',
                     en: '<div class="ending-text">The real murderer, ' + titleTxt + ', is finally arrested thanks to your insight. Wexford orchestrated his crime, but you pierced the secret of the emptied safe.</div>'
                 }
             });
             pages.push({
-                decor: 'sherlock', npc: null,
+                outro: true, decor: 'sherlock', npc: null,
                 text: {
                     fr: '<div class="ending-text">' + winTxt + ' ' + morale + '</div>',
                     en: '<div class="ending-text">' + winTxt + ' ' + morale + '</div>'
@@ -5568,21 +5632,21 @@ function scrApplyChoice(choiceKey, choiceId) {
         } else if (good) {
             /* Fin 1 - Accusation juste : 3 pages (prison → QG extérieur → île paradisiaque) */
             pages.push({
-                decor: 'prison', npc: truth.culprit,
+                outro: true, decor: 'prison', npc: scrTruthCulpritId(),
                 text: {
                     fr: '<div class="accuse-screen"><div class="accuse-result success">✅ ACCUSATION JUSTE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">' + titleTxt + ' est coupable. ' + methodeTxt + '</div></div><div class="ending-text">Derrière les barreaux, le coupable s\'effondre. ' + prisonTxt + '</div>',
                     en: '<div class="accuse-screen"><div class="accuse-result success">✅ RIGHT ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">' + titleTxt + ' is guilty. ' + methodeTxt + '</div></div><div class="ending-text">Behind the bars, the culprit breaks down. ' + prisonTxt + '</div>'
                 }
             });
             pages.push({
-                decor: 'qg', npc: 'detective-partner',
+                outro: true, decor: 'qg', npc: 'detective-partner',
                 text: {
                     fr: '<div class="ending-text">' + scrSubstituteNames('Devant le quartier général, votre partenaire Wexford vous félicite. « Affaire classée, inspecteur. Votre méthode a porté ses fruits. »', themeId) + '</div>',
                     en: '<div class="ending-text">' + scrSubstituteNames('Outside headquarters, your partner Wexford congratulates you. "Case closed, inspector. Your method bore fruit."', themeId) + '</div>'
                 }
             });
             pages.push({
-                decor: 'exile', npc: null,
+                outro: true, decor: 'exile', npc: null,
                 text: {
                     fr: '<div class="ending-text">Enfin la paix. Vous et Wexford vous offrez des vacances bien méritées sur une île paradisiaque. ' + morale + '</div>',
                     en: '<div class="ending-text">Finally, peace. You and Wexford treat yourselves to a well-deserved vacation on a paradise island. ' + morale + '</div>'
@@ -5593,21 +5657,21 @@ function scrApplyChoice(choiceKey, choiceId) {
                le vrai coupable est piégé par les preuves. Structure identique à la
                mauvaise fin : prison innocent → QG réprimande → paradisiaque coupable. */
             pages.push({
-                decor: 'prison', npc: s.accused,
+                outro: true, decor: 'prison', npc: s.accused,
                 text: {
                     fr: '<div class="accuse-screen"><div class="accuse-result partial">⚠ ACCUSATION ERRONÉE, MAIS LES PREUVES PARLENT</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Vous accusez ' + innocentTitle + ', un innocent. Mais le faisceau d\'indices est si épais que ' + titleTxt + ' ne peut plus se cacher.</div></div><div class="ending-text">Derrière les barreaux, ' + innocentTitle + ' s\'effondre, innocente. La vérité finira bien par émerger, mais trop tard pour cette affaire.</div>',
                     en: '<div class="accuse-screen"><div class="accuse-result partial">⚠ WRONG ACCUSATION, BUT THE EVIDENCE SPEAKS</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">You accuse ' + innocentTitle + ', an innocent. But the evidence beam is so thick that ' + titleTxt + ' can no longer hide.</div></div><div class="ending-text">Behind the bars, ' + innocentTitle + ' collapses, innocent. The truth will eventually emerge, but too late for this case.</div>'
                 }
             });
             pages.push({
-                decor: 'qg', npc: 'detective-partner',
+                outro: true, decor: 'qg', npc: 'detective-partner',
                 text: {
                     fr: '<div class="ending-text">' + scrSubstituteNames('Votre partenaire vous fusille du regard. « Vous avez accusé un innocent, mais le vrai coupable, ' + titleTxt + ', ne s\'en sortira pas. »', themeId) + '</div>',
                     en: '<div class="ending-text">' + scrSubstituteNames('Your partner glares at you. "You accused an innocent, but the real culprit, ' + titleTxt + ', won\'t get away."', themeId) + '</div>'
                 }
             });
             pages.push({
-                decor: 'exile', npc: truth.culprit,
+                outro: true, decor: 'exile', npc: scrTruthCulpritId(),
                 text: {
                     fr: '<div class="ending-text">' + titleTxt + ' est arrêté grâce aux preuves. La vérité prévaut, même par le bas.</div>',
                     en: '<div class="ending-text">' + titleTxt + ' is arrested thanks to the evidence. The truth prevails, even if by the back door.</div>'
@@ -5616,21 +5680,21 @@ function scrApplyChoice(choiceKey, choiceId) {
         } else {
             /* Fin 2 - Accusation erronée : 3 pages (prison innocent → QG réprimande → paradisiaque coupable) */
             pages.push({
-                decor: 'prison', npc: s.accused,
+                outro: true, decor: 'prison', npc: s.accused,
                 text: {
                     fr: '<div class="accuse-screen"><div class="accuse-result failure">❌ ACCUSATION ERRONÉE</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">Vous accusez ' + innocentTitle + ', un innocent. Le vrai coupable, ' + titleTxt + ', s\'est échappé.</div></div><div class="ending-text">Derrière les barreaux, ' + innocentTitle + ' s\'effondre, innocente. La vérité finira bien par émerger, mais trop tard pour cette affaire.</div>',
                     en: '<div class="accuse-screen"><div class="accuse-result failure">❌ WRONG ACCUSATION</div><div class="accuse-reaction">' + reaction + '</div>' + beamHtml + '<div class="accuse-summary">You accuse ' + innocentTitle + ', an innocent. The real culprit, ' + titleTxt + ', has escaped.</div></div><div class="ending-text">Behind the bars, ' + innocentTitle + ' collapses, innocent. The truth will eventually emerge, but too late for this case.</div>'
                 }
             });
             pages.push({
-                decor: 'qg', npc: 'detective-partner',
+                outro: true, decor: 'qg', npc: 'detective-partner',
                 text: {
                     fr: '<div class="ending-text">' + scrSubstituteNames('Votre partenaire vous fusille du regard. « Vous avez accusé un innocent. Le vrai coupable, ' + titleTxt + ', court toujours. »', themeId) + '</div>',
                     en: '<div class="ending-text">' + scrSubstituteNames('Your partner glares at you. "You accused an innocent. The real culprit, ' + titleTxt + ', is still free."', themeId) + '</div>'
                 }
             });
             pages.push({
-                decor: 'exile', npc: truth.culprit,
+                outro: true, decor: 'exile', npc: scrTruthCulpritId(),
                 text: {
                     fr: '<div class="ending-text">' + exileTxt + ' ' + titleTxt + ' vous nargue depuis l\'île paradisiaque. « Vous avez cru me coincer ? La justice des hommes est aussi faillible que votre raisonnement. »</div>',
                     en: '<div class="ending-text">' + exileTxt + ' ' + titleTxt + ' taunts you from the paradise island. "You thought you could corner me? Human justice is as fallible as your reasoning."</div>'
@@ -5653,7 +5717,7 @@ function scrApplyChoice(choiceKey, choiceId) {
         if (!correct && evalResult.indirectConviction) {
             revealed = true;
         }
-        var themedTitle = scrThemedTitle(truth.culprit, lang);
+        var themedTitle = scrThemedTitle(scrTruthCulpritId(), lang);
         return {
             good: correct,
             culprit: themedTitle,
