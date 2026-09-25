@@ -252,17 +252,17 @@
                 });
             }
 
-var cfg = {
-                type: 'reseau_alibis',
-                difficulty: 'extreme',
-                time: 60,
-                evidence: 'witness',
-                alibiPool: 'act2_3',
-                title: { fr: 'Le Réseau d\'alibis — Duels finaux', en: 'The Alibi Network — Final Duels' },
-                desc: { fr: 'Six suspects, deux cartes tirées au sort à chaque manche. Une carte ment — démasquez-la.', en: 'Six suspects, two cards drawn at random each round. One card lies — unmask it.' },
-                clue: { fr: 'Le réseau final : Krane avoue l\'engagement du Duc, l\'ADN accable Pembrooke, et les clés du Major ouvrent tout.', en: 'The final network: Krane admits the Duke\'s contract, the DNA damns Pembrooke, and the Major\'s keys open everything.' },
-                lang: 'fr'
-            };
+ var cfg = {
+     type: 'reseau_alibis',
+     difficulty: 'extreme',
+     time: 90,
+     evidence: 'witness',
+     alibiPool: (new URLSearchParams(window.location.search)).get('alibiPool') || 'act2_3',
+     title: { fr: 'Le Réseau d\'alibis — Duels finaux', en: 'The Alibi Network — Final Duels' },
+     desc: { fr: 'Trois duels finaux. À chaque manche, une carte ment — démasquez-la.', en: 'Three final duels. Each round, one card lies — unmask it.' },
+     clue: { fr: 'Le réseau final : Krane avoue l\'engagement du Duc, l\'ADN accable Pembrooke, et les clés du Major ouvrent tout.', en: 'The final network: Krane admits the Duke\'s contract, the DNA damns Pembrooke, and the Major\'s keys open everything.' },
+     lang: 'fr'
+ };
             
             var minigame = TDNarrativeEngine.createMinigame('reseau_alibis', cfg);
             minigame.onComplete(window.TDAlibiNavigation);

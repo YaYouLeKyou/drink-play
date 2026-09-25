@@ -4907,13 +4907,15 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
              return url;
          }
 
-         if (type === 'reseau_alibis') {
-             var page = 'reseau-alibis-1.html';
-             if (diff === 'medium') page = 'reseau-alibis-2.html';
-             else if (diff === 'hard') page = 'reseau-alibis-3.html';
-             else if (diff === 'extreme') page = 'reseau-alibis-4.html';
-             return page + '?difficulty=' + diff + '&lang=' + lang + '&theme=' + encodeURIComponent(themeId || getThemeId()) + (mode === 'story' ? '&story=1' : '');
-         }
+          if (type === 'reseau_alibis') {
+              var page = 'reseau-alibis-1.html';
+              if (diff === 'medium') page = 'reseau-alibis-2.html';
+              else if (diff === 'hard') page = 'reseau-alibis-3.html';
+              else if (diff === 'extreme') page = 'reseau-alibis-4.html';
+              var url = page + '?difficulty=' + diff + '&lang=' + lang + '&theme=' + encodeURIComponent(themeId || getThemeId()) + (mode === 'story' ? '&story=1' : '');
+              if (mgCfg && mgCfg.alibiPool) url += '&alibiPool=' + encodeURIComponent(mgCfg.alibiPool);
+              return url;
+          }
 
          if (['pong', 'pacman', 'space-invaders', 'breakout', 'asteroids', 'missile-command'].indexOf(type) >= 0) {
              return 'standalone-game.html?game=' + type + '&level=' + diff + '&lang=' + lang + '&theme=' + encodeURIComponent(themeId || getThemeId()) + (mode ? ('&mode=' + mode) : '');

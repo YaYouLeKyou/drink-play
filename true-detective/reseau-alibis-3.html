@@ -252,17 +252,17 @@
                 });
             }
 
-var cfg = {
-                type: 'reseau_alibis',
-                difficulty: 'hard',
-                time: 60,
-                evidence: 'witness',
-                alibiPool: 'act2_1',
-                title: { fr: 'Le Réseau d\'alibis — Duels du bar', en: 'The Alibi Network — Bar Duels' },
-                desc: { fr: 'Trois manches : les dépositions de Julian Pembrooke et Victor Krane. À chaque manche, trouvez le menteur.', en: 'Three rounds: the testimonies of Julian Pembrooke and Victor Krane. Find the liar each round.' },
-                clue: { fr: 'Les duels du bar scellent les contradictions : Pembrooke nie le rôdeur, Krane nie sa présence, mais les reçus V.K. disent le contraire.', en: 'The bar duels seal the contradictions: Pembrooke denies the prowler, Krane denies his presence, but the V.K. receipts say otherwise.' },
-                lang: 'fr'
-            };
+ var cfg = {
+     type: 'reseau_alibis',
+     difficulty: 'hard',
+     time: 90,
+     evidence: 'witness',
+     alibiPool: (new URLSearchParams(window.location.search)).get('alibiPool') || 'act2_1',
+     title: { fr: 'Le Réseau d\'alibis — Duels du bar', en: 'The Alibi Network — Bar Duels' },
+     desc: { fr: 'Trois duels tirés au sort parmi les dépositions du bar. À chaque manche, trouvez le menteur.', en: 'Three randomly drawn duels from the bar testimonies. Find the liar each round.' },
+     clue: { fr: 'Les duels du bar scellent les contradictions : Pembrooke nie le rôdeur, Krane nie sa présence, mais les reçus V.K. disent le contraire.', en: 'The bar duels seal the contradictions: Pembrooke denies the prowler, Krane denies his presence, but the V.K. receipts say otherwise.' },
+     lang: 'fr'
+ };
             
             var minigame = TDNarrativeEngine.createMinigame('reseau_alibis', cfg);
             minigame.onComplete(window.TDAlibiNavigation);

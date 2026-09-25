@@ -276,7 +276,7 @@
                 difficulty: 'easy',
                 time: 60,
                 evidence: 'witness',
-                alibiPool: 'act1_1',
+                alibiPool: (new URLSearchParams(window.location.search)).get('alibiPool') || 'act1_1',
                 title: { fr: 'Le Réseau d\'alibis — Duel', en: 'The Alibi Network — Duel' },
                 desc: { fr: 'Un duo de dépositions par manche : deux cartes, un seul menteur. Cliquez sur le MENTEUR.', en: 'One duo of testimonies per round: two cards, only one liar. Click the LIAR.' },
                 clue: { fr: 'Le réseau s\'ouvre : la panne de Hale et le verrou ouvert à la clé sont les premières failles.', en: 'The network opens up: Hale\'s breakdown and the key-opened lock are the first cracks.' },
