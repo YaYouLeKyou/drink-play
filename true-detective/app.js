@@ -1107,13 +1107,13 @@ applyMusicHidden(true);
                     TDAudioService.stopSpeaking();
                 }
                 /* L'enquête est terminee : on repart d'un etat neuf, sinon
-                   « Continuer » proposerait de reprendre une partie finie. */
+                   « Continuer » proposerait de reprendre une partie finie.
+                   (TDNarrativeEngine.resetGame() efface deja la sauvegarde.) */
                 try {
                     if (typeof TDScenario !== 'undefined' && TDScenario.reset) {
                         TDScenario.reset();
                     }
                 } catch (e) { /* etat non critique */ }
-                try { localStorage.removeItem('td_scenario_save'); } catch (e) {}
                 scr.active = false;
                 scr.interro = null;
                 if ($.endScreen) { $.endScreen.classList.add('hidden'); $.endScreen.classList.remove('active'); }
@@ -1332,7 +1332,7 @@ applyMusicHidden(true);
         var homeSubtitle = document.querySelector('.home-subtitle');
         if (homeSubtitle) {
             homeSubtitle.textContent = ui.language === 'fr'
-                ? 'Enquête détective interactive avec 3 univers, 6 suspects et 1 seul coupable différent à chaque fois. Démasquer l\'assassin au travers d\'une enquête palpitante avec ses mini-jeux et ses énigmes.'
+                ? 'Enquête détective interactive avec 3 univers, 6 suspects et 1 seul coupable différent à chaque fois.'
                 : 'Interactive detective investigation with 3 universes, 6 suspects and 1 different culprit each time. Unmask the assassin through a thrilling investigation with its mini-games and puzzles.';
         }
         if ($.startBtn) {
