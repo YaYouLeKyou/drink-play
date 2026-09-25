@@ -147,6 +147,93 @@
                 display: grid;
             }
         }
+
+        /* ===== PC / laptop : talkbox à GAUCHE du jeu, colonne étroite =====
+           En mode scénario, story-chrome.js insère la barre de dialogue
+           (#td-sc-bar, portrait + nom + texte) comme premier enfant de
+           .sg-main. Or .sg-main est une colonne : la barre s'étale donc sur
+           toute la largeur au-dessus du labyrinthe et vole de la place
+           verticale au jeu.
+
+           Dès 900px on repasse .sg-main en ligne : la barre devient une
+           colonne compacte calée à gauche, centrée verticalement, et le
+           labyrinthe garde le centre de la fenêtre. En dessous de 900px
+           (mobile / tablette) la disposition verticale d'origine est
+           conservée telle quelle. */
+        @media (min-width: 900px) {
+            .sg-main {
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: 20px;
+            }
+
+            /* La barre sort du flux pour ne pas écraser le jeu : colonne
+               fixe à gauche, largeur bornée. */
+            .sg-main > #td-sc-bar.td-sc-bar {
+                position: absolute;
+                top: 50%;
+                left: 16px;
+                transform: translateY(-50%);
+                width: 240px;
+                max-width: 22vw;
+                margin: 0;
+                z-index: 5;
+            }
+
+            /* Le portrait passe au-dessus du texte : plus lisible dans une
+               colonne étroite, et le cadre garde le ratio paysage des
+               sprites (677x369) au lieu de les rogner. */
+            .sg-main > #td-sc-bar.td-sc-bar .td-sc-bar-inner {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                padding: 10px;
+            }
+
+            .sg-main > #td-sc-bar.td-sc-bar .td-sc-portrait-frame {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 677 / 369;
+                border-radius: 8px;
+            }
+
+            .sg-main > #td-sc-bar.td-sc-bar .td-sc-portrait {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                object-position: center top;
+            }
+
+            .sg-main > #td-sc-bar.td-sc-bar .td-sc-dialogue-zone {
+                min-width: 0;
+            }
+
+            .sg-main > #td-sc-bar.td-sc-bar .td-sc-name {
+                font-size: 0.95rem;
+            }
+
+            .sg-main > #td-sc-bar.td-sc-bar .td-sc-role {
+                font-size: 0.6rem;
+            }
+
+            /* Texte plus compact, avec défilement interne si la réplique
+               est longue : la colonne ne doit pas dépasser la fenêtre. */
+            .sg-main > #td-sc-bar.td-sc-bar .td-sc-dialogue-box {
+                padding: 8px 10px;
+                font-size: 0.82rem;
+                line-height: 1.45;
+                max-height: 34vh;
+                overflow-y: auto;
+            }
+
+            /* Le labyrinthe est légèrement décalé à droite pour ne pas
+               passer sous la colonne de dialogue, tout en restant centré
+               dans l'espace restant. */
+            .pacman-wrap {
+                max-width: 440px;
+            }
+        }
     </style>
 </head>
 <body>
