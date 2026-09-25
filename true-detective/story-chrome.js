@@ -210,11 +210,11 @@
         'shooting': 'protecteur',
         'chess': 'femme-fatale',
         'connect4': 'suspect',
-        'memory': 'femme-fatale',
+        'memory': 'criminel',
         'jackpot': 'seducteur',
         'marginal-tower': 'marginal',
         'pong': 'femme-fatale',
-        'pacman': 'femme-fatale',
+        'pacman': 'marginal',
         'breakout': 'seducteur',
         'space-invaders': 'protecteur',
         'asteroids': 'criminel',
@@ -231,7 +231,7 @@
         'jackpot': 'barInterieur',
         'marginal-tower': 'alley',
         'pong': 'alley',
-        'pacman': 'barInterieur',
+        'pacman': 'alley',
         'breakout': 'barInterieur',
         'space-invaders': 'headquarters',
         'asteroids': 'alley',
@@ -245,7 +245,7 @@
        Elles restent événementielles et ne dépendent d'aucun timer. */
     var GAME_DEFAULT_LINES = {
         pong: {
-            start: { fr: 'Lady Vivienne : « Vous me confusez avec Silas ? Retournez donc me chercher un autre adversaire. »', en: 'Lady Vivienne: "You mistake me for Silas? Find yourself another opponent."' },
+            start: { fr: 'Lady Vivienne : « Une raquette, une balle, et vous. Aucun refuge ici, inspecteur : c\'est vous ou moi. »', en: 'Lady Vivienne: "One paddle, one ball, and you. No hiding place here, inspector: it is you or me."' },
             score: { fr: 'Lady Vivienne : « Chaque point vous rapproche de la vérité… et de ma patience. »', en: 'Lady Vivienne: "Every point brings you closer to the truth... and to the end of my patience."' },
             victory: { fr: 'Lady Vivienne : « Vous avez gagné le duel, inspecteur. Mais pas encore la vérité. »', en: 'Lady Vivienne: "You won the duel, inspector. Not yet the truth."' }
         },
@@ -253,6 +253,12 @@
             start: { fr: 'Silas Crane : « Une pièce, un étage. Montez, et vous écoutez. »', en: 'Silas Crane: "One coin, one floor. Climb, and you listen."' },
             object: { fr: 'Silas Crane : « Encore un objet. La tour se souvient de tout. »', en: 'Silas Crane: "One more object. The tower remembers everything."' },
             victory: { fr: 'Silas Crane : « Vous avez tenu la tour. La ruelle vous pertenece enfin. »', en: 'Silas Crane: "You held the tower. The alley is finally yours."' }
+        },
+        pacman: {
+            start: { fr: 'Silas Crane : « Ce labyrinthe, c\'est la ruelle après minuit. Avancez, et vous tournerez en rond comme tout le monde. »', en: 'Silas Crane: "This maze is the alley after midnight. Move, and you will go in circles like everyone else."' },
+            score: { fr: 'Silas Crane : « Les fantômes se moquent de vous. Tenez encore un peu... je veille. »', en: 'Silas Crane: "The ghosts laugh at you. Hold on a little longer... I am watching."' },
+            victory: { fr: 'Silas Crane : « Vous avez nettoyé le labyrinthe. La ruelle vous devait bien ça. »', en: 'Silas Crane: "You cleared the maze. The alley owed you that much."' },
+            defeat: { fr: 'Silas Crane : « Perdu dans les couloirs ? Revenez : la ruelle n\'a pas disparu. »', en: 'Silas Crane: "Lost in the corridors? Come back: the alley has not disappeared."' }
         },
         shooting: {
             start: { fr: 'Major Hale : « Les cibles ne mentent jamais. Touchez-en vingt sans vous tromper, inspecteur. »', en: 'Major Hale: "Targets never lie. Hit twenty without a mistake, inspector."' },
@@ -271,9 +277,10 @@
             victory: { fr: 'Lady Vivienne : « Votre stratégie est meilleure… mais vous ne connaissez pas encore ma version des faits. »', en: 'Lady Vivienne: "Your strategy is better... but you still do not know my version of events."' }
         },
         memory: {
-            start: { fr: 'Lady Vivienne : « Retenez ce visage. Une mémoire qui oublie ne vaut rien. »', en: 'Lady Vivienne: "Remember this face. A memory that forgets is worthless."' },
-            pair: { fr: 'Lady Vivienne : « Une paire. Vous vous souvenez de moi… ou de mes mensonges ? »', en: 'Lady Vivienne: "A pair. Do you remember me... or my lies?"' },
-            victory: { fr: 'Lady Vivienne : « Vous avez retrouvé chaque paire. La dernière était l’alibi, non ? »', en: 'Lady Vivienne: "You found every pair. The last one was the alibi, wasn’t it?"' }
+            start: { fr: 'Victor Krane : « Retenez chaque visage, inspecteur. Un homme de main qui oublie est un homme de main qui pourrit. »', en: 'Victor Krane: "Remember every face, inspector. A hired hand who forgets is a hired hand who rots."' },
+            pair: { fr: 'Victor Krane : « Une paire de plus… Vous notez les visages, ou les dettes ? »', en: 'Victor Krane: "One more pair... Are you noting the faces, or the debts?"' },
+            victory: { fr: 'Victor Krane : « Vous avez tout retrouvé. La dernière carte, c\'était l\'alibi, non ? »', en: 'Victor Krane: "You found them all. That last card was the alibi, wasn\'t it?"' },
+            defeat: { fr: 'Victor Krane : « La mémoire vous a lâché. Revenez quand vous saurez compter vos vies. »', en: 'Victor Krane: "Your memory failed you. Come back when you can count your lives."' }
         },
         jackpot: {
             start: { fr: 'Julian Pembrooke : « Faites tourner la machine. La chance a parfois des noms. »', en: 'Julian Pembrooke: "Spin the machine. Fortune sometimes has a name."' },
@@ -667,6 +674,9 @@
         dom.nameText = document.getElementById('td-sc-name');
         dom.roleText = document.getElementById('td-sc-role');
         dom.dialogue = document.getElementById('td-sc-dialogue');
+        if (state.mode === 'standalone') {
+            ensureHeaderSettingsBtn();
+        }
         return dom;
     }
 
@@ -822,11 +832,29 @@
             return false;
         }
 
+        /* Story mode "for real" = explicit opt or URL flag (?story=1 / ?mode=story).
+           We deliberately ignore cfg.story here: that one can come from a
+           leftover localStorage config, which would wrongly re-enable the
+           talkbox on the plain "mini jeux" page. */
+        opts.__story = (opts.story === true) || (opts.storyMode === true) ||
+            (params.get('story') === '1') || (params.get('mode') === 'story');
+
         state.active = true;
         state.mode = detectMode(opts);
         state.dom = (state.mode === 'overlay') ? ensureOverlayDom() : ensureStandaloneDom(opts);
         document.documentElement.classList.add('td-sc-' + state.mode);
         paint();
+        if (state.mode === 'standalone') {
+            var settingsBtn = document.getElementById('td-sc-settings-btn');
+            if (settingsBtn && !settingsBtn._tdScBound) {
+                settingsBtn._tdScBound = true;
+                settingsBtn.addEventListener('click', function () {
+                    if (window.DPSettings && typeof window.DPSettings.open === 'function') {
+                        window.DPSettings.open();
+                    }
+                });
+            }
+        }
 
         var startLine = pickLine('start', undefined);
         var startText = startLine ? tx(startLine.text, state.lang) : '';

@@ -28,8 +28,23 @@
         panel.setAttribute('role', 'dialog');
         panel.setAttribute('aria-label', 'Panneau des paramètres');
 
+        /* Option btnMount : montage du bouton dans un conteneur existant
+           (navbar) au lieu du positionnement fixe par défaut dans <body>.
+           Accepte un sélecteur CSS ou un élément. */
+        var mount = null;
+        if (cfg.btnMount) {
+            mount = (typeof cfg.btnMount === 'string')
+                ? document.querySelector(cfg.btnMount)
+                : cfg.btnMount;
+        }
+
         document.body.appendChild(backdrop);
-        document.body.appendChild(btn);
+        if (mount) {
+            btn.classList.add('dp-settings-btn-inline');
+            mount.appendChild(btn);
+        } else {
+            document.body.appendChild(btn);
+        }
         document.body.appendChild(panel);
     }
 
@@ -256,6 +271,7 @@
                 showRestart: false,
                 showRules: false,
                 customButtons: [],
+                btnMount: null,
                 onLangChange: null,
                 onMusicToggle: null,
                 onMusicVolume: null,

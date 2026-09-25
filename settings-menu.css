@@ -18,6 +18,18 @@
     transform: scale(1.08);
 }
 .dp-settings-btn:active { transform: scale(0.96); }
+/* Variante « dans la navbar » (option btnMount de DPSettings.init) :
+   le bouton cesse d'être flottant et s'aligne sur la barre de titre.
+   Specificité 0,2,0 : l'emporte sur .dp-settings-btn, y compris dans la
+   media query mobile du bas de fichier (top/right y sont alors ignorés). */
+.dp-settings-btn.dp-settings-btn-inline {
+    position: static;
+    width: 38px;
+    height: 38px;
+    font-size: 1.15em;
+    border-radius: 10px;
+    flex: 0 0 auto;
+}
 .dp-settings-btn.open {
     background: rgba(0, 255, 255, 0.15);
     border-color: rgba(0, 255, 255, 1);

@@ -17,31 +17,43 @@
 
     var PHRASES = {
         fr: [
-            "Les pong sont cruels, inspecteur.",
-            "Vous n'\u2019etes pas si mauvais.",
-            "La balle ne ment pas.",
-            "Essayez de me battre, detecteur.",
-            "La lumiere du neon vous observe."
+            "La balle ne ment jamais, inspecteur. Vous, moins que personne.",
+            "Gardez l'œil sur la balle... pas seulement sur moi.",
+            "Vous jouez serré. J'aime les joueurs qui serrent.",
+            "Chaque rebond est une question. Savez-vous y répondre ?",
+            "La salle vous regarde. Elle attend le premier qui craque.",
+            "Plus vite. Voilà : on est enfin réveillés.",
+            "Encore un point et vous comprendrez ma stratégie."
         ],
         en: [
-            "Pong can be cruel, inspector.",
-            "You\u2019re not so bad.",
-            "The ball doesn\u2019t lie.",
-            "Try to beat me, detective.",
-            "Neon lights watch you."
+            "The ball never lies, inspector. You, less than anyone.",
+            "Keep your eyes on the ball... not only on me.",
+            "You play tight. I like players who play tight.",
+            "Every bounce is a question. Can you answer it?",
+            "The room is watching. Waiting for the first one to crack.",
+            "Faster. There: now we are properly awake.",
+            "One more point and you will understand my strategy."
         ]
     };
 
     var TAUNTS = {
         fr: [
-            "Ha! Un point pour moi.",
-            "Vous echouez devant moi.",
-            "La ville vous doit plus que \u00e7a."
+            "Un point pour moi. Vous comptez sur la chance ?",
+            "Je vous l'avais dit : la balle ne ment pas.",
+            "Encore un effort... et vous ferez quoi, exactement ?",
+            "Ce regard-là, inspecteur, il vous va vraiment très mal.",
+            "Votre raquette a trahi. J'ai à peine bougé.",
+            "Je n'ai même pas eu besoin d'effort.",
+            "Respirez. On continue : vous avez beaucoup de chemin."
         ],
         en: [
-            "Ha! A point for me.",
-            "You fail before me.",
-            "The city owes you more than that."
+            "One point for me. Were you counting on luck?",
+            "I told you: the ball never lies.",
+            "One more effort... and what exactly will you do?",
+            "That look, inspector, does not suit you at all.",
+            "Your paddle betrayed you. I barely moved.",
+            "I did not even have to try.",
+            "Breathe. We continue: you have a long way to go."
         ]
     };
 

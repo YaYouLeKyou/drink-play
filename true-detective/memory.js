@@ -143,15 +143,17 @@
         if (diff < 1 || diff > 3) diff = 1;
         var act = diff;
         var fromStory = params.get('story') === '1' || params.get('mode') === 'story';
-        if (fromStory && window.TDStoryChrome) {
-            var culpritId = 'criminel';
+        /* Le Memory montre toujours Victor Krane (le Criminel), en mode
+           scénario comme en mode classic/standalone : on force l'init pour
+           avoir le portrait + la boîte de dialogue dans les deux cas. */
+        if (window.TDStoryChrome) {
             window.TDStoryChrome.initFromCfg({
                 type: 'memory',
                 interroId: 'criminel',
-                culprit: culpritId,
-                storyMode: true,
+                culprit: 'criminel',
+                storyMode: fromStory,
                 lang: lang
-            });
+            }, { force: true });
         }
 
 

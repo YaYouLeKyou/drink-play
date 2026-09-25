@@ -251,38 +251,64 @@
             transform: translateY(-2px);
         }
 
-        /* Mode story sur laptop : boîte du coupable à gauche, Memory à droite. */
+        /* Mode laptop : Memory au milieu, petite boîte de dialogue à gauche.
+           NB : TDStoryChrome insère .td-sc-bar comme premier enfant de .sg-main
+           (mount = .sg-main), et non dans #memory-app. */
         @media (min-width: 769px) {
             html.td-story-chrome .sg-main {
                 min-height: 0;
                 overflow: hidden;
-            }
-
-            html.td-story-chrome #memory-app {
-                width: min(100%, 864px);
-                height: 100%;
-                max-height: 100%;
                 display: grid;
-                grid-template-columns: 220px minmax(0, 620px);
+                grid-template-columns: 180px minmax(0, 620px);
                 grid-template-rows: minmax(0, 1fr);
                 align-items: center;
-                justify-content: start;
-                gap: 24px;
-                margin: 0;
-                padding: 0 24px;
-                min-height: 0;
+                justify-content: center;
+                gap: 20px;
+                padding: 16px 24px;
                 box-sizing: border-box;
             }
 
-            html.td-story-chrome #memory-app > .td-sc-bar {
-                width: 220px;
-                max-width: 220px;
+            /* Petite boîte de dialogue du Criminel, à gauche du jeu. */
+            html.td-story-chrome .sg-main > .td-sc-bar {
+                width: 180px;
+                max-width: 180px;
                 margin: 0;
-                justify-self: start;
+                justify-self: end;
                 align-self: center;
             }
 
-            html.td-story-chrome #memory-app > .memory-wrap {
+            html.td-story-chrome .sg-main > .td-sc-bar .td-sc-bar-inner {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                padding: 10px 12px;
+            }
+
+            html.td-story-chrome .sg-main > .td-sc-bar .td-sc-portrait-frame {
+                width: 40px;
+                height: 40px;
+            }
+
+            html.td-story-chrome .sg-main > .td-sc-bar .td-sc-dialogue-box {
+                padding: 6px 8px;
+                min-height: 0;
+                font-size: 0.72rem;
+                line-height: 1.35;
+            }
+
+            /* Le Memory reste centré dans l'espace restant. */
+            html.td-story-chrome .sg-main > #memory-app {
+                width: 100%;
+                height: 100%;
+                max-height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 0;
+                min-height: 0;
+            }
+
+            html.td-story-chrome .sg-main > #memory-app > .memory-wrap {
                 width: 100%;
                 max-width: 620px;
                 min-width: 0;

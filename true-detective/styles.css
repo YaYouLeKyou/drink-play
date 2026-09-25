@@ -3170,6 +3170,125 @@ html {
     display: none !important;
 }
 
+/* ===== MINIGAME OVERLAY - PACMAN LAYOUT (laptop / grand écran) =====
+   Pac-Man du Marginal : la barre de dialogue pleine largeur (min(94vw,
+   1040px)) vole trop de place au-dessus du labyrinthe. Dès que la fenêtre
+   est assez large, la classe .pacman-layout (posée par pacman-game.js)
+   bascule l'overlay en grille : le dialogue devient une colonne compacte
+   à GAUCHE, le labyrinthe et le bouton « Passer » occupent la colonne de
+   droite. Grille = le dialogue ne peut plus recouvrir le canvas.
+   Seuil à 640px (breakpoint déjà utilisé par story-chrome.css, et non
+   1024/1120) pour qu'une fenêtre de laptop non maximisée, un écran tactile
+   ou un zoom navigateur à 150% profitent aussi du panneau : sous 640px de
+   largeur CSS, un 1366x768 zoomé retombait sinon sur la barre du haut.
+   Sans condition de pointeur : un laptop tactile garde la colonne à gauche.
+   En dessous de 640px (mobile) : barre horizontale d'origine, inchangée. */
+
+@media (min-width: 640px) {
+    .minigame-overlay.pacman-layout {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "pacman-bar pacman-game"
+            "pacman-bar pacman-bottom";
+        align-items: center;
+        justify-items: center;
+        column-gap: 16px;
+    }
+
+    /* Colonne de gauche : le panneau de dialogue */
+    .minigame-overlay.pacman-layout .minigame-overlay-topbar {
+        grid-area: pacman-bar;
+        width: clamp(190px, 24vw, 300px);
+        max-width: none;
+        margin: 0;
+        padding: 10px 12px;
+        gap: 8px;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        background: rgba(0, 0, 10, 0.78);
+        border: 1px solid rgba(0, 255, 255, 0.28);
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Colonne de droite : le jeu puis le bouton « Passer » */
+    .minigame-overlay.pacman-layout .minigame-overlay-container {
+        grid-area: pacman-game;
+        width: auto;
+        max-width: 100%;
+        margin: 0;
+    }
+
+    .minigame-overlay.pacman-layout .minigame-overlay-bottombar {
+        grid-area: pacman-bottom;
+        width: auto;
+        max-width: 100%;
+        margin: 0;
+        padding: 8px 12px;
+    }
+
+    /* Portrait : l'image du personnage doit rester bien lisible */
+    .minigame-overlay.pacman-layout .minigame-topbar-character {
+        width: 72px;
+        height: 72px;
+        min-height: 72px;
+        border-radius: 10px;
+        align-self: center;
+    }
+
+    .minigame-overlay.pacman-layout .minigame-topbar-character img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .minigame-overlay.pacman-layout .minigame-topbar-dialogue {
+        flex: 0 0 auto;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .minigame-overlay.pacman-layout .minigame-npc-name {
+        margin: 0 0 4px;
+    }
+
+    .minigame-overlay.pacman-layout .minigame-npc-name-text {
+        font-size: 0.95rem;
+    }
+
+    .minigame-overlay.pacman-layout .minigame-npc-role-text {
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+    }
+
+    /* Boîte de dialogue : plus petite, texte réduit, défilement interne */
+    .minigame-overlay.pacman-layout .minigame-dialogue-box {
+        min-height: 0;
+        max-height: 42vh;
+        overflow-y: auto;
+        padding: 10px 12px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    /* Fermeture (✕) épinglée en haut à droite du panneau */
+    .minigame-overlay.pacman-layout .minigame-topbar-actions {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+    }
+
+    .minigame-overlay.pacman-layout .minigame-topbar-actions .btn {
+        width: 26px;
+        height: 26px;
+        padding: 0;
+        font-size: 0.75rem;
+    }
+}
+
 /* ===== MINIGAME OVERLAY SETTINGS MENU ===== */
 
 /* ===== DIFFICULTY SELECTION ===== */

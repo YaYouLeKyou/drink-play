@@ -47,15 +47,34 @@
 
     var PHRASE_TRIGGERS = [20, 40, 60, 80];
 
+    /* Classe de layout propre au pacman : la barre de dialogue devient un
+       panneau compact calé à gauche sur écran large (laptop).
+       Voir styles.css — « MINIGAME OVERLAY - PACMAN LAYOUT ». */
+    var PACMAN_LAYOUT_CLASS = 'pacman-layout';
+
+    function applyPacmanLayout() {
+        var ov = document.getElementById('minigame-overlay');
+        if (ov) ov.classList.add('retro-layout', PACMAN_LAYOUT_CLASS);
+        return ov;
+    }
+
+    function clearPacmanLayout() {
+        var ov = document.getElementById('minigame-overlay');
+        if (ov) ov.classList.remove('retro-layout', PACMAN_LAYOUT_CLASS);
+    }
+
     function getNpcName(npcId, lang) {
         if (typeof window !== 'undefined' && window.scr && typeof window.scrNpcName === 'function') {
-            return window.scrNpcName(npcId || 'femme-fatale');
+            return window.scrNpcName(npcId || 'marginal');
         }
-        return lang === 'fr' ? 'Lyra Noir' : 'Lyra Noir';
+        return lang === 'fr' ? 'Silas Crane' : 'Silas Crane';
     }
 
     function getNpcRole(npcId, lang) {
-        if (npcId === 'femme-fatale' || !npcId) {
+        if (npcId === 'marginal' || !npcId) {
+            return lang === 'fr' ? 'Le Marginal' : 'The Vagrant';
+        }
+        if (npcId === 'femme-fatale') {
             return lang === 'fr' ? 'Femme Fatale' : 'Femme Fatale';
         }
         return '';
@@ -63,12 +82,12 @@
 
     function getNpcImage(npcId) {
         if (typeof window !== 'undefined' && window.scr && typeof window.scrNpcImage === 'function') {
-            return window.scrNpcImage(npcId || 'femme-fatale');
+            return window.scrNpcImage(npcId || 'marginal');
         }
         if (typeof window !== 'undefined' && window.THEME_ASSETS) {
             var themeId = typeof window.getThemeId === 'function' ? window.getThemeId() : 'agatha-christie';
             var assets = window.THEME_ASSETS[themeId] || window.THEME_ASSETS['agatha-christie'];
-            return assets && assets['femme-fatale'];
+            return assets && (assets.marginal || assets.femmeFatale);
         }
         return null;
     }
@@ -80,7 +99,7 @@
 
         var overlay = document.getElementById('minigame-overlay');
         var overlayContent = overlay ? overlay.querySelector('#minigame-screen-content') : null;
-        if (overlay) overlay.classList.add('retro-layout');
+        overlay = applyPacmanLayout();
         if (overlay) {
             var topbar = overlay.querySelector('.minigame-overlay-topbar');
             var bottombar = overlay.querySelector('.minigame-overlay-bottombar');
@@ -97,7 +116,7 @@
             target = layer;
         }
 
-        var interroId = cfg.interroId || 'femme-fatale';
+        var interroId = cfg.interroId || 'marginal';
         var suspectName = getNpcName(interroId, lang);
         var suspectRole = getNpcRole(interroId, lang);
         var dialogues = cfg.dialogues || [];
@@ -180,8 +199,7 @@
         var dialogueTextEl = null;
 
         function createInterroSidebar() {
-            var overlay = document.getElementById('minigame-overlay');
-            if (overlay) overlay.classList.add('retro-layout');
+            var overlay = applyPacmanLayout();
             var sidePanel = document.getElementById('chess-side-panel');
             if (sidePanel) sidePanel.style.display = 'none';
             var leftPanel = document.getElementById('chess-left-panel');
@@ -202,8 +220,12 @@
         }
 
         function cleanupInterro() {
-            var overlay = document.getElementById('minigame-overlay');
-            if (overlay) overlay.classList.remove('retro-layout');
+            /* NE PAS retirer le layout pacman ici : l'overlay reste affiché
+               ~1,2 s après la fin de partie (réaction du suspect + révélation
+               de l'indice). Sans cela, la barre de dialogue repartait en haut
+               pendant ce temps. C'est app.js (scrFinishMinigameOverlay /
+               startSelectedMinigame) qui retire la classe, quand l'overlay
+               est réellement fermé. */
             var sidePanel = document.getElementById('chess-side-panel');
             if (sidePanel) sidePanel.style.display = 'none';
             var leftPanel = document.getElementById('chess-left-panel');
@@ -214,8 +236,9 @@
         }
 
         function restoreOverlay() {
+            /* Idem cleanupInterro : la classe pacman-layout reste jusqu'à la
+               fermeture réelle de l'overlay (gérée par app.js). */
             if (overlay) {
-                overlay.classList.remove('retro-layout');
                 var topbar = overlay.querySelector('.minigame-overlay-topbar');
                 var bottombar = overlay.querySelector('.minigame-overlay-bottombar');
                 if (topbar) topbar.style.display = '';

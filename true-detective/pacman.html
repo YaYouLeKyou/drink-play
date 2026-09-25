@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-td-no-talkbox>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -39,6 +39,15 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 16px;
+            flex-wrap: wrap;
+        }
+
+        /* Groupe d'actions à droite de la navbar (bouton Retour + roue
+           des paramètres montée via DPSettings.init({ btnMount })). */
+        .sg-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .sg-main {
@@ -144,7 +153,9 @@
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
         <h2 class="sg-title" style="color:#ffd700;font-family:'Playfair Display',serif;margin:0;font-size:1.2rem;">Pacman Arcade</h2>
-        <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
+        <div class="sg-header-actions">
+            <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
+        </div>
     </header>
 
     <nav id="hamburger-menu" class="sg-menu">
@@ -528,6 +539,9 @@
                     showMusicToggle: true, showMusicVolume: true, showNarrationVolume: false,
                     showMuteToggle: false, showGameSection: true, showBackToHub: false,
                     showRestart: false, showRules: false, customButtons: [],
+                    /* La roue des paramètres vit DANS la navbar, plus en
+                       surimpression fixe dans le coin de l'écran. */
+                    btnMount: '.sg-header-actions',
                     onBackToHub: function () { window.location.href = '../true-detective/index.html#minigames'; }
                 });
             }

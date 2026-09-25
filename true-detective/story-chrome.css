@@ -174,6 +174,13 @@ html.td-sc-hidden .td-sc-veil {
     flex: 0 0 auto;
 }
 
+/* ---------- 4bis. Talkbox désactivée (opt-out page) ---------- */
+/* Le DOM reste en place (say()/setVisible() continuent de fonctionner sans
+   erreur), seule la barre est retirée du flux. */
+.td-sc-bar.td-sc-no-talkbox {
+    display: none !important;
+}
+
 .td-sc-bar-inner {
     display: flex;
     align-items: center;
@@ -348,6 +355,30 @@ html.td-sc-hidden .td-sc-veil {
     .td-sc-role {
         display: none;
     }
+}
+
+/* ---------- 8. Bouton settings dans la navbar story ---------- */
+html.td-story-chrome .sg-header .td-sc-settings-btn {
+    flex: 0 0 auto;
+    margin-left: 8px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--td-accent);
+    background: var(--td-panel-soft);
+    border: 1px solid var(--td-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: var(--td-font);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+html.td-story-chrome .sg-header .td-sc-settings-btn:hover {
+    background: var(--td-panel);
+    border-color: var(--td-accent-strong);
+    box-shadow: var(--td-glow);
 }
 
 @media (prefers-reduced-motion: reduce) {

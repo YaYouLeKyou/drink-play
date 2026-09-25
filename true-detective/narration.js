@@ -488,7 +488,7 @@
         },
 
         marginal2: {
-            intro: { fr: "Silas Crane vous reconnaît à peine. Il grelotte encore plus que la première fois. Choisissez votre question avec douceur.", en: "Silas Crane barely recognizes you. He shivers even more than the first time. Choose your question gently." },
+            intro: { fr: "Silas Crane vous reconnaît à peine. Il grelotte plus fort qu'à la première fois, et ses yeux fuient les vôtres dès que vous sortez la photo de l'arme. Le résultat ADN a fait son effet. Choisissez vos questions avec douceur : un clochard acculé devient un témoin, pas un menteur.", en: "Silas Crane barely recognizes you. He shivers worse than before, and his eyes dodge yours the moment the weapon photo appears. The DNA result has done its work. Choose your questions gently: a cornered vagrant becomes a witness, not a liar." },
             questions: [
                 {
                     id: 'sls2_q1',
@@ -506,6 +506,46 @@
                     id: 'sls2_q3',
                     label: { fr: "« La montre en or que vous avez vue... elle appartenait à qui ? »", en: "\"That gold watch you saw... who did it belong to?\"" },
                     response: { fr: "« Je ne sais pas. Mais je l'ai revue. Au poignet du rôdeur, cette fois. Il la serrait fort, comme s'il avait peur de la perdre. »\n\n[Chronologie] La montre en or est un lien entre le rôdeur et la scène.", en: "\"I don't know. But I saw it again. On the prowler's wrist this time. He was clutching it tight, like he was afraid of losing it.\"\n\n[Chronologie] The gold watch links the prowler to the scene." },
+                    evidence: 'timeline'
+                }
+            ],
+            rounds2: [
+                {
+                    id: 'sls2_r2q1',
+                    label: { fr: "« Votre ADN est sur la crosse de l'arme et sur le battant du bureau. Comment expliquez-vous d'être entré dans cette pièce ? »", en: "\"Your DNA is on the weapon grip and the study door. How do you explain being in that room?\"" },
+                    response: { fr: "Ses mains tremblent. « Le Duc me laisse entrer parfois. Il me donne à manger, il me montre le bureau... je lisais pour lui. Les registres. »\n\n[Accès] Silas est entré par la porte du Duc : une serrure qui lui était ouverte, un homme de main gratuit.", en: "His hands shake. \"The Duke let me in sometimes. He fed me, he showed me the study... I read for him. The ledgers.\"\n\n[Accès] Silas came through the Duke's own door: a lock opened to him, a hired man for free." },
+                    evidence: 'opportunity'
+                },
+                {
+                    id: 'sls2_r2q2',
+                    label: { fr: "« Une trace de paume sous la crosse. Ce n'est pas l'empreinte qu'on laisse en poussant une porte. »", en: "\"A palm print under the grip. Not the print you leave pushing a door.\"" },
+                    response: { fr: "Il baisse les bras, épuisé. « J'ai poussé cette porte. De toutes mes forces. Je n'ai pas tiré. Je n'avais pas d'arme. Je l'ai seulement... repoussée. »\n\n[Forensique] Silas a touché l'arme sans la décharger : la trace d'une lutte, pas d'un tir.", en: "He drops his arms, exhausted. \"I pushed that door. With all I had. I did not fire. I had no gun. I only... pushed it back.\"\n\n[Forensique] Silas touched the weapon without firing it: the trace of a struggle, not of a shot." },
+                    evidence: 'forensic'
+                },
+                {
+                    id: 'sls2_r2q3',
+                    label: { fr: "« Vous étiez payé, vous aussi. Ces billets glissés dans votre canette, c'était un salaire. »", en: "\"You were being paid too. Those banknotes in your can were a wage.\"" },
+                    response: { fr: "Un rire cassé. « Trois shillings par nuit. Pour regarder la ruelle. Pour dire qui entrait, qui sortait. » Il relève les yeux. « Mais le vrai salaire, c'était qu'on me laisse dormir. »\n\n[Mobile] Silas était une vigie payée. Son commanditaire reste à identifier.", en: "A broken laugh. \"Three shillings a night. To watch the alley. To report who came in, who went out.\" He looks up. \"But the real wage was being allowed to sleep.\"\n\n[Mobile] Silas was a paid lookout. His handler remains to be identified." },
+                    evidence: 'mobile'
+                }
+            ],
+            rounds3: [
+                {
+                    id: 'sls2_r3q1',
+                    label: { fr: "« L'ADN ne dit pas qui a tué. Il dit qui était là. Qui se trouvait dans ce bureau ? »", en: "\"DNA does not say who killed. It says who was there. Who was in that study?\"" },
+                    response: { fr: "Il ferme les yeux et rejoue la scène. « Le Duc. Et quelqu'un d'autre, debout dans l'ombre, qui ne bougeait pas. Grand. Très calme. »\n\n[Témoin] Un homme grand et parfaitement immobile dans l'ombre du bureau.", en: "He closes his eyes and replays the scene. \"The Duke. And someone else, standing in the shadow, not moving. Tall. Very calm.\"\n\n[Témoin] A tall, perfectly motionless man in the study's shadow." },
+                    evidence: 'witness'
+                },
+                {
+                    id: 'sls2_r3q2',
+                    label: { fr: "« Grand, calme, ganté. Vous ne me donnez pas son nom, mais vous me donnez sa fonction. »", en: "\"Tall, calm, gloved. You are not giving me his name, but you are giving me his rank.\"" },
+                    response: { fr: "Un frisson le parcourt. « Le Major Hale. » Il crache le mot comme on crache du poison. « Celui qui me donne les trois shillings. Celui qui a les clés. Je l'ai vu cette nuit-là, dans l'ombre de ce bureau. »\n\n[Témoin] Silas identifie Hale : grand, ganté, garde du corps, détenteur des clés du manoir.", en: "A shiver runs through him. \"Major Hale.\" He spits the word like poison. \"The one who pays me three shillings. The one with the keys. I saw him that night, in the study's shadow.\"\n\n[Témoin] Silas identifies Hale: tall, gloved, bodyguard, keeper of the manor's keys." },
+                    evidence: 'witness'
+                },
+                {
+                    id: 'sls2_r3q3',
+                    label: { fr: "« Si je vous mets à l'abri, vous parlerez devant un juge ? »", en: "\"If I get you off the street, will you talk before a judge?\"" },
+                    response: { fr: "« Devant un juge, je dis tout. » Il serre sa capuche. « Mais vous, inspecteur, vous cherchez un monsieur en uniforme. Le rôdeur du jardin, lui, obéissait à quelqu'un de la maison. »\n\n[Chronologie] Le rôdeur obéissait à Hale : le commanditaire est à l'intérieur du manoir.", en: "\"Before a judge, I will say everything.\" He pulls his hood. \"But you, inspector, you are looking for a man in uniform. The garden prowler took orders from someone in the house.\"\n\n[Chronologie] The prowler took orders from Hale: the handler is inside the manor." },
                     evidence: 'timeline'
                 }
             ]
