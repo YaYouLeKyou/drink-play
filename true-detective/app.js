@@ -5548,7 +5548,8 @@ function scrApplyChoice(choiceKey, choiceId) {
             });
         } else if (evalResult.indirectConviction) {
             /* Fin 2b - Accusation erronée MAIS faisceau d'indices suffisant :
-               le vrai coupable est piégé par les preuves et arrete */
+               le vrai coupable est piégé par les preuves. Structure identique à la
+               mauvaise fin : prison innocent → QG réprimande → paradisiaque coupable. */
             pages.push({
                 decor: 'prison', npc: s.accused,
                 text: {
@@ -5557,17 +5558,17 @@ function scrApplyChoice(choiceKey, choiceId) {
                 }
             });
             pages.push({
-                decor: 'exile', npc: truth.culprit,
+                decor: 'qg', npc: 'detective-partner',
                 text: {
-                    fr: '<div class="ending-text">' + titleTxt + ' est finalement arrêté grâce aux preuves que vous avez collectées. La vérité a triplé en fin de compte.</div>',
-                    en: '<div class="ending-text">' + titleTxt + ' is finally arrested thanks to the evidence you collected. The truth prevails in the end.</div>'
+                    fr: '<div class="ending-text">' + scrSubstituteNames('Votre partenaire vous fusille du regard. « Vous avez accusé un innocent, mais le vrai coupable, ' + titleTxt + ', ne s\'en sortira pas. »', themeId) + '</div>',
+                    en: '<div class="ending-text">' + scrSubstituteNames('Your partner glares at you. "You accused an innocent, but the real culprit, ' + titleTxt + ', won\'t get away."', themeId) + '</div>'
                 }
             });
             pages.push({
-                decor: 'exile', npc: null,
+                decor: 'exile', npc: truth.culprit,
                 text: {
-                    fr: '<div class="ending-text">Enfin la paix. Vous et Wexford vous offrez des vacances bien méritées sur une île paradisiaque. ' + morale + '</div>',
-                    en: '<div class="ending-text">Finally, peace. You and Wexford treat yourselves to a well-deserved vacation on a paradise island. ' + morale + '</div>'
+                    fr: '<div class="ending-text">' + titleTxt + ' est arrêté grâce aux preuves. La vérité prévaut, même par le bas.</div>',
+                    en: '<div class="ending-text">' + titleTxt + ' is arrested thanks to the evidence. The truth prevails, even if by the back door.</div>'
                 }
             });
         } else {
