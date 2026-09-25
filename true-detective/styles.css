@@ -3754,9 +3754,22 @@ html {
     font-size: 2em;
 }
 
+/* Les 3 boutons de fin (Nouvelle enquête / Hub / Menu principal) ne
+   tiennent plus sur une seule ligne empilée : le dernier etait coupe
+   par le bas de l'ecran. On les remet en range (avec repli) et on
+   laisse le bloc defiler si la hauteur manque. */
+#end-screen .end-screen-content {
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 16px 0;
+    box-sizing: border-box;
+}
+
 .end-buttons {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
+    gap: 12px;
 }
 
 
@@ -4271,6 +4284,41 @@ html {
 .evidence-count {
   width: 36px; color: #a0a0a0; text-align: left;
   font-family: 'Special Elite', monospace; font-size: 0.75rem;
+}
+
+/* ===== Épilogue : le tableau d'accusation tient dans l'écran =====
+   La page 1/3 de l'outro empile verdict + reaction + faisceau de
+   preuves + resume : le tout est plus haut que la dialogue-box, et la
+   fin du tableau etait coupee par le bas de l'ecran. On borne la
+   hauteur et on defile a l'interieur plutot que de tronquer. */
+.dialogue-box.dialogue-box-outro {
+  max-height: 46vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Le faisceau reste compact pour tenir entier dans la boite. */
+.dialogue-box.dialogue-box-outro .accuse-screen {
+  padding: 14px;
+}
+.dialogue-box.dialogue-box-outro .evidence-beam {
+  margin-top: 10px;
+  padding: 8px 10px;
+}
+.dialogue-box.dialogue-box-outro .evidence-row {
+  margin: 3px 0;
+}
+/* Marqueur de defilement discret quand le tableau deborde. */
+.dialogue-box.dialogue-box-outro::-webkit-scrollbar {
+  width: 8px;
+}
+.dialogue-box.dialogue-box-outro::-webkit-scrollbar-thumb {
+  background: rgba(255, 215, 120, 0.4);
+  border-radius: 4px;
+}
+.dialogue-box.dialogue-box-outro::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
 }
 
 /* ===== Écran d'accusation (fin) ===== */
