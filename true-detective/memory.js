@@ -144,9 +144,11 @@
         var act = diff;
         var fromStory = params.get('story') === '1' || params.get('mode') === 'story';
         if (fromStory && window.TDStoryChrome) {
+            var culpritId = 'criminel';
             window.TDStoryChrome.initFromCfg({
                 type: 'memory',
                 interroId: 'criminel',
+                culprit: culpritId,
                 storyMode: true,
                 lang: lang
             });

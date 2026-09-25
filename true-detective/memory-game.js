@@ -233,7 +233,7 @@
             target = layer;
         }
 
-        var interroId = cfg.interroId || 'criminel';
+        var interroId = cfg.culprit || cfg.interroId || 'criminel';
         var suspectName = getNpcName(interroId, lang);
         var suspectRole = getNpcRole(interroId, lang);
         var act = cfg.act || 1;

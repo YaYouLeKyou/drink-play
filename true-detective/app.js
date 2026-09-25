@@ -4207,6 +4207,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                     : null;
                 var storyConfig = Object.assign({}, page.minigame, {
                     interroId: page.interrogation || 'page',
+                    culprit: 'criminel',
                     minigameIntro: (interroData && interroData.minigameIntro) || page.minigame.minigameIntro || null,
                     dialogues: interroData ? extractInterrogationDialogues(interroData) : page.minigame.dialogues || []
                 });
@@ -4777,6 +4778,10 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             if (roundCfg.dialogues) cfg.dialogues = roundCfg.dialogues;
         } else if (mgType === 'pong' || mgType === 'pacman' || mgType === 'space-invaders' || mgType === 'breakout' || mgType === 'asteroids' || mgType === 'shooting' || mgType === 'shooting-gallery') {
             cfg.title = roundCfg.title;
+            if (mgType === 'shooting' || mgType === 'shooting-gallery') {
+                cfg.winScore = 20;
+                cfg.targetCount = 20;
+            }
         }
         return cfg;
     }
@@ -5237,7 +5242,8 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             dialogues: roundCfg.dialogues,
             interroId: roundCfg.interroId,
             minigameIntro: roundCfg.minigameIntro,
-            storyMode: true
+            storyMode: true,
+            culprit: 'criminel'
         };
         if (mgCfg.difficulty) applyDifficultyToCfg(mgCfg.type, mgCfg, mgCfg.difficulty);
 

@@ -251,7 +251,7 @@
             transform: translateY(-2px);
         }
 
-        /* Mode story sur laptop : dialogue à gauche, jeu Memory à droite. */
+        /* Mode story sur laptop : boîte du coupable à gauche, Memory à droite. */
         @media (min-width: 769px) {
             html.td-story-chrome .sg-main {
                 min-height: 0;
@@ -259,23 +259,26 @@
             }
 
             html.td-story-chrome #memory-app {
-                width: min(100%, 1080px);
+                width: min(100%, 864px);
                 height: 100%;
                 max-height: 100%;
                 display: grid;
-                grid-template-columns: 320px minmax(0, 620px);
+                grid-template-columns: 220px minmax(0, 620px);
                 grid-template-rows: minmax(0, 1fr);
                 align-items: center;
-                justify-content: center;
+                justify-content: start;
                 gap: 24px;
-                margin: 0 auto;
+                margin: 0;
+                padding: 0 24px;
                 min-height: 0;
+                box-sizing: border-box;
             }
 
             html.td-story-chrome #memory-app > .td-sc-bar {
-                width: 100%;
-                max-width: 320px;
+                width: 220px;
+                max-width: 220px;
                 margin: 0;
+                justify-self: start;
                 align-self: center;
             }
 

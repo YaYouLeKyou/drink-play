@@ -254,6 +254,12 @@
             object: { fr: 'Silas Crane : « Encore un objet. La tour se souvient de tout. »', en: 'Silas Crane: "One more object. The tower remembers everything."' },
             victory: { fr: 'Silas Crane : « Vous avez tenu la tour. La ruelle vous pertenece enfin. »', en: 'Silas Crane: "You held the tower. The alley is finally yours."' }
         },
+        shooting: {
+            start: { fr: 'Major Hale : « Les cibles ne mentent jamais. Touchez-en vingt sans vous tromper, inspecteur. »', en: 'Major Hale: "Targets never lie. Hit twenty without a mistake, inspector."' },
+            score: { fr: 'Major Hale : « Encore quelques touches. Ne laissez pas Vivienne vous attirer. »', en: 'Major Hale: "A few more hits. Do not let Vivienne distract you."' },
+            victory: { fr: 'Major Hale : « Vingt touches au stand… Vous êtes plus rapide que moi. »', en: 'Major Hale: "Twenty hits at the range... You are faster than I am."' },
+            defeat: { fr: 'Major Hale : « Trop de bruit. Recommencez et montrez-moi votre précision. »', en: 'Major Hale: "Too much noise. Try again and show me your precision."' }
+        },
         connect4: {
             start: { fr: 'Rupert Blackwood : « Alignez quatre pièces si vous voulez ouvrir mes registres. »', en: 'Rupert Blackwood: "Align four pieces if you want my ledgers opened."' },
             aiMove: { fr: 'Rupert Blackwood : « Vous croyez avoir trouvé une ligne ? J’en ai trouvé une autre. »', en: 'Rupert Blackwood: "You think you found a line? I found another."' },
@@ -945,7 +951,7 @@
             resultLines.push({ on: 'defeat', at: null, text: loseClue });
         }
         var opts = {
-            suspectId: cfg.interroId,
+            suspectId: cfg.type === 'memory' ? (cfg.culprit || cfg.interroId) : cfg.interroId,
             decorKey: cfg.decorKey,
             lines: resultLines,
             fallback: cfg.dialogues,

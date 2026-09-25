@@ -153,7 +153,7 @@
         var dialogueLines = dialogues.beforeSpin || (PHRASES[lang] || PHRASES.en);
         var tauntLines = dialogues.afterLose || (TAUNTS[lang] || TAUNTS.en);
         var diffCfg = getDifficultyConfig(cfg.difficulty);
-        var targetCount = Math.max(cfg.targetCount || 0, diffCfg.minTargets) || diffCfg.minTargets;
+        var targetCount = 20;
         var suspectList = ['protecteur', 'seducteur', 'suspect', 'marginal', 'criminel', 'scientifique', 'detective'];
         var suspectNames = {
             protecteur: 'Hale',
@@ -224,10 +224,8 @@
         var phraseTimeout = null;
         var dialogueEl = null;
         var lastPhraseScore = 0;
-        /* PLAN §6 : seuil de victoire. Thème noire = 20 pts ; les autres
-           thèmes (0) gardent le comportement actuel : toutes les cibles. */
-        var winScore = (typeof cfg.winScore === 'number') ? cfg.winScore
-            : (themeId === 'film-noir' ? 20 : 0);
+        /* Shooting : 20 touches précises pour gagner, quel que soit le thème. */
+        var winScore = (typeof cfg.winScore === 'number') ? cfg.winScore : 20;
 
         function createTarget(type) {
             var name = suspectNames[type] || type;
@@ -374,6 +372,7 @@
                 ended = true;
                 won = false;
                 showDialogue(t(tauntLines[0], lang));
+                if (window.TDStoryChrome) window.TDStoryChrome.trigger('defeat');
                 setTimeout(function () {
                     cleanupSkip();
                     if (onDone) onDone({ won: false, score: score });
@@ -398,6 +397,7 @@
                 won = true;
                 score += diffCfg.scoreBonus;
                 showDialogue(t(dialogueLines[dialogueLines.length - 1], lang));
+                if (window.TDStoryChrome) window.TDStoryChrome.trigger('victory');
                 setTimeout(function () {
                     cleanupSkip();
                     if (onDone) onDone({ won: true, score: score });

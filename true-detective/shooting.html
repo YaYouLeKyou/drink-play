@@ -312,7 +312,7 @@
             var misses = 0;
             /* Objectif selon la difficulté demandée par l'histoire (1..3). */
             var diffParam = parseInt(new URLSearchParams(window.location.search).get('difficulty'), 10);
-            var targetGoal = (diffParam >= 3) ? 10 : (diffParam === 2 ? 8 : 5);
+            var targetGoal = 20;
             var gameOver = false;
             var activeTargets = [];
             var particleEffects = [];
