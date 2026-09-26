@@ -1391,12 +1391,27 @@ applyMusicHidden(true);
         }
     }
 
+    /* Le bandeau 🎯 « objectif » est purement decoratif : des qu'il n'a rien a
+       afficher il doit disparaitre completement, sinon il reste une box vide
+       avec la cible seule au-dessus de la dialogue-box. On normalise donc le
+       texte (chaine, objet { fr, en }, espaces) puis on bascule `hidden`. */
     function updateObjective(text) {
+        var label = '';
+        if (text != null) {
+            if (typeof text === 'object') {
+                label = (typeof TDScenario !== 'undefined' && TDScenario && typeof TDScenario.t === 'function')
+                    ? (TDScenario.t(text, ui.language) || '')
+                    : '';
+            } else {
+                label = String(text);
+            }
+        }
+        label = label.trim();
         if ($.objectiveText) {
-            $.objectiveText.textContent = text || '';
+            $.objectiveText.textContent = label;
         }
         if ($.objectiveDisplay) {
-            $.objectiveDisplay.classList.toggle('hidden', !text);
+            $.objectiveDisplay.classList.toggle('hidden', !label);
         }
     }
 
@@ -3859,10 +3874,10 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         hideNPC();
 
         var isOutro = isOutroPage(page);
-        /* Le bandeau d'objectif n'a rien à afficher en epilogue. */
-        if (isOutro) {
-            updateObjective('');
-        }
+        /* Le bandeau d'objectif n'a rien a afficher en epilogue, et les pages
+           de scenario sans champ `objective` le laisseraient vide : on le
+           masque dans les deux cas (et on l'affiche si la page en fournit un). */
+        updateObjective(isOutro ? '' : (page.objective || ''));
         if ($.dialogueBox) {
             $.dialogueBox.classList.toggle('dialogue-box-outro', isOutro);
         }

@@ -1202,6 +1202,13 @@ html {
     display: none;
 }
 
+/* Filet de securite : si le texte d'objectif est vide, la box entiere
+   disparait (meme si un chemin de code oublie de poser la classe `hidden`).
+   Evite la box vide avec la cible 🎯 seule. */
+.objective-display:not(:has(.objective-text:not(:empty))) {
+    display: none;
+}
+
 .objective-icon {
     font-size: 1.1em;
     flex-shrink: 0;
