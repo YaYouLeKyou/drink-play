@@ -3280,6 +3280,36 @@ html {
     }
 }
 
+/* ===== MINIGAME OVERLAY - ASTEROIDS LAYOUT (mobile) =====
+   Cache la boîte de dialogue pour que les commandes de direction
+   restent entièrement dans l'écran. */
+
+@media (max-width: 899px) {
+    .minigame-overlay.asteroids-layout .minigame-dialogue-box {
+        display: none !important;
+    }
+}
+
+/* ===== MINIGAME OVERLAY - BREAKOUT LAYOUT (mobile) =====
+   Cache la boîte de dialogue pour que les commandes de direction
+   restent entièrement dans l'écran. */
+
+@media (max-width: 899px) {
+    .minigame-overlay.breakout-layout .minigame-dialogue-box {
+        display: none !important;
+    }
+}
+
+/* ===== MINIGAME OVERLAY - MISSILE-COMMAND LAYOUT (mobile) =====
+   Cache la boîte de dialogue pour que les commandes de direction
+   restent entièrement dans l'écran. */
+
+@media (max-width: 899px) {
+    .minigame-overlay.missile-command-layout .minigame-dialogue-box {
+        display: none !important;
+    }
+}
+
 /* ===== MINIGAME OVERLAY SETTINGS MENU ===== */
 
 /* ===== DIFFICULTY SELECTION ===== */
