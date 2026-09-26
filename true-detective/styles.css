@@ -3263,6 +3263,16 @@ html {
     }
 }
 
+/* ===== MINIGAME OVERLAY - PACMAN LAYOUT (mobile) =====
+   Cache la boîte de dialogue pour que les boutons de direction
+   du bas du labyrinthe Pac-Man restent accessibles sur mobile. */
+
+@media (max-width: 899px) {
+    .minigame-overlay.pacman-layout .minigame-dialogue-box {
+        display: none !important;
+    }
+}
+
 /* ===== MINIGAME OVERLAY SETTINGS MENU ===== */
 
 /* ===== DIFFICULTY SELECTION ===== */
