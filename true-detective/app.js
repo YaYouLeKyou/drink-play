@@ -4137,11 +4137,43 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                 }
                 showClueToast(clue);
                 updateNotebook();
-                if (mgCfg.type === 'montre_code' && res.notes) {
+if (mgCfg.type === 'montre_code' && res.notes) {
                     s.playerNotes = res.notes;
                 }
             }
             currentOnDone = null;
+            if (res && res.won === false) {
+                var layer = document.getElementById('minigame-layer');
+                if (layer) {
+                    layer.classList.remove('active');
+                    layer.innerHTML = '';
+                }
+                var overlay = document.getElementById('minigame-overlay');
+                if (overlay) {
+                    overlay.classList.remove('hidden');
+                }
+                showScreen($.gameScreen);
+                if (TDAudioService && typeof TDAudioService.playThemeMusic === 'function') {
+                    TDAudioService.playThemeMusic(getThemeId());
+                }
+                var screenContent = document.getElementById('minigame-screen-content');
+                if (screenContent) {
+                    screenContent.innerHTML = '<div style="text-align:center;padding:40px;">' +
+                        '<p style="font-size:1.5em;margin-bottom:20px;color:#ff4444;">' + (ui.language === 'fr' ? '\u00c9chec !' : 'Failed!') + '</p>' +
+                        '<button id="retry-minigame-btn" class="btn btn-retry" style="padding:12px 32px;font-size:1.2em;cursor:pointer;">' +
+                        (ui.language === 'fr' ? 'Rejouer' : 'Retry') + '</button>' +
+                        '</div>';
+                    document.getElementById('retry-minigame-btn').onclick = function() {
+                        var ov = document.getElementById('minigame-overlay');
+                        if (ov) {
+                            ov.classList.add('hidden');
+                            ov.querySelector('#minigame-screen-content').innerHTML = '';
+                        }
+                        scrLaunchMinigame(page);
+                    };
+                }
+                return;
+            }
             var layer = document.getElementById('minigame-layer');
             if (layer) {
                 layer.classList.remove('active');
@@ -4224,7 +4256,6 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
             var gameMap = getGlobalGameMap();
             var gameNS = gameMap[mgCfg.type];
             if (!gameNS || !window[gameNS]) {
-                // Fallback to TDMiniGames.play for unrecognized types
                 TDMiniGames.play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
                 currentOnDone = onMinigameDone;
             } else {
@@ -4232,7 +4263,7 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
                     window[gameNS].play(mgCfg, ui.language, onMinigameDone, $.minigameContent);
                     currentOnDone = onMinigameDone;
                 } catch (e) {
-                    console.error('[True Detective] Minigame error "' + mgCfg.type + '" :', e);
+                    console.error('[True Detective] Erreur mini-jeu "' + mgCfg.type + '" :', e);
                     onMinigameDone({ won: false });
                 }
             }
