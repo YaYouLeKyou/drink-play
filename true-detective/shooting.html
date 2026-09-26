@@ -109,7 +109,12 @@
             display: block;
             width: 100%;
             max-width: 800px;
-            height: 420px;
+            /* `height: auto` + `aspect-ratio` : la hauteur fixe en px cassait
+               le ratio interne 800x420 sur mobile (46% de distorsion).
+               Le canvas garde ainsi ses proportions, quelle que soit la
+               largeur affichee. */
+            height: auto;
+            aspect-ratio: 800 / 420;
             background: #050510;
             border: 3px solid var(--accent-blue);
             border-radius: 12px;
@@ -209,14 +214,18 @@
             }
 
             html.td-story-chrome #shooting-canvas {
-                height: min(420px, calc(100vh - 245px));
-                min-height: 280px;
+                /* On borne la LARGEUR (et non la hauteur) pour que le ratio
+                   800/420 reste respecte sur petit ecran. */
+                height: auto;
+                max-width: min(800px, calc((100vh - 245px) * 800 / 420));
+                min-width: 240px;
             }
         }
 
         @media (max-width: 600px) {
             #shooting-canvas {
-                height: 320px;
+                /* Plus de hauteur forcee : c'est `aspect-ratio` qui regit. */
+                height: auto;
             }
         }
     </style>
@@ -266,10 +275,14 @@
     <script src="story-chrome.js"></script>
     <script src="standalone-theme.js"></script>
     <script src="sfx.js"></script>
+    <script src="perf-helper.js"></script>
     <script src="minigame-audio.js" data-minigame="shooting"></script>
     <script>
         (function () {
             'use strict';
+
+            var PERF = window.TDPerf || null;
+            function lowPerf() { return !!(PERF && PERF.LOW); }
 
             var canvas = document.getElementById('shooting-canvas');
             var ctx = canvas.getContext('2d');
@@ -285,6 +298,43 @@
             // Chargement de l'image de fond (Manoir)
             var manorBg = new Image();
             manorBg.src = 'assets/image true detective/lieux/classic/manoir.png';
+
+            /* Calque de fond statique (manoir + voile sombre + rail) : il ne
+               change jamais. On le compose UNE fois dans un canvas hors ecran,
+               puis chaque image ne fait plus qu'un seul drawImage. Avant, on
+               repetait a chaque image un blit 800x420 puis un fillRect plein
+               ecran : deux operations plein cadre par image. */
+            var bgLayer = document.createElement('canvas');
+            bgLayer.width = canvas.width;
+            bgLayer.height = canvas.height;
+            var bgCtx = bgLayer.getContext('2d');
+            var bgReady = false;
+
+            function buildBackground() {
+                if (bgReady) return;
+                var w = bgLayer.width, h = bgLayer.height;
+                if (manorBg.complete && manorBg.naturalWidth !== 0) {
+                    bgCtx.drawImage(manorBg, 0, 0, w, h);
+                    bgCtx.fillStyle = 'rgba(5, 5, 16, 0.4)';
+                    bgCtx.fillRect(0, 0, w, h);
+                } else {
+                    bgCtx.fillStyle = '#050510';
+                    bgCtx.fillRect(0, 0, w, h);
+                }
+                /* Rail horizontal. `var(--accent-blue)` n'est pas resolu par
+                   le contexte 2D : la valeur etait ignoree, trait invisible. */
+                bgCtx.fillStyle = 'rgba(14, 18, 34, 0.85)';
+                bgCtx.fillRect(0, h - 45, w, 45);
+                bgCtx.strokeStyle = '#00d4ff';
+                bgCtx.lineWidth = 2;
+                bgCtx.beginPath();
+                bgCtx.moveTo(0, h - 45);
+                bgCtx.lineTo(w, h - 45);
+                bgCtx.stroke();
+                bgReady = true;
+            }
+            if (manorBg.complete) { buildBackground(); }
+            else { manorBg.addEventListener('load', buildBackground); }
 
             var characterData = [
                 { name: "Le Criminel", file: "le-criminel.png", type: "criminal", points: 100, quote: "Vous ne m'aurez pas si facilement..." },
@@ -489,27 +539,12 @@
             }
 
             function draw() {
-                // 1. Dessin de l'arrière-plan (Manoir) avec un léger assombrissement pour le contraste
-                if (manorBg.complete && manorBg.naturalWidth !== 0) {
-                    ctx.drawImage(manorBg, 0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = 'rgba(5, 5, 16, 0.4)'; // Voile sombre pour intégrer les éléments
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                } else {
-                    ctx.fillStyle = '#050510';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                }
+                // 1. Fond : un seul blit depuis le calque mis en cache.
+                if (!bgReady) buildBackground();
+                ctx.drawImage(bgLayer, 0, 0);
 
-                // 2. Le rail horizontal
-                ctx.fillStyle = 'rgba(14, 18, 34, 0.85)';
-                ctx.fillRect(0, canvas.height - 45, canvas.width, 45);
-                ctx.strokeStyle = 'var(--accent-blue)';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(0, canvas.height - 45);
-                ctx.lineTo(canvas.width, canvas.height - 45);
-                ctx.stroke();
-
-                // 3. Dessin des cibles mouvantes et leurs contours colorés
+                // 2. Dessin des cibles mouvantes et leurs contours colorés
+                var cheap = lowPerf();
                 for (var i = 0; i < activeTargets.length; i++) {
                     var t = activeTargets[i];
                     var img = loadedImages[t.file];
@@ -518,8 +553,15 @@
                     var isCriminal = (t.type === 'criminal');
                     var themeColor = isCriminal ? '#00ff88' : '#ff3333';
 
-                    ctx.shadowBlur = 12;
-                    ctx.shadowColor = isCriminal ? 'rgba(0, 255, 136, 0.4)' : 'rgba(255, 51, 51, 0.5)';
+                    /* shadowBlur est de loin le poste le plus lourd du jeu
+                       (flou logiciel recalcule a chaque primitive). On le
+                       coupe des que l'appareil ne tient pas la cadence. */
+                    if (cheap) {
+                        ctx.shadowBlur = 0;
+                    } else {
+                        ctx.shadowBlur = 12;
+                        ctx.shadowColor = isCriminal ? 'rgba(0, 255, 136, 0.4)' : 'rgba(255, 51, 51, 0.5)';
+                    }
 
                     if (img && img.complete && img.naturalWidth !== 0) {
                         ctx.drawImage(img, t.x, t.y, t.width, t.height);
@@ -556,13 +598,20 @@
                 }
             }
 
-            function mainLoop() {
+            function mainLoop(now) {
+                /* Delta temps : sert a surveiller la cadence reelle pour
+                   adapter la qualite (voir perf-helper.js). */
+                var dt = lastFrame ? now - lastFrame : 16.7;
+                lastFrame = now;
+                if (PERF) PERF.tick(dt);
+
                 update();
                 draw();
                 requestAnimationFrame(mainLoop);
             }
 
-            mainLoop();
+            var lastFrame = 0;
+            requestAnimationFrame(mainLoop);
 
             var hamburgerBtn = document.getElementById('hamburger-btn');
             var menu = document.getElementById('hamburger-menu');

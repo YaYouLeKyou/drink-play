@@ -58,7 +58,9 @@
             display: block;
             width: 100%;
             max-width: 600px;
-            height: 380px;
+            /* Hauteur fixe en px -> 26% de distorsion sur mobile. */
+            height: auto;
+            aspect-ratio: 600 / 380;
             background: #060611;
             border: 3px solid var(--accent-blue);
             border-radius: 12px;
@@ -103,7 +105,7 @@
 
         @media (max-width: 600px) {
             #pong-canvas {
-                height: 280px;
+                height: auto;
             }
             .pong-header-info {
                 font-size: 0.85rem;
@@ -152,6 +154,7 @@
     <script src="story-chrome.js"></script>
     <script src="standalone-theme.js"></script>
     <script src="sfx.js"></script>
+    <script src="perf-helper.js"></script>
     <script src="minigame-audio.js" data-minigame="pong"></script>
     <script>
         (function () {
@@ -380,39 +383,62 @@
                 }
             }
 
+            /* Calque de fond statique : terrain + ligne mediane pointillee.
+               Ces deux elements ne changent jamais ; on les compose une fois
+               hors ecran puis on ne fait plus qu'un blit par image. */
+            var bgLayer = document.createElement('canvas');
+            bgLayer.width = canvas.width;
+            bgLayer.height = canvas.height;
+            var bgCtx = bgLayer.getContext('2d');
+            var bgReady = false;
+
+            function buildField() {
+                if (bgReady) return;
+                bgCtx.fillStyle = '#060611';
+                bgCtx.fillRect(0, 0, bgLayer.width, bgLayer.height);
+                bgCtx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                bgCtx.lineWidth = 2;
+                bgCtx.setLineDash([6, 6]);
+                bgCtx.beginPath();
+                bgCtx.moveTo(bgLayer.width / 2, 0);
+                bgCtx.lineTo(bgLayer.width / 2, bgLayer.height);
+                bgCtx.stroke();
+                bgCtx.setLineDash([]);
+                bgReady = true;
+            }
+
             // Boucle de rendu graphique
             function draw() {
-                // Fond du terrain
-                ctx.fillStyle = '#060611';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                /* Fond + ligne mediane : calque STATIQUE (ils ne changent
+                   jamais). On ne fait plus qu'un blit par image au lieu d'un
+                   fill plein cadre + une ligne en pointilles. */
+                if (!bgReady) buildField();
+                ctx.drawImage(bgLayer, 0, 0);
 
-                // Ligne centrale pointillée
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-                ctx.lineWidth = 2;
-                ctx.setLineDash([6, 6]);
-                ctx.beginPath();
-                ctx.moveTo(canvas.width / 2, 0);
-                ctx.lineTo(canvas.width / 2, canvas.height);
-                ctx.stroke();
-                ctx.setLineDash([]);
+                const cheap = !!(window.TDPerf && window.TDPerf.LOW);
 
-                // Dessin de la raquette du joueur (Vert néon)
-                ctx.shadowBlur = 12;
+                /* Le halo est optionnel : on pose shadow juste avant les
+                   remplissages et on l'enleve juste apres, une seule fois. */
+                if (!cheap) ctx.shadowBlur = 12;
+
+                // Raquette du joueur (Vert néon)
                 ctx.shadowColor = '#00ff88';
                 ctx.fillStyle = '#00ff88';
                 ctx.fillRect(player.x, player.y, player.width, player.height);
 
-                // Dessin de la raquette IA (Orange néon)
+                // Raquette IA (Orange néon)
                 ctx.shadowColor = '#ff6b00';
                 ctx.fillStyle = '#ff6b00';
                 ctx.fillRect(ai.x, ai.y, ai.width, ai.height);
 
-                // Dessin de la balle (Bleu néon)
+                // Balle (Bleu néon)
                 ctx.shadowColor = '#00d4ff';
                 ctx.fillStyle = '#00d4ff';
                 ctx.beginPath();
                 ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
                 ctx.fill();
+
+                ctx.shadowBlur = 0;
 
                 // Dessin des particules
                 ctx.shadowBlur = 0;
@@ -437,7 +463,13 @@
                 }
             }
 
-            function loop() {
+            var lastFrame = 0;
+            function loop(now) {
+                /* Delta temps : sert a surveiller la cadence reelle (perf-helper.js). */
+                var dt = lastFrame ? now - lastFrame : 16.7;
+                lastFrame = now;
+                if (window.TDPerf) window.TDPerf.tick(dt);
+
                 update();
                 draw();
                 requestAnimationFrame(loop);

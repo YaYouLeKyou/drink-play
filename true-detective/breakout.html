@@ -73,7 +73,12 @@
             display: block;
             width: 100%;
             max-width: 600px;
-            height: 400px;
+            /* Hauteur fixe en px -> 32% de distorsion : le casse-brique
+               paraissait decale et deforme sur mobile. `auto` + `aspect-ratio`
+               conserve le ratio interne 600x400, donc un affichage centre
+               et a la bonne echelle. */
+            height: auto;
+            aspect-ratio: 600 / 400;
             background: #050510;
             border: 3px solid var(--accent-gold);
             border-radius: 12px;
@@ -128,7 +133,7 @@
 
         @media (max-width: 600px) {
             #breakout-canvas {
-                height: 320px;
+                height: auto;
             }
         }
     </style>
@@ -240,6 +245,50 @@
 
             var brickColors = ['#ff006e', '#ffd600', '#00d4ff', '#00ff88', '#b088ff'];
 
+            /* Calque des briques : elles ne changent que lorsqu'une brique est
+               detruite. On les compose donc dans un canvas hors ecran et on
+               recycle — sinon on repetait ~60 primitives (fill + stroke) par
+               image, pour un resultat identique. */
+            var brickLayer = document.createElement('canvas');
+            brickLayer.width = canvas.width;
+            brickLayer.height = canvas.height;
+            var brickCtx = brickLayer.getContext('2d');
+            var bricksDirty = true;
+
+            function layoutBricks() {
+                for (var c = 0; c < brickColumnCount; c++) {
+                    for (var r = 0; r < brickRowCount; r++) {
+                        bricks[c][r].x = c * (brickWidth + brickPadding) + brickOffsetLeft;
+                        bricks[c][r].y = r * (brickHeight + brickPadding) + brickOffsetTop;
+                    }
+                }
+            }
+
+            function buildBricks() {
+                var bCtx = brickCtx;
+                bCtx.clearRect(0, 0, brickLayer.width, brickLayer.height);
+                bCtx.lineWidth = 2;
+                for (var c = 0; c < brickColumnCount; c++) {
+                    for (var r = 0; r < brickRowCount; r++) {
+                        if (bricks[c][r].status === 1) {
+                            var bx = bricks[c][r].x;
+                            var by = bricks[c][r].y;
+                            bCtx.fillStyle = brickColors[bricks[c][r].colorIndex % brickColors.length];
+                            bCtx.fillRect(bx, by, brickWidth, brickHeight);
+                            bCtx.strokeStyle = '#050510';
+                            bCtx.strokeRect(bx, by, brickWidth, brickHeight);
+                        }
+                    }
+                }
+            }
+
+            /* Les positions etaient calculees dans draw() : la detection de
+               collision en dependait donc, et ne/providerait rien avant la
+               premiere image. On les calcule une fois ici. */
+            layoutBricks();
+            buildBricks();
+            bricksDirty = false;
+
             // Gestionnaires clavier
             window.addEventListener('keydown', function(e) {
                 if (e.code === 'ArrowLeft' || e.code === 'KeyA') paddle.isMovingLeft = true;
@@ -291,6 +340,7 @@
                             ) {
                                 ball.dy = -ball.dy;
                                 b.status = 0;
+                                bricksDirty = true;   // le calque des briques est perime
                                 score += 50;
                                 playSfx('paddle');
 
@@ -385,23 +435,13 @@
                 ctx.fillStyle = '#050510';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                // Dessin des briques
-                for (var c = 0; c < brickColumnCount; c++) {
-                    for (var r = 0; r < brickRowCount; r++) {
-                        if (bricks[c][r].status === 1) {
-                            var brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
-                            var brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
-                            bricks[c][r].x = brickX;
-                            bricks[c][r].y = brickY;
-                            
-                            ctx.fillStyle = brickColors[bricks[c][r].colorIndex % brickColors.length];
-                            ctx.fillRect(brickX, brickY, brickWidth, brickHeight);
-                            ctx.strokeStyle = '#050510';
-                            ctx.lineWidth = 2;
-                            ctx.strokeRect(brickX, brickY, brickWidth, brickHeight);
-                        }
-                    }
+                /* Briques : un seul blit, sauf quand l'une vient d'etre
+                   detruite (alors on recompose le calque). */
+                if (bricksDirty) {
+                    buildBricks();
+                    bricksDirty = false;
                 }
+                ctx.drawImage(brickLayer, 0, 0);
 
                 // Dessin de la raquette
                 ctx.fillStyle = '#ffd600';
@@ -425,7 +465,13 @@
                 }
             }
 
-            function loop() {
+            var lastFrame = 0;
+            function loop(now) {
+                /* Delta temps : sert a surveiller la cadence reelle (perf-helper.js). */
+                var dt = lastFrame ? now - lastFrame : 16.7;
+                lastFrame = now;
+                if (window.TDPerf) window.TDPerf.tick(dt);
+
                 update();
                 draw();
                 requestAnimationFrame(loop);

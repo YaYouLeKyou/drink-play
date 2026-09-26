@@ -73,7 +73,10 @@
             display: block;
             width: 100%;
             max-width: 650px;
-            height: 420px;
+            /* Hauteur fixe en px -> 34% de distorsion sur mobile. `auto` +
+               `aspect-ratio` conserve le ratio interne 650x420. */
+            height: auto;
+            aspect-ratio: 650 / 420;
             background: #050510;
             border: 3px solid var(--accent-pink);
             border-radius: 12px;
@@ -128,7 +131,8 @@
 
         @media (max-width: 600px) {
             #asteroids-canvas {
-                height: 320px;
+                /* Plus de hauteur forcee : `aspect-ratio` regit. */
+                height: auto;
             }
         }
     </style>
@@ -173,6 +177,7 @@
     <script src="story-chrome.js"></script>
     <script src="standalone-theme.js"></script>
     <script src="sfx.js"></script>
+    <script src="perf-helper.js"></script>
     <script src="minigame-audio.js" data-minigame="asteroids"></script>
     <script>
         function getLevel() {
@@ -210,6 +215,8 @@
             var targetScore = 4000; // Objectif quadruplé (4x plus d'astéroïdes/points nécessaires)
             var gameOver = false;
             var gameWon = false;
+            /* Memo du HUD : evite une ecriture DOM (et un reflow) par image. */
+            var lastInfoTxt = null;
 
             // Vaisseau
             var ship = {
@@ -370,7 +377,14 @@
                     }
                 }
 
-                infoEl.textContent = "Score: " + score + " | Vies: " + lives + " | Objectif: " + targetScore + " pts";
+                /* Ecriture DOM uniquement quand la valeur change : un
+                   textContent par image force un reflow, tres penalisant
+                   sur mobile. */
+                const infoTxt = "Score: " + score + " | Vies: " + lives + " | Objectif: " + targetScore + " pts";
+                if (infoTxt !== lastInfoTxt) {
+                    lastInfoTxt = infoTxt;
+                    infoEl.textContent = infoTxt;
+                }
             }
 
             function handleEndGame(won) {
@@ -428,7 +442,13 @@
                 }
             }
 
-            function loop() {
+            var lastFrame = 0;
+            function loop(now) {
+                /* Delta temps : sert a surveiller la cadence reelle (perf-helper.js). */
+                var dt = lastFrame ? now - lastFrame : 16.7;
+                lastFrame = now;
+                if (window.TDPerf) window.TDPerf.tick(dt);
+
                 update();
                 draw();
                 requestAnimationFrame(loop);

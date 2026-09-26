@@ -85,7 +85,10 @@
         #mc-canvas {
             display: block;
             width: 100%;
-            height: 460px;
+            /* Hauteur fixe en px -> 54% de distorsion sur mobile. `auto` +
+               `aspect-ratio` garde le ratio interne 720x460. */
+            height: auto;
+            aspect-ratio: 720 / 460;
             background: radial-gradient(circle at center, #0a0e1a 0%, #020307 100%);
             cursor: crosshair;
             touch-action: none;
@@ -129,9 +132,13 @@
     <script src="story-chrome.js"></script>
     <script src="standalone-theme.js"></script>
     <script src="sfx.js"></script>
+    <script src="perf-helper.js"></script>
     <script src="minigame-audio.js" data-minigame="missile-command"></script>
 
     <script>
+        const PERF = window.TDPerf || null;
+        const lowPerf = () => !!(PERF && PERF.LOW);
+
         const canvas = document.getElementById('mc-canvas');
         const ctx = canvas.getContext('2d');
 
@@ -145,6 +152,9 @@
         let enemyMissiles = [];
         let playerMissiles = [];
         let explosions = [];
+
+        /* Memo du HUD : evite une ecriture DOM (et donc un reflow) par image. */
+        let lastScoreTxt = null, lastWave = null;
 
         // Fonction utilitaire sécurisée pour jouer les SFX via TDSfx
         function playSound(soundName) {
@@ -384,52 +394,87 @@
             }
         }
 
-        function draw() {
-            ctx.fillStyle = '#030408';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        /* Calque de fond statique : fond noir, grille radar et sol ne changent
+           jamais. On les compose une fois hors ecran ; chaque image ne fait
+           plus qu'un blit au lieu de ~20 stroke + 2 fill plein cadre. */
+        const bgLayer = document.createElement('canvas');
+        bgLayer.width = canvas.width || 720;
+        bgLayer.height = canvas.height || 460;
+        const bgCtx = bgLayer.getContext('2d');
+        let bgReady = false;
+
+        function buildBackdrop() {
+            const w = bgLayer.width, h = bgLayer.height;
+            bgCtx.fillStyle = '#030408';
+            bgCtx.fillRect(0, 0, w, h);
 
             // Grille radar
-            ctx.strokeStyle = 'rgba(0, 229, 255, 0.05)';
-            ctx.lineWidth = 1;
-            for (let i = 0; i < canvas.width; i += 40) {
-                ctx.beginPath();
-                ctx.moveTo(i, 0);
-                ctx.lineTo(i, 435);
-                ctx.stroke();
+            bgCtx.strokeStyle = 'rgba(0, 229, 255, 0.05)';
+            bgCtx.lineWidth = 1;
+            for (let i = 0; i < w; i += 40) {
+                bgCtx.beginPath();
+                bgCtx.moveTo(i, 0);
+                bgCtx.lineTo(i, 435);
+                bgCtx.stroke();
             }
 
             // Sol
-            ctx.fillStyle = '#060a16';
-            ctx.beginPath();
-            ctx.moveTo(0, canvas.height);
-            ctx.lineTo(0, 435);
-            ctx.lineTo(canvas.width, 435);
-            ctx.lineTo(canvas.width, canvas.height);
-            ctx.fill();
+            bgCtx.fillStyle = '#060a16';
+            bgCtx.beginPath();
+            bgCtx.moveTo(0, h);
+            bgCtx.lineTo(0, 435);
+            bgCtx.lineTo(w, 435);
+            bgCtx.lineTo(w, h);
+            bgCtx.fill();
 
-            ctx.strokeStyle = '#00e5ff';
-            ctx.lineWidth = 2.5;
-            ctx.shadowColor = '#00e5ff';
-            ctx.shadowBlur = 10;
-            ctx.beginPath();
-            ctx.moveTo(0, 435);
-            ctx.lineTo(canvas.width, 435);
-            ctx.stroke();
-            ctx.shadowBlur = 0;
+            bgCtx.strokeStyle = '#00e5ff';
+            bgCtx.lineWidth = 2.5;
+            bgCtx.beginPath();
+            bgCtx.moveTo(0, 435);
+            bgCtx.lineTo(w, 435);
+            bgCtx.stroke();
 
+            bgReady = true;
+        }
+
+        /* Explosions : deux gradients radiaux seulement (un par type), crees
+           en (0,0,R). Chaque explosion est ensuite dessinee dans un repere
+           translate sur son centre, donc le meme gradient est reutilisable.
+           Avant : un createRadialGradient par explosion ET par image, soit des
+           dizaines d'allocations par seconde (pression sur le GC). */
+        const EXP_R = 64;
+        let expGradPlayer = null, expGradEnemy = null;
+
+        function buildExplosionGradients() {
+            function mk(mid, end) {
+                const g = ctx.createRadialGradient(0, 0, 0, 0, 0, EXP_R);
+                g.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+                g.addColorStop(0.4, mid);
+                g.addColorStop(1, end);
+                return g;
+            }
+            expGradPlayer = mk('rgba(0, 229, 255, 0.6)', 'rgba(0, 100, 255, 0)');
+            expGradEnemy = mk('rgba(255, 23, 68, 0.6)', 'rgba(150, 0, 20, 0)');
+        }
+
+        function draw() {
+            // Fond + grille radar : calque STATIQUE, composé une seule fois.
+            if (!bgReady) buildBackdrop();
+            ctx.drawImage(bgLayer, 0, 0);
+
+            const cheap = lowPerf();
             // Villes
             cities.forEach(c => {
                 if (c.alive) {
                     ctx.fillStyle = '#00e676';
-                    ctx.shadowColor = '#00e676';
-                    ctx.shadowBlur = 8;
+                    if (!cheap) { ctx.shadowColor = '#00e676'; ctx.shadowBlur = 8; }
                     ctx.fillRect(c.x - 12, c.y - 18, 24, 18);
+                    ctx.shadowBlur = 0;
                     ctx.fillStyle = '#030408';
                     ctx.fillRect(c.x - 8, c.y - 14, 5, 5);
                     ctx.fillRect(c.x + 3, c.y - 14, 5, 5);
                     ctx.fillRect(c.x - 8, c.y - 7, 5, 5);
                     ctx.fillRect(c.x + 3, c.y - 7, 5, 5);
-                    ctx.shadowBlur = 0;
                 } else {
                     ctx.fillStyle = '#ff1744';
                     ctx.fillRect(c.x - 10, c.y - 6, 20, 6);
@@ -442,8 +487,7 @@
             silos.forEach(s => {
                 if (s.alive) {
                     ctx.fillStyle = '#00e5ff';
-                    ctx.shadowColor = '#00e5ff';
-                    ctx.shadowBlur = 10;
+                    if (!cheap) { ctx.shadowColor = '#00e5ff'; ctx.shadowBlur = 10; }
                     ctx.beginPath();
                     ctx.arc(s.x, s.y, 20, Math.PI, 0, false);
                     ctx.fill();
@@ -460,8 +504,7 @@
             enemyMissiles.forEach(m => {
                 ctx.strokeStyle = '#ff1744';
                 ctx.lineWidth = 2;
-                ctx.shadowColor = '#ff1744';
-                ctx.shadowBlur = 8;
+                if (!cheap) { ctx.shadowColor = '#ff1744'; ctx.shadowBlur = 8; }
                 ctx.beginPath();
                 ctx.moveTo(m.x, m.y);
                 ctx.lineTo(m.x - Math.cos(m.angle) * 16, m.y - Math.sin(m.angle) * 16);
@@ -476,8 +519,7 @@
             playerMissiles.forEach(m => {
                 ctx.strokeStyle = '#00e5ff';
                 ctx.lineWidth = 1.5;
-                ctx.shadowColor = '#00e5ff';
-                ctx.shadowBlur = 6;
+                if (!cheap) { ctx.shadowColor = '#00e5ff'; ctx.shadowBlur = 6; }
                 ctx.beginPath();
                 ctx.moveTo(m.x, m.y);
                 ctx.lineTo(m.destX, m.destY);
@@ -488,27 +530,36 @@
                 ctx.fillRect(m.destX - 2, m.destY - 2, 4, 4);
             });
 
-            // Explosions
-            explosions.forEach(exp => {
-                const gradient = ctx.createRadialGradient(exp.x, exp.y, 0, exp.x, exp.y, exp.radius);
-                if (exp.type === 'player') {
-                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-                    gradient.addColorStop(0.4, 'rgba(0, 229, 255, 0.6)');
-                    gradient.addColorStop(1, 'rgba(0, 100, 255, 0)');
-                } else {
-                    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-                    gradient.addColorStop(0.4, 'rgba(255, 23, 68, 0.6)');
-                    gradient.addColorStop(1, 'rgba(150, 0, 20, 0)');
+            // Explosions : gradients reutilises, dessines dans un repere local.
+            if (!expGradPlayer) buildExplosionGradients();
+            if (explosions.length) {
+                for (let i = 0; i < explosions.length; i++) {
+                    const exp = explosions[i];
+                    /* Le gradient est fixe (rayon EXP_R) ; on met a l'echelle
+                       pour coller au rayon courant de l'explosion. */
+                    const k = exp.radius / EXP_R;
+                    ctx.save();
+                    ctx.translate(exp.x, exp.y);
+                    ctx.scale(k, k);
+                    ctx.fillStyle = (exp.type === 'player') ? expGradPlayer : expGradEnemy;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, EXP_R, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
                 }
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.arc(exp.x, exp.y, exp.radius, 0, Math.PI * 2);
-                ctx.fill();
-            });
+            }
 
-            // HUD
-            document.getElementById('hud-score').textContent = String(score).padStart(6, '0');
-            document.getElementById('hud-wave').textContent = wave;
+            // HUD : on n'ecrit dans le DOM que si la valeur a change.
+            // Un textContent par image force un reflow et sature le mobile.
+            const scoreTxt = String(score).padStart(6, '0');
+            if (scoreTxt !== lastScoreTxt) {
+                lastScoreTxt = scoreTxt;
+                document.getElementById('hud-score').textContent = scoreTxt;
+            }
+            if (wave !== lastWave) {
+                lastWave = wave;
+                document.getElementById('hud-wave').textContent = wave;
+            }
 
             // Game Over
             if (gameState === 'GAMEOVER') {
@@ -530,14 +581,21 @@
             }
         }
 
-        function loop() {
+        let lastFrame = 0;
+        function loop(now) {
+            /* Delta temps : sert a surveiller la cadence reelle pour
+               adapter la qualite (voir perf-helper.js). */
+            const dt = lastFrame ? now - lastFrame : 16.7;
+            lastFrame = now;
+            if (PERF) PERF.tick(dt);
+
             update();
             draw();
             requestAnimationFrame(loop);
         }
 
         initGame();
-        loop();
+        requestAnimationFrame(loop);
     </script>
 
     <!-- Scripts de gestion de navigation et interface -->
