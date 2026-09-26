@@ -34,12 +34,16 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            /* Empeche le pull-to-refresh / rubber-band pendant qu'on joue. */
+            overscroll-behavior: none;
         }
 
         #marginal-tower-app {
             display: flex;
             flex-direction: column;
             height: 100vh;
+            /* `dvh` ignore la barre d'URL mobile qui rogne le bas de l'ecran. */
+            height: 100dvh;
             width: 100vw;
             box-sizing: border-box;
         }
@@ -84,6 +88,8 @@
             display: block;
             width: 100%;
             height: 100%;
+            /* Pas de zoom ni de scroll declenche par le tactile sur le jeu. */
+            touch-action: none;
         }
 
         .height-hud {
@@ -294,7 +300,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 768px), (orientation: landscape) and (max-height: 550px) {
             .tower-main {
                 flex-direction: column-reverse;
             }
@@ -321,6 +327,122 @@
             }
             .palette-hint {
                 display: none;
+            }
+
+            /* --- Suppression de la box de dialogue (story-chrome) ---
+               Sur mobile elle vole ~90px de hauteur au canvas, qui est deja
+               le seul espace utile pour empiler la tour. Le portrait, le nom
+               et la replique restent accessibles : la page d'accueil de
+               l'enquete reprend le fil, et le bouton « Continuer » du header
+               permet de quitter la manche. */
+            html.td-story-chrome .game-container .td-sc-bar {
+                display: none !important;
+            }
+
+            /* --- Gain de place pour le canvas --- */
+            .tower-header {
+                padding: 8px 12px;
+            }
+            .tower-title {
+                font-size: 1rem;
+            }
+            /* Le titre « Materiaux » ne sert plus : les icones parlent seules. */
+            .palette-title {
+                display: none;
+            }
+            .block-palette {
+                max-height: none;
+                padding: 8px;
+            }
+            .palette-grid {
+                gap: 6px;
+                padding-bottom: 4px;
+                /* Le defilement horizontal ne doit pas faire reboucler la page. */
+                overscroll-behavior-x: contain;
+                -webkit-overflow-scrolling: touch;
+            }
+            .palette-btn {
+                min-width: 66px;
+                padding: 6px 4px;
+                font-size: 0.75rem;
+                gap: 4px;
+            }
+            .palette-icon {
+                font-size: 1.1rem;
+            }
+            .palette-count {
+                font-size: 0.75rem;
+            }
+
+            /* --- HUD de hauteur compact --- */
+            .height-hud {
+                top: 10px;
+                left: 10px;
+                padding: 8px 12px;
+                gap: 6px;
+                border-radius: 10px;
+            }
+            .height-hud-title {
+                font-size: 0.62rem;
+            }
+            .height-progress-bar {
+                width: 104px;
+                height: 8px;
+            }
+
+            /* --- Overlays : ils doivent tenir dans un ecran etroit --- */
+            .victory-content, .defeat-content, .loading-content {
+                padding: 20px 18px;
+                max-width: 92vw;
+                border-radius: 14px;
+            }
+            .victory-content h2, .defeat-content h2 {
+                font-size: 1.15rem;
+            }
+            .victory-content p, .defeat-content p {
+                font-size: 0.85rem;
+                line-height: 1.45;
+            }
+            .btn {
+                padding: 12px 20px;
+                font-size: 0.78rem;
+                width: 100%;
+                margin-top: 10px;
+                /* Pas de delai de 300ms au tap sur mobile. */
+                touch-action: manipulation;
+            }
+        }
+
+        /* Paysage sur petit ecran (iPhone en rotation) : la palette horizontale
+           mangeait un tiers de la hauteur. On la compacte pour rendre au
+           canvas la place necessaire a la tour. */
+        @media (orientation: landscape) and (max-height: 430px) {
+            .tower-header {
+                padding: 5px 10px;
+            }
+            .block-palette {
+                padding: 5px;
+            }
+            .palette-grid {
+                padding-bottom: 2px;
+            }
+            .palette-btn {
+                min-width: 54px;
+                padding: 4px 2px;
+                font-size: 0.65rem;
+                gap: 2px;
+            }
+            .palette-icon {
+                font-size: 0.95rem;
+            }
+            .height-hud {
+                top: 6px;
+                left: 6px;
+                padding: 6px 9px;
+            }
+            .height-progress-bar {
+                width: 84px;
+                height: 6px;
             }
         }
 
@@ -351,7 +473,13 @@
             line-height: 1.45;
         }
         html.td-story-chrome #tower-canvas {
-            flex: 1 1 auto;
+            /* `flex: 1 1 0` et NON `1 1 auto` : avec une base `auto`, la taille
+               intrinsique du canvas (ses attributs width/height, que Matter
+               reecrit a chaque resize) entre dans le calcul flex. Le canvas
+               grossissait alors a chaque rotation, jusqu'a deborder de
+               l'ecran. Une base de 0 rend la taille independante du backing
+               store : la hauteur vient uniquement de l'espace restant. */
+            flex: 1 1 0;
             width: 100%;
             height: auto;
             min-height: 0;
@@ -517,7 +645,7 @@
                 return;
             }
 
-            const { Engine, Render, Runner, Bodies, Composite, Events } = Matter;
+            const { Engine, Render, Runner, Bodies, Body, Composite, Events } = Matter;
 
             const container = document.getElementById('game-container');
             const canvas = document.getElementById('tower-canvas');
@@ -556,6 +684,14 @@
             let isGameOver = false;
             let framesStable = 0;
             let storyObjectsUsed = 0;
+            /* References des corps statiques, pour pouvoir les repositionner
+               quand la taille de l'ecran change (rotation, barre d'URL). */
+            let staticBodies = { ground: null, left: null, right: null };
+            /* Largeur de reference : au-dela, les blocs gardent leur taille
+               nominale ; en dessous ils retrecissent pour rester empilables. */
+            const REFERENCE_WIDTH = 820;
+            const AVG_BLOCK_HEIGHT = 29;
+            const WALL_THICKNESS = 100;
 
             const blockProperties = {
                 wood: { width: 80, height: 28, density: 0.0012, friction: 0.6, restitution: 0.05, color: '#d9822b', stroke: '#ffaa54' },
@@ -592,6 +728,117 @@
                 }
             }
 
+            /* Echelle des blocs : proportionnelle a la largeur du canvas pour
+               que la tour garde les memes proportions sur un petit ecran que
+               sur grand. Bornee pour ne jamais devenir illisible ni enorme. */
+            function blockScale() {
+                var w = render ? render.options.width : REFERENCE_WIDTH;
+                return Math.max(0.62, Math.min(1.15, w / REFERENCE_WIDTH));
+            }
+
+            /* Recalcule le sol et la ligne cible.
+               La hauteur a franchir est plafonnee a ~13 blocs moyens : sans ce
+               plafond, un canvas bas (mobile) rend la partie impossible, car il
+               faut empiler moins de blocs dans moins de pixels. */
+            function layoutTarget() {
+                var h = render.options.height;
+                var scale = blockScale();
+                groundY = h - 20;
+                var fromRatio = h * 0.65 - 20;
+                var fromBlocks = AVG_BLOCK_HEIGHT * scale * 13;
+                var needed = Math.max(40, Math.min(fromRatio, fromBlocks));
+                targetHeightY = Math.max(10, groundY - needed);
+            }
+
+            /* Taille reellement accordee au canvas par le layout.
+               On mesure le canvas lui-meme, et non le conteneur : en mode
+               recit la barre de dialogue est un frere dans le flux flex
+               vertical, donc la hauteur du conteneur n'est pas celle du canvas.
+
+               Point important : on retire d'abord la taille en ligne. En effet
+               Render.setPixelRatio ecrit style.width/height en px, qui Sert de
+               base au calcul flex ; sans cette neutralisation, la valeur
+               ecrite au tour precedent biaiserait la mesure suivante (et le
+               canvas deborderait de l'ecran en paysage). On reapplique ensuite
+               exactement la valeur mesuree : le layout ne bouge donc pas. */
+            function applySize() {
+                if (!render || !container) return;
+
+                canvas.style.removeProperty('width');
+                canvas.style.removeProperty('height');
+
+                /* getBoundingClientRect force un reflow synchrone. On garde la
+                   valeur flottante : arrondir introduirait un decalage de
+                   1 a 3 px entre l'ecran physique et la zone affichee. */
+                var rect = canvas.getBoundingClientRect();
+                var w = rect.width;
+                var h = rect.height;
+                if (!(w > 0) || !(h > 0)) return;
+
+                var dpr = Math.min(window.devicePixelRatio || 1, 2);
+                /* Garde-fou : si la taille n'a pas bouge, on ne retouche pas.
+                   Indispensable avec le ResizeObserver, sinon l'ecriture de la
+                   taille declenche l'observateur qui relance l'ecriture... */
+                if (Math.abs(w - lastW) < 0.5 && Math.abs(h - lastH) < 0.5 && dpr === lastDpr) return;
+                lastW = w; lastH = h; lastDpr = dpr;
+
+                render.options.width = w;
+                render.options.height = h;
+                /* Matter 0.19 n'a pas Render.setSize : setPixelRatio lit et
+                   ecrit options.width|height, dimensionne le backing store et
+                   pose le style CSS. */
+                Render.setPixelRatio(render, dpr);
+                /* `bounds` est fige a la creation sur la taille physique du
+                   canvas : on le resynchronise pour que le rendu ne cadre pas
+                   sur l'ancienne resolution. */
+                if (render.bounds) {
+                    render.bounds.max.x = w * dpr;
+                    render.bounds.max.y = h * dpr;
+                }
+
+                layoutTarget();
+                positionBoundaries();
+            }
+
+            function positionBoundaries() {
+                if (!engine) return;
+                var w = render.options.width;
+                var h = render.options.height;
+                if (staticBodies.ground) Body.setPosition(staticBodies.ground, { x: w / 2, y: h - 10 });
+                if (staticBodies.left) Body.setPosition(staticBodies.left, { x: -WALL_THICKNESS / 2, y: h / 2 });
+                if (staticBodies.right) Body.setPosition(staticBodies.right, { x: w + WALL_THICKNESS / 2, y: h / 2 });
+            }
+
+            /* Orientation / rotation / barre d'URL mobile : le canvas doit
+               suivre la taille reelle du conteneur. Debounce pour ne pas
+               recalculer a chaque frame pendant une rotation. */
+            var resizeTimer = null;
+            var lastW = 0, lastH = 0, lastDpr = 0;
+            function scheduleResize() {
+                if (resizeTimer) clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function () {
+                    resizeTimer = null;
+                    applySize();
+                }, 120);
+            }
+
+            /* Observer la mise en page, pas seulement la fenetre : le canvas
+               change aussi de taille quand les polices Google se chargent, quand
+               la palette change de hauteur, ou quand la barre de dialogue
+               apparait/disparait. Sans cela, l'ecran physique et la zone
+               affichee divergeaient de quelques pixels. */
+            function watchLayout() {
+                if (typeof ResizeObserver === 'undefined') return;
+                var ro = new ResizeObserver(scheduleResize);
+                ro.observe(container);
+                if (canvas) ro.observe(canvas);
+            }
+            function watchFonts() {
+                if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
+                    document.fonts.ready.then(scheduleResize).catch(function () {});
+                }
+            }
+
             function initPhysics() {
                 engine = Engine.create({
                     gravity: { x: 0, y: 1 }
@@ -599,8 +846,6 @@
 
                 const width = container.clientWidth || 400;
                 const height = container.clientHeight || 600;
-                groundY = height - 20;
-                targetHeightY = height * 0.35;
 
                 render = Render.create({
                     canvas: canvas,
@@ -618,8 +863,17 @@
                 Runner.run(runner, engine);
 
                 createBoundaries(width, height);
+                applySize();
                 initCustomGraphics();
                 initUI();
+
+                window.addEventListener('resize', scheduleResize);
+                window.addEventListener('orientationchange', scheduleResize);
+                if (window.visualViewport) {
+                    window.visualViewport.addEventListener('resize', scheduleResize);
+                }
+                watchLayout();
+                watchFonts();
 
                 setTimeout(() => {
                     document.getElementById('loading-overlay').classList.add('hidden');
@@ -628,14 +882,19 @@
             }
 
             function createBoundaries(width, height) {
-                const thickness = 100;
-                const ground = Bodies.rectangle(width / 2, height - 10, width, 20, { 
-                    isStatic: true, 
-                    render: { fillStyle: '#00f0ff', strokeStyle: '#ffffff', lineWidth: 1 } 
+                /* Sol volontairement tres large : il couvre toujours la largeur
+                   du canvas, meme apres une rotation, sans avoir a le redimensionner. */
+                const ground = Bodies.rectangle(width / 2, height - 10, 4000, 20, {
+                    isStatic: true,
+                    render: { fillStyle: '#00f0ff', strokeStyle: '#ffffff', lineWidth: 1 }
                 });
-                
-                const leftWall = Bodies.rectangle(-thickness / 2, height / 2, thickness, height * 2, { isStatic: true });
-                const rightWall = Bodies.rectangle(width + thickness / 2, height / 2, thickness, height * 2, { isStatic: true });
+
+                const leftWall = Bodies.rectangle(-WALL_THICKNESS / 2, height / 2, WALL_THICKNESS, height * 4, { isStatic: true });
+                const rightWall = Bodies.rectangle(width + WALL_THICKNESS / 2, height / 2, WALL_THICKNESS, height * 4, { isStatic: true });
+
+                staticBodies.ground = ground;
+                staticBodies.left = leftWall;
+                staticBodies.right = rightWall;
 
                 Composite.add(engine.world, [ground, leftWall, rightWall]);
             }
@@ -755,14 +1014,24 @@
                     });
                 });
 
-                canvas.addEventListener('click', (event) => {
+                /* `pointerdown` couvre souris, tactile et stylet d'un coup, et
+                   repond au drop immediatement : le `click` attendait ~300ms
+                   sur mobile et pouvait aussi declencher deux fois. */
+                canvas.addEventListener('pointerdown', (event) => {
                     if (isGameOver) return;
+                    event.preventDefault();
+                    /* Matter dessine en pixels CSS (canvas.style.width vaut
+                       options.width), et rect.width vaut cette meme valeur :
+                       aucune mise a l'echelle n'est necessaire ici. */
                     const rect = canvas.getBoundingClientRect();
-                    const x = event.clientX - rect.left;
-                    const y = 35; 
+                    /* On borne la position : un tap pres du bord ne doit pas
+                       faire naitre un bloc a moitie dehors. */
+                    const margin = 24;
+                    const x = Math.max(margin, Math.min(rect.width - margin, event.clientX - rect.left));
+                    const y = 35;
 
                     spawnBlock(x, y, selectedBlockType);
-                });
+                }, { passive: false });
 
                 document.getElementById('defeat-retry-btn').addEventListener('click', () => {
                     window.location.reload();
@@ -801,7 +1070,12 @@
                 const props = blockProperties[type];
                 if (!props) return;
 
-                const block = Bodies.rectangle(x, y, props.width, props.height, {
+                /* Dimensions misees a l'echelle de l'ecran : sur un petit
+                   ecran, des blocs de 80px de large occuperaient un quart de
+                   la largeur et la tour deviendrait impossible a empiler. */
+                const scale = blockScale();
+
+                const block = Bodies.rectangle(x, y, props.width * scale, props.height * scale, {
                     density: props.density,
                     friction: props.friction,
                     restitution: props.restitution,
