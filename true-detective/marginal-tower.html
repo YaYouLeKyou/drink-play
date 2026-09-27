@@ -55,6 +55,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
+            /* Une seule ligne : le titre se tronque plutot que de pousser
+               le bouton « Continuer » et le ⚙ hors de l'ecran. */
+            flex-wrap: nowrap;
             padding: 12px 20px;
             z-index: 10;
         }
@@ -66,6 +70,53 @@
             font-size: 1.3rem;
             letter-spacing: 0.05em;
             text-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+            /* flex: 1 + min-width: 0 : sans ce couple, le titre refuse de
+               descendre sous sa largeur de contenu et le titre long deborde
+               sur les controles voisins. */
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Bouton « Continuer » du mode scenario : fleche compacte carree.
+           Ce jeu ne charge pas standalone-game.css (d'ou les regles
+           locales, alignees sur celles de .sg-header). */
+        #story-continue-btn {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            min-height: 38px;
+            flex: 0 0 auto;
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0;
+            padding: 0;
+            font-size: 1.25rem;
+            line-height: 1;
+            font-weight: 700;
+            border-radius: 8px;
+            background: rgba(0, 255, 136, 0.15);
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            cursor: pointer;
+        }
+
+        #story-continue-btn:hover {
+            background: rgba(0, 255, 136, 0.3);
+        }
+
+        @media (max-width: 400px) {
+            #story-continue-btn {
+                width: 36px;
+                height: 36px;
+                min-width: 36px;
+                min-height: 36px;
+                font-size: 1.15rem;
+            }
         }
 
         .tower-main {
@@ -491,8 +542,12 @@
         <header class="tower-header">
             <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu" style="background:none;border:none;color:var(--neon-blue);font-size:1.3rem;cursor:pointer;">☰</button>
             <h1 class="tower-title">La Tour de Silas</h1>
+            <!-- Bouton « Continuer » du mode scenario : fleche compacte, dans le
+                 flux de l'en-tete, juste avant le bouton Retour puis le ⚙.
+                 La geometrie (carre 38x38) vient de standalone-game.css. -->
+            <button id="story-continue-btn" class="btn btn-continue" type="button"
+                    style="display:none;margin-top:0;padding:0;" aria-label="Continuer" title="Continuer">→</button>
             <button id="back-to-minigame-btn" class="btn btn-secondary" style="margin-top:0;padding:6px 14px;font-size:0.75rem;">Retour</button>
-            <button id="story-continue-btn" class="btn btn-continue" style="display:none;margin-top:0;padding:6px 14px;font-size:0.75rem;">Continuer</button>
         </header>
 
         <main class="tower-main">
@@ -1054,7 +1109,7 @@
 
                 var storyBtn = document.getElementById('story-continue-btn');
                 if (fromStory && storyBtn) {
-                    storyBtn.style.display = 'inline-block';
+                    storyBtn.style.display = 'inline-flex';
                     storyBtn.addEventListener('click', function () {
                         stopMusic();
                         tdLeaveMinigame(false);

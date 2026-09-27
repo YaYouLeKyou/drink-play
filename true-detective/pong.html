@@ -81,11 +81,6 @@
         }
 
         .btn-continue {
-            position: fixed;
-            top: 15px;
-            right: 20px;
-            padding: 8px 18px;
-            font-size: 0.85rem;
             font-weight: 700;
             background: rgba(0, 255, 136, 0.15);
             border: 2px solid var(--accent-green);
@@ -94,9 +89,6 @@
             cursor: pointer;
             transition: all 0.2s ease;
             font-family: 'Montserrat', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            z-index: 100;
         }
         .btn-continue:hover {
             background: rgba(0, 255, 136, 0.3);
@@ -120,10 +112,12 @@
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
         <h2 class="sg-title" style="color:var(--accent-blue);font-family:'Playfair Display',serif;">Pong Investigation</h2>
+        <!-- Bouton « Continuer » du mode scenario : fleche compacte, dans le
+             flux de l'en-tete, juste avant le bouton Retour puis le ⚙. -->
+        <button id="story-continue-btn" class="btn-continue" type="button"
+                style="display:none;" aria-label="Continuer" title="Continuer">→</button>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
-    
-    <button id="story-continue-btn" class="btn-continue" style="display:none;">Continuer</button>
 
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
@@ -521,7 +515,7 @@
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
                 if (storyContinueBtn) {
-                    storyContinueBtn.style.display = 'inline-block';
+                    storyContinueBtn.style.display = 'inline-flex';
                     storyContinueBtn.addEventListener('click', function () {
                         try {
                             var existingRaw = localStorage.getItem('td_standalone_game_result');

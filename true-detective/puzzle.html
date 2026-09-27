@@ -170,12 +170,12 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
+        /* Aspect visuel du bouton « Continuer » du mode scenario.
+           La GEOMETRIE (position, taille carree 38x38, alignement) est
+           centralisee dans standalone-game.css : ce bloc ne fixe plus que
+           les couleurs, afin que le bouton puisse rejoindre le flux flex
+           de .sg-header au lieu de flotter au-dessus du titre et du ⚙. */
         .btn-continue {
-            position: fixed;
-            top: 15px;
-            right: 20px;
-            padding: 8px 18px;
-            font-size: 0.85rem;
             font-weight: 700;
             background: rgba(0, 255, 136, 0.15);
             border: 2px solid var(--accent-green);
@@ -184,27 +184,18 @@
             cursor: pointer;
             transition: all 0.2s ease;
             font-family: 'Montserrat', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            z-index: 100;
         }
         .btn-continue:hover {
             background: rgba(0, 255, 136, 0.3);
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
         }
 
-        /* styles.css est charge apres ce <style> et redefinit .btn-continue en bas
-           au centre (bottom/left/transform). Sans ce rappel, le bouton se retrouve
-           avec top ET bottom definis : il s'etire alors sur toute la hauteur de
-           l'ecran et masque le puzzle. */
-        #story-continue-btn {
-            top: 15px !important;
-            right: 20px !important;
-            bottom: auto !important;
-            left: auto !important;
-            transform: none !important;
-            max-width: none !important;
-        }        @media (max-width: 600px) {
+        /* Ce rappel fixait le bouton « Continuer » en haut a droite pour
+           contrer le .btn-continue de styles.css (fixed, centre en bas).
+           Inutile desormais : le bouton vit dans le flux de .sg-header et
+           standalone-game.css annule deja ces proprietes la ou c'est
+           necessaire. Le garder risked de ledetacher du titre. */
+        @media (max-width: 600px) {
             .puzzle-wrap {
                 padding: 10px !important;
             }
@@ -225,11 +216,13 @@
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
         <h2 class="sg-title" style="color:var(--accent-orange);font-family:'Playfair Display',serif;">Anomalie Murale</h2>
+        <!-- Bouton « Continuer » du mode scenario : fleche compacte, dans le
+             flux de l'en-tete, juste avant le bouton Retour puis le ⚙. -->
+        <button id="story-continue-btn" class="btn-continue" type="button"
+                style="display:none;" aria-label="Continuer" title="Continuer">→</button>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
-    
-    <button id="story-continue-btn" class="btn-continue" style="display:none;">Continuer</button>
-    
+
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
             <span class="menu-icon">🏠</span>
@@ -471,7 +464,7 @@
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
                 if (storyContinueBtn) {
-                    storyContinueBtn.style.display = 'inline-block';
+                    storyContinueBtn.style.display = 'inline-flex';
                     storyContinueBtn.addEventListener('click', function () {
                         try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'puzzle', won: solved, clue: solved ? "Derrière la boiserie, un mur latéral bascule révélant un compartiment caché. Les documents falsifiés y sont stockés." : "", ts: Date.now() })); } catch (e) {}
                         try {

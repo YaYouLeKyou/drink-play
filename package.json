@@ -7,6 +7,10 @@
     "start": "node server.js",
     "dev": "node server.js",
     "validate:scenario": "node tools/validate-scenario.js",
+    "validate:continue-btn": "node tools/audit-continue-btn.js",
+    "validate:interro-btns": "node tools/test-interrogation-buttons.js",
+    "validate:chess-btn": "node tools/test-chess-continue-clear.js",
+    "test:mobile-header": "node tools/test-mobile-header.js",
     "permute": "node tools/generate-permutation.js"
   },
   "dependencies": {

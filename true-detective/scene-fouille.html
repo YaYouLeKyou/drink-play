@@ -85,19 +85,38 @@
             color: var(--text-secondary);
             line-height: 1.5;
         }
-        .btn-continue {
-            padding: 10px 20px;
-            font-size: 0.9rem;
+        /* Bouton « Continuer » : fleche compacte carree (38x38). Ce jeu
+           l'injecte dans .sg-main (pas dans l'en-tete), donc la regle
+           contextuelle de standalone-game.css ne s'applique pas et il faut
+           redefinir la geometrie ici. Meme contrat visuel partout. */
+        .btn-continue,
+        #story-continue-btn {
+            position: static;
+            box-sizing: border-box;
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            min-height: 38px;
+            max-width: none;
+            margin: 16px auto 0;
+            padding: 0;
+            gap: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            line-height: 1;
+            font-size: 1.25rem;
             font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: none;
+            letter-spacing: 0;
             background: rgba(0, 255, 136, 0.15);
             border: 2px solid #00ff88;
             border-radius: 8px;
             color: #00ff88;
             cursor: pointer;
             transition: all 0.2s ease;
-            font-family: 'Montserrat', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
         }
         .btn-continue:hover {
             background: rgba(0, 255, 136, 0.3);
@@ -109,6 +128,14 @@
                 transform: none;
                 width: 100%;
                 margin-top: 12px;
+            }
+            .btn-continue,
+            #story-continue-btn {
+                width: 36px;
+                height: 36px;
+                min-width: 36px;
+                min-height: 36px;
+                font-size: 1.15rem;
             }
         }
     </style>
@@ -329,9 +356,16 @@
                 if (fromStory) {
                     var continueBtn = document.createElement('button');
                     continueBtn.id = 'story-continue-btn';
+                    continueBtn.type = 'button';
                     continueBtn.className = 'btn btn-continue';
-                    continueBtn.textContent = 'Continuer';
-                    continueBtn.style.cssText = 'margin-top:16px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
+                    continueBtn.textContent = '→';
+                    continueBtn.setAttribute('aria-label', 'Continuer');
+                    continueBtn.title = 'Continuer';
+                    /* Fleche compacte : la geometrie (carre 38x38) vient de
+                       standalone-game.css, ce bloc ne porte que les couleurs.
+                       Le libelle long « Continuer » etait trop large et
+                       chevauchait le titre de l'en-tete. */
+                    continueBtn.style.cssText = 'font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;';
                     continueBtn.addEventListener('click', function () {
                         try {
                             var existingRaw = localStorage.getItem('td_standalone_game_result');

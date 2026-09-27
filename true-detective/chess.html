@@ -167,6 +167,20 @@
             transform: scale(1.08);
         }
 
+        /* Hauteur reservee en bas pour le bouton « Continuer ».
+           Le bouton est en position:fixed : il sort du flux et ne pousse
+           donc ni le plateau ni le conteneur. Sans cette reservation, un
+           echiquier centre dans l'espace restant vient recouvrir le bouton
+           (20px de recouvrement mesure, constant quelle que soit la
+           hauteur d'ecran).
+
+           42px (hauteur du bouton) + 20px (marge basse) + 12px de respiration
+           = 74px. La valeur est reprise telle quelle dans le calcul de
+           taille du plateau en mode story. */
+        :root {
+            --chess-continue-band: 74px;
+        }
+
         /* Bouton Continuer : fixe en bas au centre de l'ecran, toujours visible.
            Important : ne jamais le placer dans un ancetre avec transform/filter/
            backdrop-filter, sinon cet ancetre devient son bloc conteneur et le
@@ -218,11 +232,13 @@
 
         /* Ecrans peu hauts : on reduit la taille de l'echiquier pour reserver
            la bande du bouton Continuer (fixe en bas) et ne jamais recouvrir
-           la derniere rangee. L'echiquier reste carre et jamais tronque. */
+           la derniere rangee. L'echiquier reste carre et jamais tronque.
+           On retire aussi la bande du bouton, sinon le plateau vient
+           recouvrir ce dernier de 20px. */
         @media (max-height: 700px) {
             .chess-board {
-                width: min(76vw, calc(100vh - 200px));
-                height: min(76vw, calc(100vh - 200px));
+                width: min(76vw, calc(100vh - 200px - var(--chess-continue-band)));
+                height: min(76vw, calc(100vh - 200px - var(--chess-continue-band)));
             }
         }
 
@@ -260,8 +276,12 @@
             height: auto;
         }
         html.td-story-chrome .chess-board {
-            width: min(76vw, calc(100vh - 285px));
-            height: min(76vw, calc(100vh - 285px));
+            /* 285px = barre de titre + barre de dialogue + marge interne.
+               On y retranche la bande du bouton « Continuer » (position
+               fixed, hors flux) : sans cela le plateau, centre dans l'espace
+               restant, recouvrait le bouton de 20px sur laptop. */
+            width: min(76vw, calc(100vh - 285px - var(--chess-continue-band)));
+            height: min(76vw, calc(100vh - 285px - var(--chess-continue-band)));
         }
     </style>
 </head>

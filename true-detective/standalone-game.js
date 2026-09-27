@@ -629,14 +629,28 @@
             if (!storyBtn) {
                 storyBtn = document.createElement('button');
                 storyBtn.id = 'story-continue-btn';
+                storyBtn.type = 'button';
                 storyBtn.className = 'btn btn-continue';
-                storyBtn.textContent = 'Continuer';
-                storyBtn.style.cssText = 'display:none;margin-left:8px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
+                /* Fleche compacte : la geometrie (carre 38x38, non ecrasable)
+                   vient de standalone-game.css, ce bloc ne porte que les
+                   couleurs. Le libelle long « Continuer » etait la cause du
+                   chevauchement avec le titre et le ⚙ sur mobile. */
+                storyBtn.textContent = '→';
+                storyBtn.setAttribute('aria-label', 'Continuer');
+                storyBtn.title = 'Continuer';
+                storyBtn.style.cssText = 'font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;';
                 var header = document.querySelector('.sg-header');
-                if (header) header.appendChild(storyBtn);
+                if (header) {
+                    /* Ordre de lecture ☰ · titre · → · ⚙ : on glisse la fleche
+                       avant le bouton Retour plutot que de l'ajouter a la fin,
+                       sinon elle se retrouve apres la roue de parametres. */
+                    var backBtn = document.getElementById('back-to-minigame-btn');
+                    if (backBtn && backBtn.parentNode === header) header.insertBefore(storyBtn, backBtn);
+                    else header.appendChild(storyBtn);
+                }
             }
             if (storyBtn) {
-                storyBtn.style.display = 'inline-block';
+                storyBtn.style.display = 'inline-flex';
                 storyBtn.addEventListener('click', function () {
                     returnToStory(true);
                 });

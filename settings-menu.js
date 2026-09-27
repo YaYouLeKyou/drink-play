@@ -8,7 +8,9 @@
     let cfg = {};
 
     /* En dessous de cette largeur libre, on ne tente plus de mettre le bouton
-       Continue à côté du ⚙ mais en dessous (écrans étroits / paysage). */
+       Continue à côté du ⚙ mais en dessous (écrans étroits / paysage).
+       Seuil atteint par les rares boutons encore flottants : les flèches
+       compactes de l'en-tête mesurent 38px, donc bien en dessous. */
     var MIN_CONTINUE_WIDTH = 120;
 
     /* Résolution du conteneur d'accueil du bouton. Les pages de mini-jeux
@@ -23,15 +25,27 @@
         return null;
     }
 
-    /* Le bouton « Continuer » du mode scénario est en `position: fixed`
-       en haut à droite sur plusieurs mini-jeux (puzzle, chemistry, shooting,
-       breakout…), exactement là où le ⚙ est monté dans la barre de titre.
-       Résultat : les deux se chevauchent et le ⚙ devient incliquable.
+    /* Le bouton « Continuer » du mode scénario est désormais une flèche
+       compacte (38x38) insérée dans le flux flex de la barre de titre, aux
+       côtés du ☰, du titre et du ⚙. Le flexbox tranche lui-même la place :
+       le titre porte `min-width: 0` + ellipsis (voir standalone-game.css) et
+       le bouton est en `flex-shrink: 0`, donc aucun chevauchement n'est
+       possible, et aucun réglage JS n'est nécessaire.
 
-       On ne peut pas faire dependre chaque page de ce réglage, donc on déplace
-       le bouton Continue à côté du ⚙ dès qu'on constate un chevauchement, puis
-       on rejoue le calcul au redimensionnement. On ne touche que le bouton
-       Continue : sa logique et son gestionnaire de clic restent inchangés. */
+       `keepContinueButtonClear()` ci-dessous reste le filet de sécurité
+       pour les quelques boutons encore flottants (voir les exemptions) :
+       si l'un d'eux recouvre malgré tout le ⚙, on le décale. Les boutons
+       déjà dans l'en-tête sont explicitement ignorés — leur repositionnement
+       en `left`/`top` serait inopérant (position: static) et polluerait
+       leur style inline. */
+    /* Un bouton « Continuer » qui vit DANS la barre de titre est déjà
+       correctement placé par le flexbox : on ne le touche pas. Le
+       repositionnement en left/top ne servirait à rien (position: static)
+       et injecterait du style inline inutile sur chaque bouton. */
+    function isInHeaderFlow(el) {
+        return !!el.closest('.sg-header, .sg-header-actions, .tower-header');
+    }
+
     function continueButtons() {
         return Array.prototype.slice.call(document.querySelectorAll(
             '#story-continue-btn, .reseau-alibis-continue, .btn-continue'
@@ -40,6 +54,8 @@
             // Ignore les boutons d'accueil (ceux de l'index) : ils ne sont pas
             // dans un mini-jeu et n'ont pas de barre de titre à partager.
             if (!document.querySelector('.sg-header, .sg-header-actions, .tower-header')) return false;
+            // Déjà dans l'en-tête : le flexbox s'en charge (voir commentaire).
+            if (isInHeaderFlow(el)) return false;
             var r = el.getBoundingClientRect();
             return r.width > 0 && r.height > 0;
         });

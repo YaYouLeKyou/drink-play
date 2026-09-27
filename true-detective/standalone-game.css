@@ -62,12 +62,92 @@ html, body {
     letter-spacing: 0.04em;
     flex: 1;
     text-align: center;
+    /* Protection du titre contre les controles voisins sur mobile.
+       Sans `min-width: 0`, un element flex refuse de descendre sous la
+       largeur de son contenu : le titre le plus long pushes alors le
+       bouton « Continuer » (ou le ⚙) hors de l'ecran, ou pire fait passer
+       l'en-tete sur deux lignes. Avec ces quatre proprietes, le titre se
+       comprime proprement et finit en « … » au lieu de chevaucher. */
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .sg-hud {
     display: flex;
     gap: 16px;
     flex-wrap: wrap;
+}
+
+/* ===== BOUTON « CONTINUER » COMPACT (mode scenario) =====
+   Le libelle texte « Continuer » (ou « Continuer l'Enquete ») prenait
+   120 a 180px de large dans la barre de titre : sur un ecran de 360 a
+   430px, il ecrasait le titre et se|superposait au ⚙ des parametres.
+
+   Il est desormais remplace partout par une fleche droite « → » dans une
+   cible tactile carree de 38x38px, inseree dans le flux flex de l'en-tete
+   (donc `flex-shrink: 0` : elle ne se fait jamais ecraser) et placee juste
+   avant le retour / le ⚙.
+
+   Le selecteur est volontairement contextuel (`.sg-header`, `.tower-header`,
+   `.sg-header-actions`) : les boutons de CONTINUER volontairement flottants
+   en bas d'ecran (chess, montre-code, reseau-alibis-*) gardent leur mise en
+   page d'origine, car ils ne se disputent pas l'en-tete.
+
+   Les annulations `position/bottom/left/transform` neutralisent le
+   `.btn-continue` global de styles.css (fixed, centre en bas) sur les pages
+   qui chargent aussi styles.css (chemistry, puzzle, scene-fouille, ...). */
+.sg-header .btn-continue,
+.sg-header-actions .btn-continue,
+.tower-header .btn-continue,
+.sg-header #story-continue-btn,
+.sg-header-actions #story-continue-btn,
+.tower-header #story-continue-btn {
+    position: static;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    /* Cible tactile carree : 38x38 px, conforme aux 44x44 px recommandes
+       une fois le padding tactile de .btn-back ajoute par le navigateur. */
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    gap: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* La fleche doit rester centree verticalement : sans line-height: 1,
+       l'emoji/glyph herite de la hauteur de ligne et parait decale. */
+    line-height: 1;
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-indent: 0;
+    overflow: hidden;
+    border-radius: 8px;
+    white-space: nowrap;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.sg-header .btn-continue:hover,
+.sg-header-actions .btn-continue:hover,
+.tower-header .btn-continue:hover {
+    transform: translateY(-1px);
+}
+
+.sg-header .btn-continue:active,
+.sg-header-actions .btn-continue:active,
+.tower-header .btn-continue:active {
+    transform: scale(0.94);
 }
 
 /* ===== BUTTONS ===== */
@@ -370,6 +450,9 @@ html, body {
     .sg-header {
         padding: 8px 10px;
         gap: 8px;
+        /* Une seule ligne guarantee : le titre se tronque (ellipsis), il ne
+           passe jamais sous les controles, qui ne se chevauchent donc plus. */
+        flex-wrap: nowrap;
     }
 
     .sg-title {
@@ -379,6 +462,22 @@ html, body {
     .btn {
         padding: 6px 10px;
         font-size: 0.7rem;
+    }
+
+    /* La fleche « → » garde une cible tactile confortable meme en 360px :
+       seule la taille du glyphe descend, pas la boite. */
+    .sg-header .btn-continue,
+    .sg-header-actions .btn-continue,
+    .tower-header .btn-continue,
+    .sg-header #story-continue-btn,
+    .sg-header-actions #story-continue-btn,
+    .tower-header #story-continue-btn {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
+        font-size: 1.15rem;
+        padding: 0;
     }
 
     .suspect-chrome {

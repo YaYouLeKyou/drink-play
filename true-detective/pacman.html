@@ -691,9 +691,17 @@
             if (fromStory) {
                 if (backBtn) backBtn.style.display = 'none';
                 var continueBtn = document.createElement('button');
+                continueBtn.id = 'story-continue-btn';
+                continueBtn.type = 'button';
                 continueBtn.className = 'btn btn-continue';
-                continueBtn.textContent = 'Continuer';
-                continueBtn.style.cssText = 'margin-left:8px;padding:8px 16px;font-size:0.85rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;';
+                /* Fleche compacte : la geometrie (carre 38x38, non ecrasable)
+                   vient de standalone-game.css, ce bloc ne porte que les
+                   couleurs. Le libelle long « Continuer » etait la cause du
+                   chevauchement avec le titre et le ⚙ sur mobile. */
+                continueBtn.textContent = '→';
+                continueBtn.setAttribute('aria-label', 'Continuer');
+                continueBtn.title = 'Continuer';
+                continueBtn.style.cssText = 'font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;';
                 
                 continueBtn.addEventListener('click', function () {
                     try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'pacman', won: false, ts: Date.now() })); } catch (e) {}
@@ -708,7 +716,16 @@
                     window.location.href = fromStory ? '../true-detective/index.html?standalone=pacman' : '../true-detective/index.html#minigames';
                 });
                 var header = document.querySelector('.sg-header');
-                if (header) header.appendChild(continueBtn);
+                if (header) {
+                    /* Sur pacman le ⚙ est monte dans .sg-header-actions (voir
+                       btnMount), et le bouton Retour y vit aussi. On glisse donc
+                       la fleche avant ce bloc pour garder l'ordre
+                       ☰ · titre · → · [Retour · ⚙]. */
+                    var actions = header.querySelector('.sg-header-actions');
+                    if (actions) header.insertBefore(continueBtn, actions);
+                    else if (backBtn && backBtn.parentNode === header) header.insertBefore(continueBtn, backBtn);
+                    else header.appendChild(continueBtn);
+                }
             } else {
                 if (backBtn) {
                     backBtn.textContent = 'Accueil';

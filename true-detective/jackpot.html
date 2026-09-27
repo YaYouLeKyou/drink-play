@@ -197,9 +197,12 @@
                 if (backBtn) backBtn.style.display = 'none';
                 var continueBtn = document.createElement('button');
                 continueBtn.id = 'story-continue-btn';
+                continueBtn.type = 'button';
                 continueBtn.className = 'btn btn-continue';
-                continueBtn.textContent = 'Continuer';
-                continueBtn.style.cssText = 'margin-left:8px;padding:10px 20px;font-size:0.9rem;font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;cursor:pointer;font-family:Montserrat,sans-serif;text-transform:uppercase;letter-spacing:0.05em;';
+                continueBtn.textContent = '→';
+                continueBtn.setAttribute('aria-label', 'Continuer');
+                continueBtn.title = 'Continuer';
+                continueBtn.style.cssText = 'font-weight:700;background:rgba(0,255,136,0.15);border:2px solid #00ff88;border-radius:8px;color:#00ff88;';
                 continueBtn.addEventListener('click', function () {
                     var clues = [];
                     try {
@@ -226,7 +229,13 @@
                     window.location.href = fromStory ? '../true-detective/index.html?standalone=jackpot' : '../true-detective/index.html#minigames';
                 });
                 var header = document.querySelector('.sg-header');
-                if (header) header.appendChild(continueBtn);
+                if (header) {
+                    /* Ordre de lecture ☰ · titre · → · ⚙ : on glisse la fleche
+                       avant le bouton Retour plutot que de l'ajouter a la fin,
+                       sinon elle se retrouve apres la roue de parametres. */
+                    if (backBtn && backBtn.parentNode === header) header.insertBefore(continueBtn, backBtn);
+                    else header.appendChild(continueBtn);
+                }
             } else {
                 if (backBtn) {
                     backBtn.textContent = 'Accueil';

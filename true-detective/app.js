@@ -4409,10 +4409,15 @@ if (mgCfg.type === 'montre_code' && res.notes) {
             interroId = s.prochainSuspect || 'suspect';
         }
         scr.interro = { id: interroId, questionRound: 0, minigameRound: 0, done: false, questionsDone: false, finalInterrogation: !!(page && page.finalInterrogation) };
-        // « Continuer » reste à l'écran mais reste inactif pendant l'interrogatoire
-        $.continueBtn.classList.remove('hidden');
-        $.continueBtn.disabled = true;
-        $.continueBtn.textContent = getText('continue') || 'Continuer';
+        /* On ne montre PAS « Continuer » ici : scrShowInterroAskButton() ci-dessous
+           decide de l'ecran. Soit il affiche le bouton « Interroger » — auquel cas
+           « Continuer » doit rester absent (les deux sont ancres au meme point en
+           bas d'ecran) — soit il enchaine sur les questions ou le mini-jeu, qui
+           remettent eux-memes « Continuer » en place.
+
+           L'ancien code l'affichait ici puis le masquait aussitot apres sur mobile
+           seulement : sur desktop, les deux boutons restaient affiches au meme
+           endroit et se recouvraient. */
         scrShowInterroAskButton();
     }
 
@@ -4553,6 +4558,12 @@ if (mgCfg.type === 'montre_code' && res.notes) {
         if ((it.finalInterrogation || (scrCurrentPhase() && scrCurrentPhase().id === 'act2_3')) && !it.questionsDone) {
             scr.awaitingChoice = false;
             $.choicesContainer.innerHTML = '';
+            /* Interrogatoire final / acte 2 phase 3 : les questions s'affichent
+               d'emblee, sans passer par le bouton « Interroger ». « Continuer »
+               doit malgre tout rester absent, sinon le joueur peut le
+               cliquer au milieu des questions : il repart vers la page
+               suivante via un onclick perime d'une page precedente. */
+            $.continueBtn.classList.add('hidden');
             scrShowInterroQuestions();
             return;
         }
@@ -4570,14 +4581,20 @@ if (mgCfg.type === 'montre_code' && res.notes) {
                 scrShowInterroQuestions();
             });
             $.choicesContainer.appendChild(askBtn);
-            if (isMobile()) {
-                $.continueBtn.classList.add('hidden');
-            } else {
-                $.continueBtn.classList.remove('hidden');
-                $.continueBtn.disabled = true;
-                $.continueBtn.textContent = getText('continue') || 'Continuer';
-                $.continueBtn.onclick = handleContinue;
-            }
+            /* Le bouton « Interroger » est ancre en bas au centre de l'ecran
+               (position: fixed, bottom: 20px, left: 50%), exactement ou vit
+               le bouton « Continuer » (.btn-continue, lui aussi fixed et
+               centre en bas). Les deux se superposaient donc sur desktop :
+               on masque « Continuer » des que « Interroger » est affiche,
+               sans condition de largeur.
+
+               Le garde isMobile() d'avant ne suffisait pas : sur mobile il
+               masquait bien le bouton, mais sur toute la place au-dela de
+               768px les deux boutons etaient affiches au meme point.
+
+               « Continuer » reapparait en fin d'interrogatoire
+               (scrEndInterrogation) ou au lancement du mini-jeu. */
+            $.continueBtn.classList.add('hidden');
 
             return;
         }
@@ -4798,9 +4815,12 @@ if (mgCfg.type === 'montre_code' && res.notes) {
     function scrEndInterrogation() {
         scr.interro.done = true;
         scr.awaitingChoice = false;
-        if (isMobile()) {
-            $.continueBtn.classList.remove('hidden');
-        }
+        /* L'interrogatoire est fini : plus de bouton « Interroger », donc
+           « Continuer » redevient l'unique action possible et doit reapparaitre.
+           Le retrait du garde isMobile() va avec le masquage inconditionnel
+           de scrShowInterroAskButton : sans cela, sur desktop le bouton
+           resterait masque a la fin et la partie serait bloquee. */
+        $.continueBtn.classList.remove('hidden');
         $.continueBtn.disabled = false;
         $.continueBtn.textContent = getText('continue') || 'Continuer';
         $.continueBtn.onclick = function () {
@@ -5520,10 +5540,11 @@ if (mgCfg.type === 'montre_code' && res.notes) {
                         scr.awaitingChoice = false;
                         s2.prochainSuspect = suspectId;
                         scr.interro = { id: suspectId, questionRound: 0, minigameRound: 0, done: false, questionsDone: false };
-                        $.continueBtn.classList.remove('hidden');
-                        $.continueBtn.disabled = false;
-                        $.continueBtn.textContent = getText('continue') || 'Continuer';
-                        $.continueBtn.onclick = handleContinue;
+                        /* Pas de « Continuer » ici : scrShowInterroAskButton() affiche
+                           soit le bouton « Interroger » (qui exige « Continuer » absent),
+                           soit la serie de questions. Ce dernier cas finit sur
+                           scrEndInterrogation / le lancement du mini-jeu, qui remettent
+                           « Continuer » en place. */
                         scrShowInterroAskButton();
                     });
                     $.choicesContainer.appendChild(btn);
@@ -5598,10 +5619,10 @@ function scrApplyChoice(choiceKey, choiceId) {
             }
             s.reinterroges.push(choiceId);
             scr.interro = { id: choiceId, questionRound: 0, minigameRound: 0, done: false, questionsDone: false };
-            $.continueBtn.classList.remove('hidden');
-            $.continueBtn.disabled = true;
-            $.continueBtn.textContent = getText('continue') || 'Continuer';
-            $.continueBtn.onclick = handleContinue;
+            /* Comme pour scrStartInterrogation : « Continuer » n'est pas affiche
+               ici, c'est scrShowInterroAskButton() qui decide — et il doit
+               disparaitre des l'affichage du bouton « Interroger », ancre au
+               meme point en bas d'ecran. */
             scrShowInterroAskButton();
         } else if (choiceKey === 'accuser') {
             s.accused = choiceId;

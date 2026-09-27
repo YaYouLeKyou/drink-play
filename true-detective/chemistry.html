@@ -322,28 +322,25 @@
             100% { top: 0%; opacity: 0; }
         }
 
+        /* Bouton « Continuer » du mode scenario : fleche compacte dans le
+           flux de l'en-tete (voir standalone-game.css pour la geometrie
+           38x38 partagee par tous les mini-jeux).
+           Ce bloc ne fixe plus que les couleurs. Les anciens
+           `position: fixed !important` / `top` / `right` / `bottom` /
+           `left` / `transform` sont supprimes : ilsendaient le bouton
+           par-dessus le titre et le ⚙, et avec `top` ET `bottom` ils
+           l'etiraient sur toute la hauteur de l'ecran. */
         #story-continue-btn {
-            position: fixed !important;
-            top: 14px !important;
-            right: 20px !important;
-            /* Annule bottom/left/transform heritees de styles.css (.btn-continue) :
-               avec top + bottom definis, le bouton fixed s'etirerait sur toute la
-               hauteur de l'ecran et masquerait le mini-jeu. */
-            bottom: auto !important;
-            left: auto !important;
-            transform: none !important;
-            max-width: none !important;
-            padding: 8px 18px !important;
-            font-size: 0.85rem !important;
             font-weight: 700 !important;
             background: rgba(0, 255, 136, 0.12) !important;
             border: 2px solid var(--accent-green) !important;
             border-radius: 8px !important;
             color: var(--accent-green) !important;
             cursor: pointer !important;
-            z-index: 100 !important;
+            font-size: 1.25rem !important;
+            line-height: 1 !important;
             display: none;
-             box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
         }
 
         @media (max-width: 768px) {
@@ -440,6 +437,10 @@
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
         <h2 class="sg-title" style="color:var(--accent-blue);font-family:'Playfair Display',serif;">🧬 Séquençage ADN : Les 6 Suspects</h2>
+        <!-- Bouton « Continuer » du mode scenario : fleche compacte, dans le
+             flux de l'en-tete, juste avant le bouton Retour puis le ⚙. -->
+        <button id="story-continue-btn" class="btn-continue" type="button"
+                style="display:none;" aria-label="Continuer" title="Continuer">→</button>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
 
@@ -534,8 +535,6 @@
         </div>
     </main>
 
-    <button id="story-continue-btn" class="btn btn-continue">Continuer l'Enquête</button>
-
     <script src="minigame-audio.js" data-minigame="chemistry"></script>
     <script src="../settings-menu.js"></script>
     <script src="story-chrome.js"></script>
@@ -559,7 +558,7 @@
 
             if (fromStory) {
                 if ($backBtn) $backBtn.style.display = 'none';
-                if ($continueBtn) $continueBtn.style.display = 'block';
+                if ($continueBtn) $continueBtn.style.display = 'inline-flex';
             } else {
                 if ($backBtn) {
                     $backBtn.textContent = 'Accueil';
@@ -718,7 +717,7 @@
                         document.getElementById('mission-board').innerHTML = "🏆 <b>TOUS LES SUSPECTS ONT ÉTÉ ANALYSÉS !</b> Séquençage complet terminé.";
                         const fromStory = new URLSearchParams(window.location.search).get('story') === '1' || new URLSearchParams(window.location.search).get('mode') === 'story';
                         if (fromStory) {
-                            document.getElementById('story-continue-btn').style.display = 'block';
+                            document.getElementById('story-continue-btn').style.display = 'inline-flex';
                         }
                     }
                 } else {

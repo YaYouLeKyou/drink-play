@@ -226,11 +226,13 @@
             box-sizing: border-box;
         }
 
-        /* Bouton Continuer ultra fluide */
+        /* Bouton Continuer : fleche compacte dans l'en-tete.
+           La geometrie (carre 38x38, flex-shrink: 0) est centralisee dans
+           standalone-game.css ; ce bloc ne fixe que les couleurs et la
+           fluidite. Les anciens `padding: 8px 18px` / `margin-left: 8px` /
+           `text-transform: uppercase` sont supprimes : le libelle texte
+           prenait 120-180px et poussait le titre hors de l'ecran. */
         #story-continue-btn {
-            margin-left: 8px;
-            padding: 8px 18px !important;
-            font-size: 0.85rem !important;
             font-weight: 700 !important;
             background: rgba(0, 255, 136, 0.12) !important;
             border: 2px solid var(--accent-green) !important;
@@ -238,9 +240,6 @@
             color: var(--accent-green) !important;
             cursor: pointer !important;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            font-family: 'Montserrat', sans-serif !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.05em !important;
             box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
             will-change: transform, box-shadow;
         }
@@ -416,8 +415,11 @@
                 if (backBtn) backBtn.style.display = 'none';
                 var continueBtn = document.createElement('button');
                 continueBtn.id = 'story-continue-btn';
+                continueBtn.type = 'button';
                 continueBtn.className = 'btn btn-continue';
-                continueBtn.textContent = 'Continuer';
+                continueBtn.textContent = '→';
+                continueBtn.setAttribute('aria-label', 'Continuer');
+                continueBtn.title = 'Continuer';
                 continueBtn.addEventListener('click', function () {
                     try { 
                         localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'memory', won: false, ts: Date.now() })); 
@@ -437,7 +439,13 @@
                     window.location.href = '../true-detective/index.html?standalone=memory';
                 });
                 var header = document.querySelector('.sg-header');
-                if (header) header.appendChild(continueBtn);
+                if (header) {
+                    /* Ordre de lecture ☰ · titre · → · ⚙ : on glisse la fleche
+                       avant le bouton Retour plutot que de l'ajouter a la fin,
+                       sinon elle se retrouve apres la roue de parametres. */
+                    if (backBtn && backBtn.parentNode === header) header.insertBefore(continueBtn, backBtn);
+                    else header.appendChild(continueBtn);
+                }
             } else {
                 if (backBtn) {
                     backBtn.textContent = 'Accueil';

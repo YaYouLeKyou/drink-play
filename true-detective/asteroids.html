@@ -106,12 +106,12 @@
             background: rgba(255, 0, 110, 0.4);
         }
 
+        /* Aspect visuel du bouton « Continuer » du mode scenario.
+           La GEOMETRIE (position, taille carree 38x38, alignement) est
+           centralisee dans standalone-game.css : ce bloc ne fixe plus que
+           les couleurs, afin que le bouton puisse rejoindre le flux flex
+           de .sg-header au lieu de flotter au-dessus du titre et du ⚙. */
         .btn-continue {
-            position: fixed;
-            top: 15px;
-            right: 20px;
-            padding: 8px 18px;
-            font-size: 0.85rem;
             font-weight: 700;
             background: rgba(0, 255, 136, 0.15);
             border: 2px solid var(--accent-green);
@@ -120,9 +120,6 @@
             cursor: pointer;
             transition: all 0.2s ease;
             font-family: 'Montserrat', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            z-index: 100;
         }
         .btn-continue:hover {
             background: rgba(0, 255, 136, 0.3);
@@ -141,10 +138,12 @@
     <header class="sg-header" style="position:relative;">
         <button id="hamburger-btn" class="sg-hamburger" aria-label="Menu">☰</button>
         <h2 class="sg-title" style="color:var(--accent-pink);font-family:'Playfair Display',serif;">Traque Nocturne</h2>
+        <!-- Bouton « Continuer » du mode scenario : fleche compacte, dans le
+             flux de l'en-tete, juste avant le bouton Retour puis le ⚙. -->
+        <button id="story-continue-btn" class="btn-continue" type="button"
+                style="display:none;" aria-label="Continuer" title="Continuer">→</button>
         <button id="back-to-minigame-btn" class="btn btn-back">Retour</button>
     </header>
-
-    <button id="story-continue-btn" class="btn-continue" style="display:none;">Continuer</button>
 
     <nav id="hamburger-menu" class="sg-menu">
         <button class="sg-menu-item" id="menu-home">
@@ -395,7 +394,7 @@
                 var fromStory = new URLSearchParams(window.location.search).get('story') === '1';
                 if (won && fromStory) {
                     var continueBtn = document.getElementById('story-continue-btn');
-                    if (continueBtn) continueBtn.style.display = 'inline-block';
+                    if (continueBtn) continueBtn.style.display = 'inline-flex';
                 }
             }
 
@@ -485,7 +484,7 @@
                 if (backBtn) backBtn.style.display = 'none';
                 var storyContinueBtn = document.getElementById('story-continue-btn');
                 if (storyContinueBtn) {
-                    storyContinueBtn.style.display = 'inline-block';
+                    storyContinueBtn.style.display = 'inline-flex';
                     storyContinueBtn.addEventListener('click', function () {
                         try { localStorage.setItem('td_standalone_game_result', JSON.stringify({ type: 'asteroids', won: false, ts: Date.now() })); } catch (e) {}
                         try {
