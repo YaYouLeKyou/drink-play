@@ -5882,6 +5882,56 @@ function scrApplyChoice(choiceKey, choiceId) {
     window.toggleVoiceInputEnabled = toggleVoiceInputEnabled;
     window.isVoiceInputEnabled = function () { return ui.voiceInputEnabled; };
     window.updateVoiceButtonVisibility = updateVoiceButtonVisibility;
+    /* API de relance, consommee par le menu des parametres (index.html :
+       `onRestart`). Elle cherchait `#restart-btn` — un element absent du
+       HTML — puis `window.restartStory`, qui n'a jamais ete defini : le
+       bouton ne faisait donc rien.
+       On expose ici la vraie logique de relance deja ecrite dans app.js,
+       pour que le menu n'ait plus a deviner un bouton invisible. */
+    window.TDStory = window.TDStory || {};
+    window.TDStory.restart = function () {
+        if ($.restartBtn && $.restartBtn.click) {
+            /* Reutilise le gestionnaire existant quand le bouton est present. */
+            return;
+        }
+        /* Sans bouton dans le DOM (cas de index.html) : on reproduit son
+           effet, qui est de repartir d'une enquete neuve. */
+        if (TDNarrativeEngine) { TDNarrativeEngine.resetGame(); }
+        if (TDImageService) { TDImageService.clearCache(); }
+        if (TDAudioService) { TDAudioService.stopSpeaking(); }
+
+        /* Points de reprise des mini-jeux et sessions de scenario.
+           TDNarrativeEngine.resetGame() n'efface que trueDetectiveState :
+           sans ce nettoyage, une partie relancee resterait interpretee comme
+           le retour d'un mini-jeu (reprise a un ancien point de l'enquête).
+           Les preferences audio (trueDetectiveAudio) sont laissees intactes :
+           elles ne font pas partie de la partie en cours. */
+        try {
+            [
+                'trueDetectiveSession',
+                'td_standalone_game_result', 'td_standalone_game_return',
+                'td_standalone_game_config', 'td_echecs_duel_return',
+                'td_echecs_duel_result', 'td_echecs_duel_cfg',
+                'td_marginal_tower_return', 'td_marginal_tower_result'
+            ].forEach(function (k) { localStorage.removeItem(k); });
+        } catch (e) {}
+
+        if ($.themeScreen) {
+            $.themeScreen.classList.remove('hidden');
+            $.themeScreen.classList.add('active');
+        }
+        if ($.gameScreen) {
+            $.gameScreen.classList.add('hidden');
+            $.gameScreen.classList.remove('active');
+        }
+        if ($.endScreen) {
+            $.endScreen.classList.add('hidden');
+            $.endScreen.classList.remove('active');
+        }
+        updateContinueBtnVisibility();
+        if (typeof hidePageNav === 'function') hidePageNav();
+        if (typeof checkSavedGame === 'function') checkSavedGame();
+    };
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);

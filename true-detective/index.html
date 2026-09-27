@@ -493,9 +493,19 @@
                     if (muteBtn) muteBtn.click();
                 },
                 onRestart: function () {
+                    /* Ce callback cherchait `#restart-btn` (absent du HTML)
+                       puis `window.restartStory` (jamais defini) : le bouton
+                       ne faisait donc rien. app.js expose desormais la vraie
+                       relance via `window.TDStory.restart()`.
+                       On garde les deux anciens chemins en repli, au cas ou
+                       une autre page provide encore l'un des deux. */
+                    if (window.TDStory && typeof window.TDStory.restart === 'function') {
+                        window.TDStory.restart();
+                        return;
+                    }
                     var b = document.getElementById('restart-btn');
                     if (b) b.click();
-                    else if (window.restartStory) window.restartStory();
+                    else if (typeof window.restartStory === 'function') window.restartStory();
                 },
                 onBackToHub: function () { window.location.href = '../index.html'; },
                 onDevMode: function () {
