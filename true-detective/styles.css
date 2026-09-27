@@ -1322,6 +1322,32 @@ html {
     display: none !important;
 }
 
+/* Pendant un interrogatoire, le bouton « Interroger » (.interrogation-ask)
+   est ancre en bas au centre, exactement comme « Continuer » : les deux se
+   recouvrent. La regle est appliquee ICI, en CSS, et non en JS.
+
+   Pourquoi en CSS : « Continuer » est reaffiche par
+   updateContinueBtnVisibility(), appelée par une quarantaine d'endroits
+   (changement d'ecran, ouverture du carnet…). Tout masquage pose en JS
+   depuis l'interrogatoire est donc annule au tour suivant, et le
+   chevauchement revient. `:has()` observe la presence reelle du bouton
+   « Interroger » dans le DOM : plus aucun ordre d'appel ne peut faire
+   reapparaitre « Continuer » a cote.
+
+   `display: none !important` l'emporte sur `.btn-continue.always-active`
+   (opacity/pointer-events), qui ne pourrait pas masquer le bouton.
+
+   Le selecteur porte sur `body` et non sur `#game-screen` : « Continuer » est
+   un enfant direct de `<body>`, tandis que « Interroger » vit dans
+   `#game-screen`. Ces deux boutons n'ont donc pas d'ancetre commun plus
+   precis que `body`. */
+body:has(#game-screen .interrogation-ask) .btn-continue,
+body:has(#game-screen .interrogation-ask) #continue-btn,
+body:has(#game-screen .interrogation-ask) #mobile-continue-btn {
+    display: none !important;
+    pointer-events: none !important;
+}
+
 .btn-continue {
     pointer-events: auto !important;
     cursor: pointer !important;

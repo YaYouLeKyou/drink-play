@@ -365,6 +365,18 @@
         updateContinueBtnVisibility();
     }
 
+    /* Pendant un interrogatoire, « Continuer » est masque en CSS (voir
+       styles.css : `body:has(#game-screen .interrogation-ask)`), parce que
+       cette fonction est appelee par une quarantaine d'endroits
+       (changement d'ecran, ouverture du carnet…) et remettait le bouton en
+       place apres que l'interrogatoire l'ait masque.
+
+       On ne le masque donc PAS ici : la regle vit en CSS, pour n'avoir qu'une
+       seule source de verite. La masquer aussi en JS fonctionnerait, mais
+       cette fonction peut etre appelee avant l'insertion du bouton
+       « Interroger » dans le DOM, et le conflit passerait alors. Le CSS, lui,
+       depend de l'etat reel du DOM et ne peut pas etre contourne par un
+       ordre d'appel. */
     function updateContinueBtnVisibility() {
         var storyScreens = ['game-screen'];
         var activeScreen = document.querySelector('.screen.active');
