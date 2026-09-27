@@ -132,6 +132,101 @@
                 height: auto;
             }
         }
+
+        /* ===== PC / laptop : barre de dialogue a GAUCHE du jeu =====
+           En mode scenario, story-chrome.js insere la barre de dialogue
+           (#td-sc-bar : portrait + nom + texte) comme premier enfant de
+           .sg-main. Or .sg-main est une colonne : la barre s'etale donc sur
+           toute la largeur AU-DESSUS du jeu, le repousse vers le bas et le
+           sort de l'ecran. Le jeu etait alors inutilisable au demarrage
+           sur les univers a barre de dialogue (dont cyberpunk).
+
+           Des 900px, .sg-main repasse en ligne et la barre devient une
+           colonne compacte, calee a gauche, centree verticalement et sortie
+           du flux : le jeu garde le centre de la fenetre. En dessous de
+           900px (mobile / tablette), la disposition verticale d'origine
+           est conservee telle quelle.
+
+           Meme approche que pacman.html, qui a rencontre le meme
+           probleme. Ce bloc est volontairement en ASCII : ecrit via un
+           script PowerShell, l'UTF-8 des commentaires avait ete relu comme
+           du Latin-1, ce qui transformait chaque accent en suite de
+           caracteres illisibles. */
+        @media (min-width: 900px) {
+            .sg-main {
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                gap: 20px;
+                position: relative;
+            }
+
+            /* La barre sort du flux pour ne pas ecraser le jeu. */
+            .sg-main > #td-sc-bar.td-sc-bar {
+                position: absolute;
+                top: 50%;
+                left: 16px;
+                transform: translateY(-50%);
+                width: 240px;
+                max-width: 22vw;
+                margin: 0;
+                z-index: 5;
+            }
+
+            /* Le portrait passe au-dessus du texte : plus lisible dans une
+               colonne etroite, et le cadre garde le ratio paysage des
+               sprites (677x369) au lieu de les rogner. */
+            .sg-main > #td-sc-bar.td-sc-bar .td-sc-bar-inner {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                padding: 10px;
+            }
+
+            .sg-main > #td-sc-bar.td-sc-bar .td-sc-portrait-frame {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 677 / 369;
+                border-radius: 8px;
+            }
+
+            .sg-main > #td-sc-bar.td-sc-bar .td-sc-portrait {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                object-position: center top;
+            }
+
+            .sg-main > #td-sc-bar.td-sc-bar .td-sc-dialogue-zone {
+                min-width: 0;
+            }
+
+            .sg-main > #td-sc-bar.td-sc-bar .td-sc-name {
+                font-size: 0.95rem;
+            }
+
+            .sg-main > #td-sc-bar.td-sc-bar .td-sc-role {
+                font-size: 0.6rem;
+            }
+
+            /* Texte compact avec defilement interne : la colonne ne doit
+               pas deborder de la fenetre sur une longue replique. */
+            .sg-main > #td-sc-bar.td-sc-bar .td-sc-dialogue-box {
+                padding: 8px 10px;
+                font-size: 0.82rem;
+                line-height: 1.45;
+                max-height: 34vh;
+                overflow-y: auto;
+            }
+
+            /* Le jeu est legerement decale a droite pour ne pas passer sous
+               la colonne de dialogue, tout en restant centre dans l'espace
+               restant. */
+            .asteroids-wrap {
+                margin-left: 240px;
+                max-width: 800px;
+            }
+        }
     </style>
 </head>
 <body>

@@ -12,6 +12,7 @@
     "validate:interro-live": "node tools/test-interro-live.js",
     "validate:chess-btn": "node tools/test-chess-continue-clear.js",
     "validate:restart-btn": "node tools/test-restart-button.js",
+    "validate:asteroids-box": "node tools/test-asteroids-talkbox.js",
     "test:mobile-header": "node tools/test-mobile-header.js",
     "permute": "node tools/generate-permutation.js"
   },
