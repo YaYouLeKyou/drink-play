@@ -90,7 +90,7 @@ const backgroundM4TImg = createImage("./media/backgroundM4T.png");
 const backgroundM5Img = createImage("./media/backgroundM5.png");
 const backgroundM5TImg = createImage("./media/backgroundM5T.png");
 const backgroundM6Img = createImage("./media/backgroundM6.png");
-const backgroundM7Img = createImage("./media/background M7.png");
+const backgroundM7Img = createImage("./media/backgroundM7.png");
 const topPipeImg = createImage("./media/toppipe.png");
 const bottomPipeImg = createImage("./media/bottompipe.png");
 const beerImg = createImage("./media/beer.png");
@@ -767,6 +767,8 @@ function update() {
                     gameState.enemies = []; // Clear all enemies
                     gameState.pipesEntered = 0;
                     showMessageWithDuration("Congratulation!", "", "gold", 120);
+                    /* Boss vaincu : on quitte la musique de boss pour la
+                       musique du niveau suivant (ou le generique de fin). */
                     if (window.DA_Audio) {
                         if (currentLevel === 1) window.DA_Audio.playLevel('level2');
                         else if (currentLevel === 2) window.DA_Audio.playLevel('level3');
@@ -869,23 +871,26 @@ function update() {
             }
         }
 
+        /* Musique de boss a l'entree dans chaque combat, puis retour a la
+           musique du niveau une fois le boss vaincu. playBoss() memorise la
+           piste courante pour pouvoir la restaurer. */
         if (gameState.currentScore === 60 && !gameState.bossMode && !gameState.postBossDelayActive && !gameState.boss1Defeated) {
             spawnBoss(1);
-            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playLevel('level2'); }
+            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playBoss(); }
         }
         if (gameState.currentScore === 120 && !gameState.bossMode && !gameState.postBossDelayActive && !gameState.boss2Defeated) {
             spawnBoss(2);
-            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playLevel('level3'); }
+            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playBoss(); }
         }
         if (gameState.currentScore === 180 && !gameState.bossMode && !gameState.postBossDelayActive && !gameState.boss3AppearedOnce) {
             spawnBoss(3);
             gameState.boss3AppearedOnce = true;
-            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playLevel('level4'); }
+            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playBoss(); }
         }
         if (gameState.currentScore === 500 && !gameState.bossMode && !gameState.postBossDelayActive && gameState.boss3Defeated && !gameState.boss3AppearedTwice) {
             spawnBoss(3);
             gameState.boss3AppearedTwice = true;
-            if (window.DA_Audio) window.DA_Audio.sfx.bossEntry();
+            if (window.DA_Audio) { window.DA_Audio.sfx.bossEntry(); window.DA_Audio.playLevel('level4'); }
         }
         if (gameState.bossMode && !gameState.activeBoss && gameState.bossEntryDelay > 0) {
             gameState.bossEntryDelay--;

@@ -8,16 +8,18 @@
 (function () {
     'use strict';
 
-    /* ---------- Music playlist (matches existing media files) ---------- */
+    /* ---------- Music playlist (noms de fichiers exacts sur disque) ----------
+       Les noms DOIVENT respecter la casse : le deploiement (Linux/Vercel)
+       est sensible a la casse, un ecart se traduit par un 404 silencieux. */
     var MUSIC_BASE = './media/';
     var PLAYLIST = [
-        { name: 'Accueil',     file: 'accueil.mp3',            track: 'home'   },
-        { name: 'Level 1',     file: 'Level1.mp3',             track: 'level1' },
-        { name: 'Level 2',     file: 'Level 2.mp3',            track: 'level2' },
-        { name: 'Level 3',     file: 'level 3.mp3',            track: 'level3' },
-        { name: 'Level 4',     file: 'level 4.mp3',            track: 'level4' },
-        { name: 'Boss 1',      file: 'Boss 1.mp3',             track: 'boss1'  },
-        { name: 'Generique',   file: 'generique de fin.mp3',   track: 'ending' }
+        { name: 'Accueil',     file: 'accueil.mp3',            track: 'home'    },
+        { name: 'Level 1',     file: 'Level1.mp3',             track: 'level1'  },
+        { name: 'Level 2',     file: 'Level 2.mp3',            track: 'level2'  },
+        { name: 'Level 3',     file: 'Level 3.mp3',            track: 'level3'  },
+        { name: 'Level 4',     file: 'level 4.mp3',            track: 'level4'  },
+        { name: 'Boss 1',      file: 'Boss 1.mp3',             track: 'boss1'   },
+        { name: 'Generique',   file: 'generique de fin.mp3',   track: 'ending'  }
     ];
 
     var DEFAULT_VOLUME = 0.4;
@@ -119,7 +121,17 @@
         }
     }
 
-    /* ---------- Music player UI ---------- */
+    /* ---------- Music player UI (compact, non intrusive) ----------
+       Le lecteur est volontairement replie par defaut et ancre en haut a
+       gauche : il ne doit jamais recouvrir le canvas ni capter les taps
+       de jeu (les evenements sont stoppes sur le panneau). */
+
+    var toggleBtn = document.createElement('button');
+    toggleBtn.className = 'da-audio-toggle';
+    toggleBtn.title = 'Musique & sons';
+    toggleBtn.setAttribute('aria-label', 'Musique & sons');
+    toggleBtn.textContent = '\u{1F3B5}';
+
     var playerRoot = document.createElement('div');
     playerRoot.id = 'da-music-player';
 
@@ -129,7 +141,7 @@
     var prevBtn = document.createElement('button');
     prevBtn.className = 'da-music-btn';
     prevBtn.title = 'Previous track';
-    prevBtn.textContent = '⏮';
+    prevBtn.textContent = '\u23EE';
 
     var playBtn = document.createElement('button');
     playBtn.className = 'da-music-btn da-music-play';
@@ -182,96 +194,156 @@
         selectEl.appendChild(opt);
     }
 
-    playerRoot.appendChild(titleEl);
-    playerRoot.appendChild(prevBtn);
-    playerRoot.appendChild(playBtn);
-    playerRoot.appendChild(nextBtn);
-    playerRoot.appendChild(selectEl);
-    playerRoot.appendChild(volumeEl);
-    playerRoot.appendChild(muteSfxBtn);
-    playerRoot.appendChild(sfxVolumeEl);
+    // Ligne 1 : titre + lecture ; ligne 2 : navigation + selection ;
+    // ligne 3 : volumes. Sur mobile le panneau reste empile verticalement.
+    var rowMain = document.createElement('div');
+    rowMain.className = 'da-row';
+    rowMain.appendChild(titleEl);
+    rowMain.appendChild(playBtn);
+
+    var rowNav = document.createElement('div');
+    rowNav.className = 'da-row';
+    rowNav.appendChild(prevBtn);
+    rowNav.appendChild(nextBtn);
+    rowNav.appendChild(selectEl);
+
+    var rowVol = document.createElement('div');
+    rowVol.className = 'da-row';
+    rowVol.appendChild(volumeEl);
+    rowVol.appendChild(muteSfxBtn);
+    rowVol.appendChild(sfxVolumeEl);
+
+    playerRoot.appendChild(rowMain);
+    playerRoot.appendChild(rowNav);
+    playerRoot.appendChild(rowVol);
+
+    /* Le panneau ne doit pas declencher le pilotage du jeu : les ecouteurs
+       globaux de script.js ecoutent mousedown/touchstart sur document. */
+    ['mousedown', 'mouseup', 'touchstart', 'touchend', 'click', 'pointerdown'].forEach(function (evt) {
+        playerRoot.addEventListener(evt, function (e) { e.stopPropagation(); });
+        toggleBtn.addEventListener(evt, function (e) { e.stopPropagation(); });
+    });
+
+    function setPanelOpen(open) {
+        playerRoot.classList.toggle('da-open', open);
+        toggleBtn.classList.toggle('da-active', open);
+        toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    toggleBtn.addEventListener('click', function () {
+        setPanelOpen(!playerRoot.classList.contains('da-open'));
+    });
+    // Referme si on clique ailleurs, sans laisser passer l'evenement de jeu.
+    document.addEventListener('pointerdown', function (e) {
+        if (!playerRoot.classList.contains('da-open')) return;
+        if (playerRoot.contains(e.target) || toggleBtn.contains(e.target)) return;
+        setPanelOpen(false);
+    });
 
     var style = document.createElement('style');
     style.textContent = [
+        '/* Bouton dans le flux du header : il ne peut donc ni recouvrir le',
+        '   canvas, ni chevaucher le bouton « Contacter le dev » (fixed, en',
+        '   haut a droite), ni passer au-dessus du bouton Hub. */',
+        '.da-audio-toggle {',
+        '    position: static;',
+        '    display: inline-flex;',
+        '    align-items: center;',
+        '    justify-content: center;',
+        '    width: 32px;',
+        '    height: 32px;',
+        '    margin-left: 6px;',
+        '    padding: 0;',
+        '    background: rgba(15, 15, 25, 0.8);',
+        '    color: #fff;',
+        '    border: 1px solid rgba(255, 255, 255, 0.2);',
+        '    border-radius: 8px;',
+        '    font-size: 14px;',
+        '    line-height: 1;',
+        '    vertical-align: middle;',
+        '    cursor: pointer;',
+        '    touch-action: manipulation;',
+        '    -webkit-tap-highlight-color: transparent;',
+        '}',
+        '.da-audio-toggle.da-active {',
+        '    background: rgba(126, 200, 255, 0.25);',
+        '    border-color: rgba(126, 200, 255, 0.6);',
+        '}',
         '#da-music-player {',
         '    position: fixed;',
-        '    bottom: 12px;',
-        '    left: 12px;',
-        '    right: 12px;',
-        '    z-index: 9999;',
-        '    display: flex;',
-        '    align-items: center;',
-        '    gap: 6px;',
-        '    padding: 6px 10px;',
-        '    background: rgba(15, 15, 25, 0.85);',
+        '    top: 8px;',
+        '    left: 8px;',
+        '    z-index: 10001;',
+        '    display: none;',
+        '    flex-direction: column;',
+        '    gap: 5px;',
+        '    width: 190px;',
+        '    max-width: calc(100vw - 16px);',
+        '    padding: 7px 9px;',
+        '    background: rgba(15, 15, 25, 0.9);',
         '    border: 1px solid rgba(255, 255, 255, 0.18);',
         '    border-radius: 10px;',
-        '    backdrop-filter: blur(6px);',
-        '    -webkit-backdrop-filter: blur(6px);',
-        '    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);',
         '    color: #fff;',
         '    font-family: "Press Start 2P", cursive;',
-        '    font-size: 9px;',
-        '    max-width: calc(100vw - 24px);',
-        '    overflow: hidden;',
+        '    font-size: 8px;',
+        '    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);',
+        '    touch-action: manipulation;',
+        '}',
+        '#da-music-player.da-open { display: flex; }',
+        '#da-music-player .da-row {',
+        '    display: flex;',
+        '    align-items: center;',
+        '    gap: 5px;',
         '}',
         '#da-music-player .da-music-title {',
-        '    font-size: 10px;',
+        '    font-size: 9px;',
         '    white-space: nowrap;',
         '    overflow: hidden;',
         '    text-overflow: ellipsis;',
-        '    max-width: 100px;',
-        '    flex-shrink: 0;',
+        '    flex: 1 1 auto;',
+        '    min-width: 0;',
         '}',
         '#da-music-player .da-music-btn {',
         '    background: transparent;',
         '    color: #fff;',
         '    border: none;',
-        '    font-size: 14px;',
+        '    font-size: 13px;',
         '    line-height: 1;',
         '    cursor: pointer;',
-        '    padding: 4px 6px;',
-        '    border-radius: 50%;',
-        '    transition: transform 0.15s ease, background 0.15s ease;',
+        '    padding: 3px 4px;',
         '    flex-shrink: 0;',
         '}',
-        '#da-music-player .da-music-btn:hover {',
-        '    background: rgba(255, 255, 255, 0.15);',
-        '    transform: scale(1.12);',
-        '}',
-        '#da-music-player .da-music-play { font-size: 16px; }',
-        '#da-music-player .da-music-volume,',
-        '#da-music-player .da-sfx-volume {',
-        '    width: 60px;',
+        '#da-music-player .da-music-play { font-size: 15px; }',
+        '#da-music-player .da-music-volume {',
+        '    width: 58px;',
         '    accent-color: #7ec8ff;',
         '    cursor: pointer;',
-        '    flex-shrink: 0;',
+        '    flex: 1 1 auto;',
+        '    min-width: 0;',
         '}',
         '#da-music-player .da-music-select {',
         '    background: rgba(255, 255, 255, 0.1);',
         '    color: #fff;',
         '    border: 1px solid rgba(255, 255, 255, 0.2);',
         '    border-radius: 4px;',
-        '    padding: 2px 4px;',
+        '    padding: 2px 3px;',
         '    font-family: "Press Start 2P", cursive;',
-        '    font-size: 8px;',
+        '    font-size: 7px;',
         '    cursor: pointer;',
-        '    flex-shrink: 1;',
+        '    flex: 1 1 auto;',
         '    min-width: 0;',
         '}',
-        '@media (max-width: 480px) {',
-        '    #da-music-player { font-size: 8px; padding: 4px 6px; gap: 4px; }',
-        '    #da-music-player .da-music-title { max-width: 60px; font-size: 8px; }',
-        '    #da-music-player .da-music-volume, #da-music-player .da-sfx-volume { width: 40px; }',
-        '    #da-music-player .da-music-btn { font-size: 12px; padding: 3px 4px; }',
-        '    #da-music-player .da-music-play { font-size: 13px; }',
+        '@media (max-width: 700px) {',
+        '    .da-audio-toggle { width: 28px; height: 28px; font-size: 12px; }',
+        '    #da-music-player { top: 6px; left: 6px; width: 168px; }',
+        '    #da-music-player .da-music-volume { width: 46px; }',
         '}'
     ].join('\n');
     document.head.appendChild(style);
 
     function updateTitle() {
         var track = findTrackByKey(currentTrackKey);
-        titleEl.textContent = '🎵 ' + (track ? track.name : '');
+        titleEl.textContent = '\u{1F3B5} ' + (track ? track.name : '');
+        if (track) selectEl.value = track.track;
     }
 
     function updatePlayButton() {
@@ -656,6 +728,21 @@
 
     /* ---------- Boot ---------- */
     document.body.appendChild(playerRoot);
+
+    /* Le declencheur est place dans le header (a cote du bouton Hub) plutot
+       qu'en position fixe : il ne peut alors pas masquer le canvas ni le
+       bouton Pause, et suit la mise en page sur mobile. */
+    var headerEl = document.querySelector('header');
+    var gameHeaderEl = headerEl ? headerEl.querySelector('.game-header') : null;
+    if (gameHeaderEl) {
+        gameHeaderEl.insertBefore(toggleBtn, gameHeaderEl.children[1] || null);
+    } else if (headerEl) {
+        headerEl.insertBefore(toggleBtn, headerEl.firstChild);
+    } else {
+        document.body.appendChild(toggleBtn);
+    }
+
+    setPanelOpen(false);
     updateTitle();
     updatePlayButton();
     // Start with home music
