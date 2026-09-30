@@ -289,9 +289,10 @@
                     journal.sceneFouilleEvidence = journal.sceneFouilleEvidence || [];
                     if (journal.sceneFouilleEvidence.indexOf(spot.label) === -1) {
                         journal.sceneFouilleEvidence.push(spot.label);
+                        var lang = window && window.ui ? window.ui.language : 'en';
                         journal['evidence_' + spot.label] = {
-                            title: spot.title && spot.title.fr ? spot.title.fr : spot.label,
-                            info: spot.info && spot.info.fr ? spot.info.fr : ''
+                            title: (spot.title && (spot.title[lang] || spot.title.fr)) || spot.label,
+                            info: (spot.info && (spot.info[lang] || spot.info.fr)) || ''
                         };
                         localStorage.setItem('td_journal', JSON.stringify(journal));
                     }
@@ -302,8 +303,9 @@
 
             function showEvidence(spot) {
                 if (!$evidenceCard) return;
-                $evidenceTitle.textContent = (spot.title && spot.title.fr) || spot.label;
-                $evidenceText.textContent = (spot.info && spot.info.fr) || '';
+                var lang = window && window.ui ? window.ui.language : 'en';
+                $evidenceTitle.textContent = (spot.title && (spot.title[lang] || spot.title.fr)) || spot.label;
+                $evidenceText.textContent = (spot.info && (spot.info[lang] || spot.info.fr)) || '';
                 $evidenceCard.classList.add('visible');
             }
 

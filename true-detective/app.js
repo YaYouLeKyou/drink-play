@@ -2333,6 +2333,16 @@ function buildTransitionPages(sceneData) {
             return;
         }
 
+        // Handle scenario mode (V2) - check if scenario is active
+        if (typeof scr !== 'undefined' && scr && scr.active) {
+            ui.isWaiting = true;
+            if (TDAudioService) {
+                TDAudioService.stopSpeaking();
+            }
+            scrNext();
+            return;
+        }
+
         ui.isWaiting = true;
 
         if (TDAudioService) {
