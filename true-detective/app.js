@@ -386,6 +386,13 @@
         var notebook = document.getElementById('notebook');
         var isNotebookOpen = notebook && notebook.classList.contains('open');
 
+        // Clean up any stale .interrogation-ask elements that could hide
+        // the continue button via the body:has() CSS rule.
+        var staleAsk = document.querySelectorAll('#game-screen .interrogation-ask');
+        for (var i = 0; i < staleAsk.length; i++) {
+            if (staleAsk[i].parentNode) staleAsk[i].parentNode.removeChild(staleAsk[i]);
+        }
+
         if ($.continueBtn) {
             if (isStoryScreen && !isActPageVisible && !isNotebookOpen) {
                 $.continueBtn.classList.remove('hidden');
@@ -3882,6 +3889,14 @@ function scrCurrentPhase() { return window.TDPhases[scr.phaseIdx] || null; }
         $.continueBtn.classList.remove('hidden');
         $.continueBtn.disabled = false;
         $.continueBtn.onclick = handleContinue;
+        /* Nettoyer les boutons .interrogation-ask orphelins : sur mobile,
+           la regle CSS body:has(#game-screen .interrogation-ask) masque
+           le bouton Continuer, et un bouton orphelin d'une page precedente
+           pouvait le faire de facon permanente. */
+        var staleAsk = document.querySelectorAll('#game-screen .interrogation-ask');
+        for (var i = 0; i < staleAsk.length; i++) {
+            if (staleAsk[i].parentNode) staleAsk[i].parentNode.removeChild(staleAsk[i]);
+        }
         $.npcName.textContent = '';
         hideNPC();
 
@@ -4329,7 +4344,9 @@ if (mgCfg.type === 'montre_code' && res.notes) {
                     : null;
                 var storyConfig = Object.assign({}, page.minigame, {
                     interroId: page.interrogation || 'page',
-                    culprit: 'criminel',
+                    /* Meme correction : le mini-jeu doit afficher le suspect
+                       de la page, pas toujours Krane. */
+                    culprit: page.interrogation || page.npc || scrTruthCulpritId(),
                     minigameIntro: (interroData && interroData.minigameIntro) || page.minigame.minigameIntro || null,
                     dialogues: interroData ? extractInterrogationDialogues(interroData) : page.minigame.dialogues || []
                 });
@@ -4340,6 +4357,14 @@ if (mgCfg.type === 'montre_code' && res.notes) {
         $.continueBtn.classList.remove('hidden');
         $.continueBtn.disabled = false;
         $.continueBtn.textContent = getText('continue') || 'Continuer';
+        /* Nettoyer les boutons .interrogation-ask orphelins : sur mobile,
+           la regle CSS body:has(#game-screen .interrogation-ask) masque
+           le bouton Continuer, et un bouton orphelin d'une page precedente
+           pouvait le faire de facon permanente. */
+        var staleAsk = document.querySelectorAll('#game-screen .interrogation-ask');
+        for (var i = 0; i < staleAsk.length; i++) {
+            if (staleAsk[i].parentNode) staleAsk[i].parentNode.removeChild(staleAsk[i]);
+        }
         $.continueBtn.onclick = function () {
             $.continueBtn.disabled = true;
             if (standaloneType) {
@@ -4827,6 +4852,13 @@ if (mgCfg.type === 'montre_code' && res.notes) {
     function scrEndInterrogation() {
         scr.interro.done = true;
         scr.awaitingChoice = false;
+        /* Nettoyer les boutons .interrogation-ask orphelins qui pourraient
+           rester dans le DOM et declencher la regle CSS body:has() qui masque
+           le bouton Continuer. */
+        var staleAsk = document.querySelectorAll('#game-screen .interrogation-ask');
+        for (var i = 0; i < staleAsk.length; i++) {
+            if (staleAsk[i].parentNode) staleAsk[i].parentNode.removeChild(staleAsk[i]);
+        }
         /* L'interrogatoire est fini : plus de bouton « Interroger », donc
            « Continuer » redevient l'unique action possible et doit reapparaitre.
            Le retrait du garde isMobile() va avec le masquage inconditionnel
@@ -5258,6 +5290,118 @@ if (mgCfg.type === 'montre_code' && res.notes) {
         }
     }
 
+    /* =====================================================================
+       RÉVÉLATION D'INDICE DANS LA TALKBOX
+       ---------------------------------------------------------------------
+       Victoire d'un mini-jeu = le suspect affronté lâche un indice. Jusqu'ici
+       l'indice n'etait montre que par un toast : le joueur le lisait seul, sans lien
+       avec la personne qu'il vient de battre. On l'inscrit donc dans la
+       talkbox, en plein dialogue, avec le suspect RÉELLEMENT affronté
+       (celui de l'interrogatoire en cours) — et non un suspect figé dans la
+       config du mini-jeu, qui ramenait toujours Victor Krane quel que soit
+       l'interrogatoire en cours.
+       ===================================================================== */
+    /* Réactions d'ouverture : chacune son ton, pour que la révélation ne
+       soit jamais un simple texte déversé dans la boîte. */
+    var CLUE_REVEAL_LEAD = {
+        protecteur: {
+            fr: 'Vous ne me battrez pas à la parole. Puisque vous l\'emportez, voilà ma part de vérité :',
+            en: 'You will not beat me with words. Since you win, here is my share of the truth:'
+        },
+        'femme-fatale': {
+            fr: 'Voilà des années que personne ne m\'a fait perdre. Prenez donc ce que je ne pouvais plus garder :',
+            en: 'It has been years since anyone beat me. Take what I could no longer keep:'
+        },
+        seducteur: {
+            fr: 'Bravo. J\'ai trahi trop de monde pour rien. Voici ce que je n\'aurais jamais dû dire :',
+            en: 'Bravo. I have betrayed too many for nothing. Here is what I should never have said:'
+        },
+        suspect: {
+            fr: 'Vous avez fait diligence. Un homme qui tient ses comptes finit par lâcher une ligne :',
+            en: 'You were thorough. An accountant who keeps his books eventually lets a line slip:'
+        },
+        marginal: {
+            fr: 'Vous savez compter, vous. Moi je sais seulement regarder. Tenez, ce que j\'ai vu :',
+            en: 'You know how to count. I only know how to look. Here is what I saw:'
+        },
+        criminel: {
+            fr: 'Un métier est un métier. Vous avez gagné, je paie donc — une fois :',
+            en: 'A job is a job. You won, so I pay — once:'
+        },
+        'detective-partner': {
+            fr: 'Je ne vous dois rien. Mais vous avez fait ce que je n\'aurais pas dû vous laisser faire. Tenez :',
+            en: 'I owe you nothing. But you did what I should not have let you do. Here:'
+        },
+        detective: {
+            fr: 'Vous m\'avez percé à jour. C\'est la première fois depuis longtemps. Voici ce que j\'ai enterré :',
+            en: 'You saw through me. It is the first time in a long while. Here is what I buried:'
+        }
+    };
+
+    var CLUE_REVEAL_LEAD_DEFAULT = {
+        fr: 'Vous avez gagné. Voici ce que je vous dois :',
+        en: 'You have won. Here is what I owe you:'
+    };
+
+    var CLUE_REVEAL_CLOSE = {
+        fr: 'Mettez ça dans votre carnet. Et priez pour que ça suffise.',
+        en: 'Put that in your notebook. And pray it is enough.'
+    };
+
+    /* Construit le texte de révélation. `clueText` est l'indice gagne. */
+    function scrClueRevealText(suspectId, clueText) {
+        var lang = ui.language === 'en' ? 'en' : 'fr';
+        var lead = (CLUE_REVEAL_LEAD[suspectId] || CLUE_REVEAL_LEAD_DEFAULT)[lang]
+            || CLUE_REVEAL_LEAD_DEFAULT[lang];
+        var clue = TDScenario.t(clueText, lang);
+        if (typeof clue !== 'string' || !clue) clue = clueText || '';
+        return lead + '\n\n« ' + clue + ' »\n\n' + (CLUE_REVEAL_CLOSE[lang] || CLUE_REVEAL_CLOSE.fr);
+    }
+
+    /* Affiche la révélation dans la talkbox principale, avec le portrait et
+       le nom du suspect. `onDone` est appelé quand le joueur referme. */
+    function scrShowClueReveal(suspectId, clueText, onDone) {
+        var npcId = suspectId || (scr && scr.interro ? scr.interro.id : null);
+        var txt = scrClueRevealText(npcId, clueText);
+        txt = scrSubstituteNames(txt, getThemeId());
+
+        if ($.choicesContainer) $.choicesContainer.innerHTML = '';
+        /* Le bouton « Interroger » (.interrogation-ask) doit disparaitre : tant
+           qu'il est dans le DOM, la regle
+           `body:has(#game-screen .interrogation-ask) #continue-btn` masque
+           « Continuer » en `display:none !important`, et le joueur resterait
+           bloque devant cette revelation, sans moyen de la refermer. */
+        var staleAsk = document.querySelectorAll('#game-screen .interrogation-ask');
+        for (var i = 0; i < staleAsk.length; i++) {
+            if (staleAsk[i].parentNode) staleAsk[i].parentNode.removeChild(staleAsk[i]);
+        }
+        if ($.conversationInput) $.conversationInput.classList.add('hidden');
+        if ($.npcName) $.npcName.textContent = scrNpcName(npcId);
+        var npcImg = scrNpcImage(npcId);
+        if (npcImg) loadNPCImage(npcImg);
+        else hideNPC();
+        updateObjective('');
+
+        if ($.continueBtn) {
+            $.continueBtn.classList.remove('hidden');
+            $.continueBtn.disabled = true;
+            $.continueBtn.textContent = '';
+            $.continueBtn.onclick = null;
+        }
+        /* Vitesse de frappe légèrement accélérée : une révélation d'indice
+           fait généralement 3 lignes, et la frappe au ralenti retardait
+           l'enchaînement de la scène. */
+        typeWriter(txt, function () {
+            if (!$.continueBtn) { if (onDone) onDone(); return; }
+            $.continueBtn.disabled = false;
+            $.continueBtn.textContent = getText('continue') || 'Continuer';
+            $.continueBtn.onclick = function () {
+                $.continueBtn.disabled = true;
+                if (typeof onDone === 'function') onDone();
+            };
+        }, 12);
+    }
+
     function scrHandleMinigameResult(roundIndex, result) {
         var it = scr.interro;
         if (!it) return;
@@ -5280,21 +5424,56 @@ if (mgCfg.type === 'montre_code' && res.notes) {
             updateNotebook();
         }
 
+        /* En cas de VICTOIRE, l'indice ne doit pas disparaitre dans un toast :
+           le suspect affronté le livre de vive voix dans la talkbox. On
+           attend que le joueur referme ce dialogue avant d'enchaîner. */
+        var facedSuspect = it.id;
+        function proceed() {
+            it.minigameRound = roundIndex + 1;
+            scrEndInterrogation();
+        }
+        function revealThenProceed() {
+            if (won && clueText) {
+                scrShowClueReveal(facedSuspect, clueText, proceed);
+            } else {
+                proceed();
+            }
+        }
+
         /* Laisser le suspect afficher sa réaction avant de fermer l'overlay. */
         if (window.TDStoryChrome && window.TDStoryChrome.isActive && window.TDStoryChrome.isActive()) {
             window.TDStoryChrome.trigger(won ? 'victory' : 'defeat', { text: clueText });
             setTimeout(function () {
                 scrFinishMinigameOverlay();
-                it.minigameRound = roundIndex + 1;
-                scrEndInterrogation();
+                revealThenProceed();
             }, won ? 1800 : 1200);
             return;
         }
 
         scrFinishMinigameOverlay();
-        it.minigameRound = roundIndex + 1;
-        scrEndInterrogation();
+        revealThenProceed();
     }
+
+    /* ---------------------------------------------------------------------
+       Pont de test (aucun effet en jeu).
+       Le flux de revelation vit dans la closure de app.js : sans ce point
+       d'entree, impossible de le verifier de facon deterministe en
+       navigateur. `simulateVictory` rejoue une manche gagnee pour un suspect
+       donne, en passant par le vrai scrHandleMinigameResult.
+       Utilise par tools/test-clue-reveal.js.
+       --------------------------------------------------------------------- */
+    window.TDClueReveal = {
+        buildText: scrClueRevealText,
+        show: scrShowClueReveal,
+        suspects: Object.keys(CLUE_REVEAL_LEAD),
+        simulateVictory: function (suspectId, clue) {
+            scr.interro = {
+                id: suspectId, questionRound: 99, minigameRound: 0,
+                done: false, questionsDone: true, fromDuel: true
+            };
+            scrHandleMinigameResult(0, { won: true, clue: clue });
+        }
+    };
 
     function scrFinishMinigameOverlay() {
         if (typeof window._interroSidebarCleanup === 'function') {
@@ -5421,7 +5600,11 @@ if (mgCfg.type === 'montre_code' && res.notes) {
             interroId: roundCfg.interroId,
             minigameIntro: roundCfg.minigameIntro,
             storyMode: true,
-            culprit: 'criminel'
+            /* Le suspect reellement affronte : avant, la valeur etait figee a
+               'criminel' (Victor Krane) quel que soit l'interrogatoire, si
+               bien que le portrait et les dialogues du mini-jeu montraient
+               toujours Krane, meme en confrontant Hale ou Vivienne. */
+            culprit: (scr.interro && scr.interro.id) ? scr.interro.id : scrTruthCulpritId()
         };
         if (mgCfg.difficulty) applyDifficultyToCfg(mgCfg.type, mgCfg, mgCfg.difficulty);
 
